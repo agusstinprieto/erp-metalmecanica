@@ -1,0 +1,143 @@
+import { supabase } from '../lib/supabase';
+
+export interface Employee {
+  id: string;
+  employee_number: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  rfc: string;
+  curp: string;
+  nss: string;
+  job_title: string;
+  department: string;
+  hire_date: string;
+  daily_salary: number;
+  monthly_salary?: number;
+  contract_type?: string;
+  benefits?: string[];
+  status: 'active' | 'inactive' | 'vacation' | 'medical_leave';
+  photo_url?: string;
+  documents?: Record<string, string>;
+  shift_id?: string;
+}
+
+export const employeeService = {
+  /**
+   * Obtiene todos los empleados del tenant activo.
+   */
+  async listEmployees() {
+    const { data: tenantData } = await supabase.from('tenants').select('id').limit(1).maybeSingle();
+    let query = supabase.from('employees').select('*').order('employee_number', { ascending: true });
+
+    if (tenantData) {
+      query = query.eq('tenant_id', tenantData.id);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('Error fetching employees:', error);
+      throw error;
+    }
+
+    return data as Employee[];
+  },
+
+  /**
+   * Crea un nuevo empleado.
+   */
+  async createEmployee(employee: Partial<Employee>) {
+    const { data: tenantData } = await supabase.from('tenants').select('id').limit(1).maybeSingle();
+
+    const { data, error } = await supabase
+      .from('employees')
+      .insert({ ...employee, tenant_id: tenantData?.id })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating employee:', error);
+      throw error;
+    }
+
+    return data as Employee;
+  },
+
+  /**
+   * Actualiza un empleado existente.
+   */
+  async updateEmployee(id: string, updates: Partial<Employee>) {
+    const { data, error } = await supabase
+      .from('employees')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating employee:', error);
+      throw error;
+    }
+
+    return data as Employee;
+  },
+
+  /**
+   * Elimina un empleado.
+   */
+  async deleteEmployee(id: string) {
+    const { error } = await supabase
+      .from('employees')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting employee:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Sube una foto de empleado al almacenamiento de Supabase.
+   */
+  async uploadPhoto(employeeId: string, file: File) {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${employeeId}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const filePath = `employee-photos/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('erp-assets')
+      .upload(filePath, file);
+
+    if (uploadError) {
+      console.error('Error uploading photo:', uploadError);
+      throw uploadError;
+    }
+
+    const { data } = supabase.storage.from('erp-assets').getPublicUrl(filePath);
+    return data.publicUrl;
+  },
+
+  /**
+   * Sube un documento del expediente digital.
+   */
+  async uploadDocument(employeeId: string, docType: string, file: File) {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${employeeId}-${docType}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const filePath = `employee-documents/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('erp-assets')
+      .upload(filePath, file);
+
+    if (uploadError) {
+      console.error('Error uploading document:', uploadError);
+      throw uploadError;
+    }
+
+    const { data } = supabase.storage.from('erp-assets').getPublicUrl(filePath);
+    return data.publicUrl;
+  }
+};

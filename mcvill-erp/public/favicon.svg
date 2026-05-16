@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="zap-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4FA5FF"/>
+      <stop offset="100%" stop-color="#3B82F6"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <!-- Background for contrast in browser tabs -->
+  <rect width="64" height="64" rx="16" fill="#020617" opacity="0.1"/>
+  <path 
+    d="M34.6 5.3 8 37.3h24l-2.6 21.3 26.6-32H32l2.6-21.3z" 
+    fill="url(#zap-grad)" 
+    filter="url(#glow)"
+  />
+</svg>

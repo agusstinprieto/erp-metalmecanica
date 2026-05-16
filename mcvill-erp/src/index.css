@@ -1,0 +1,498 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display: 'Outfit', sans-serif;
+  
+  /* Shared Base Tokens */
+  --color-mcvill-blue: #3B82F6;
+  --color-mcvill-blue-accent: #4FA5FF;
+  --color-mcvill-cyber: #00D1FF;
+  
+  /* Semantic Tokens */
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+  --color-info: #3B82F6;
+
+  /* Variables that change per theme */
+  --color-mcvill-accent: var(--theme-accent);
+  --color-mcvill-bg: var(--theme-bg);
+  --color-mcvill-card: var(--theme-card);
+  --color-mcvill-card-border: var(--theme-card-border);
+  --color-mcvill-text: var(--theme-text);
+  --color-mcvill-text-muted: var(--theme-text-muted);
+  
+  --shadow-cyber: var(--theme-shadow);
+  --shadow-cyber-lg: var(--theme-shadow-lg);
+  
+  @keyframes slow-zoom {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.15); }
+  }
+
+  --animate-glow: glow 2s ease-in-out infinite alternate;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-slow-zoom: slow-zoom 20s ease-in-out infinite alternate;
+
+  @keyframes glow {
+    from { text-shadow: 0 0 10px var(--theme-glow); }
+    to { text-shadow: 0 0 20px var(--theme-glow), 0 0 30px var(--theme-glow); }
+  }
+  
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+  }
+}
+
+/* Dark Mode - Blue/Black (Default) */
+:root, .dark {
+  color-scheme: dark;
+  accent-color: #4FA5FF;
+  --theme-accent: #4FA5FF;
+ /* 🚀 AGUS PRO: Azul Neural vibrante para máxima legibilidad */
+  --theme-bg: #020617;
+  --theme-card: rgba(15, 23, 42, 0.6);
+  --theme-card-border: rgba(79, 165, 255, 0.2); /* Azul Neural sutil y elegante */
+  --theme-text: #f1f5f9;
+  --theme-text-muted: #94a3b8;
+  --theme-glow: rgba(79, 165, 255, 0.5);
+  --theme-shadow: 0 0 20px rgba(79, 165, 255, 0.1);
+  --theme-shadow-lg: 0 0 40px rgba(79, 165, 255, 0.2);
+}
+
+/* Global Border Overrides to prevent white borders */
+.dark .border-white\/5,
+.dark .border-white\/10,
+.dark .border-white\/20,
+.dark .border-slate-800,
+.dark .border-slate-700 {
+  border-color: var(--theme-card-border) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LIGHT MODE — McVill Professional
+   Fondo: slate-50 tintado azul · Cards: blanco con sombra real
+   ═══════════════════════════════════════════════════════════ */
+.light {
+  color-scheme: light;
+  /* --theme-accent, --theme-card-border, --theme-glow se inyectan por ConfigContext */
+  --theme-bg:          #F0F4F8;
+  --theme-card:        #FFFFFF;
+  --theme-card-border: #CBD5E1;           /* slate-300 fijo — visible sin depender del acento */
+  --theme-text:        #0F172A;           /* slate-950 */
+  --theme-text-muted:  #475569;           /* slate-600 — más contrastado */
+  --theme-glow:        rgba(29,78,216,0.12);
+  --theme-shadow:      0 1px 4px rgba(15,23,42,0.10), 0 4px 16px rgba(15,23,42,0.06);
+  --theme-shadow-lg:   0 4px 16px rgba(15,23,42,0.12), 0 12px 32px rgba(15,23,42,0.08);
+}
+
+/* ── Fondos ─────────────────────────────────────────────── */
+.light .bg-slate-950,
+.light .bg-slate-900,
+.light .bg-slate-800 { background-color: #F1F5F9 !important; }
+
+.light .bg-slate-950\/40,
+.light .bg-slate-950\/50,
+.light .bg-slate-950\/80,
+.light .bg-slate-950\/90,
+.light .bg-slate-950\/95,
+.light .bg-slate-900\/80,
+.light .bg-slate-900\/30,
+.light .bg-slate-900\/40,
+.light .bg-slate-900\/50,
+.light .bg-slate-900\/60 { background-color: rgba(241,245,249,0.97) !important; }
+
+.light .bg-black\/20,
+.light .bg-black\/30,
+.light .bg-black\/40,
+.light .bg-black\/60,
+.light .bg-black\/80 { background-color: rgba(255,255,255,0.92) !important; }
+
+.light .bg-white\/5  { background-color: color-mix(in srgb, var(--theme-accent), transparent 96%) !important; }
+.light .bg-white\/10 { background-color: color-mix(in srgb, var(--theme-accent), transparent 94%) !important; }
+.light .bg-white\/20 { background-color: color-mix(in srgb, var(--theme-accent), transparent 91%) !important; }
+
+/* ── Cards y panels ─────────────────────────────────────── */
+.light .glass-premium,
+.light .cyber-panel {
+  background-color: #FFFFFF !important;
+  border-color: var(--theme-card-border) !important;
+  box-shadow: var(--theme-shadow) !important;
+}
+.light .cyber-panel:hover {
+  border-color: rgba(29,78,216,0.30) !important;
+  box-shadow: var(--theme-shadow-lg) !important;
+}
+
+/* Modales — backdrop + panel */
+.light .backdrop-blur-xl,
+.light .backdrop-blur-2xl,
+.light .backdrop-blur-3xl { --tw-backdrop-blur: blur(24px); }
+
+/* ── Bordes ─────────────────────────────────────────────── */
+.light .border-white\/5,
+.light .border-white\/10,
+.light .border-white\/20,
+.light .border-white\/30 { border-color: #E2E8F0 !important; }
+
+.light .border-slate-700,
+.light .border-slate-800 { border-color: #CBD5E1 !important; }
+
+/* ── Texto ──────────────────────────────────────────────── */
+.light .text-white        { color: #0F172A !important; }
+.light .text-slate-200    { color: #1E293B !important; }
+.light .text-slate-300    { color: #334155 !important; }
+.light .text-slate-400    { color: #475569 !important; }
+.light .text-slate-500    { color: #64748B !important; }
+.light .text-slate-600    { color: #475569 !important; }
+
+.light .hover\:text-white:hover   { color: #1E3A8A !important; }
+
+/* Colores de acento — mantener en light */
+.light .text-blue-400,
+.light .text-blue-500,
+.light .text-blue-600,
+.light .text-mcvill-accent { color: var(--theme-accent) !important; }
+.light .text-emerald-400,
+.light .text-emerald-500  { color: #059669 !important; }
+.light .text-amber-400,
+.light .text-amber-500    { color: #D97706 !important; }
+.light .text-red-400,
+.light .text-red-500      { color: #DC2626 !important; }
+.light .text-rose-400,
+.light .text-rose-500     { color: #E11D48 !important; }
+.light .text-orange-400,
+.light .text-orange-500   { color: #EA580C !important; }
+.light .text-violet-400,
+.light .text-violet-500   { color: #2563EB !important; }
+.light .text-indigo-400,
+.light .text-indigo-500   { color: #1D4ED8 !important; }
+
+/* ── Inputs y selects ───────────────────────────────────── */
+.light .cyber-input,
+.light input[class*="bg-"],
+.light textarea[class*="bg-"] {
+  background-color: #FFFFFF !important;
+  border-color: #CBD5E1 !important;
+  color: #0F172A !important;
+}
+.light .cyber-input:focus,
+.light input[class*="bg-"]:focus,
+.light textarea[class*="bg-"]:focus {
+  border-color: #1D4ED8 !important;
+  box-shadow: 0 0 0 4px rgba(29,78,216,0.15) !important;
+}
+.light input::placeholder,
+.light textarea::placeholder { color: #94A3B8 !important; }
+.light select option { background-color: #FFFFFF !important; color: #0F172A !important; }
+
+/* ── Tablas — filas ─────────────────────────────────────── */
+.light .hover\:bg-blue-600\/5:hover  { background-color: rgba(29,78,216,0.04) !important; }
+.light .hover\:bg-white\/5:hover     { background-color: rgba(29,78,216,0.04) !important; }
+.light .hover\:bg-white\/10:hover    { background-color: rgba(29,78,216,0.06) !important; }
+.light .bg-blue-600\/10              { background-color: rgba(29,78,216,0.08) !important; }
+.light tr:hover                      { background-color: rgba(29,78,216,0.03) !important; }
+.light thead tr                      { background-color: #F1F5F9 !important; }
+
+/* ── Botones ─────────────────────────────────────────────── */
+.light .hover\:bg-white\/10:hover   { background-color: rgba(29,78,216,0.06) !important; }
+.light .hover\:bg-slate-800:hover   { background-color: #E2E8F0 !important; }
+
+/* ── Badge / pill colores de estado — sin cambios ─────── */
+/* mantener azul/verde/rojo/naranja en ambos modos */
+
+/* ── Scrollbar ──────────────────────────────────────────── */
+.light ::-webkit-scrollbar-thumb    { background-color: #94A3B8 !important; }
+
+/* ── Fondos oscuros adicionales (slate-800/900/950 con opacidad) ── */
+.light .bg-slate-950\/20,
+.light .bg-slate-950\/30,
+.light .bg-slate-950\/60 { background-color: rgba(241,245,249,0.97) !important; }
+
+.light .bg-slate-900\/10,
+.light .bg-slate-900\/20 { background-color: rgba(241,245,249,0.92) !important; }
+
+.light .bg-slate-800,
+.light .bg-slate-800\/40,
+.light .bg-slate-800\/50,
+.light .bg-slate-800\/60,
+.light .bg-slate-800\/80 { background-color: #E8EFF7 !important; }
+
+.light .bg-slate-700,
+.light .bg-slate-700\/50,
+.light .bg-slate-700\/60 { background-color: #E2E8F0 !important; }
+
+/* ── Bordes adicionales ─────────────────────────────────── */
+.light .border-slate-800\/40,
+.light .border-slate-800\/50 { border-color: #D1D9E6 !important; }
+
+.light .border-slate-900,
+.light .border-slate-950  { border-color: #CBD5E1 !important; }
+
+/* ── Cyan → Azul en modo claro ──────────────────────────── */
+.light .bg-cyan-600,
+.light .hover\:bg-cyan-500:hover { background-color: #1D4ED8 !important; }
+.light .bg-cyan-500              { background-color: #2563EB !important; }
+.light .bg-cyan-500\/5           { background-color: rgba(37,99,235,0.04) !important; }
+.light .bg-cyan-500\/10          { background-color: rgba(37,99,235,0.06) !important; }
+.light .bg-cyan-500\/20          { background-color: rgba(37,99,235,0.10) !important; }
+.light .bg-cyan-400\/10          { background-color: rgba(37,99,235,0.06) !important; }
+.light .bg-cyan-950\/20          { background-color: rgba(241,245,249,0.97) !important; }
+
+.light .text-cyan-300            { color: #3B82F6 !important; }
+.light .text-cyan-400,
+.light .text-cyan-500            { color: #1D4ED8 !important; }
+
+.light .border-cyan-400\/20,
+.light .border-cyan-500\/10,
+.light .border-cyan-500\/20,
+.light .border-cyan-500\/30,
+.light .border-cyan-500\/40,
+.light .border-cyan-500\/50      { border-color: color-mix(in srgb, var(--theme-accent), transparent 82%) !important; }
+.light .border-cyan-900\/30      { border-color: color-mix(in srgb, var(--theme-accent), transparent 90%) !important; }
+
+/* ── Hover states oscuros ───────────────────────────────── */
+.light .hover\:bg-slate-800\/40:hover { background-color: #E2E8F0 !important; }
+.light .hover\:bg-slate-800:hover     { background-color: #CBD5E1 !important; }
+.light .hover\:border-slate-700:hover { border-color: rgba(29,78,216,0.22) !important; }
+.light .hover\:border-cyan-500\/30:hover { border-color: rgba(29,78,216,0.28) !important; }
+
+/* ── Textos oscuros que escapan a los overrides generales ─ */
+.light .text-slate-600 { color: #475569 !important; }
+.light .text-slate-700 { color: #334155 !important; }
+
+@layer base {
+  * {
+    @apply border-mcvill-card-border;
+  }
+  
+  body {
+    @apply bg-mcvill-bg text-mcvill-text font-sans selection:bg-mcvill-accent selection:text-white antialiased;
+    font-size: 14px;
+    letter-spacing: -0.01em;
+    transition: background-color 0.5s ease, color 0.5s ease;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-black tracking-tight uppercase;
+  }
+}
+
+@utility glass-premium {
+  @apply backdrop-blur-xl bg-mcvill-card border border-mcvill-card-border rounded-2xl;
+}
+
+@utility cyber-panel {
+  @apply glass-premium shadow-cyber overflow-hidden transition-all duration-500;
+  
+  &:hover {
+    @apply border-mcvill-accent/40 shadow-cyber-lg;
+  }
+}
+
+@utility cyber-input {
+  @apply bg-mcvill-bg/50 border border-mcvill-card-border rounded-2xl px-6 py-3.5 text-mcvill-text placeholder:text-mcvill-text-muted/50 focus:outline-none focus:border-mcvill-accent focus:ring-4 focus:ring-mcvill-accent/5 transition-all duration-300 font-sans;
+}
+
+@utility cyber-select {
+  @apply bg-mcvill-bg/80 border border-mcvill-card-border rounded-2xl px-6 py-3.5 text-mcvill-text focus:outline-none focus:border-mcvill-accent transition-all duration-300 font-sans appearance-none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1.5rem center;
+  background-size: 1em;
+}
+
+/* Dropdown option styles */
+select option {
+  @apply bg-slate-900 text-white;
+}
+
+@utility mcvill-btn {
+  @apply px-8 py-4 rounded-2xl font-display font-black text-[10px] tracking-[0.2em] uppercase transition-all duration-500 flex items-center justify-center gap-2 active:scale-95 relative overflow-hidden cursor-pointer;
+}
+
+@utility mcvill-btn-primary {
+  @apply bg-mcvill-accent text-white shadow-[0_0_20px_var(--theme-glow)] hover:shadow-[0_0_35px_var(--theme-glow)] hover:scale-[1.02] border border-white/10;
+}
+
+@utility mcvill-btn-secondary {
+  @apply bg-mcvill-accent/5 text-mcvill-text border border-mcvill-card-border hover:bg-mcvill-accent/10 hover:border-mcvill-accent/30;
+}
+
+@utility mcvill-btn-ai {
+  @apply bg-indigo-600 text-white shadow-[0_0_20px_rgba(79,165,255,0.6)] hover:shadow-[0_0_35px_rgba(79,165,255,0.8)] border border-indigo-400/50 hover:bg-indigo-500 transition-all duration-300;
+}
+
+@utility mcvill-btn-create {
+  @apply bg-emerald-600 text-white shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_35px_rgba(16,185,129,0.5)] border border-emerald-400/50 hover:bg-emerald-500 transition-all duration-300;
+}
+
+@utility mcvill-btn-planning {
+  @apply bg-violet-600 text-white shadow-[0_0_20px_rgba(139,92,246,0.3)] hover:shadow-[0_0_35px_rgba(139,92,246,0.5)] border border-violet-400/50 hover:bg-violet-500 transition-all duration-300;
+}
+
+@utility glow-text {
+  @apply animate-glow text-mcvill-accent;
+}
+
+@utility architect-grid {
+  background-image: radial-gradient(circle at 1px 1px, var(--theme-card-border) 1px, transparent 0);
+  background-size: 40px 40px;
+}
+
+@utility custom-scrollbar {
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    @apply bg-mcvill-accent/20 rounded-full hover:bg-mcvill-accent/40 transition-colors;
+  }
+}
+
+@utility text-glow-sm { text-shadow: 0 0 10px var(--theme-glow); }
+@utility text-glow-lg { text-shadow: 0 0 20px var(--theme-glow); }
+
+@utility agus-label-blue {
+  @apply text-[11px] font-bold text-mcvill-accent uppercase tracking-[0.2em] flex items-center gap-1.5 opacity-90;
+  /* 🚀 AGUS PRO: Azul Neural nítido para el ERP */
+}
+
+/* Animations for industrial feel */
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(1000%); }
+}
+
+.scanline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, transparent, var(--theme-glow), transparent);
+  animation: scanline 8s linear infinite;
+  pointer-events: none;
+  opacity: 0.2;
+}
+
+/* Chart normalization */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: var(--theme-card-border);
+  stroke-opacity: 0.5;
+}
+
+.recharts-text {
+  @apply font-sans font-black uppercase tracking-widest;
+  fill: var(--theme-text-muted);
+  font-size: 10px;
+}
+
+.recharts-legend-item-text {
+  @apply font-sans font-black uppercase tracking-widest;
+  color: var(--theme-text-muted) !important;
+  font-size: 10px !important;
+}
+
+/* Glassmorphism overlays */
+.glass-overlay {
+  @apply absolute inset-0 backdrop-blur-3xl opacity-50 pointer-events-none;
+  background: radial-gradient(circle at 50% -20%, var(--theme-accent) 0%, transparent 70%);
+}
+
+/* ── Date / DateTime picker — McVill Dark Theme ─────────────────────── */
+:root input[type="date"],
+:root input[type="datetime-local"],
+.dark input[type="date"],
+.dark input[type="datetime-local"] {
+  color-scheme: dark;
+  accent-color: #3b82f6;
+  background-color: #020617 !important;
+  color: #f1f5f9 !important;
+  border-color: rgba(30, 58, 138, 0.5) !important;
+}
+
+/* Texto interior del input (día/mes/año) */
+input[type="date"]::-webkit-datetime-edit,
+input[type="datetime-local"]::-webkit-datetime-edit {
+  color: #f1f5f9;
+}
+input[type="date"]::-webkit-datetime-edit-fields-wrapper,
+input[type="datetime-local"]::-webkit-datetime-edit-fields-wrapper {
+  background-color: #020617;
+  padding: 0;
+}
+input[type="date"]::-webkit-datetime-edit-text,
+input[type="datetime-local"]::-webkit-datetime-edit-text {
+  color: #3b82f6;
+  padding: 0 2px;
+}
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field,
+input[type="date"]::-webkit-datetime-edit-year-field,
+input[type="datetime-local"]::-webkit-datetime-edit-month-field,
+input[type="datetime-local"]::-webkit-datetime-edit-day-field,
+input[type="datetime-local"]::-webkit-datetime-edit-year-field,
+input[type="datetime-local"]::-webkit-datetime-edit-hour-field,
+input[type="datetime-local"]::-webkit-datetime-edit-minute-field {
+  color: #f1f5f9;
+  background-color: transparent;
+  border-radius: 3px;
+}
+input[type="date"]::-webkit-datetime-edit-month-field:focus,
+input[type="date"]::-webkit-datetime-edit-day-field:focus,
+input[type="date"]::-webkit-datetime-edit-year-field:focus,
+input[type="datetime-local"]::-webkit-datetime-edit-month-field:focus,
+input[type="datetime-local"]::-webkit-datetime-edit-day-field:focus,
+input[type="datetime-local"]::-webkit-datetime-edit-year-field:focus {
+  background-color: #1e3a8a;
+  color: #fff;
+}
+
+/* Ícono del calendario */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  background-color: transparent;
+  filter: invert(0.7) sepia(0.5) hue-rotate(200deg) saturate(1.6) brightness(1.1);
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity 0.15s, filter 0.15s;
+  border-radius: 3px;
+  padding: 2px;
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  filter: invert(0.5) sepia(0.8) hue-rotate(200deg) saturate(2) brightness(1.3);
+}
+
+/* Light mode */
+.light input[type="date"],
+.light input[type="datetime-local"] {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: rgba(37,99,235,0.2) !important;
+}
+.light input[type="date"]::-webkit-datetime-edit,
+.light input[type="datetime-local"]::-webkit-datetime-edit { color: #0f172a; }
+.light input[type="date"]::-webkit-datetime-edit-fields-wrapper,
+.light input[type="datetime-local"]::-webkit-datetime-edit-fields-wrapper { background-color: #fff; }
+.light input[type="date"]::-webkit-datetime-edit-text,
+.light input[type="datetime-local"]::-webkit-datetime-edit-text { color: #2563eb; }
+.light input[type="date"]::-webkit-datetime-edit-month-field,
+.light input[type="date"]::-webkit-datetime-edit-day-field,
+.light input[type="date"]::-webkit-datetime-edit-year-field { color: #0f172a; }
+.light input[type="date"]::-webkit-calendar-picker-indicator,
+.light input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: none;
+  opacity: 0.6;
+}
