@@ -37,15 +37,17 @@ export const CeoMobileSim: React.FC = () => {
   const { config } = useConfig();
   const [activeTab, setActiveTab] = useState<MobileTab>('finance');
   
+  const brandPrefix = (config.brandName || 'MCV').substring(0, 3).toUpperCase();
+
   // CCTV Simulation States
   const [scans, setScans] = useState<QualityScan[]>([
-    { partCode: 'MCV-BRIDA-409', defect: null, confidence: 99.8, status: 'aprobado', timestamp: '10:52:11' },
-    { partCode: 'MCV-PLACA-L22', defect: 'Fisura en Soldadura Cordón #2', confidence: 97.4, status: 'scrap', timestamp: '10:53:05' },
-    { partCode: 'MCV-VALVULA-88', defect: null, confidence: 99.2, status: 'aprobado', timestamp: '10:54:32' },
+    { partCode: `${brandPrefix}-BRIDA-409`, defect: null, confidence: 99.8, status: 'aprobado', timestamp: '10:52:11' },
+    { partCode: `${brandPrefix}-PLACA-L22`, defect: 'Fisura en Soldadura Cordón #2', confidence: 97.4, status: 'scrap', timestamp: '10:53:05' },
+    { partCode: `${brandPrefix}-VALVULA-88`, defect: null, confidence: 99.2, status: 'aprobado', timestamp: '10:54:32' },
   ]);
   const [isScanning, setIsScanning] = useState(true);
   const [activeScan, setActiveScan] = useState<QualityScan>({
-    partCode: 'MCV-PERFIL-702',
+    partCode: `${brandPrefix}-PERFIL-702`,
     defect: null,
     confidence: 99.6,
     status: 'aprobado',
@@ -55,7 +57,7 @@ export const CeoMobileSim: React.FC = () => {
 
   // Copilot Chat States
   const [chatMessages, setChatMessages] = useState([
-    { sender: 'ai', text: 'Hola Sr. Prieto. Estoy monitoreando las Plantas McVill en tiempo real. ¿Desea el informe financiero de producción o enviar una directiva a piso?' }
+    { sender: 'ai', text: `Hola. Estoy monitoreando las Plantas de ${config.brandName || 'la empresa'} en tiempo real. ¿Desea el informe financiero de producción o enviar una directiva a piso?` }
   ]);
   const [chatInput, setChatInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -65,7 +67,13 @@ export const CeoMobileSim: React.FC = () => {
     if (!isScanning) return;
     const interval = setInterval(() => {
       // Pick random next piece
-      const partCodes = ['MCV-EJE-890', 'MCV-PLACA-W3', 'MCV-SOPORTE-X', 'MCV-BRIDA-99', 'MCV-HORN-55'];
+      const partCodes = [
+        `${brandPrefix}-EJE-890`,
+        `${brandPrefix}-PLACA-W3`,
+        `${brandPrefix}-SOPORTE-X`,
+        `${brandPrefix}-BRIDA-99`,
+        `${brandPrefix}-HORN-55`
+      ];
       const defects = [
         'Desviación Dimensional (+0.4mm)', 
         'Porosidad de Fusión Láser', 
@@ -133,7 +141,7 @@ export const CeoMobileSim: React.FC = () => {
           TU PLANTA EN <span className="text-mcvill-accent">EL CELULAR</span>
         </h1>
         <p className="text-[10px] font-mono text-slate-500 uppercase tracking-widest mt-2 leading-relaxed">
-          Diseño conceptual del ecosistema móvil integrado de McVill. Abre este simulador interactivo para monitorear el piso industrial desde cualquier parte del mundo.
+          Diseño conceptual del ecosistema móvil integrado de {config.brandName || 'la empresa'}. Abre este simulador interactivo para monitorear el piso industrial desde cualquier parte del mundo.
         </p>
       </div>
 
@@ -166,7 +174,7 @@ export const CeoMobileSim: React.FC = () => {
               <div className="flex items-center gap-1.5">
                 <div className="w-2.5 h-2.5 rounded bg-mcvill-accent animate-pulse" />
                 <div>
-                  <h4 className="text-[8px] font-black text-white uppercase tracking-widest">McVill Mobile</h4>
+                  <h4 className="text-[8px] font-black text-white uppercase tracking-widest">{config.brandName || 'Company'} Mobile</h4>
                   <p className="text-[6px] font-mono text-slate-500 uppercase tracking-widest">Director Hub v2.5</p>
                 </div>
               </div>
@@ -470,7 +478,7 @@ export const CeoMobileSim: React.FC = () => {
             </div>
 
             <p className="text-[11px] text-slate-300 leading-relaxed">
-              Si yo fuera el **dueño de McVill**, no querría ver listados interminables ni lidiar con complejos menús en mi celular. El dueño viaja, visita clientes corporativos de primer nivel (como Caterpillar o John Deere) y necesita **Control y Paz Mental**. 
+              Si yo fuera el **dueño de {config.brandName || 'la empresa'}**, no querría ver listados interminables ni lidiar con complejos menús en mi celular. El dueño viaja, visita clientes corporativos de primer nivel (como Caterpillar o John Deere) y necesita **Control y Paz Mental**. 
             </p>
 
             {/* Strategic Columns */}
@@ -520,7 +528,7 @@ export const CeoMobileSim: React.FC = () => {
 
             {/* Strategic ROI Summary Quote */}
             <div className="border-t border-slate-800 pt-3 flex items-center justify-between">
-              <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest">McVill Industrial Ecosystem © 2026</span>
+              <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest">{config.brandName || 'Company'} Industrial Ecosystem © 2026</span>
               <span className="text-[8px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded font-black tracking-wider uppercase">
                 100% Monetizable SaaS Ready
               </span>
