@@ -1,0 +1,35 @@
+{
+  "name": "mcvill-mobile",
+  "version": "1.0.0",
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "expo": "~52.0.43",
+    "expo-router": "~4.0.17",
+    "expo-camera": "~15.0.16",
+    "expo-image-picker": "~15.0.7",
+    "expo-file-system": "~17.0.1",
+    "expo-status-bar": "~2.0.1",
+    "expo-constants": "~17.0.7",
+    "expo-haptics": "~13.0.1",
+    "react": "18.3.2",
+    "react-native": "0.76.7",
+    "@supabase/supabase-js": "^2.45.4",
+    "react-native-url-polyfill": "^2.0.0",
+    "@react-native-async-storage/async-storage": "1.23.1",
+    "@expo/vector-icons": "^14.0.4",
+    "react-native-safe-area-context": "4.12.0",
+    "react-native-screens": "~4.4.0",
+    "react-native-gesture-handler": "~2.20.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.24.0",
+    "typescript": "~5.3.3",
+    "@types/react": "~18.3.12"
+  }
+}

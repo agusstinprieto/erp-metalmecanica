@@ -1,6 +1,0 @@
-bin/
-obj/
-.local-chromium/
-*.user
-*.suo
-.vs/

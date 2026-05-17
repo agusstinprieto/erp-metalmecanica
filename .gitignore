@@ -1,0 +1,9 @@
+node_modules/
+.env
+.env.local
+.vercel/
+dist/
+build_erp_output.log
+reporting-service/bin/
+reporting-service/obj/
+Acelerador de Software/

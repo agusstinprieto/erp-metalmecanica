@@ -1,9 +1,0 @@
-[Bb]in/
-[Oo]bj/
-.vs/
-.vscode/
-*.user
-*.userosscache
-*.sln.docstates
-appsettings.Development.json
-out/
