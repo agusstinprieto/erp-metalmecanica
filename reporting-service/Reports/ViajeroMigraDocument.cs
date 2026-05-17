@@ -129,7 +129,7 @@ public static class ViajeroMigraDocument
             AddOperationsTable(section, m.Operaciones, tempFiles);
 
         if (m.Materiales.Any())
-            AddMaterialsTable(section, m.Materiales);
+            AddMaterialsTable(section, m.Materiales, tempFiles);
 
         if (m.Componentes.Any())
             AddComponentsTable(section, m.Componentes);
@@ -201,7 +201,7 @@ public static class ViajeroMigraDocument
             try
             {
                 var img = cellLeft.AddImage(logoPath);
-                img.Height = "1.0cm";
+                img.Height = "1.8cm";
                 img.LockAspectRatio = true;
             }
             catch
@@ -532,12 +532,12 @@ public static class ViajeroMigraDocument
     }
 
     // ── Tabla de materiales ───────────────────────────────────────────────────
-    private static void AddMaterialsTable(Section section, List<MaterialModel> mats)
+    private static void AddMaterialsTable(Section section, List<MaterialModel> mats, List<string> tempFiles)
     {
         AddSectionTitle(section, "MATERIALES / RECOGIDAS");
 
         var table = CreateDataTable(section);
-        table.AddColumn("2.5cm"); // Clave
+        table.AddColumn("2.5cm"); // Clave + Barcode
         table.AddColumn("6.6cm"); // Descripción
         table.AddColumn("1.5cm"); // Cant.
         table.AddColumn("1.5cm"); // U/M
@@ -550,12 +550,36 @@ public static class ViajeroMigraDocument
         foreach (var mat in mats)
         {
             var row = table.AddRow();
-            row.Height = "0.55cm";
             row.VerticalAlignment = VerticalAlignment.Center;
             row.Borders.Bottom.Width = 0.5;
             row.Borders.Bottom.Color = Color.FromRgb(191, 219, 254);
 
-            SetCell(row, 0, mat.ClaveMaterial);
+            // Clave con barcode debajo
+            var cellClave = row.Cells[0];
+            cellClave.Format.Alignment = ParagraphAlignment.Center;
+
+            var pClave = cellClave.AddParagraph();
+            var runClave = pClave.AddFormattedText(mat.ClaveMaterial ?? "");
+            runClave.Bold = true;
+            runClave.Font.Size = 7.5;
+            runClave.Font.Color = Color.FromRgb(0, 0, 0);
+
+            var barcodePath = GenerateBarcodeImage(mat.ClaveMaterial, tempFiles);
+            if (barcodePath != null)
+            {
+                try
+                {
+                    var pBar = cellClave.AddParagraph();
+                    pBar.Format.Alignment = ParagraphAlignment.Center;
+                    pBar.Format.SpaceBefore = Unit.FromPoint(2);
+                    pBar.Format.SpaceAfter = Unit.FromPoint(2);
+                    var imgBar = pBar.AddImage(barcodePath);
+                    imgBar.Height = "0.4cm";
+                    imgBar.LockAspectRatio = true;
+                }
+                catch { }
+            }
+
             SetCell(row, 1, mat.Descripcion);
             SetCell(row, 2, mat.Cantidad?.ToString("0.##") ?? "—", ParagraphAlignment.Center);
             SetCell(row, 3, mat.Unidad, ParagraphAlignment.Center);
