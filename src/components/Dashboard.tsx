@@ -714,7 +714,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           
           {/* Card 1: Asistencia & Ausentismo */}
-          <div className="bg-slate-900/40 border border-slate-800/40 p-3.5 rounded-2xl hover:border-slate-700/60 transition-all group relative overflow-hidden">
+          <div title="Fórmula: (Operadores Presentes / Plantilla Total) * 100" className="bg-slate-900/40 border border-slate-800/40 p-3.5 rounded-2xl hover:border-slate-700/60 transition-all group relative overflow-hidden">
             <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl group-hover:bg-blue-500/10 transition-all" />
             <div className="flex items-center justify-between mb-3 relative z-10">
               <div className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400">
@@ -736,7 +736,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
           </div>
 
           {/* Card 2: OEE Producción */}
-          <div className="bg-slate-900/40 border border-slate-800/40 p-3.5 rounded-2xl hover:border-slate-700/60 transition-all group relative overflow-hidden">
+          <div title="Fórmula OEE: Disponibilidad × Rendimiento × Calidad (Meta ≥ 85%)" className="bg-slate-900/40 border border-slate-800/40 p-3.5 rounded-2xl hover:border-slate-700/60 transition-all group relative overflow-hidden">
             <div className="absolute top-0 right-0 w-24 h-24 bg-mcvill-accent/5 rounded-full blur-2xl group-hover:bg-mcvill-accent/10 transition-all" />
             <div className="flex items-center justify-between mb-3 relative z-10">
               <div className="p-2 rounded-xl bg-mcvill-accent/10 border border-mcvill-accent/20 text-mcvill-accent">
@@ -755,7 +755,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
           </div>
 
           {/* Card 3: Calidad / Scrap */}
-          <div className="bg-slate-900/40 border border-slate-800/40 p-3.5 rounded-2xl hover:border-slate-700/60 transition-all group relative overflow-hidden">
+          <div title="Fórmula Scrap: (Piezas Defectuosas / Producción Total) * 100" className="bg-slate-900/40 border border-slate-800/40 p-3.5 rounded-2xl hover:border-slate-700/60 transition-all group relative overflow-hidden">
             <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-all" />
             <div className="flex items-center justify-between mb-3 relative z-10">
               <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
@@ -772,7 +772,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
           </div>
 
           {/* Card 4: Seguridad LTI */}
-          <div className="bg-slate-900/40 border border-slate-800/40 p-3.5 rounded-2xl hover:border-slate-700/60 transition-all group relative overflow-hidden">
+          <div title="LTI (Lost Time Injury): Días consecutivos operando sin accidentes incapacitantes" className="bg-slate-900/40 border border-slate-800/40 p-3.5 rounded-2xl hover:border-slate-700/60 transition-all group relative overflow-hidden">
             <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/5 rounded-full blur-2xl group-hover:bg-red-500/10 transition-all" />
             <div className="flex items-center justify-between mb-3 relative z-10">
               <div className="p-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400">
@@ -789,7 +789,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
           </div>
 
           {/* Card 5: Eficiencia Energética */}
-          <div className="bg-slate-900/40 border border-slate-800/40 p-3.5 rounded-2xl hover:border-slate-700/60 transition-all group relative overflow-hidden col-span-2 sm:col-span-1">
+          <div title="Fórmula Energía: Consumo Total KWh / Toneladas Métricas Producidas" className="bg-slate-900/40 border border-slate-800/40 p-3.5 rounded-2xl hover:border-slate-700/60 transition-all group relative overflow-hidden col-span-2 sm:col-span-1">
             <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/5 rounded-full blur-2xl group-hover:bg-amber-500/10 transition-all" />
             <div className="flex items-center justify-between mb-3 relative z-10">
               <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400">
