@@ -14,14 +14,24 @@ namespace McVill.ReportService.Reports;
 public class ViajeroDocument : IDocument
 {
     public List<ViajeroModel> Models { get; }
+    public string CompanyName { get; }
 
-    public ViajeroDocument(List<ViajeroModel> models) => Models = models;
-    public ViajeroDocument(ViajeroModel model) => Models = new List<ViajeroModel> { model };
+    public ViajeroDocument(List<ViajeroModel> models, string companyName = "ERP Industrial")
+    {
+        Models = models;
+        CompanyName = companyName;
+    }
+
+    public ViajeroDocument(ViajeroModel model, string companyName = "ERP Industrial")
+    {
+        Models = new List<ViajeroModel> { model };
+        CompanyName = companyName;
+    }
 
     public DocumentMetadata GetMetadata() => new DocumentMetadata
     {
-        Title    = "Viajero McVill SA de CV",
-        Author   = "McVill — Sistema Acelerador de Software",
+        Title    = $"Viajero {CompanyName}",
+        Author   = $"{CompanyName} — Sistema ERP",
         Creator  = "QuestPDF / IA.AGUS",
     };
 
@@ -93,7 +103,7 @@ public class ViajeroDocument : IDocument
                     row.ConstantItem(150).Column(c =>
                     {
                         c.Item().PaddingTop(2)
-                            .Text("MCVILL SA DE CV")
+                            .Text(CompanyName.ToUpper())
                             .FontSize(9).Bold().FontColor("#000000");
                     });
                 }
@@ -649,7 +659,7 @@ public class ViajeroDocument : IDocument
 
                 row.ConstantItem(220).AlignCenter().Column(c =>
                 {
-                    c.Item().AlignCenter().Text("MCVILL SA DE CV — IA.AGUS").FontSize(6);
+                    c.Item().AlignCenter().Text($"{CompanyName.ToUpper()} — IA.AGUS").FontSize(6);
                     c.Item().AlignCenter().Text(t =>
                     {
                         t.Span("Pág. ").FontSize(6);

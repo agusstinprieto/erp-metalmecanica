@@ -163,7 +163,7 @@ public class HerramentalModel
 public class AprobacionModel
 {
     public string Ingenieria { get; set; } = "ING. AGUSTIN PRIETO";
-    public string Produccion { get; set; } = "OPERACIONES MCVILL";
+    public string Produccion { get; set; } = "OPERACIONES PLANTA";
     public string Calidad { get; set; } = "ASEGURAMIENTO CALIDAD";
 }
 

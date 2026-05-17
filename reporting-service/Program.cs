@@ -97,7 +97,10 @@ app.MapPost("/api/reports/viajero/print-selected", async (HttpContext ctx, Viaje
         var dataList = await db.GetBatchViajeroDataAsync(jobIds);
         if (!dataList.Any()) return Results.NotFound("No se encontraron datos para los IDs proporcionados.");
 
-        var document = new ViajeroDocument(dataList);
+        var companyName = ctx.Request.Headers["X-Company-Name"].ToString();
+        if (string.IsNullOrEmpty(companyName)) companyName = "ERP Industrial";
+
+        var document = new ViajeroDocument(dataList, companyName);
         var pdf = document.GeneratePdf();
         Console.WriteLine("✅ PDF print-selected generado exitosamente.");
         return Results.File(pdf, "application/pdf", $"Viajero_Seleccionados_{DateTime.Now:yyyyMMdd_HHmm}.pdf");
@@ -113,7 +116,7 @@ app.MapPost("/api/reports/viajero/print-selected", async (HttpContext ctx, Viaje
 app.MapGet("/api/reports/viajero/print-selected", () => 
     Results.BadRequest("Este endpoint requiere una petición POST con el body JSON { \"jobIds\": [...] }"));
 
-app.MapGet("/api/reports/viajero/{jobID}", async (string jobID, bool? preview, ViajeroService db) =>
+app.MapGet("/api/reports/viajero/{jobID}", async (string jobID, bool? preview, ViajeroService db, HttpContext ctx) =>
 {
     Console.WriteLine($"📢 [REQUEST] Generando reporte para: {jobID}");
     string targetID = jobID;
@@ -134,7 +137,10 @@ app.MapGet("/api/reports/viajero/{jobID}", async (string jobID, bool? preview, V
     }
 
     Console.WriteLine("🎨 Generando PDF con QuestPDF...");
-    var document = new ViajeroDocument(new List<ViajeroModel> { data });
+    var companyName = ctx.Request.Headers["X-Company-Name"].ToString();
+    if (string.IsNullOrEmpty(companyName)) companyName = "ERP Industrial";
+
+    var document = new ViajeroDocument(new List<ViajeroModel> { data }, companyName);
     
     // 🚀 AGUS PRO: Soporte para QuestPDF Previewer
     if (preview == true)
@@ -178,11 +184,11 @@ app.MapGet("/api/reports/viajero/list-by-date", async (
 });
 
 
-// 🚀 AGUS PRO: Generar PDF de jobs seleccionados desde el panel de fechas
 app.MapGet("/api/reports/viajero/print-by-date", async (
     string? fechaInicio, 
     string? fechaFin, 
-    ViajeroService db) =>
+    ViajeroService db,
+    HttpContext ctx) =>
 {
     List<ViajeroCatalogModel> catalog;
     if (!string.IsNullOrEmpty(fechaInicio) && !string.IsNullOrEmpty(fechaFin) 
@@ -198,7 +204,11 @@ app.MapGet("/api/reports/viajero/print-by-date", async (
 
     var jobIds = catalog.Select(c => c.JobID).ToList();
     var dataList = await db.GetSelectedViajeroDataAsync(jobIds);
-    var document = new ViajeroDocument(dataList);
+
+    var companyName = ctx.Request.Headers["X-Company-Name"].ToString();
+    if (string.IsNullOrEmpty(companyName)) companyName = "ERP Industrial";
+
+    var document = new ViajeroDocument(dataList, companyName);
     var pdf = document.GeneratePdf();
     return Results.File(pdf, "application/pdf", $"Viajeros_{fechaInicio}_{fechaFin}.pdf");
 });
@@ -245,7 +255,7 @@ app.MapPatch("/api/reports/viajero/{id}", async (string id, JsonElement data, Vi
 });
 
 // ── MigraDoc: Viajero individual (MIT, sin costo de licencia) ────────────────
-app.MapGet("/api/reports/viajero/{jobID}/migra", async (string jobID, ViajeroService db) =>
+app.MapGet("/api/reports/viajero/{jobID}/migra", async (string jobID, ViajeroService db, HttpContext ctx) =>
 {
     Console.WriteLine($"📄 [MIGRADOC] Generando reporte para: {jobID}");
     var data = await db.GetViajeroDataAsync(jobID);
@@ -253,7 +263,10 @@ app.MapGet("/api/reports/viajero/{jobID}/migra", async (string jobID, ViajeroSer
 
     try
     {
-        var pdf = ViajeroMigraDocument.Generate(data);
+        var companyName = ctx.Request.Headers["X-Company-Name"].ToString();
+        if (string.IsNullOrEmpty(companyName)) companyName = "ERP Industrial";
+
+        var pdf = ViajeroMigraDocument.Generate(data, companyName);
         Console.WriteLine("✅ [MIGRADOC] PDF generado exitosamente.");
         return Results.File(pdf, "application/pdf", $"Viajero_{jobID}_migra.pdf");
     }
@@ -292,7 +305,10 @@ app.MapPost("/api/reports/viajero/migra/print-selected", async (HttpContext ctx,
         var dataList = await db.GetBatchViajeroDataAsync(jobIds);
         if (!dataList.Any()) return Results.NotFound("No se encontraron datos para los IDs.");
 
-        var pdf = ViajeroMigraDocument.Generate(dataList);
+        var companyName = ctx.Request.Headers["X-Company-Name"].ToString();
+        if (string.IsNullOrEmpty(companyName)) companyName = "ERP Industrial";
+
+        var pdf = ViajeroMigraDocument.Generate(dataList, companyName);
         Console.WriteLine("✅ [MIGRADOC] PDF batch generado.");
         return Results.File(pdf, "application/pdf", $"Viajeros_Seleccionados_{DateTime.Now:yyyyMMdd_HHmm}.pdf");
     }

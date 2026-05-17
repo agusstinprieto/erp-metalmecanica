@@ -379,7 +379,11 @@ export const ViajeroAdminPanel: React.FC<{
     setIsGenerating(true);
 
     try {
-      const headers: any = { 'Content-Type': 'application/json' };
+      const headers: any = { 
+        'Content-Type': 'application/json',
+        'X-Company-Name': config.companyName || 'ERP Industrial',
+        'X-Brand-Name': config.brandName || 'METALMECÁNICA',
+      };
       if (tenantConfig?.sql_connection_string) {
         headers['X-SQL-Connection'] = tenantConfig.sql_connection_string;
       }

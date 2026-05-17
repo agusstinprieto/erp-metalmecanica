@@ -28,8 +28,9 @@ interface Paso {
 }
 
 function getPasos(brandName: string, companyName: string): Paso[] {
-  {
-    id: 'nueva_rfq',
+  return [
+    {
+      id: 'nueva_rfq',
     num: 1,
     titulo: 'Nueva RFQ',
     subtitulo: 'El cliente solicita cotización',

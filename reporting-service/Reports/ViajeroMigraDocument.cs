@@ -12,12 +12,12 @@ namespace McVill.ReportService.Reports;
 public static class ViajeroMigraDocument
 {
     // ── Punto de entrada ──────────────────────────────────────────────────────
-    public static byte[] Generate(ViajeroModel model)
-        => Generate(new List<ViajeroModel> { model });
+    public static byte[] Generate(ViajeroModel model, string companyName = "ERP Industrial")
+        => Generate(new List<ViajeroModel> { model }, companyName);
 
-    public static byte[] Generate(List<ViajeroModel> models)
+    public static byte[] Generate(List<ViajeroModel> models, string companyName = "ERP Industrial")
     {
-        var document = BuildDocument(models);
+        var document = BuildDocument(models, companyName);
         var renderer = new PdfDocumentRenderer { Document = document };
         renderer.RenderDocument();
 
@@ -27,16 +27,16 @@ public static class ViajeroMigraDocument
     }
 
     // ── Construcción del documento ────────────────────────────────────────────
-    private static Document BuildDocument(List<ViajeroModel> models)
+    private static Document BuildDocument(List<ViajeroModel> models, string companyName)
     {
         var doc = new Document();
-        doc.Info.Title  = "Viajero de Producción — McVill SA de CV";
-        doc.Info.Author = "McVill ERP / IA.AGUS";
+        doc.Info.Title  = $"Viajero de Producción — {companyName}";
+        doc.Info.Author = $"{companyName} ERP / IA.AGUS";
 
         DefineStyles(doc);
 
         foreach (var model in models)
-            AddViajeroSection(doc, model);
+            AddViajeroSection(doc, model, companyName);
 
         return doc;
     }
@@ -50,7 +50,7 @@ public static class ViajeroMigraDocument
     }
 
     // ── Una sección por viajero ───────────────────────────────────────────────
-    private static void AddViajeroSection(Document doc, ViajeroModel m)
+    private static void AddViajeroSection(Document doc, ViajeroModel m, string companyName)
     {
         var section = doc.AddSection();
         section.PageSetup.PageFormat   = PageFormat.Letter;
@@ -63,14 +63,14 @@ public static class ViajeroMigraDocument
         // Pie de página
         var ftPara = section.Footers.Primary.AddParagraph();
         ftPara.Format.Alignment = ParagraphAlignment.Center;
-        ftPara.AddText("McVill SA de CV  |  Viajero de Producción  |  Página ");
+        ftPara.AddText($"{companyName}  |  Viajero de Producción  |  Página ");
         ftPara.AddPageField();
         ftPara.AddText(" de ");
         ftPara.AddNumPagesField();
         ftPara.Format.Font.Size  = 7;
         ftPara.Format.Font.Color = Color.FromRgb(100, 116, 139);
 
-        AddHeader(section, m);
+        AddHeader(section, m, companyName);
         AddInfoCard(section, m);
 
         if (m.Operaciones.Any())
@@ -86,7 +86,7 @@ public static class ViajeroMigraDocument
     }
 
     // ── Encabezado ────────────────────────────────────────────────────────────
-    private static void AddHeader(Section section, ViajeroModel m)
+    private static void AddHeader(Section section, ViajeroModel m, string companyName)
     {
         var table = section.AddTable();
         table.Borders.Width = 0;
@@ -103,7 +103,7 @@ public static class ViajeroMigraDocument
         // Izquierda: nombre empresa
         var cellLeft = row.Cells[0];
         cellLeft.VerticalAlignment = VerticalAlignment.Center;
-        var p1 = cellLeft.AddParagraph("McVill SA de CV");
+        var p1 = cellLeft.AddParagraph(companyName);
         p1.Format.Font.Bold  = true;
         p1.Format.Font.Size  = 13;
         p1.Format.Font.Color = Color.FromRgb(255, 255, 255);
