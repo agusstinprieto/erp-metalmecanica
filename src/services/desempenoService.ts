@@ -1,5 +1,7 @@
 import { supabase } from '../lib/supabase';
 
+const TENANT = 'mcvill';
+
 let _cachedTenant: string | null = null;
 async function getTenant(): Promise<string> {
   if (_cachedTenant) return _cachedTenant;

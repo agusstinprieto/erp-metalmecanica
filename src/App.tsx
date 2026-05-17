@@ -84,7 +84,7 @@ function App() {
     setActiveView('factibilidad_ia');
   }, []);
   const [isTVMode, setIsTVMode] = useState(false);
-  const { config, isDarkMode, toggleTheme } = useConfig();
+  const { config, isDarkMode, toggleTheme, setThemeName } = useConfig();
 
   useEffect(() => {
     // Restore session on page load
@@ -263,14 +263,36 @@ function App() {
                   onClick={toggleTheme}
                   className={clsx(
                     "p-2 rounded-2xl transition-all duration-300 border",
-                    isDarkMode 
-                      ? "border-white/5 bg-slate-900/50 text-amber-400 hover:border-amber-400/30" 
+                    isDarkMode
+                      ? "border-white/5 bg-slate-900/50 text-amber-400 hover:border-amber-400/30"
                       : "border-slate-200 bg-slate-50 text-blue-500 hover:border-blue-300"
                   )}
                   title={isDarkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
                 >
                   {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
                 </button>
+
+                {/* Theme Color Selector */}
+                <div className={clsx("flex items-center gap-1 p-1.5 rounded-2xl border", isDarkMode ? "border-white/5 bg-slate-900/50" : "border-slate-200 bg-slate-50")}>
+                  {([
+                    { id: 'blue',    color: '#4FA5FF', label: 'Azul Industrial' },
+                    { id: 'slate',   color: '#94A3B8', label: 'Slate Neutro' },
+                    { id: 'emerald', color: '#34D399', label: 'Esmeralda' },
+                    { id: 'carbon',  color: '#FF6B00', label: 'Carbon' },
+                  ] as const).map(t => (
+                    <button
+                      key={t.id}
+                      onClick={() => setThemeName(t.id)}
+                      title={t.label}
+                      className="w-4 h-4 rounded-full transition-all duration-200 hover:scale-125"
+                      style={{
+                        backgroundColor: t.color,
+                        outline: (config.themeName ?? 'blue') === t.id ? `2px solid ${t.color}` : '2px solid transparent',
+                        outlineOffset: '2px',
+                      }}
+                    />
+                  ))}
+                </div>
 
                 {/* Logout Button */}
                 <button

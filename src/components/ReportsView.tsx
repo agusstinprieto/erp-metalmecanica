@@ -86,14 +86,18 @@ export const ReportsView = () => {
   const loadScheduled = useCallback(async () => {
     try {
       setScheduledLoading(true);
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('report_schedules')
         .select('*')
         .eq('activo', true)
         .order('fecha', { ascending: true });
-      setScheduled(data ?? []);
+      if (error) {
+        // Tabla no aplicada aún — usar localStorage como fallback silencioso
+        try { setScheduled(JSON.parse(localStorage.getItem(SCHEDULE_KEY) || '[]')); } catch {}
+      } else {
+        setScheduled(data ?? []);
+      }
     } catch {
-      // Fallback to localStorage if table doesn't exist yet
       try { setScheduled(JSON.parse(localStorage.getItem(SCHEDULE_KEY) || '[]')); } catch {}
     } finally {
       setScheduledLoading(false);

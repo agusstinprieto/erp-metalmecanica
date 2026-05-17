@@ -63,6 +63,26 @@
   --theme-shadow-lg: 0 0 40px rgba(79, 165, 255, 0.2);
 }
 
+/* Temas no-azul: remap clases blue/indigo/cyan hardcodeadas al acento del tema */
+:not([data-theme="blue"]) .text-blue-400,
+:not([data-theme="blue"]) .text-blue-500,
+:not([data-theme="blue"]) .text-blue-600,
+:not([data-theme="blue"]) .text-blue-700,
+:not([data-theme="blue"]) .text-indigo-400,
+:not([data-theme="blue"]) .text-indigo-500,
+:not([data-theme="blue"]) .text-cyan-400,
+:not([data-theme="blue"]) .text-cyan-500 { color: var(--theme-accent) !important; }
+
+:not([data-theme="blue"]) .border-blue-400,
+:not([data-theme="blue"]) .border-blue-500,
+:not([data-theme="blue"]) .border-blue-600\/20,
+:not([data-theme="blue"]) .border-blue-500\/30,
+:not([data-theme="blue"]) .border-indigo-500\/30 { border-color: var(--theme-card-border) !important; }
+
+:not([data-theme="blue"]) .bg-blue-600\/10,
+:not([data-theme="blue"]) .bg-blue-500\/10,
+:not([data-theme="blue"]) .bg-blue-400\/10 { background-color: color-mix(in srgb, var(--theme-accent), transparent 90%) !important; }
+
 /* Global Border Overrides to prevent white borders */
 .dark .border-white\/5,
 .dark .border-white\/10,
