@@ -190,7 +190,7 @@ Responde ÚNICAMENTE con JSON:
           <button
             onClick={captureAndAnalyze}
             disabled={analyzing}
-            className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-600/20 hover:bg-blue-600 border border-blue-500/30 text-blue-400 hover:text-white rounded-lg text-[8px] font-black uppercase tracking-wider transition-all disabled:opacity-40"
+            className="flex items-center gap-1 px-2.5 py-1.5 bg-indigo-600/20 hover:bg-indigo-600 border border-indigo-500/30 text-indigo-400 hover:text-white rounded-lg text-[8px] font-black uppercase tracking-wider transition-all disabled:opacity-40 hover:shadow-[0_0_14px_rgba(99,102,241,0.7)]"
           >
             {analyzing ? <Loader2 size={10} className="animate-spin" /> : <Zap size={10} />}
             Analizar IA

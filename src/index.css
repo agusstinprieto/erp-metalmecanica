@@ -81,7 +81,43 @@
 
 :not([data-theme="blue"]) .bg-blue-600\/10,
 :not([data-theme="blue"]) .bg-blue-500\/10,
+:not([data-theme="blue"]) .bg-blue-500\/5,
 :not([data-theme="blue"]) .bg-blue-400\/10 { background-color: color-mix(in srgb, var(--theme-accent), transparent 90%) !important; }
+
+/* Sólidos azules (botones de acción) → acento del tema en temas no-azul */
+:not([data-theme="blue"]) .bg-blue-600 { background-color: var(--theme-accent) !important; }
+:not([data-theme="blue"]) .bg-blue-500 { background-color: color-mix(in srgb, var(--theme-accent), white 12%) !important; }
+:not([data-theme="blue"]) .hover\:bg-blue-500:hover { background-color: color-mix(in srgb, var(--theme-accent), white 12%) !important; }
+:not([data-theme="blue"]) .hover\:bg-blue-600:hover { background-color: var(--theme-accent) !important; }
+:not([data-theme="blue"]) .hover\:bg-blue-500\/5:hover { background-color: color-mix(in srgb, var(--theme-accent), transparent 95%) !important; }
+
+/* ── Remap naranja (acción primaria) → acento del tema ───────────────── */
+.text-orange-300 { color: color-mix(in srgb, var(--theme-accent), white 35%) !important; }
+.text-orange-400, .text-orange-500, .text-orange-600 { color: var(--theme-accent) !important; }
+.hover\:text-orange-400:hover, .hover\:text-orange-500:hover { color: var(--theme-accent) !important; }
+.bg-orange-600, .bg-orange-500 { background-color: var(--theme-accent) !important; }
+.hover\:bg-orange-600:hover { background-color: var(--theme-accent) !important; }
+.hover\:bg-orange-500:hover { background-color: color-mix(in srgb, var(--theme-accent), white 12%) !important; }
+.bg-orange-500\/10, .bg-orange-600\/10 { background-color: color-mix(in srgb, var(--theme-accent), transparent 90%) !important; }
+.bg-orange-500\/20, .bg-orange-600\/20 { background-color: color-mix(in srgb, var(--theme-accent), transparent 80%) !important; }
+.border-orange-500\/20, .border-orange-600\/20 { border-color: color-mix(in srgb, var(--theme-accent), transparent 78%) !important; }
+.border-orange-500\/30, .border-orange-600\/30 { border-color: color-mix(in srgb, var(--theme-accent), transparent 68%) !important; }
+.hover\:bg-orange-500\/5:hover { background-color: color-mix(in srgb, var(--theme-accent), transparent 95%) !important; }
+.shadow-orange-600\/20 { box-shadow: 0 0 12px color-mix(in srgb, var(--theme-accent), transparent 78%) !important; }
+.focus\:border-orange-500\/50:focus { border-color: color-mix(in srgb, var(--theme-accent), transparent 50%) !important; }
+
+/* ── Remap púrpura (acción secundaria) → acento del tema ─────────────── */
+.text-purple-300 { color: color-mix(in srgb, var(--theme-accent), white 35%) !important; }
+.text-purple-400, .text-purple-500 { color: var(--theme-accent) !important; }
+.hover\:text-purple-400:hover { color: var(--theme-accent) !important; }
+.bg-purple-600, .bg-purple-500 { background-color: var(--theme-accent) !important; }
+.hover\:bg-purple-500:hover { background-color: color-mix(in srgb, var(--theme-accent), white 12%) !important; }
+.hover\:bg-purple-600:hover { background-color: var(--theme-accent) !important; }
+.bg-purple-500\/10, .bg-purple-600\/10 { background-color: color-mix(in srgb, var(--theme-accent), transparent 90%) !important; }
+.bg-purple-500\/20, .bg-purple-600\/20 { background-color: color-mix(in srgb, var(--theme-accent), transparent 80%) !important; }
+.border-purple-500\/20, .border-purple-600\/20 { border-color: color-mix(in srgb, var(--theme-accent), transparent 78%) !important; }
+.border-purple-500\/30 { border-color: color-mix(in srgb, var(--theme-accent), transparent 68%) !important; }
+.hover\:bg-purple-500\/5:hover { background-color: color-mix(in srgb, var(--theme-accent), transparent 95%) !important; }
 
 /* Global Border Overrides to prevent white borders */
 .dark .border-white\/5,
@@ -343,7 +379,27 @@ select option {
 }
 
 @utility mcvill-btn-ai {
-  @apply bg-indigo-600 text-white shadow-[0_0_20px_rgba(79,165,255,0.6)] hover:shadow-[0_0_35px_rgba(79,165,255,0.8)] border border-indigo-400/50 hover:bg-indigo-500 transition-all duration-300;
+  @apply text-white border border-violet-400/40 transition-all duration-300 relative overflow-hidden;
+  background: linear-gradient(135deg, #4338CA 0%, #6366F1 50%, #8B5CF6 100%);
+  box-shadow: 0 0 20px rgba(99,102,241,0.55), inset 0 1px 0 rgba(255,255,255,0.08);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.10) 50%, transparent 100%);
+    transform: translateX(-110%);
+    transition: transform 0.55s ease;
+    pointer-events: none;
+  }
+
+  &:hover {
+    background: linear-gradient(135deg, #3730A3 0%, #4F46E5 45%, #7C3AED 100%);
+    box-shadow: 0 0 40px rgba(139,92,246,0.9), 0 0 70px rgba(99,102,241,0.35), inset 0 1px 0 rgba(255,255,255,0.14) !important;
+    transform: scale(1.02);
+
+    &::after { transform: translateX(110%); }
+  }
 }
 
 @utility mcvill-btn-create {

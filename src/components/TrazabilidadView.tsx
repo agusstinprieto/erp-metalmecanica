@@ -300,16 +300,16 @@ export const TrazabilidadView: React.FC = () => {
           {tabs.map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id as Tab)}
               className={clsx('flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all text-[9px] font-black uppercase tracking-widest',
-                activeTab === tab.id ? 'bg-orange-600 text-white shadow-lg shadow-orange-600/20' : 'text-slate-500 hover:text-white')}>
+                activeTab === tab.id ? 'bg-orange-600 text-white shadow-cyber' : 'text-slate-500 hover:text-white')}>
               <tab.icon size={12} />{tab.label}
             </button>
           ))}
         </div>
         <div className="relative flex-1 group">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-orange-500 transition-colors" size={12} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-mcvill-accent transition-colors" size={12} />
           <input type="text" placeholder="BUSCAR POR LOTE, MATERIAL, VIAJERO, PRODUCTO..." value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
-            className="w-full bg-black/40 border border-white/10 rounded-lg py-1.5 pl-9 pr-4 outline-none text-[10px] font-bold text-white placeholder:text-slate-700 focus:border-orange-500/50 transition-all" />
+            className="w-full bg-black/40 border border-white/10 rounded-lg py-1.5 pl-9 pr-4 outline-none text-[10px] font-bold text-white placeholder:text-slate-700 focus:border-mcvill-accent/50 transition-all" />
         </div>
       </div>
 

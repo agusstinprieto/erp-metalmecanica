@@ -30,8 +30,8 @@ export const CyberModal: React.FC<CyberModalProps> = ({
       case 'success': return <CheckCircle2 className="text-emerald-400" size={28} />;
       case 'error': return <ShieldAlert className="text-red-400" size={28} />;
       case 'warning': return <AlertCircle className="text-amber-400" size={28} />;
-      case 'confirm': return <HelpCircle className="text-blue-400" size={28} />;
-      default: return <Info className="text-blue-400" size={28} />;
+      case 'confirm': return <HelpCircle className="text-mcvill-accent" size={28} />;
+      default: return <Info className="text-mcvill-accent" size={28} />;
     }
   };
 
@@ -40,8 +40,8 @@ export const CyberModal: React.FC<CyberModalProps> = ({
       case 'success': return 'border-emerald-500/30 bg-emerald-500/5';
       case 'error': return 'border-red-500/30 bg-red-500/5';
       case 'warning': return 'border-amber-500/30 bg-amber-500/5';
-      case 'confirm': return 'border-blue-500/30 bg-blue-500/5';
-      default: return 'border-blue-500/30 bg-blue-500/5';
+      case 'confirm': return 'border-mcvill-card-border bg-mcvill-accent/5';
+      default: return 'border-mcvill-card-border bg-mcvill-accent/5';
     }
   };
 
@@ -50,7 +50,7 @@ export const CyberModal: React.FC<CyberModalProps> = ({
       case 'success': return 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-900/20';
       case 'error': return 'bg-red-600 hover:bg-red-500 shadow-red-900/20';
       case 'warning': return 'bg-amber-600 hover:bg-amber-500 shadow-amber-900/20';
-      default: return 'bg-blue-600 hover:bg-blue-500 shadow-blue-900/20';
+      default: return 'bg-mcvill-accent hover:bg-mcvill-accent/80 shadow-cyber';
     }
   };
 
