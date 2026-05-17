@@ -2,18 +2,19 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Truck, Package, Wrench, Plus, Pencil, Trash2, Save, X,
-  Loader2, AlertCircle, Search, ChevronRight, FileText
+  Loader2, AlertCircle, Search, ChevronRight, FileText, ShoppingCart
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { OCProveedorManagerModal } from './OCProveedorManagerModal';
 import { useTenant } from '../hooks/useTenant';
 
-type TabId = 'proveedores' | 'materiales' | 'operaciones';
+type TabId = 'proveedores' | 'materiales' | 'operaciones' | 'ordenes_compra';
 
 const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
-  { id: 'proveedores', label: 'Proveedores', icon: Truck    },
-  { id: 'materiales',  label: 'Materiales',  icon: Package  },
-  { id: 'operaciones', label: 'Operaciones', icon: Wrench   },
+  { id: 'proveedores',   label: 'Proveedores',      icon: Truck         },
+  { id: 'materiales',   label: 'Materiales',        icon: Package       },
+  { id: 'operaciones',  label: 'Operaciones',       icon: Wrench        },
+  { id: 'ordenes_compra', label: 'Órdenes de Compra', icon: ShoppingCart },
 ];
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -603,13 +604,13 @@ CREATE POLICY "Public access" ON operaciones_catalogo FOR ALL USING (true);`}
 
 export const ComprasPanel: React.FC = () => {
   const [tab, setTab] = useState<TabId>('proveedores');
-  const [isOCModalOpen, setIsOCModalOpen] = useState(false);
   const tenantId = useTenant();
 
   const TAB_COLOR: Record<TabId, string> = {
-    proveedores: 'text-amber-400',
-    materiales:  'text-blue-400',
-    operaciones: 'text-blue-400',
+    proveedores:   'text-amber-400',
+    materiales:    'text-blue-400',
+    operaciones:   'text-blue-400',
+    ordenes_compra: 'text-amber-400',
   };
 
   return (
@@ -630,18 +631,8 @@ export const ComprasPanel: React.FC = () => {
           </div>
         </div>
         
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setIsOCModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-1.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-lg transition-all group"
-            title="Órdenes de Compra a Proveedores"
-          >
-            <FileText size={14} className="text-amber-400 group-hover:scale-110" />
-            <span className="text-[10px] font-black uppercase tracking-widest hidden sm:block">Órdenes de Compra</span>
-          </button>
-          <div className="text-[8px] font-mono text-slate-500 uppercase tracking-widest">
-            CADENA DE SUMINISTRO: <span className="text-amber-400">ACTIVO</span>
-          </div>
+        <div className="text-[8px] font-mono text-slate-500 uppercase tracking-widest">
+          CADENA DE SUMINISTRO: <span className="text-amber-400">ACTIVO</span>
         </div>
       </div>
 
@@ -663,17 +654,15 @@ export const ComprasPanel: React.FC = () => {
         <AnimatePresence mode="wait">
           <motion.div key={tab} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.15 }} className="h-full overflow-y-auto custom-scrollbar">
-            {tab === 'proveedores' && <ProveedoresTab />}
-            {tab === 'materiales'  && <MaterialesTab />}
-            {tab === 'operaciones' && <OperacionesTab />}
+            {tab === 'proveedores'    && <ProveedoresTab />}
+            {tab === 'materiales'     && <MaterialesTab />}
+            {tab === 'operaciones'    && <OperacionesTab />}
+            {tab === 'ordenes_compra' && (
+              <OCProveedorManagerModal isOpen={true} onClose={() => {}} isInline={true} />
+            )}
           </motion.div>
         </AnimatePresence>
       </div>
-
-      <OCProveedorManagerModal
-        isOpen={isOCModalOpen}
-        onClose={() => setIsOCModalOpen(false)}
-      />
     </div>
   );
 };

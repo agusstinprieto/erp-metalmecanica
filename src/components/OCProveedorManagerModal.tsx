@@ -30,9 +30,10 @@ interface OCProveedor {
 interface OCProveedorManagerModalProps {
   isOpen: boolean;
   onClose: () => void;
+  isInline?: boolean;
 }
 
-export const OCProveedorManagerModal: React.FC<OCProveedorManagerModalProps> = ({ isOpen, onClose }) => {
+export const OCProveedorManagerModal: React.FC<OCProveedorManagerModalProps> = ({ isOpen, onClose, isInline }) => {
   const [ocs, setOcs] = useState<OCProveedor[]>([]);
   const [proveedores, setProveedores] = useState<Proveedor[]>([]);
   const [loading, setLoading] = useState(false);
@@ -41,10 +42,10 @@ export const OCProveedorManagerModal: React.FC<OCProveedorManagerModalProps> = (
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen || isInline) {
       fetchData();
     }
-  }, [isOpen]);
+  }, [isOpen, isInline]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -142,21 +143,10 @@ export const OCProveedorManagerModal: React.FC<OCProveedorManagerModalProps> = (
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen && !isInline) return null;
 
-  return (
-    <div className="fixed inset-0 left-64 top-16 z-[100] flex items-center justify-center p-4">
-      <motion.div 
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-        onClick={onClose}
-        className="absolute inset-0 bg-black/80 backdrop-blur-md -left-64 -top-16" 
-      />
-      
-      <motion.div 
-        initial={{ scale: 0.95, opacity: 0, y: 20 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        className="relative w-full max-w-5xl bg-[#0a0f1d] border border-white/10 rounded-[40px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
-      >
+  const innerContent = (
+    <>
         {/* Header */}
         <div className="px-8 py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
           <div className="flex items-center gap-4">
@@ -369,6 +359,28 @@ export const OCProveedorManagerModal: React.FC<OCProveedorManagerModalProps> = (
             )}
           </div>
         </div>
+    </>
+  );
+
+  if (isInline) return (
+    <div className="w-full h-full flex flex-col bg-[#0a0f1d] overflow-hidden">
+      {innerContent}
+    </div>
+  );
+
+  return (
+    <div className="fixed inset-0 left-64 top-16 z-[100] flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="absolute inset-0 bg-black/80 backdrop-blur-md -left-64 -top-16"
+      />
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        className="relative w-full max-w-5xl bg-[#0a0f1d] border border-white/10 rounded-[40px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+      >
+        {innerContent}
       </motion.div>
     </div>
   );

@@ -45,6 +45,7 @@ import {
   UserSearch,
   ScanSearch,
   Scan,
+  Landmark,
 } from 'lucide-react';
 import { useConfig } from '../contexts/ConfigContext';
 
@@ -358,6 +359,7 @@ export const Sidebar = (props: {
               </p>
             )}
             <SidebarItem icon={CircleDollarSign} label="Finanzas" active={activeView === 'finance'} onClick={() => navigate('finance')} collapsed={isSidebarCollapsed} />
+            <SidebarItem icon={Landmark} label="Banco" active={activeView === 'banco'} onClick={() => navigate('banco')} collapsed={isSidebarCollapsed} />
             <SidebarItem icon={BarChart3} label="Costos" active={activeView === 'costing'} onClick={() => navigate('costing')} collapsed={isSidebarCollapsed} />
             <SidebarItem icon={Gauge} label="Costeo Live" active={activeView === 'costeo'} onClick={() => navigate('costeo')} collapsed={isSidebarCollapsed} />
 

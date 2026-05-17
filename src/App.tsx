@@ -62,6 +62,7 @@ const MetalQuoterView        = lz(() => import('./components/MetalQuoterView'), 
 const RecruitmentView        = lz(() => import('./components/RecruitmentView'),        'RecruitmentView');
 const VisualIAInspection     = lz(() => import('./components/VisualIAInspection'),     'VisualIAInspection');
 const ShopFloorTracking      = lz(() => import('./components/ShopFloorTracking'),      'ShopFloorTracking');
+const BancoView              = lz(() => import('./components/BancoView'),              'BancoView');
 
 type UserRole = 'ceo' | 'gerente' | 'sistemas' | 'empleado' | 'rh' | 'finanzas' | 'contabilidad' | 'supervisor';
 
@@ -240,6 +241,23 @@ function App() {
                 <span className="text-sm leading-none">{MODULE_GUIDES[activeView]?.emoji ?? '⚡'}</span>
                 <span className="hidden sm:inline">Guía</span>
               </button>
+
+              {/* Manual Link */}
+              <a
+                href="/manual.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Manual del Sistema"
+                className={clsx(
+                  "flex items-center gap-2 px-3 py-1.5 rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all",
+                  isDarkMode
+                    ? "border-white/10 bg-white/5 text-slate-400 hover:text-mcvill-accent hover:border-mcvill-accent/30"
+                    : "border-slate-200 bg-slate-50 text-slate-500 hover:text-blue-600 hover:border-blue-200"
+                )}
+              >
+                <span className="text-sm leading-none">📖</span>
+                <span className="hidden lg:inline">Manual</span>
+              </a>
             </div>
 
             <div className="flex items-center gap-3 lg:gap-10 shrink-0">
@@ -410,6 +428,7 @@ function App() {
             {activeView === 'recruitment' && <RecruitmentView />}
             {activeView === 'visual_ia' && <VisualIAInspection onClose={() => setActiveView('dashboard')} onComplete={() => setActiveView('quality')} />}
             {activeView === 'shop_floor' && <ShopFloorTracking onBack={() => setActiveView('production')} />}
+            {activeView === 'banco' && <BancoView />}
           </Suspense>
           </div>
         </div>

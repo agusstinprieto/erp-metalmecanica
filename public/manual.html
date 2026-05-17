@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Manual ERP McVill — Documentación Completa</title>
+<style>
+:root{
+  --bg:#020617;--card:#0f172a;--border:rgba(79,165,255,.18);--accent:#4FA5FF;
+  --text:#f1f5f9;--muted:#94a3b8;--success:#34d399;--warning:#fbbf24;
+  --danger:#f87171;--sidebar-w:280px;--header-h:60px;
+}
+[data-theme="light"]{
+  --bg:#f0f4f8;--card:#ffffff;--border:#cbd5e1;--accent:#1d4ed8;
+  --text:#0f172a;--muted:#475569;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.65}
+
+/* ── HEADER ───────────────────────────────────────────── */
+#topbar{position:fixed;top:0;left:0;right:0;height:var(--header-h);background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1.5rem;gap:1rem;z-index:100;backdrop-filter:blur(12px)}
+#topbar .logo{font-size:1.1rem;font-weight:900;letter-spacing:.12em;color:var(--accent);flex:1}
+#topbar .logo span{color:var(--muted);font-weight:400}
+#search-box{padding:.4rem .8rem;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:.85rem;width:220px;outline:none}
+#search-box:focus{border-color:var(--accent)}
+#theme-btn{padding:.4rem .7rem;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:.85rem}
+#theme-btn:hover{color:var(--accent);border-color:var(--accent)}
+
+/* ── LAYOUT ───────────────────────────────────────────── */
+#wrap{display:flex;padding-top:var(--header-h);min-height:100vh}
+#sidebar{width:var(--sidebar-w);flex-shrink:0;position:fixed;top:var(--header-h);bottom:0;overflow-y:auto;padding:1rem 0;border-right:1px solid var(--border);background:var(--card)}
+#sidebar::-webkit-scrollbar{width:4px}
+#sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+#content{margin-left:var(--sidebar-w);flex:1;padding:2.5rem 3rem 6rem;max-width:960px}
+@media(max-width:768px){#sidebar{display:none}#content{margin-left:0;padding:1.5rem 1rem 4rem}}
+
+/* ── SIDEBAR NAV ──────────────────────────────────────── */
+.nav-section{padding:.3rem 1rem .2rem;font-size:.65rem;font-weight:800;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;margin-top:.6rem}
+.nav-link{display:block;padding:.38rem 1.2rem;font-size:.82rem;color:var(--muted);text-decoration:none;border-left:2px solid transparent;transition:all .15s}
+.nav-link:hover{color:var(--text);background:rgba(255,255,255,.04);border-left-color:var(--accent)}
+.nav-link.active{color:var(--accent);border-left-color:var(--accent);font-weight:600;background:rgba(79,165,255,.07)}
+
+/* ── SECTIONS ─────────────────────────────────────────── */
+section{margin-bottom:3.5rem;scroll-margin-top:80px}
+h1{font-size:2rem;font-weight:900;letter-spacing:-.02em;margin-bottom:.5rem;color:var(--text)}
+h1 .badge{font-size:.65rem;font-weight:700;padding:.2rem .6rem;border-radius:99px;background:var(--accent);color:#fff;vertical-align:middle;margin-left:.5rem;letter-spacing:.08em}
+h2{font-size:1.35rem;font-weight:800;margin:2.5rem 0 .8rem;padding-bottom:.5rem;border-bottom:2px solid var(--border);color:var(--text)}
+h3{font-size:1.05rem;font-weight:700;margin:1.8rem 0 .6rem;color:var(--accent)}
+h4{font-size:.9rem;font-weight:700;margin:1.2rem 0 .4rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+p{margin-bottom:.8rem;color:var(--text);opacity:.92}
+ul,ol{padding-left:1.4rem;margin-bottom:.8rem}
+li{margin-bottom:.3rem;opacity:.9}
+strong{color:var(--text);opacity:1}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── CARDS & BOXES ────────────────────────────────────── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.4rem;margin-bottom:1rem}
+.card h3{margin-top:0}
+.tip{background:rgba(79,165,255,.08);border:1px solid rgba(79,165,255,.25);border-radius:8px;padding:.8rem 1rem;margin:.8rem 0;font-size:.88rem}
+.tip::before{content:"💡 ";font-size:.9rem}
+.warn{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:8px;padding:.8rem 1rem;margin:.8rem 0;font-size:.88rem}
+.warn::before{content:"⚠️ ";font-size:.9rem}
+.danger-box{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);border-radius:8px;padding:.8rem 1rem;margin:.8rem 0;font-size:.88rem}
+.danger-box::before{content:"🔴 "}
+
+/* ── CODE ─────────────────────────────────────────────── */
+pre,code{font-family:'Cascadia Code','Fira Code','Courier New',monospace}
+pre{background:#0a0f1e;border:1px solid var(--border);border-radius:10px;padding:1.2rem;overflow-x:auto;font-size:.82rem;line-height:1.7;margin:.8rem 0}
+code{background:rgba(79,165,255,.12);padding:.15em .45em;border-radius:4px;font-size:.85em;color:var(--accent)}
+pre code{background:none;padding:0;color:#c9d1d9}
+
+/* ── TABLES ───────────────────────────────────────────── */
+.table-wrap{overflow-x:auto;margin:.8rem 0}
+table{width:100%;border-collapse:collapse;font-size:.86rem}
+th{background:rgba(79,165,255,.12);color:var(--accent);font-weight:700;text-transform:uppercase;font-size:.72rem;letter-spacing:.06em;padding:.65rem .85rem;text-align:left;border-bottom:2px solid var(--border)}
+td{padding:.6rem .85rem;border-bottom:1px solid var(--border);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.03)}
+
+/* ── FORMULA BOX ──────────────────────────────────────── */
+.formula{background:linear-gradient(135deg,rgba(79,165,255,.06),rgba(52,211,153,.04));border:1px solid rgba(79,165,255,.2);border-radius:10px;padding:1.2rem 1.4rem;margin:1rem 0;font-family:'Cascadia Code','Fira Code',monospace;font-size:.9rem;line-height:2}
+.formula .eq{color:var(--accent);font-weight:700}
+.formula .comment{color:var(--muted);font-style:italic;font-size:.8rem}
+
+/* ── STATUS PILLS ─────────────────────────────────────── */
+.pill{display:inline-block;padding:.15rem .55rem;border-radius:99px;font-size:.72rem;font-weight:700;letter-spacing:.04em}
+.pill-blue{background:rgba(79,165,255,.15);color:var(--accent)}
+.pill-green{background:rgba(52,211,153,.15);color:#34d399}
+.pill-amber{background:rgba(251,191,36,.15);color:#fbbf24}
+.pill-red{background:rgba(248,113,113,.15);color:#f87171}
+.pill-purple{background:rgba(167,139,250,.15);color:#a78bfa}
+.pill-gray{background:rgba(148,163,184,.12);color:var(--muted)}
+
+/* ── MODULE GRID ──────────────────────────────────────── */
+.module-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.8rem;margin:.8rem 0}
+.module-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.9rem 1rem;font-size:.82rem}
+.module-card .icon{font-size:1.2rem;margin-bottom:.3rem;display:block}
+.module-card .name{font-weight:700;color:var(--text);margin-bottom:.2rem}
+.module-card .desc{color:var(--muted);font-size:.75rem}
+
+/* ── STEP LIST ────────────────────────────────────────── */
+.steps{counter-reset:step;list-style:none;padding:0}
+.steps li{counter-increment:step;padding:.5rem 0 .5rem 3rem;position:relative;border-left:2px solid var(--border);margin-left:1rem;padding-left:2rem}
+.steps li::before{content:counter(step);position:absolute;left:-1rem;top:.45rem;width:2rem;height:2rem;border-radius:50%;background:var(--accent);color:#fff;font-size:.75rem;font-weight:800;display:flex;align-items:center;justify-content:center}
+.steps li:last-child{border-left:2px solid transparent}
+
+/* ── HERO ─────────────────────────────────────────────── */
+.hero{background:linear-gradient(135deg,rgba(79,165,255,.1),rgba(52,211,153,.05));border:1px solid var(--border);border-radius:16px;padding:2rem;margin-bottom:2rem;text-align:center}
+.hero .version{font-size:.72rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem}
+.hero h1{font-size:2.4rem;margin-bottom:.6rem}
+.hero p{color:var(--muted);max-width:600px;margin:0 auto}
+
+/* ── SEARCH HIGHLIGHT ─────────────────────────────────── */
+mark{background:rgba(251,191,36,.35);color:var(--text);border-radius:2px;padding:0 .1em}
+
+/* ── PRINT ────────────────────────────────────────────── */
+@media print{
+  #topbar,#sidebar{display:none}
+  #content{margin:0;max-width:none;padding:1rem}
+  section{page-break-inside:avoid}
+  pre{white-space:pre-wrap}
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <div class="logo">MCVILL <span>ERP</span> &nbsp;·&nbsp; Manual Técnico</div>
+  <input id="search-box" type="search" placeholder="🔍  Buscar en el manual…" oninput="doSearch(this.value)"/>
+  <button id="theme-btn" onclick="toggleTheme()">☀ Modo Claro</button>
+  <button id="theme-btn" style="margin-left:.4rem" onclick="window.print()">🖨 Imprimir</button>
+</div>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="nav-section">Introducción</div>
+  <a class="nav-link" href="#intro">¿Qué es McVill ERP?</a>
+  <a class="nav-link" href="#arquitectura">Arquitectura</a>
+  <a class="nav-link" href="#roles">Roles y Permisos</a>
+  <a class="nav-link" href="#temas">Temas de Color</a>
+
+  <div class="nav-section">Módulos Operativos</div>
+  <a class="nav-link" href="#dashboard">Dashboard</a>
+  <a class="nav-link" href="#produccion">Control de Planta</a>
+  <a class="nav-link" href="#viajeros">Viajeros Industriales</a>
+  <a class="nav-link" href="#planeacion">Planeación IA</a>
+  <a class="nav-link" href="#inventario">Inventarios Pro</a>
+  <a class="nav-link" href="#calidad">Calidad SGC</a>
+  <a class="nav-link" href="#hse">Seguridad HSE</a>
+  <a class="nav-link" href="#mantenimiento">Mantenimiento</a>
+
+  <div class="nav-section">Capital Humano</div>
+  <a class="nav-link" href="#asistencia">Asistencia &amp; Fichaje</a>
+  <a class="nav-link" href="#nomina">Nómina — Fórmulas</a>
+  <a class="nav-link" href="#rh">Recursos Humanos</a>
+  <a class="nav-link" href="#desempeno">Desempeño e Incentivos</a>
+  <a class="nav-link" href="#reclutamiento">Reclutamiento IA</a>
+
+  <div class="nav-section">Comercial</div>
+  <a class="nav-link" href="#ventas">Ventas y CRM</a>
+  <a class="nav-link" href="#compras">Compras</a>
+  <a class="nav-link" href="#cotizaciones">Agente de Cotizaciones</a>
+  <a class="nav-link" href="#rfq">RFQ Kanban</a>
+  <a class="nav-link" href="#factibilidad">Factibilidad IA</a>
+  <a class="nav-link" href="#metal-quoter">Metal Quoter</a>
+
+  <div class="nav-section">Ingeniería</div>
+  <a class="nav-link" href="#ingenieria">Ingeniería y Diseño</a>
+  <a class="nav-link" href="#instrucciones">Instrucciones de Trabajo</a>
+  <a class="nav-link" href="#nesting">Nesting &amp; Optimizador</a>
+  <a class="nav-link" href="#layout">Diseño de Layout</a>
+  <a class="nav-link" href="#simulador">Simulador de Procesos</a>
+
+  <div class="nav-section">Calidad Avanzada</div>
+  <a class="nav-link" href="#spc">SPC — Control Estadístico</a>
+  <a class="nav-link" href="#visual-ia">Inspección Visual IA</a>
+  <a class="nav-link" href="#trazabilidad">Trazabilidad</a>
+  <a class="nav-link" href="#defectos">Biblioteca de Defectos</a>
+  <a class="nav-link" href="#ppap">PPAP / FAI</a>
+  <a class="nav-link" href="#voc">VOC — Voz del Cliente</a>
+
+  <div class="nav-section">Finanzas &amp; Análisis</div>
+  <a class="nav-link" href="#finanzas">Finanzas y ROI</a>
+  <a class="nav-link" href="#costos">Control de Costos</a>
+  <a class="nav-link" href="#costeo-vivo">Costeo en Vivo</a>
+  <a class="nav-link" href="#reportes">Reportes KPI</a>
+
+  <div class="nav-section">Inteligencia Artificial</div>
+  <a class="nav-link" href="#chat-ia">Chat IA &amp; Voice Link</a>
+  <a class="nav-link" href="#minutas">Minutas IA</a>
+  <a class="nav-link" href="#shop-floor">Shop Floor Monitor</a>
+
+  <div class="nav-section">Hardware &amp; IoT</div>
+  <a class="nav-link" href="#hw-escaner">Escáner de Códigos</a>
+  <a class="nav-link" href="#hw-camaras">Cámaras IP</a>
+  <a class="nav-link" href="#hw-tablets">Tablets en Planta</a>
+  <a class="nav-link" href="#hw-impresora">Impresora de Etiquetas</a>
+  <a class="nav-link" href="#hw-proyectos">Proyectos Pendientes</a>
+
+  <div class="nav-section">Fórmulas de Referencia</div>
+  <a class="nav-link" href="#form-nomina">Nómina Completa</a>
+  <a class="nav-link" href="#form-spc">SPC Completo</a>
+  <a class="nav-link" href="#form-oee">OEE y Desempeño</a>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main id="content">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="version">Sistema ERP Industrial · IA.AGUS · v2.6</div>
+  <h1>Manual Técnico McVill ERP</h1>
+  <p>Documentación completa de módulos, fórmulas, hardware, flujos de proceso e integración de IA para manufactura metalmecánica industrial.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="intro">
+<h1>¿Qué es McVill ERP? <span class="badge">Introducción</span></h1>
+<p><strong>McVill ERP</strong> es un sistema de planificación de recursos empresariales diseñado específicamente para la industria metalmecánica. Integra manufactura, calidad, capital humano, comercial, ingeniería y análisis financiero en una sola plataforma impulsada por Inteligencia Artificial.</p>
+
+<div class="card">
+  <h3>Capacidades principales</h3>
+  <ul>
+    <li><strong>+35 módulos</strong> integrados — desde dashboard hasta PPAP</li>
+    <li><strong>IA Gemini</strong> en producción, calidad, cotizaciones, inspección visual y voz</li>
+    <li><strong>Multi-tenant</strong> — cada empresa tiene sus datos completamente aislados</li>
+    <li><strong>Tiempo real</strong> — Supabase Realtime sincroniza estados al instante</li>
+    <li><strong>Hardware ready</strong> — escáneres, cámaras IP, tablets, impresoras de etiquetas</li>
+    <li><strong>Accesible desde cualquier dispositivo</strong> — navegador web, sin instalación</li>
+  </ul>
+</div>
+
+<div class="module-grid">
+  <div class="module-card"><span class="icon">🏭</span><div class="name">Control de Planta</div><div class="desc">OTs, etapas, tiempos reales</div></div>
+  <div class="module-card"><span class="icon">🗂️</span><div class="name">Viajeros Industriales</div><div class="desc">Rastreo pieza por planta</div></div>
+  <div class="module-card"><span class="icon">🤖</span><div class="name">IA Integrada</div><div class="desc">Gemini Vision + Chat + Voz</div></div>
+  <div class="module-card"><span class="icon">📊</span><div class="name">SPC en Tiempo Real</div><div class="desc">Cartas de control automáticas</div></div>
+  <div class="module-card"><span class="icon">💰</span><div class="name">Nómina ISR 2026</div><div class="desc">Cálculo automático SAT</div></div>
+  <div class="module-card"><span class="icon">📸</span><div class="name">Inspección Visual</div><div class="desc">IA detecta defectos en foto</div></div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="arquitectura">
+<h1>Arquitectura del Sistema</h1>
+<div class="card">
+<pre>
+┌─────────────────────────────────────────────────────────┐
+│            FRONTEND — React 19 + Vite + TypeScript       │
+│      Tailwind CSS v4  ·  Framer Motion  ·  Lucide Icons  │
+└────────────────────────┬────────────────────────────────┘
+                         │ HTTPS / WebSocket
+┌────────────────────────▼────────────────────────────────┐
+│           SUPABASE (Backend as a Service)                │
+│  PostgreSQL · Auth · RLS · Realtime · Storage · Edge Fn  │
+└──────────┬─────────────────────────────┬────────────────┘
+           │ REST API                    │ API Key
+┌──────────▼──────────┐    ┌─────────────▼──────────────┐
+│  Base de datos      │    │  Google Gemini AI          │
+│  Multi-tenant RLS   │    │  gemini-2.5-flash-lite     │
+│  Migraciones SQL    │    │  Gemini Vision (imágenes)  │
+└─────────────────────┘    └────────────────────────────┘
+</pre>
+</div>
+<div class="table-wrap"><table>
+<tr><th>Capa</th><th>Tecnología</th><th>Propósito</th></tr>
+<tr><td>Frontend</td><td>React 19, TypeScript, Tailwind CSS v4</td><td>Interfaz de usuario responsiva</td></tr>
+<tr><td>Backend</td><td>Supabase (PostgreSQL 15)</td><td>Base de datos, autenticación, RLS</td></tr>
+<tr><td>Auth</td><td>Supabase Auth + JWT</td><td>Sesiones seguras por tenant</td></tr>
+<tr><td>IA General</td><td>Google Gemini 2.5 Flash Lite</td><td>Chat, análisis, cotizaciones</td></tr>
+<tr><td>IA Visión</td><td>Gemini Vision</td><td>Inspección de piezas, planos</td></tr>
+<tr><td>IA Voz</td><td>Gemini Flash Native Audio</td><td>Voice Link (comandos de voz)</td></tr>
+<tr><td>Deploy</td><td>Vercel (frontend) + Supabase Cloud</td><td>CDN global, auto-deploy</td></tr>
+<tr><td>Tiempo Real</td><td>Supabase Realtime</td><td>Sincronización en vivo</td></tr>
+</table></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="roles">
+<h1>Roles y Permisos</h1>
+<div class="table-wrap"><table>
+<tr><th>Rol</th><th>Nivel</th><th>Módulos con Acceso</th></tr>
+<tr><td><span class="pill pill-purple">CEO</span></td><td>Máximo</td><td>Todos los módulos + Configuración + Godmode completo</td></tr>
+<tr><td><span class="pill pill-blue">Sistemas</span></td><td>Admin</td><td>Igual que CEO — administrador técnico</td></tr>
+<tr><td><span class="pill pill-green">Gerente</span></td><td>Alto</td><td>Todos los módulos + Reportes gerenciales</td></tr>
+<tr><td><span class="pill pill-amber">Supervisor</span></td><td>Medio-Alto</td><td>Planta, Viajeros, Calidad, Ingeniería, Mantenimiento</td></tr>
+<tr><td><span class="pill pill-amber">RH</span></td><td>Medio</td><td>Capital Humano, RH, Nómina, Asistencia</td></tr>
+<tr><td><span class="pill pill-amber">Finanzas</span></td><td>Medio</td><td>Finanzas, Costos, Costeo, Nómina (solo lectura)</td></tr>
+<tr><td><span class="pill pill-gray">Empleado</span></td><td>Básico</td><td>Dashboard, Inventario, Producción, Viajeros, Calidad, HSE</td></tr>
+</table></div>
+<div class="tip">Los módulos marcados "Godmode" en el sidebar solo son visibles para CEO, Sistemas y Gerente.</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="temas">
+<h1>Temas de Color</h1>
+<p>Cada usuario puede elegir su tema desde el header (barra superior). El cambio es instantáneo y se guarda por usuario.</p>
+<div class="table-wrap"><table>
+<tr><th>Tema</th><th>Dark Mode</th><th>Light Mode</th><th>Perfil</th></tr>
+<tr><td>🔵 <strong>Azul Industrial</strong></td><td>Fondo #020617 · Acento #4FA5FF</td><td>Fondo #F0F4F8 · Acento #1D4ED8</td><td>Corporativo · Predeterminado</td></tr>
+<tr><td>⚫ <strong>Slate Neutro</strong></td><td>Fondo #0F172A · Acento #94A3B8</td><td>Fondo #F8FAFC · Acento #475569</td><td>Minimalista · Sin color dominante</td></tr>
+<tr><td>🟢 <strong>Esmeralda</strong></td><td>Fondo #020617 · Acento #34D399</td><td>Fondo #F0FDF9 · Acento #059669</td><td>Producción · Planta industrial</td></tr>
+<tr><td>🟠 <strong>Carbon</strong></td><td>Fondo #0A0A0A · Acento #FF6B00</td><td>Fondo #FAFAF9 · Acento #C2410C</td><td>Negro puro · Naranja brillante</td></tr>
+</table></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="dashboard">
+<h2>Dashboard — Tablero Principal</h2>
+<p>Vista central del ERP. Muestra el estado del negocio en tiempo real con KPIs, alertas y accesos rápidos.</p>
+<h3>KPIs en Tiempo Real</h3>
+<ul>
+  <li><strong>OEE</strong> (Overall Equipment Effectiveness) — eficiencia global de equipos</li>
+  <li><strong>FTT</strong> (First Time Through) — % piezas buenas sin retrabajo</li>
+  <li><strong>Entregas a tiempo</strong> — % órdenes entregadas en fecha prometida</li>
+  <li><strong>Margen promedio</strong> — rentabilidad media de órdenes activas</li>
+</ul>
+<h3>Alertas Predictivas</h3>
+<ul>
+  <li>🔴 Rojo = acción inmediata requerida</li>
+  <li>🟡 Amarillo = atención pronto</li>
+  <li>🟢 Verde = dentro de parámetros normales</li>
+</ul>
+<div class="tip">El botón de cerebro (🧠) en cada KPI activa análisis profundo con IA Gemini que explica la causa raíz y sugiere acciones.</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="produccion">
+<h2>Control de Planta</h2>
+<p>Gestión completa de Órdenes de Trabajo (OT) desde creación hasta entrega, con rastreo por etapa de manufactura.</p>
+<h3>Ciclo de vida de una OT</h3>
+<ol class="steps">
+  <li>Se crea la OT con número de parte, cliente, cantidad y fecha de entrega</li>
+  <li>Se asigna ruta de proceso: Corte → Doblez → Soldadura → Maquinado → Pintura → Ensamble</li>
+  <li>Operador inicia etapa: registra hora de inicio y número de empleado</li>
+  <li>Al completar etapa: avanza automáticamente a la siguiente, registra tiempo real</li>
+  <li>Inspección visual IA en puntos críticos — crea NC si detecta defecto</li>
+  <li>OT completada: actualiza inventario de producto terminado</li>
+</ol>
+<h3>Centros de Trabajo</h3>
+<div class="table-wrap"><table>
+<tr><th>Centro</th><th>Código</th><th>Procesos típicos</th></tr>
+<tr><td>Corte Láser</td><td>LASER</td><td>Corte CNC, perforado, grabado</td></tr>
+<tr><td>Doblez</td><td>DOBLEZ</td><td>Plegado, formado en frío</td></tr>
+<tr><td>Soldadura</td><td>SOLDADURA</td><td>MIG, TIG, punto, proyección</td></tr>
+<tr><td>Maquinado CNC</td><td>CNC</td><td>Torneado, fresado, taladrado</td></tr>
+<tr><td>Pintura</td><td>PINTURA</td><td>Granallado, primario, acabado</td></tr>
+<tr><td>Ensamble</td><td>ENSAMBLE</td><td>Armado, torqueo, empaque</td></tr>
+</table></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="viajeros">
+<h2>Viajeros Industriales</h2>
+<p>El <strong>Viajero</strong> es el pasaporte digital de cada pieza. Acompaña la orden de fabricación desde la creación hasta la entrega al cliente, registrando cada operación, tiempo, operador y resultado de calidad.</p>
+
+<h3>Estructura de datos del Viajero</h3>
+<div class="card">
+<pre>
+Encabezado:
+  cliente · número_parte · revisión · OC_cliente
+  cantidad_orden · cant_fabricada · fecha_orden · fecha_entrega
+  cotización · horas_estimadas_totales · notas
+
+Operaciones:
+  centro_trabajo · tiempo_estimado · tiempo_real
+  estado (pendiente|en_proceso|completado) · operador · secuencia
+
+Materiales / Recogidas:
+  clave_material · descripción · cantidad · calibre
+  código de barras para escaneo en almacén
+
+BOM — Componentes:
+  sub-órdenes hijas · descripción · cantidad · fechas
+</pre>
+</div>
+
+<h3>Estados del Viajero y colores</h3>
+<div class="table-wrap"><table>
+<tr><th>Estado</th><th>Color</th><th>Condición</th></tr>
+<tr><td>PENDIENTE</td><td><span class="pill pill-gray">Gris</span></td><td>No ha comenzado</td></tr>
+<tr><td>EN PROCESO</td><td><span class="pill pill-blue">Azul</span></td><td>En fabricación, dentro de tiempo</td></tr>
+<tr><td>EN RIESGO</td><td><span class="pill pill-amber">Ámbar</span></td><td>Menos de 2 días para fecha de entrega</td></tr>
+<tr><td>ATRASADO</td><td><span class="pill pill-red">Rojo</span></td><td>Fecha estimada fin &gt; fecha entrega</td></tr>
+<tr><td>DETENIDO</td><td><span class="pill pill-amber">Naranja</span></td><td>Orden pausada manualmente</td></tr>
+<tr><td>COMPLETADO</td><td><span class="pill pill-green">Verde</span></td><td>Terminado a tiempo</td></tr>
+<tr><td>RECHAZADO</td><td><span class="pill pill-red">Rojo Oscuro</span></td><td>Defecto en QC — requiere acción</td></tr>
+</table></div>
+
+<h3>Lógica de detección de retraso</h3>
+<div class="formula">
+  <span class="eq">horas_restantes</span> = horas_estimadas × (1 - avance/100)<br>
+  <span class="eq">días_para_terminar</span> = horas_restantes / 8<br>
+  <span class="eq">fecha_estimada_fin</span> = hoy + días_para_terminar<br><br>
+  <span class="comment">— Decisión:</span><br>
+  Si fecha_estimada_fin &gt; fecha_entrega → <span style="color:#f87171">ATRASADO</span><br>
+  Si diferencia &lt; 2 días → <span style="color:#fbbf24">EN RIESGO</span><br>
+  Si va dentro de tiempo → <span style="color:#34d399">OK</span>
+</div>
+
+<h3>Código QR del Viajero</h3>
+<p>Cada viajero genera un QR que codifica su ID único. Al escanear con tablet o celular en el piso de planta, abre directamente el estado actual del viajero en ShopFloor Tracking. Se puede imprimir en etiqueta con impresora Zebra o en el PDF del viajero.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="planeacion">
+<h2>Planeación IA</h2>
+<h3>Gantt de Producción</h3>
+<p>Diagrama de Gantt interactivo con todas las OTs activas. La IA puede reordenar automáticamente para minimizar tiempos de cambio y optimizar secuencias por centro de trabajo.</p>
+<h3>MRP — Planeación de Materiales</h3>
+<p>Cruza órdenes abiertas vs inventario disponible. Genera lista de compras priorizada: rojo = déficit crítico, amarillo = stock ajustado.</p>
+<h3>S&OP — Sales &amp; Operations Planning</h3>
+<p>Consolida pipeline de cotizaciones vs capacidad operativa real. Responde: <em>"¿Podemos comprometer estas nuevas órdenes sin afectar las actuales?"</em></p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="inventario">
+<h2>Inventarios Pro</h2>
+<h3>Catálogo de Materiales</h3>
+<ul>
+  <li>Búsqueda por descripción, clave o proveedor</li>
+  <li>Indicador de barra: % del almacén usado</li>
+  <li>🔴 Rojo = stock bajo el nivel mínimo configurado</li>
+  <li>IA identifica materiales por foto (útil en recepción)</li>
+</ul>
+<h3>Niveles de alerta</h3>
+<div class="formula">
+  Stock mínimo (configurado por material)<br>
+  Si <span class="eq">stock_actual</span> &lt; <span class="eq">stock_mínimo</span> → <span style="color:#f87171">ALERTA CRÍTICA</span><br>
+  Si <span class="eq">stock_actual</span> &lt; <span class="eq">stock_mínimo × 1.2</span> → <span style="color:#fbbf24">ALERTA BAJA</span>
+</div>
+<h3>Movimientos</h3>
+<p>Cada entrada/salida de material queda registrada con usuario, fecha, OT relacionada y motivo. El historial permite auditar discrepancias.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="calidad">
+<h2>Calidad SGC</h2>
+<h3>Inspección Visual con IA</h3>
+<p>6 tipos de inspección especializados, cada uno con un modelo de prompt entrenado en normas industriales:</p>
+<div class="table-wrap"><table>
+<tr><th>Tipo</th><th>Norma</th><th>Defectos detectados</th></tr>
+<tr><td>Soldadura</td><td>AWS D1.1 / ISO 5817</td><td>Porosidades, fisuras, socavación, salpicaduras, penetración</td></tr>
+<tr><td>Ensamble</td><td>Interna</td><td>Piezas faltantes, tornillos sueltos, desalineación, daños</td></tr>
+<tr><td>Pintura</td><td>Acabados superficiales</td><td>Chorreos, burbujas, cáscara de naranja, delaminación</td></tr>
+<tr><td>Dimensional</td><td>GD&amp;T / ASME Y14.5</td><td>Rebabas, deformaciones, perforaciones incorrectas</td></tr>
+<tr><td>Material</td><td>Materia prima</td><td>Contaminación, corrosión, defectos de fundición</td></tr>
+<tr><td>General</td><td>Multi-propósito</td><td>Cualquier no conformidad visible</td></tr>
+</table></div>
+<h3>Flujo de No Conformidades (NC)</h3>
+<ol class="steps">
+  <li>IA detecta FAIL → crea NC automáticamente con evidencia fotográfica</li>
+  <li>Asigna severidad: Crítica (&gt;85% confianza) · Mayor (&gt;60%) · Menor (&lt;60%)</li>
+  <li>Supervisor recibe notificación en tiempo real</li>
+  <li>Se registra causa raíz y acción correctiva/preventiva</li>
+  <li>Flujo: Abierta → En Proceso → Verificación → Cerrada</li>
+</ol>
+<div class="warn">Una NC con severidad Crítica bloquea automáticamente el avance del viajero hasta ser resuelta.</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="hse">
+<h2>Seguridad HSE</h2>
+<h3>NOMs aplicables</h3>
+<ul>
+  <li><strong>NOM-001-STPS</strong> — Instalaciones eléctricas</li>
+  <li><strong>NOM-017-STPS</strong> — Equipo de Protección Personal (EPP)</li>
+  <li><strong>NOM-026-STPS</strong> — Colores y señales de seguridad</li>
+</ul>
+<h3>Registro de Incidentes</h3>
+<p>Cada incidente registra: tipo, área, empleado involucrado, descripción, acción inmediata, análisis de causa raíz y acciones correctivas. El mapa de calor muestra zonas con mayor frecuencia.</p>
+<h3>EPP y Capacitaciones</h3>
+<p>El sistema alerta automáticamente cuando vence la vida útil de un EPP o cuando una certificación de seguridad está por expirar.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="mantenimiento">
+<h2>Mantenimiento</h2>
+<h3>Health Score de Equipos</h3>
+<div class="formula">
+  <span class="eq">Health Score</span> = Índice compuesto de disponibilidad, edad, historial de fallas<br><br>
+  <span style="color:#34d399">80 – 100:</span> Excelente — sin acción requerida<br>
+  <span style="color:#fbbf24">60 – 79:</span> Atención — programar mantenimiento preventivo<br>
+  <span style="color:#f87171">0 – 59:</span> Urgente — riesgo de falla inminente
+</div>
+<h3>Mantenimiento Preventivo</h3>
+<p>Se definen planes por frecuencia (diaria, semanal, mensual, por horas de uso). El sistema genera alertas automáticamente y al ejecutar registra técnico, duración, partes usadas y observaciones.</p>
+<div class="tip">La IA predice fecha probable de falla basándose en el historial de mantenimientos y patrones de uso.</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- ██████████████ ASISTENCIA DETALLADA ████████████████ -->
+<section id="asistencia">
+<h1>Control de Asistencia — Guía Completa <span class="badge">Hardware</span></h1>
+<p>El módulo de asistencia registra entradas y salidas de empleados mediante escaneo de gafetes con código de barras. Los datos alimentan directamente el cálculo de nómina.</p>
+
+<h2>Hardware Requerido</h2>
+
+<h3>1. Escáner de Código de Barras (Lector HID)</h3>
+<p>El sistema acepta cualquier <strong>escáner HID USB</strong> — se comporta como teclado automático, compatible con cualquier PC o tablet con Chrome.</p>
+
+<div class="table-wrap"><table>
+<tr><th>Característica</th><th>Mínimo requerido</th><th>Recomendado</th></tr>
+<tr><td>Tipo</td><td>1D (Code 128)</td><td>1D + 2D (QR y Code 128)</td></tr>
+<tr><td>Interfaz</td><td>USB HID</td><td>USB HID (Bluetooth opcional)</td></tr>
+<tr><td>Velocidad lectura</td><td>100 lecturas/min</td><td>300+ lecturas/min</td></tr>
+<tr><td>Modelos sugeridos</td><td>Honeywell 1250g · Datalogic QD2430</td><td>Zebra DS2208 · Motorola DS9208</td></tr>
+<tr><td>Costo aprox.</td><td>$80–$150 USD</td><td>$200–$400 USD</td></tr>
+</table></div>
+
+<div class="tip">El escáner HID envía el código como si el empleado lo escribiera en el teclado — no requiere driver ni software adicional. Solo conectar por USB y listo.</div>
+
+<h3>2. Gafetes con Código de Barras</h3>
+<p>Cada empleado recibe un gafete con su <strong>número de empleado</strong> codificado en Code 128 (estándar industrial). El número de empleado es el identificador único en el sistema.</p>
+
+<h4>Formato del código</h4>
+<div class="formula">
+  Formato: <span class="eq">EMP-001</span>, <span class="eq">EMP-002</span>, etc.<br>
+  Simbología: <span class="eq">Code 128</span> (alfanumérico, alta densidad)<br>
+  Dimensiones barra: mínimo <span class="eq">2.5 cm de ancho × 1.2 cm de alto</span><br>
+  Módulo mínimo: <span class="eq">0.25 mm</span> (lectura a 5–30 cm de distancia)
+</div>
+
+<h4>Información del gafete</h4>
+<div class="card">
+<pre>
+┌────────────────────────────────────┐
+│  🏭  McVill S.A. de C.V.          │
+│                                    │
+│  JUAN MARTÍNEZ LÓPEZ               │
+│  Soldador Senior  ·  SOLDADURA     │
+│  Turno Matutino                    │
+│                                    │
+│  ║║║║║║║║║║║║║║║║║║║║║║           │
+│         EMP-001                    │
+└────────────────────────────────────┘
+  Tamaño CR80 (tarjeta de crédito)
+  Material: PVC 0.76 mm
+</pre>
+</div>
+
+<h3>3. Impresora de Gafetes / Etiquetas</h3>
+<div class="table-wrap"><table>
+<tr><th>Uso</th><th>Modelo recomendado</th><th>Costo aprox.</th><th>Notas</th></tr>
+<tr><td>Gafetes PVC (tarjeta)</td><td>Zebra ZC300 · Evolis Primacy 2</td><td>$800–$2,000 USD</td><td>Impresión por sublimación + código de barras</td></tr>
+<tr><td>Etiquetas adhesivas</td><td>Zebra ZD411 · Brother QL-820</td><td>$250–$500 USD</td><td>Etiquetas de 50×25 mm con código</td></tr>
+<tr><td>Solo papel (provisional)</td><td>Cualquier impresora láser</td><td>Ya disponible</td><td>Laminar o plastificar para durabilidad</td></tr>
+</table></div>
+
+<h4>Configuración de etiqueta (ZPL para Zebra)</h4>
+<pre>
+^XA
+^FO20,20^BY2^BCN,60,Y,N,N^FD${employee_number}^FS
+^FO20,100^A0N,20,20^FD${full_name}^FS
+^FO20,125^A0N,16,16^FD${job_title} · ${department}^FS
+^XZ
+</pre>
+
+<h3>4. Tablet o PC para la Estación de Fichaje</h3>
+<div class="table-wrap"><table>
+<tr><th>Opción</th><th>Hardware</th><th>Ubicación típica</th></tr>
+<tr><td>Tablet montada</td><td>iPad 10 gen o Samsung Tab A9+ en brazo articulado</td><td>Entrada de planta / comedor</td></tr>
+<tr><td>PC con monitor</td><td>Mini PC + pantalla 21" táctil</td><td>Caseta de seguridad</td></tr>
+<tr><td>Laptop dedicada</td><td>Cualquier laptop con Chrome</td><td>Oficina de RH</td></tr>
+</table></div>
+<div class="tip">La estación muestra reloj en tiempo real, nombre y foto del empleado al escanear, y feedback verde (entrada) o azul (salida) claramente visible.</div>
+
+<h2>Flujo de Registro de Asistencia</h2>
+<ol class="steps">
+  <li><strong>Empleado llega a su turno</strong> — se dirige a la estación de fichaje</li>
+  <li><strong>Escanea su gafete</strong> — el escáner lee EMP-001 y lo envía al sistema</li>
+  <li><strong>Sistema busca el empleado</strong> — por número de empleado en tabla <code>profiles</code></li>
+  <li><strong>Registro automático</strong> — si no hay entrada hoy: registra CHECK-IN con timestamp exacto</li>
+  <li><strong>Pantalla de confirmación</strong> — muestra nombre, turno y hora de entrada en verde</li>
+  <li><strong>Al salir del turno</strong> — vuelve a escanear el mismo gafete</li>
+  <li><strong>CHECK-OUT automático</strong> — registra hora de salida y calcula minutos trabajados</li>
+  <li><strong>Sincronización con Nómina</strong> — el registro queda disponible para el cálculo de pago</li>
+</ol>
+
+<h3>Detección automática de incidencias</h3>
+<div class="table-wrap"><table>
+<tr><th>Situación</th><th>Lógica</th><th>Resultado</th></tr>
+<tr><td>Entrada puntual</td><td>check_in ≤ hora_inicio_turno + 5 min</td><td><span class="pill pill-green">✓ A tiempo</span></td></tr>
+<tr><td>Tardanza</td><td>check_in &gt; hora_inicio_turno + 5 min</td><td><span class="pill pill-amber">⚠ Tardanza</span></td></tr>
+<tr><td>Ausencia</td><td>Sin registro en la fecha</td><td><span class="pill pill-red">✗ Ausente</span></td></tr>
+<tr><td>Tiempo extra</td><td>check_out &gt; hora_fin_turno + 30 min</td><td><span class="pill pill-blue">OT detectada</span></td></tr>
+<tr><td>Gafete no encontrado</td><td>Número no existe en sistema</td><td>Alerta "No registrado"</td></tr>
+<tr><td>Doble escaneo</td><td>Ya tiene entrada y salida del día</td><td>Notificación informativa</td></tr>
+</table></div>
+
+<h3>Datos capturados por registro</h3>
+<pre>
+{
+  employee_id: "uuid",
+  employee_number: "EMP-001",
+  date: "2026-05-16",
+  check_in:  "2026-05-16T07:02:00Z",   // Hora de entrada
+  check_out: "2026-05-16T16:35:00Z",   // Hora de salida
+  minutes_worked: 573,                  // 9h 33min
+  overtime_minutes: 93,                 // 1h 33min (si aplica)
+  status: "on_time | late | absent",
+  notes: "opcional — incidencia manual"
+}
+</pre>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- ██████████████ NÓMINA COMPLETA ████████████████████ -->
+<section id="nomina">
+<h1>Nómina — Fórmulas Completas <span class="badge">2026</span></h1>
+<p>El módulo de nómina calcula automáticamente el salario neto de cada empleado usando los registros de asistencia como insumo principal. Cumple con LISR 2026 y cuotas IMSS vigentes.</p>
+
+<h2>Parámetros Base del Sistema</h2>
+<div class="table-wrap"><table>
+<tr><th>Constante</th><th>Valor</th><th>Descripción</th></tr>
+<tr><td><code>DAILY_WAGE</code></td><td>$450 MXN</td><td>Salario diario base configurable por empleado</td></tr>
+<tr><td><code>HOURLY_RATE_MULTIPLIER</code></td><td>× 2</td><td>Factor de horas extra (doble pago — Ley Federal del Trabajo)</td></tr>
+<tr><td><code>OEE_BONUS_THRESHOLD</code></td><td>85%</td><td>OEE mínimo para activar bono de productividad</td></tr>
+<tr><td><code>OEE_BONUS_PCT</code></td><td>5%</td><td>Porcentaje del bono OEE sobre salario bruto</td></tr>
+<tr><td><code>UMA Diaria 2026</code></td><td>$108.57 MXN</td><td>Unidad de Medida y Actualización (INEGI)</td></tr>
+<tr><td><code>3 UMAs Mensual</code></td><td>$9,900 MXN</td><td>Tope para cuota base IMSS enfermedad/maternidad</td></tr>
+</table></div>
+
+<h2>Paso 1 — Obtener Datos de Asistencia</h2>
+<div class="formula">
+  <span class="eq">days_worked</span> = COUNT(registros con check_in Y check_out en el período)<br>
+  <span class="eq">overtime_hours</span> = SUM(minutos_extra) / 60  &nbsp;<span class="comment">→ solo si &gt; 30 min al día</span><br>
+  <span class="eq">days_absent</span> = días_laborables - days_worked<br>
+  <span class="eq">days_late</span> = COUNT(registros con tardanza &gt; 5 min)
+</div>
+
+<h2>Paso 2 — Salario Base</h2>
+<div class="formula">
+  <span class="eq">salario_base</span> = daily_salary × days_worked<br><br>
+  <span class="comment">Ejemplo: $450 × 22 días = $9,900</span>
+</div>
+
+<h2>Paso 3 — Pago de Horas Extra</h2>
+<p>Según el Art. 67 de la LFT: las primeras 9 horas extra semanales se pagan al <strong>doble</strong>. Las que excedan ese límite se pagan al <strong>triple</strong>.</p>
+<div class="formula">
+  <span class="eq">hourly_rate</span> = daily_salary / 8<br>
+  <span class="eq">overtime_amount</span> = overtime_hours × hourly_rate × 2<br><br>
+  <span class="comment">Ejemplo: 10h extra × ($450/8) × 2 = $1,125</span>
+</div>
+
+<h2>Paso 4 — Bono OEE (Productividad)</h2>
+<div class="formula">
+  Si <span class="eq">oee_percentage</span> ≥ 85% :<br>
+  &nbsp;&nbsp;<span class="eq">bonus_oee</span> = (salario_base + overtime_amount) × 0.05<br>
+  Si <span class="eq">oee_percentage</span> &lt; 85% :<br>
+  &nbsp;&nbsp;<span class="eq">bonus_oee</span> = $0<br><br>
+  <span class="comment">Ejemplo: ($9,900 + $1,125) × 0.05 = $550.25</span>
+</div>
+
+<h2>Paso 5 — Deducciones por Faltas</h2>
+<div class="formula">
+  <span class="eq">deductions_absence</span> = days_absent × daily_salary<br><br>
+  <span class="comment">Ejemplo: 2 faltas × $450 = $900</span>
+</div>
+
+<h2>Paso 6 — Salario Bruto</h2>
+<div class="formula">
+  <span class="eq">gross_salary</span> = salario_base + overtime_amount + bonus_oee - deductions_absence<br><br>
+  <span class="comment">Ejemplo: $9,900 + $1,125 + $550 - $900 = $10,675</span>
+</div>
+
+<h2>Paso 7 — Cálculo ISR (Art. 96 LISR)</h2>
+<p>Se aplica la tarifa mensual del SAT 2026. Se localiza el rango al que pertenece el salario bruto mensual y se aplica la fórmula:</p>
+<div class="formula">
+  <span class="eq">excedente</span> = gross_salary - límite_inferior_del_rango<br>
+  <span class="eq">impuesto_marginal</span> = excedente × tasa_del_rango<br>
+  <span class="eq">ISR_bruto</span> = cuota_fija + impuesto_marginal<br>
+  <span class="eq">ISR_neto</span> = ISR_bruto - subsidio_al_empleo<br><br>
+  <span class="comment">Si ISR_neto &lt; 0 → el subsidio al empleo es a favor del trabajador</span>
+</div>
+
+<h3>Tabla ISR Mensual 2026 (Art. 96 LISR)</h3>
+<div class="table-wrap"><table>
+<tr><th>Límite Inferior</th><th>Límite Superior</th><th>Cuota Fija</th><th>Tasa %</th></tr>
+<tr><td>$0.01</td><td>$7,735.00</td><td>$0.00</td><td>1.92%</td></tr>
+<tr><td>$7,735.01</td><td>$65,651.07</td><td>$148.51</td><td>6.40%</td></tr>
+<tr><td>$65,651.08</td><td>$115,375.90</td><td>$3,844.66</td><td>10.88%</td></tr>
+<tr><td>$115,375.91</td><td>$134,119.41</td><td>$9,264.97</td><td>16.00%</td></tr>
+<tr><td>$134,119.42</td><td>$160,577.65</td><td>$12,254.93</td><td>17.92%</td></tr>
+<tr><td>$160,577.66</td><td>$323,862.00</td><td>$18,994.18</td><td>21.36%</td></tr>
+<tr><td>$323,862.01</td><td>$510,451.00</td><td>$53,854.20</td><td>23.52%</td></tr>
+<tr><td>$510,451.01</td><td>$974,535.03</td><td>$97,754.25</td><td>30.00%</td></tr>
+<tr><td>$974,535.04</td><td>$1,299,380.04</td><td>$236,986.41</td><td>32.00%</td></tr>
+<tr><td>$1,299,380.05</td><td>En adelante</td><td>$340,946.91</td><td>34.00%</td></tr>
+</table></div>
+
+<h4>Ejemplo ISR para $10,675</h4>
+<div class="formula">
+  Rango: $7,735.01 – $65,651.07 (6.40%)<br>
+  excedente = $10,675 - $7,735.01 = $2,939.99<br>
+  impuesto_marginal = $2,939.99 × 6.40% = $188.16<br>
+  ISR_bruto = $148.51 + $188.16 = <span class="eq">$336.67</span>
+</div>
+
+<h2>Paso 8 — Cálculo IMSS (Cuotas Obrero 2026)</h2>
+<div class="table-wrap"><table>
+<tr><th>Concepto</th><th>Tasa</th><th>Base de cálculo</th></tr>
+<tr><td>Invalidez y Vida (IV)</td><td>0.625%</td><td>Salario mensual completo</td></tr>
+<tr><td>Cesantía y Vejez (CV)</td><td>1.125%</td><td>Salario mensual completo</td></tr>
+<tr><td>Enf. y Mat. — excedente 3 UMAs</td><td>0.400%</td><td>Salario – $9,900 (si aplica)</td></tr>
+</table></div>
+<div class="formula">
+  <span class="eq">cuota_IV_CV</span> = gross_salary × (0.00625 + 0.01125)<br>
+  <span class="eq">cuota_IV_CV</span> = gross_salary × 0.01875<br><br>
+  <span class="eq">excedente_EM</span> = max(0, gross_salary - 9,900)<br>
+  <span class="eq">cuota_EM</span> = excedente_EM × 0.004<br><br>
+  <span class="eq">IMSS_obrero_total</span> = cuota_IV_CV + cuota_EM<br><br>
+  <span class="comment">Ejemplo ($10,675):</span><br>
+  IV_CV = $10,675 × 0.01875 = $200.16<br>
+  excedente = $10,675 - $9,900 = $775<br>
+  cuota_EM = $775 × 0.004 = $3.10<br>
+  IMSS = $200.16 + $3.10 = <span class="eq">$203.26</span>
+</div>
+
+<h2>Paso 9 — Salario Neto</h2>
+<div class="formula">
+  <span class="eq">deductions_total</span> = ISR_neto + IMSS_obrero + otras_deducciones<br>
+  <span class="eq">net_salary</span> = gross_salary - deductions_total<br><br>
+  <span class="comment">Ejemplo:</span><br>
+  net_salary = $10,675 - $336.67 - $203.26 = <span class="eq">$10,135.07</span>
+</div>
+
+<h2>Resumen del Recibo de Nómina</h2>
+<div class="card">
+<pre>
+PERCEPCIONES                          DEDUCCIONES
+──────────────────────────────────    ───────────────────────
+Salario base (22 días)    $9,900.00   ISR retenido      $336.67
+Tiempo extra (10h)        $1,125.00   IMSS obrero       $203.26
+Bono OEE (95% → aplica)     $550.25   Falta injust.(0)    $0.00
+──────────────────────────────────    ───────────────────────
+Bruto                    $11,575.25   Total deducciones $539.93
+                                      ───────────────────────
+                                      NETO A PAGAR   $11,035.32
+</pre>
+</div>
+
+<h2>Ciclo completo Asistencia → Nómina</h2>
+<ol class="steps">
+  <li><strong>Período de corte:</strong> Generalmente quincena o semana — RH define las fechas</li>
+  <li><strong>Datos de asistencia:</strong> El sistema cuenta días trabajados, faltas y horas extra del período</li>
+  <li><strong>Cálculo automático:</strong> Botón "Calcular Nómina" procesa todos los empleados</li>
+  <li><strong>Revisión de incidencias:</strong> RH valida faltas justificadas, permisos, incapacidades IMSS</li>
+  <li><strong>Aprobación:</strong> Gerente o CEO aprueba la nómina antes de procesar</li>
+  <li><strong>Pago:</strong> Se genera archivo de transferencia bancaria o recibo individual por empleado</li>
+  <li><strong>PDF por empleado:</strong> Recibo de nómina imprimible con desglose completo</li>
+</ol>
+
+<h3>Estados de una nómina</h3>
+<div class="table-wrap"><table>
+<tr><th>Estado</th><th>Descripción</th></tr>
+<tr><td><span class="pill pill-gray">draft</span></td><td>Calculada pero no aprobada — puede modificarse</td></tr>
+<tr><td><span class="pill pill-blue">calculated</span></td><td>Cálculo finalizado — pendiente de aprobación</td></tr>
+<tr><td><span class="pill pill-green">approved</span></td><td>Aprobada por gerencia — lista para pago</td></tr>
+<tr><td><span class="pill pill-purple">paid</span></td><td>Pagada — registro definitivo</td></tr>
+</table></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="rh">
+<h2>Recursos Humanos</h2>
+<h3>Directorio de Empleados</h3>
+<p>Cada empleado tiene expediente digital con: foto, documentos escaneados, certificaciones, número IMSS, contrato, fecha de ingreso, puesto y área.</p>
+<h3>Matriz de Habilidades</h3>
+<p>Define qué operador está certificado para qué proceso (Soldadura MIG, CNC, Láser, etc.). El sistema usa esta matriz para asignación de OTs y para detectar brechas de capacitación.</p>
+<h3>Onboarding</h3>
+<p>Al contratar a un nuevo empleado, el sistema genera automáticamente un plan de onboarding con capacitaciones obligatorias según el puesto y área, con seguimiento en los primeros 90 días.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="desempeno">
+<h2>Desempeño e Incentivos</h2>
+<h3>KPIs por Operador</h3>
+<div class="formula">
+  <span class="eq">Eficiencia</span> = (piezas_reales / piezas_meta) × 100%<br>
+  <span class="eq">Tasa de Calidad</span> = (piezas_OK / piezas_reales) × 100%<br>
+  <span class="eq">Disponibilidad</span> = (horas_trabajadas - horas_paro) / horas_trabajadas<br>
+  <span class="eq">OEE</span> = Eficiencia × Tasa_Calidad × Disponibilidad<br><br>
+  <span class="comment">OEE clase mundial: &gt; 85% · Bueno: 60–85% · Mejorable: &lt; 60%</span>
+</div>
+
+<h3>Sistema de Incentivos</h3>
+<div class="table-wrap"><table>
+<tr><th>Tipo de Bono</th><th>Condición</th><th>Monto</th></tr>
+<tr><td>Productividad</td><td>Eficiencia ≥ 100%</td><td>5% del salario quincenal</td></tr>
+<tr><td>Productividad Plus</td><td>Eficiencia ≥ 110%</td><td>10% del salario quincenal</td></tr>
+<tr><td>Calidad</td><td>Tasa de calidad ≥ 98%</td><td>3% del salario quincenal</td></tr>
+<tr><td>Seguridad</td><td>0 incidentes en el período</td><td>2% del salario quincenal</td></tr>
+<tr><td>5S</td><td>Score 5S ≥ 90%</td><td>1% del salario quincenal</td></tr>
+<tr><td>Puntualidad</td><td>0 tardanzas en el período</td><td>1% del salario quincenal</td></tr>
+<tr><td>Especial</td><td>Discrecional del supervisor</td><td>Monto fijo definido</td></tr>
+</table></div>
+
+<h3>Incentivos por Célula</h3>
+<p>Cuando toda una célula (SOLDADURA, CORTE, etc.) supera sus metas grupales, el bono se distribuye equitativamente entre todos sus operadores. Esto fomenta el trabajo en equipo.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="reclutamiento">
+<h2>Reclutamiento IA</h2>
+<ol class="steps">
+  <li>Crear vacante con perfil de puesto detallado</li>
+  <li>Subir CVs en PDF (uno o múltiples simultáneamente)</li>
+  <li>IA analiza cada CV y asigna puntuación 0–100 con justificación</li>
+  <li>Sistema genera guía de entrevista personalizada por candidato</li>
+  <li>Kanban: Nuevo → Revisión → Entrevista → Oferta → Contratado</li>
+  <li>Al contratar: datos fluyen automáticamente a módulo RH y onboarding</li>
+</ol>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="ventas">
+<h2>Ventas y CRM</h2>
+<p>Gestión de clientes con historial de órdenes, RFC, crédito disponible y days-to-pay promedio. Pipeline de cotizaciones con valor total visible en tiempo real.</p>
+<h3>Flujo de Cotización</h3>
+<p><strong>Borrador → Enviada → Aprobada → Convertida a OT</strong></p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="compras">
+<h2>Compras</h2>
+<p>Gestión de Órdenes de Compra con flujo: <strong>Borrador → Aprobada → Enviada → Recibida → Cerrada</strong>. Al recibir, el inventario se actualiza automáticamente.</p>
+<h3>Score de Proveedores</h3>
+<p>Cada proveedor acumula score basado en: cumplimiento de fecha (40%), calidad de materiales (40%), precio competitivo (20%). La IA sugiere el proveedor óptimo para cada recompra.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="cotizaciones">
+<h2>Agente de Cotizaciones IA</h2>
+<p>Describe en lenguaje natural lo que necesitas cotizar y el agente calcula costos, genera PDF y puede convertirlo en OT.</p>
+<div class="card">
+<pre>
+Entrada: "50 estructuras de acero A36 para PEMEX,
+         peso aprox 120kg c/u, acabado pintura epóxica,
+         entrega 30 días"
+
+El agente calcula automáticamente:
+  • Material: $X (precio actual acero A36)
+  • Corte láser: $X (tiempo estimado + gas)
+  • Soldadura: $X (horas × tasa soldador)
+  • Pintura: $X (m² × costo por m²)
+  • Overhead: $X (% configurable)
+  • Utilidad: $X (margen configurable)
+  ─────────────────────────────
+  • TOTAL: $X,XXX por pieza
+  • PDF listo para enviar al cliente
+</pre>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="rfq">
+<h2>RFQ Kanban</h2>
+<p>Tablero Kanban de Solicitudes de Cotización (RFQ). Columnas: <strong>Nuevo → Análisis → Propuesta → Negociación → Cerrado</strong>. Integrado con el Agente de Cotizaciones para generar respuestas automáticamente desde el correo del cliente.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="factibilidad">
+<h2>Factibilidad IA</h2>
+<p>Filtro inteligente antes de invertir tiempo en cotizar. Sigue el formato <strong>PM_F001</strong> (estándar McVill).</p>
+<div class="formula">
+  <span class="eq">Score</span> = ponderación de: complejidad técnica, capacidad instalada,<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;riesgo de mercado, margen estimado, plazo de entrega<br><br>
+  ≥ 70 → <span style="color:#34d399">VIABLE — proceder</span><br>
+  45–69 → <span style="color:#fbbf24">VIABLE CON CONDICIONES — análisis adicional</span><br>
+  &lt; 45 → <span style="color:#f87171">NO RECOMENDADO — declinar o renegociar</span>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="metal-quoter">
+<h2>Metal Quoter — Cotizador Metal</h2>
+<p>Cotización manual proceso por proceso. Ideal para piezas con procesos conocidos.</p>
+<div class="table-wrap"><table>
+<tr><th>Proceso</th><th>Parámetros</th><th>Cálculo base</th></tr>
+<tr><td>Láser / Corte</td><td>Calibre, material, longitud corte</td><td>Tiempo × costo/hora laser</td></tr>
+<tr><td>Doblez</td><td>N° dobleces, espesor</td><td>N° golpes × tiempo setup</td></tr>
+<tr><td>Soldadura</td><td>Longitud cordón, proceso</td><td>Metros × tasa deposición</td></tr>
+<tr><td>Maquinado CNC</td><td>Operaciones, material</td><td>Tiempo ciclo × costo máquina/hora</td></tr>
+<tr><td>Pintura</td><td>Área m², tipo acabado</td><td>m² × costo m² (según acabado)</td></tr>
+<tr><td>Ensamble</td><td>Componentes, tornillería</td><td>Tiempo ensamble × costo operador</td></tr>
+</table></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="ingenieria">
+<h2>Ingeniería y Diseño</h2>
+<h3>Blueprint Analyzer IA</h3>
+<p>Sube plano técnico PDF o foto → la IA extrae en segundos:</p>
+<ul>
+  <li>Cuadro de título (número parte, revisión, cliente)</li>
+  <li>Dimensiones y tolerancias (GD&amp;T)</li>
+  <li>Material y especificaciones de acabado</li>
+  <li>Notas técnicas y tratamientos superficiales</li>
+  <li>BOM automática de materia prima</li>
+</ul>
+<div class="tip">Blueprint Analyzer es 50× más rápido que lectura manual de planos. Reduce errores de transcripción al eliminar el paso manual.</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="instrucciones">
+<h2>Instrucciones de Trabajo</h2>
+<p>Guías digitales de operación por proceso. Cada instrucción incluye foto del resultado esperado, puntos críticos de seguridad (en rojo), tolerancias y herramientas. El operador confirma lectura antes de iniciar la operación.</p>
+<div class="tip">Al actualizar una instrucción de trabajo, el cambio llega en tiempo real a todas las tablets del piso de planta — sin necesidad de reimprimir ni distribuir hojas.</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="nesting">
+<h2>Nesting &amp; Optimizador de Corte</h2>
+<p>Organiza piezas dentro de la lámina para maximizar aprovechamiento de material. Compatible con láminas estándar (1.22×2.44m) y dimensiones custom.</p>
+<div class="formula">
+  <span class="eq">Aprovechamiento</span> = (Área piezas / Área lámina) × 100%<br>
+  <span class="eq">Desperdicio</span> = 100% - Aprovechamiento<br>
+  Ahorro estimado con nesting: <span style="color:#34d399">15%–30%</span> menos consumo de materia prima
+</div>
+<h3>Gestión de Retazos</h3>
+<p>Los retazos aprovechables se reingresan al inventario con clave especial. El sistema los sugiere automáticamente antes de abrir una lámina nueva.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="layout">
+<h2>Diseño de Layout</h2>
+<p>Editor visual de planta. Arrastra estaciones, dibuja flujos de material con flechas. El análisis de distancias identifica movimientos innecesarios (mudas de transporte). La IA sugiere reordenamientos para minimizar WIP y distancias recorridas.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="simulador">
+<h2>Simulador de Procesos</h2>
+<p>Define etapas, tiempos ciclo, recursos y tasas de falla. Corre simulación con el volumen del mes y obtiene: throughput, WIP promedio, utilización de máquinas, tiempo de ciclo total.</p>
+<p>Compara proceso <strong>actual vs propuesto</strong> lado a lado y calcula impacto económico: horas ahorradas × costo hora.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="spc">
+<h1>SPC — Control Estadístico de Proceso <span class="badge">Calidad Avanzada</span></h1>
+
+<h2>¿Qué es SPC?</h2>
+<p>El Control Estadístico de Proceso (SPC, por sus siglas en inglés) detecta variación anormal en un proceso de manufactura <em>antes</em> de que se produzcan defectos. Se usan cartas de control X̄-R (Media y Rango) para monitorear características críticas como diámetros, espesores, pesos o temperaturas.</p>
+
+<h2>Constantes de Shewhart por tamaño de subgrupo</h2>
+<div class="table-wrap"><table>
+<tr><th>n</th><th>A2</th><th>D3</th><th>D4</th><th>d2</th></tr>
+<tr><td>2</td><td>1.880</td><td>0</td><td>3.267</td><td>1.128</td></tr>
+<tr><td>3</td><td>1.023</td><td>0</td><td>2.574</td><td>1.693</td></tr>
+<tr><td>4</td><td>0.729</td><td>0</td><td>2.282</td><td>2.059</td></tr>
+<tr><td>5</td><td>0.577</td><td>0</td><td>2.114</td><td>2.326</td></tr>
+<tr><td>6</td><td>0.483</td><td>0</td><td>2.004</td><td>2.534</td></tr>
+<tr><td>7</td><td>0.419</td><td>0.076</td><td>1.924</td><td>2.704</td></tr>
+<tr><td>8</td><td>0.373</td><td>0.136</td><td>1.864</td><td>2.847</td></tr>
+<tr><td>9</td><td>0.337</td><td>0.184</td><td>1.816</td><td>2.970</td></tr>
+<tr><td>10</td><td>0.308</td><td>0.223</td><td>1.777</td><td>3.078</td></tr>
+</table></div>
+
+<h2>Cálculo de Límites de Control</h2>
+<div class="formula">
+  <span class="eq">X̄̄</span> = promedio de todas las medias de subgrupos (Gran Media)<br>
+  <span class="eq">R̄</span> = promedio de todos los rangos de subgrupos (Rango Medio)<br><br>
+  <span class="eq">UCL_X̄</span> = X̄̄ + A2 × R̄  &nbsp;<span class="comment">← Límite de Control Superior (Media)</span><br>
+  <span class="eq">LCL_X̄</span> = X̄̄ − A2 × R̄  &nbsp;<span class="comment">← Límite de Control Inferior (Media)</span><br><br>
+  <span class="eq">UCL_R</span> = D4 × R̄  &nbsp;<span class="comment">← Límite Superior (Rango)</span><br>
+  <span class="eq">LCL_R</span> = D3 × R̄  &nbsp;<span class="comment">← Límite Inferior (Rango, 0 si D3=0)</span><br><br>
+  <span class="eq">σ</span> = R̄ / d2  &nbsp;<span class="comment">← Desviación estándar del proceso</span>
+</div>
+
+<h2>Índices de Capacidad</h2>
+<div class="formula">
+  <span class="eq">Cp</span> = (USL − LSL) / (6 × σ)  &nbsp;<span class="comment">← Capacidad potencial</span><br>
+  <span class="eq">Cpk</span> = min( (USL − X̄̄)/(3σ) , (X̄̄ − LSL)/(3σ) )  &nbsp;<span class="comment">← Capacidad real (centrado)</span>
+</div>
+
+<h3>Interpretación de Cp y Cpk</h3>
+<div class="table-wrap"><table>
+<tr><th>Valor</th><th>Clasificación</th><th>PPM defectos</th><th>Acción</th></tr>
+<tr><td>Cpk ≥ 1.67</td><td><span class="pill pill-green">Excelente</span></td><td>&lt; 0.57 ppm</td><td>Continuar monitoreo</td></tr>
+<tr><td>Cpk 1.33–1.67</td><td><span class="pill pill-green">Bueno</span></td><td>&lt; 63 ppm</td><td>Mantener control</td></tr>
+<tr><td>Cpk 1.00–1.33</td><td><span class="pill pill-amber">Aceptable</span></td><td>&lt; 2,700 ppm</td><td>Mejorar si posible</td></tr>
+<tr><td>Cpk &lt; 1.00</td><td><span class="pill pill-red">No capaz</span></td><td>&gt; 2,700 ppm</td><td>Investigar causa raíz</td></tr>
+</table></div>
+
+<h2>Reglas de Nelson — Alertas Automáticas</h2>
+<div class="table-wrap"><table>
+<tr><th>Regla</th><th>Condición</th><th>Interpretación</th></tr>
+<tr><td>Regla 1</td><td>1 punto fuera de UCL o LCL</td><td>Causa especial inmediata — detener y analizar</td></tr>
+<tr><td>Regla 2</td><td>9 puntos consecutivos del mismo lado de X̄̄</td><td>Cambio de nivel en el proceso</td></tr>
+<tr><td>Regla 3</td><td>6 puntos consecutivos con tendencia</td><td>Desgaste de herramienta o deriva térmica</td></tr>
+<tr><td>Regla 4</td><td>14 puntos alternando ↑↓↑↓</td><td>Dos fuentes de variación alternándose</td></tr>
+</table></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="visual-ia">
+<h2>Inspección Visual IA</h2>
+<p>Sistema de inspección fotográfica con IA Gemini Vision. 6 modos especializados con prompts entrenados en normas industriales. Al detectar FAIL, crea NC automáticamente y notifica al supervisor.</p>
+<h3>Clasificación de severidad</h3>
+<div class="formula">
+  Confianza de fallo &gt; 85% → <span style="color:#f87171">CRÍTICA — detener proceso</span><br>
+  Confianza de fallo 60–85% → <span style="color:#fbbf24">MAYOR — revisión inmediata</span><br>
+  Confianza de fallo &lt; 60% → <span style="color:#94a3b8">MENOR — documentar</span>
+</div>
+
+<h3>Ejemplo: Auditoría de Soldadura</h3>
+<p>La IA analiza fotografías de cordones de soldadura e identifica porosidad, socavamiento, falta de fusión, salpicaduras y discontinuidades según normas AWS D1.1 / ISO 5817. El operador sube la foto desde su dispositivo y el sistema devuelve el dictamen con nivel de severidad en segundos.</p>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.5rem 0;">
+  <div style="position:relative;">
+    <img src="demo-soldadura-tig.jpg" alt="Soldadura TIG — inspección visual IA"
+      style="width:100%;border-radius:12px;border:2px solid #334155;object-fit:cover;max-height:260px;" />
+    <div style="position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,0.75);padding:4px 10px;border-radius:8px;font-size:10px;font-weight:700;color:#94a3b8;letter-spacing:0.1em;text-transform:uppercase;">
+      Soldadura TIG — Cordón analizado
+    </div>
+    <span style="position:absolute;top:8px;right:8px;background:#10b981;color:#fff;font-size:9px;font-weight:900;padding:3px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:0.1em;">PASS</span>
+  </div>
+  <div style="position:relative;">
+    <img src="demo-soldadura-inspeccion.jpg" alt="Inspección IA soldadura — resultado detallado"
+      style="width:100%;border-radius:12px;border:2px solid #334155;object-fit:cover;max-height:260px;" />
+    <div style="position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,0.75);padding:4px 10px;border-radius:8px;font-size:10px;font-weight:700;color:#94a3b8;letter-spacing:0.1em;text-transform:uppercase;">
+      Vista de inspección — resultado IA
+    </div>
+  </div>
+</div>
+
+<h3>Modos de inspección disponibles</h3>
+<ul>
+  <li><strong>Soldadura (MIG/TIG/SMAW):</strong> Porosidad, socavamiento, falta de fusión, salpicaduras</li>
+  <li><strong>Superficies metálicas:</strong> Rayaduras, oxidación, marcas de herramienta, pintura</li>
+  <li><strong>Dimensional:</strong> Visión asistida para verificar longitudes y diámetros aproximados</li>
+  <li><strong>Ensamble:</strong> Tornillos presentes, posición correcta de componentes</li>
+  <li><strong>Empaque:</strong> Daños físicos, etiqueta correcta, cantidad</li>
+  <li><strong>Libre:</strong> Prompt personalizado por el supervisor para casos especiales</li>
+</ul>
+
+<h3>Flujo de inspección</h3>
+<ol>
+  <li>Operador selecciona el modo de inspección en la app</li>
+  <li>Sube o toma foto desde tablet / teléfono</li>
+  <li>Gemini Vision analiza contra el prompt del modo seleccionado</li>
+  <li>El sistema muestra: PASS / FAIL con confianza % y descripción de hallazgos</li>
+  <li>Si FAIL: crea No Conformidad automática vinculada al viajero activo</li>
+  <li>Notifica al supervisor por el módulo de alertas</li>
+  <li>Se guarda en el historial de auditoría con timestamp y operador</li>
+</ol>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="trazabilidad">
+<h2>Trazabilidad de Partes</h2>
+<p>Árbol completo de cada pieza: de qué lote de materia prima vino, en qué órdenes se usó, qué operadores la trabajaron, qué inspecciones pasó. En caso de defecto de campo, identifica en segundos todos los productos afectados del mismo lote.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="defectos">
+<h2>Biblioteca de Defectos</h2>
+<p>Catálogo visual de defectos con foto de referencia, descripción, causa raíz y acción correctiva. La IA vincula automáticamente nuevas NCs con defectos similares históricos, sugiriendo la solución comprobada.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="ppap">
+<h2>PPAP / FAI</h2>
+<p>Gestión del proceso de aprobación de piezas (PPAP — Production Part Approval Process). Genera los 18 elementos del PPAP según nivel requerido por el cliente. Integra resultados dimensionales de FAI (First Article Inspection) contra tolerancias del plano.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="voc">
+<h2>VOC — Voz del Cliente</h2>
+<p>Registro de quejas, sugerencias y felicitaciones. Las quejas se convierten automáticamente en NCs. El NPS y satisfacción se calculan automáticamente. Pareto de causas más frecuentes para dirección.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="finanzas">
+<h2>Finanzas y ROI</h2>
+<h3>Módulos financieros</h3>
+<ul>
+  <li><strong>Flujo de Caja:</strong> Cobros esperados vs pagos, proyección 8 semanas</li>
+  <li><strong>CxC:</strong> Cuentas por cobrar con días vencidos</li>
+  <li><strong>CxP:</strong> Cuentas por pagar con fechas de vencimiento</li>
+  <li><strong>ROI del ERP:</strong> Calcula en tiempo real el retorno de inversión del sistema</li>
+</ul>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="costos">
+<h2>Control de Costos</h2>
+<div class="formula">
+  <span class="eq">Costo Real</span> = materia_prima_consumida + horas_reales × costo_hora + overhead_aplicado<br>
+  <span class="eq">Margen</span> = (precio_venta - costo_real) / precio_venta × 100%<br>
+  <span class="eq">Erosión de margen</span>: alerta si costo_real &gt; presupuesto_original × 1.05
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="costeo-vivo">
+<h2>Costeo en Vivo</h2>
+<p>Los precios de materia prima se actualizan dinámicamente. Al cambiar el precio del acero, todas las cotizaciones y órdenes activas se recalculan automáticamente. El simulador de precios permite analizar impacto antes de comprometerse en contratos a largo plazo.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="reportes">
+<h2>Reportes KPI</h2>
+<p>Genera reportes en PDF con gráficas, tablas y análisis comparativo para cualquier período. La IA añade un resumen ejecutivo con los 3 puntos más importantes. Configura envíos automáticos por correo con la frecuencia deseada.</p>
+<h3>Dashboard Gerencial</h3>
+<p>KPIs consolidados para junta directiva: OEE, FTT, entregas a tiempo, margen promedio, rotación de inventario. Ideal para revisiones mensuales S&amp;OP.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="chat-ia">
+<h2>Chat IA y Voice Link</h2>
+<h3>Chat IA (McVill Chat)</h3>
+<p>Asistente conversacional que conoce el contexto del ERP. Puede responder: <em>"¿Cuáles órdenes están atrasadas?"</em>, <em>"Dame el reporte de faltas de esta semana"</em>, <em>"¿Qué materiales están en crítico?"</em>. Usa RAG (búsqueda semántica) sobre los datos del tenant.</p>
+<h3>Voice Link</h3>
+<p>Interfaz de voz bidireccional usando Gemini Flash Native Audio. El operador habla en español natural y el sistema responde por voz. Útil en el piso de planta con manos ocupadas.</p>
+<h3>Modelos IA disponibles</h3>
+<div class="table-wrap"><table>
+<tr><th>Modelo</th><th>Uso</th><th>Velocidad</th></tr>
+<tr><td>gemini-2.5-flash-lite</td><td>Chat, análisis, cotizaciones (default)</td><td>Rápido</td></tr>
+<tr><td>gemini-2.5-flash-native</td><td>Voice Link (audio nativo)</td><td>Tiempo real</td></tr>
+<tr><td>text-embedding-004</td><td>Búsqueda semántica RAG</td><td>—</td></tr>
+</table></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="minutas">
+<h2>Minutas IA</h2>
+<p>Pega el transcript de la junta o describe los puntos tratados en lenguaje natural. La IA estructura automáticamente: asistentes, temas, acuerdos, responsables y fechas límite. Genera PDF profesional y activa seguimiento de acuerdos con alertas de vencimiento.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="shop-floor">
+<h2>Shop Floor Monitor</h2>
+<p>Panel de piso en vivo. Estado de cada máquina: 🟢 Produciendo · 🟡 Setup · 🔴 Paro. Actualización cada 30 segundos. OEE y pareto de tiempos muertos en tiempo real. <strong>Modo TV</strong> para proyectar en pantalla grande del piso — sin interfaz, solo datos clave.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="hw-escaner">
+<h1>Hardware — Escáner de Códigos <span class="badge">IoT</span></h1>
+<p>El ERP soporta tres métodos de lectura de códigos de barras, en orden de preferencia:</p>
+
+<h3>Método 1 — Escáner HID USB (Recomendado)</h3>
+<p>El lector emula un teclado. Al escanear, envía el código seguido de <code>Enter</code>. El campo de entrada del sistema captura el valor automáticamente sin intervención del usuario.</p>
+<div class="tip">Cualquier escáner 1D USB compatible con HID funciona. No requiere driver. Conectar y usar.</div>
+
+<h3>Método 2 — BarcodeDetector API (Cámara Web)</h3>
+<p>Chrome 83+ puede leer códigos de barras directamente desde la cámara usando la API nativa <code>BarcodeDetector</code>. El sistema activa automáticamente este modo si detecta la API disponible.</p>
+<pre>
+// Navegadores compatibles
+Chrome 83+ ✓    Edge 83+ ✓
+Firefox ✗        Safari iOS 17+ ✓ (parcial)
+</pre>
+
+<h3>Método 3 — Entrada manual</h3>
+<p>Fallback para cuando no hay escáner disponible. El operador escribe el número de empleado con el teclado.</p>
+
+<h3>Modelos de escáner sugeridos</h3>
+<div class="table-wrap"><table>
+<tr><th>Modelo</th><th>Tipo</th><th>Precio aprox.</th><th>Notas</th></tr>
+<tr><td>Honeywell 1250g</td><td>1D USB</td><td>$80–$120 USD</td><td>Económico y confiable para asistencia</td></tr>
+<tr><td>Datalogic QD2430</td><td>1D+2D USB</td><td>$100–$150 USD</td><td>Lee QR (útil para viajeros)</td></tr>
+<tr><td>Zebra DS2208</td><td>1D+2D USB</td><td>$200–$280 USD</td><td>Industrial, resistente a golpes</td></tr>
+<tr><td>Motorola DS9208</td><td>1D+2D Omnidireccional</td><td>$300–$400 USD</td><td>Sin necesidad de apuntar — presentación rápida</td></tr>
+</table></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="hw-camaras">
+<h2>Hardware — Cámaras IP</h2>
+<p>El módulo <strong>CameraFeedPanel</strong> integra cámaras IP MJPEG para monitoreo en vivo y análisis automático con IA Gemini Vision.</p>
+<h3>Requerimientos de cámara</h3>
+<ul>
+  <li>Protocolo: <strong>MJPEG stream</strong> accesible por URL interna</li>
+  <li>Snapshot JPEG: <code>http://192.168.1.x/jpg/image.jpg</code></li>
+  <li>Stream: <code>http://192.168.1.x/mjpg/video.mjpg</code></li>
+  <li>Red: Ethernet (no WiFi para producción — latencia)</li>
+</ul>
+<div class="table-wrap"><table>
+<tr><th>Marca</th><th>Modelo</th><th>Resolución</th><th>Precio</th></tr>
+<tr><td>Hikvision</td><td>DS-2CD2121G0</td><td>2MP / 1080p</td><td>$150–$200 USD</td></tr>
+<tr><td>Dahua</td><td>IPC-HDW2831T</td><td>4K</td><td>$180–$250 USD</td></tr>
+<tr><td>Axis</td><td>M3106-L Mk II</td><td>4MP</td><td>$350–$500 USD</td></tr>
+</table></div>
+<div class="warn">Las cámaras deben estar en la misma red interna que el servidor o PC donde corre el ERP. El acceso desde internet requiere configuración adicional de seguridad.</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="hw-tablets">
+<h2>Hardware — Tablets en Planta</h2>
+<p>Para ShopFloor Tracking, inspección visual y escaneo de viajeros en el piso de planta.</p>
+<div class="table-wrap"><table>
+<tr><th>Dispositivo</th><th>Uso recomendado</th><th>Precio</th></tr>
+<tr><td>iPad 10ª gen (2024)</td><td>Inspección visual, instrucciones de trabajo</td><td>$450–$550 USD</td></tr>
+<tr><td>Samsung Galaxy Tab A9+</td><td>ShopFloor, viajeros — resistente</td><td>$300–$400 USD</td></tr>
+<tr><td>Lenovo Tab M10 Plus</td><td>Asistencia (económico)</td><td>$180–$220 USD</td></tr>
+</table></div>
+<p>Se recomienda montar tablets en <strong>brazos articulados</strong> en cada estación de trabajo para acceso sin necesidad de cargar el dispositivo.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="hw-impresora">
+<h2>Hardware — Impresora de Etiquetas y Gafetes</h2>
+<div class="table-wrap"><table>
+<tr><th>Tipo</th><th>Modelo</th><th>Para qué</th><th>Precio</th></tr>
+<tr><td>Impresora PVC (tarjeta)</td><td>Zebra ZC300</td><td>Gafetes permanentes de empleados</td><td>$1,200–$2,000 USD</td></tr>
+<tr><td>Impresora térmica etiquetas</td><td>Zebra ZD411</td><td>Etiquetas viajeros, materiales, QRs</td><td>$300–$500 USD</td></tr>
+<tr><td>Impresora desktop + laminadora</td><td>Brother HL-L2350 + pouch</td><td>Gafetes papel laminado (solución económica)</td><td>$150–$250 USD</td></tr>
+</table></div>
+<h3>Tamaños de etiqueta recomendados</h3>
+<div class="table-wrap"><table>
+<tr><th>Uso</th><th>Tamaño</th><th>Contenido</th></tr>
+<tr><td>Gafete empleado</td><td>85.6 × 54 mm (CR80)</td><td>Nombre, puesto, código de barras EMP-XXX</td></tr>
+<tr><td>Etiqueta viajero</td><td>100 × 50 mm</td><td>N° parte, cliente, QR del viajero</td></tr>
+<tr><td>Etiqueta material</td><td>50 × 25 mm</td><td>Clave, descripción, código barras</td></tr>
+</table></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="hw-proyectos">
+<h2>Proyectos Hardware Pendientes</h2>
+<div class="table-wrap"><table>
+<tr><th>Proyecto</th><th>Estado</th><th>Hardware requerido</th><th>Costo estimado</th></tr>
+<tr><td>Videograbadores IA (P3)</td><td><span class="pill pill-amber">Pendiente</span></td><td>2–4 cámaras IP MJPEG por línea</td><td>$600–$1,200 USD</td></tr>
+<tr><td>Microscopía Microdefectos (P9)</td><td><span class="pill pill-amber">Pendiente</span></td><td>USB Microscope 1080p 50–500×</td><td>$80–$150 USD</td></tr>
+<tr><td>Cámaras Go/No-Go Ensamble (P13)</td><td><span class="pill pill-amber">Pendiente</span></td><td>Cámaras industriales + iluminación especializada</td><td>$1,500–$3,000 USD</td></tr>
+<tr><td>Visión en Soldadura (P14)</td><td><span class="pill pill-amber">Pendiente</span></td><td>Cámara macro + filtro UV/IR para arco</td><td>$800–$1,500 USD</td></tr>
+<tr><td>Sensores IoT Ensamble/Soldadura (P15)</td><td><span class="pill pill-amber">Pendiente</span></td><td>Sensores proximidad, presión, temperatura (ESP32)</td><td>$500–$1,000 USD</td></tr>
+</table></div>
+<div class="tip">Todos los proyectos pendientes de hardware tienen el software del ERP ya preparado para recibirlos. Solo requieren la adquisición e instalación física del hardware.</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="form-nomina">
+<h1>Referencia Rápida — Todas las Fórmulas de Nómina</h1>
+<div class="formula">
+  <span class="comment">═ PERCEPCIONES ══════════════════════════════</span><br>
+  salario_base = daily_salary × days_worked<br>
+  hourly_rate = daily_salary / 8<br>
+  overtime_amount = overtime_hours × hourly_rate × 2<br>
+  bonus_oee = (oee ≥ 85%) ? (base+OT) × 0.05 : 0<br>
+  gross_salary = base + overtime + bonus_oee<br><br>
+  <span class="comment">═ DEDUCCIONES ═══════════════════════════════</span><br>
+  deductions_absence = days_absent × daily_salary<br>
+  ISR = cuota_fija + (gross - LI) × tasa  [tabla SAT]<br>
+  IMSS_IV_CV = gross × 0.01875<br>
+  IMSS_EM = max(0, gross - 9900) × 0.004<br>
+  IMSS_total = IMSS_IV_CV + IMSS_EM<br>
+  deductions_total = ISR + IMSS_total + absence<br><br>
+  <span class="comment">═ NETO ══════════════════════════════════════</span><br>
+  net_salary = gross_salary - deductions_total
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="form-spc">
+<h1>Referencia Rápida — Fórmulas SPC</h1>
+<div class="formula">
+  X̄̄ = Σ(X̄ᵢ) / k  &nbsp;<span class="comment">k = número de subgrupos</span><br>
+  R̄ = Σ(Rᵢ) / k<br><br>
+  UCL_X̄ = X̄̄ + A2·R̄  &nbsp;&nbsp;  LCL_X̄ = X̄̄ − A2·R̄<br>
+  UCL_R = D4·R̄  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  LCL_R = D3·R̄<br><br>
+  σ = R̄ / d2<br>
+  Cp = (USL−LSL) / 6σ<br>
+  Cpk = min( (USL−X̄̄)/3σ , (X̄̄−LSL)/3σ )
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="form-oee">
+<h1>Referencia Rápida — OEE y Desempeño</h1>
+<div class="formula">
+  <span class="comment">═ OEE ════════════════════════════════════════</span><br>
+  Disponibilidad = (tiempo_total − paros) / tiempo_total<br>
+  Rendimiento = (piezas_reales × tiempo_ciclo) / tiempo_disponible<br>
+  Calidad = piezas_buenas / piezas_reales<br>
+  <span class="eq">OEE = Disponibilidad × Rendimiento × Calidad</span><br><br>
+  <span class="comment">Clase mundial: OEE &gt; 85%  ·  Bueno: 60–85%</span><br><br>
+  <span class="comment">═ INCENTIVOS ═════════════════════════════════</span><br>
+  Bono Prod. = (efic ≥ 100%) ? salary × 0.05 : 0<br>
+  Bono Calidad = (tasa ≥ 98%) ? salary × 0.03 : 0<br>
+  Bono Seguridad = (incidentes=0) ? salary × 0.02 : 0<br>
+  Bono 5S = (score_5s ≥ 90%) ? salary × 0.01 : 0
+</div>
+
+<div style="margin-top:4rem;padding-top:2rem;border-top:1px solid var(--border);text-align:center;color:var(--muted);font-size:.8rem">
+  <strong style="color:var(--accent)">McVill ERP</strong> &nbsp;·&nbsp; Manual Técnico v2.6 &nbsp;·&nbsp;
+  Desarrollado por <strong>IA.AGUS</strong> &nbsp;·&nbsp; 2026<br>
+  <span style="font-size:.75rem">Este documento se genera automáticamente desde el código fuente del ERP.</span>
+</div>
+</section>
+
+</main>
+
+<!-- SCRIPTS -->
+<script>
+// ── Theme toggle ──────────────────────────────────────
+function toggleTheme(){
+  const h=document.documentElement;
+  const dark=h.getAttribute('data-theme')==='dark';
+  h.setAttribute('data-theme',dark?'light':'dark');
+  document.getElementById('theme-btn').textContent=dark?'🌙 Modo Oscuro':'☀ Modo Claro';
+}
+
+// ── Active nav on scroll ──────────────────────────────
+const sections=[...document.querySelectorAll('section[id]')];
+const navLinks=[...document.querySelectorAll('.nav-link')];
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      navLinks.forEach(l=>l.classList.remove('active'));
+      const a=document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+      if(a){a.classList.add('active');a.scrollIntoView({block:'nearest'})}
+    }
+  });
+},{rootMargin:'-60px 0px -60% 0px'});
+sections.forEach(s=>obs.observe(s));
+
+// ── Search ────────────────────────────────────────────
+let prevMarks=[];
+function doSearch(q){
+  prevMarks.forEach(el=>{
+    const p=el.parentNode;
+    p.replaceChild(document.createTextNode(el.textContent),el);
+    p.normalize();
+  });
+  prevMarks=[];
+  if(!q||q.length<2)return;
+  const walker=document.createTreeWalker(document.getElementById('content'),NodeFilter.SHOW_TEXT);
+  const regex=new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
+  const nodes=[];
+  while(walker.nextNode())nodes.push(walker.currentNode);
+  nodes.forEach(node=>{
+    if(!regex.test(node.textContent))return;
+    regex.lastIndex=0;
+    const frag=document.createDocumentFragment();
+    let last=0,m;
+    while((m=regex.exec(node.textContent))!==null){
+      frag.appendChild(document.createTextNode(node.textContent.slice(last,m.index)));
+      const mark=document.createElement('mark');
+      mark.textContent=m[0];
+      frag.appendChild(mark);
+      prevMarks.push(mark);
+      last=m.index+m[0].length;
+    }
+    frag.appendChild(document.createTextNode(node.textContent.slice(last)));
+    node.parentNode.replaceChild(frag,node);
+  });
+  if(prevMarks.length)prevMarks[0].scrollIntoView({behavior:'smooth',block:'center'});
+}
+</script>
+</body>
+</html>
