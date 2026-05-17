@@ -1853,6 +1853,17 @@ Usa precios actuales de mercado en México para materiales industriales metalmec
                             <span className="text-[7px] font-black text-white uppercase tracking-widest">Foto Real</span>
                           </div>
                         )}
+                        <button
+                          onClick={() => {
+                            setForm(f => ({ ...f, image_url: '' }));
+                            setIsUploadedImage(false);
+                            toast('Imagen eliminada de la vista previa.', 'success');
+                          }}
+                          className="absolute top-3 right-4 p-2 rounded-xl bg-red-600/80 hover:bg-red-500 text-white transition-all shadow-lg border border-red-500/20 cursor-pointer"
+                          title="Eliminar imagen"
+                        >
+                          <Trash2 size={13} />
+                        </button>
                       </>
                     ) : imageGenerating ? (
                       <div className="text-center space-y-4">
