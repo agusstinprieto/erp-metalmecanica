@@ -631,7 +631,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
         </div>
 
         {/* Filters Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 shrink-0">
+        <div className="flex flex-wrap items-center justify-end gap-2 shrink-0">
           
           {/* Planta Selector */}
           <div className="relative">
@@ -680,13 +680,21 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
             ))}
           </div>
 
-          {/* Action Button */}
-          <button
-            onClick={() => setIsOrderModalOpen(true)}
-            className="px-4 py-2 bg-mcvill-accent hover:opacity-90 text-slate-950 text-[9px] font-black uppercase rounded-xl tracking-wider transition-all flex items-center gap-1.5 shadow-[0_0_12px_var(--theme-glow)]"
-          >
-            <Plus size={12} /> ORDEN
-          </button>
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => setIsBancoModalOpen(true)}
+              className="px-4 py-2 bg-slate-900 border border-slate-800 hover:border-blue-500/50 text-white text-[9px] font-black uppercase rounded-xl tracking-wider transition-all flex items-center gap-1.5 whitespace-nowrap"
+            >
+              <Database size={12} className="text-blue-400" /> BANCOS
+            </button>
+            <button
+              onClick={() => setIsOrderModalOpen(true)}
+              className="px-4 py-2 bg-mcvill-accent hover:opacity-90 text-slate-950 text-[9px] font-black uppercase rounded-xl tracking-wider transition-all flex items-center gap-1.5 shadow-[0_0_12px_var(--theme-glow)] whitespace-nowrap"
+            >
+              <Plus size={12} /> ORDEN
+            </button>
+          </div>
 
         </div>
 
@@ -897,16 +905,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
               </div>
             </div>
 
-            {/* Quick Actions Panel */}
-            <div className="space-y-2">
-              <button
-                onClick={() => setIsBancoModalOpen(true)}
-                className="w-full h-10 rounded-xl bg-slate-950 border border-slate-800 hover:border-mcvill-accent/30 text-[9px] font-black uppercase text-slate-300 hover:text-white transition-all flex items-center justify-center gap-2"
-              >
-                <Database size={13} />
-                Enlazar Cuenta Bancaria BBVA / Santander
-              </button>
-            </div>
+            {/* Quick Actions Panel removido para colocar botones en la cabecera */}
 
           </div>
 
