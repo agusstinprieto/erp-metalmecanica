@@ -834,7 +834,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
                 ? (last > vals[0] ? 'text-red-400' : 'text-emerald-400')
                 : (last > vals[0] ? 'text-emerald-400' : 'text-red-400');
               return (
-                <div key={key} className="bg-slate-900/40 border border-slate-800/40 rounded-2xl p-3.5 hover:border-slate-700/60 transition-all group relative overflow-hidden">
+                <div key={key} title={`Histórico: ${label}. Cálculo de tendencia: (Valor Actual - Valor Inicial).`} className="bg-slate-900/40 border border-slate-800/40 rounded-2xl p-3.5 hover:border-slate-700/60 transition-all group relative overflow-hidden">
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: `radial-gradient(circle at top right, rgba(${colorRgb},0.04), transparent 70%)` }} />
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-1.5">
@@ -912,7 +912,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
         </div>
 
         {/* ── ESCENARIO DE ASISTENCIA: OPERADORES POR TURNO Y PUESTO ──────────── */}
-        <div className="bg-slate-900/30 border border-slate-800/40 rounded-2xl p-4">
+        <div title="Fórmula Ausentismo: 1 - (Presentes / Empleados). Penalización de Nómina = 1 día base x Falta Injustificada." className="bg-slate-900/30 border border-slate-800/40 rounded-2xl p-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Users className="text-blue-400" size={15} />
@@ -989,7 +989,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
             </div>
 
             {/* Alertas de Cobertura */}
-            <div className="bg-slate-950/50 border border-slate-800/40 rounded-xl p-3">
+            <div title="Lógica Cobertura: Riesgo detona si capacidad < 85%. Generación predictiva de Horas Extras al 200% para cubrir huecos." className="bg-slate-950/50 border border-slate-800/40 rounded-xl p-3">
               <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-2.5 flex items-center gap-1.5"><AlertTriangle size={10} className="text-amber-400" /> Cobertura</p>
               <div className="space-y-2">
                 {metrics.empleados - metrics.presentes > 0 ? (
@@ -1025,7 +1025,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
         </div>
 
         {/* ── DEMOGRAFÍA OPERATIVA ─────────────────────────────────────────── */}
-        <div className="bg-slate-900/30 border border-slate-800/40 rounded-2xl p-4">
+        <div title="Fórmulas RRHH: Porcentajes calculados base total (Headcount). Pirámide evalúa índice de jubilación y planes de sucesión (8% personal > 55 años)." className="bg-slate-900/30 border border-slate-800/40 rounded-2xl p-4">
           <div className="flex items-center gap-2 mb-4">
             <Users className="text-pink-400" size={15} />
             <h3 className="text-[10px] font-black text-white uppercase tracking-widest">Demografía Operativa</h3>
