@@ -58,13 +58,18 @@ const sidebarSections: SidebarSection[] = [
     title: 'Operaciones',
     items: [
       { id: 'dashboard', label: 'Tablero', icon: LayoutDashboard },
-      { id: 'inventory', label: 'Inventarios', icon: Package },
       { id: 'production', label: 'Planta', icon: Factory },
       { id: 'viajeros', label: 'Viajeros', icon: Route },
       { id: 'planeacion', label: 'Planeación', icon: CalendarDays },
+      { id: 'inventory', label: 'Inventarios', icon: Package },
+    ]
+  },
+  {
+    title: 'Calidad',
+    items: [
       { id: 'quality', label: 'Calidad', icon: ClipboardCheck },
-      { id: 'factibilidad', label: 'Factibilidad', icon: ShieldCheck },
-      { id: 'roi', label: 'Cotizador ROI', icon: TrendingUp },
+      { id: 'hse', label: 'HSE', icon: ShieldAlert },
+      { id: 'maintenance', label: 'Mantto.', icon: Wrench },
     ]
   }
 ];
@@ -254,6 +259,94 @@ export const Sidebar = (props: {
           </div>
         ))}
         
+        {isGodmode && (
+          <div className="space-y-2 pt-3 border-t border-mcvill-accent/30">
+            {!isSidebarCollapsed && (
+              <p className="px-3 mb-1 text-[9px] font-black text-mcvill-accent/70 tracking-[0.25em] uppercase flex items-center gap-2">
+                <span className="w-1 h-1 rounded-full bg-mcvill-accent/60" />
+                Calidad Avanzada
+              </p>
+            )}
+            <SidebarItem icon={LineChart} label="SPC Alertas" active={activeView === 'spc'} onClick={() => navigate('spc')} collapsed={isSidebarCollapsed} />
+            <SidebarItem icon={ScanSearch} label="Inspección IA" active={activeView === 'visual_ia'} onClick={() => navigate('visual_ia')} collapsed={isSidebarCollapsed} />
+            <SidebarItem icon={GitBranch} label="Trazabilidad" active={activeView === 'trazabilidad'} onClick={() => navigate('trazabilidad')} collapsed={isSidebarCollapsed} />
+            <SidebarItem icon={Library} label="Bib. Defectos" active={activeView === 'defect_library'} onClick={() => navigate('defect_library')} collapsed={isSidebarCollapsed} />
+            <SidebarItem icon={FileCheck2} label="PPAP" active={activeView === 'ppap'} onClick={() => navigate('ppap')} collapsed={isSidebarCollapsed} />
+            <SidebarItem icon={MessageCircle} label="VOC" active={activeView === 'voc'} onClick={() => navigate('voc')} collapsed={isSidebarCollapsed} />
+            <SidebarItem icon={Scan} label="Shop Floor" active={activeView === 'shop_floor'} onClick={() => navigate('shop_floor')} collapsed={isSidebarCollapsed} />
+
+            {!isSidebarCollapsed && (
+              <p className="px-3 mt-3 mb-1 text-[9px] font-black text-mcvill-accent/70 tracking-[0.25em] uppercase flex items-center gap-2">
+                <span className="w-1 h-1 rounded-full bg-mcvill-accent/60" />
+                Comercial
+              </p>
+            )}
+            <SidebarItem icon={TrendingUp} label="Ventas" active={activeView === 'ventas'} onClick={() => navigate('ventas')} collapsed={isSidebarCollapsed} />
+            <SidebarItem icon={ShoppingCart} label="Compras" active={activeView === 'compras'} onClick={() => navigate('compras')} collapsed={isSidebarCollapsed} />
+            <SidebarItem icon={Sparkles} label="Agente Cot." active={activeView === 'agente_cot'} onClick={() => navigate('agente_cot')} collapsed={isSidebarCollapsed} />
+            <SidebarItem icon={KanbanSquare} label="Kanban RFQ" active={activeView === 'rfq_kanban'} onClick={() => navigate('rfq_kanban')} collapsed={isSidebarCollapsed} />
+            <SidebarItem icon={ShieldCheck} label="Factibilidad" active={activeView === 'factibilidad'} onClick={() => navigate('factibilidad')} collapsed={isSidebarCollapsed} />
+            <SidebarItem icon={BrainCircuit} label="Fact. IA" active={activeView === 'factibilidad_ia'} onClick={() => navigate('factibilidad_ia')} collapsed={isSidebarCollapsed} />
+            <SidebarItem icon={Calculator} label="Cotizador Metal" active={activeView === 'metal_quoter'} onClick={() => navigate('metal_quoter')} collapsed={isSidebarCollapsed} />
+            <SidebarItem icon={TrendingUp} label="Cotizador ROI" active={activeView === 'roi'} onClick={() => navigate('roi')} collapsed={isSidebarCollapsed} />
+
+            {!isSidebarCollapsed && (
+              <p className="px-3 mt-3 mb-1 text-[9px] font-black text-mcvill-accent/70 tracking-[0.25em] uppercase flex items-center gap-2">
+                <span className="w-1 h-1 rounded-full bg-mcvill-accent/60" />
+                Ingeniería
+              </p>
+            )}
+            <SidebarItem icon={Cpu} label="Ingeniería" active={activeView === 'engineering'} onClick={() => navigate('engineering')} collapsed={isSidebarCollapsed} />
+            <SidebarItem icon={ClipboardList} label="Inst. Trabajo" active={activeView === 'work_instructions'} onClick={() => navigate('work_instructions')} collapsed={isSidebarCollapsed} />
+            <SidebarItem icon={Layout} label="Layout Planta" active={activeView === 'layout_design'} onClick={() => navigate('layout_design')} collapsed={isSidebarCollapsed} />
+            <SidebarItem icon={FlaskConical} label="Simulador" active={activeView === 'process_simulator'} onClick={() => navigate('process_simulator')} collapsed={isSidebarCollapsed} />
+            <SidebarItem icon={Layers} label="Nesting" active={activeView === 'nesting'} onClick={() => navigate('nesting')} collapsed={isSidebarCollapsed} />
+
+            {!isSidebarCollapsed && (
+              <p className="px-3 mt-3 mb-1 text-[9px] font-black text-mcvill-accent/70 tracking-[0.25em] uppercase flex items-center gap-2">
+                <span className="w-1 h-1 rounded-full bg-mcvill-accent/60" />
+                Capital Humano
+              </p>
+            )}
+            <SidebarItem icon={MembersIcon} label="RH" active={activeView === 'rh'} onClick={() => navigate('rh')} collapsed={isSidebarCollapsed} />
+            <SidebarItem icon={FileText} label="Nómina" active={activeView === 'payroll'} onClick={() => navigate('payroll')} collapsed={isSidebarCollapsed} />
+            <SidebarItem icon={CalendarCheck} label="Asistencia" active={activeView === 'attendance'} onClick={() => navigate('attendance')} collapsed={isSidebarCollapsed} />
+            <SidebarItem icon={UserSearch} label="Reclutamiento" active={activeView === 'recruitment'} onClick={() => navigate('recruitment')} collapsed={isSidebarCollapsed} />
+            <SidebarItem icon={Medal} label="Desempeño" active={activeView === 'desempeno'} onClick={() => navigate('desempeno')} collapsed={isSidebarCollapsed} />
+
+            {!isSidebarCollapsed && (
+              <p className="px-3 mt-3 mb-1 text-[9px] font-black text-mcvill-accent/70 tracking-[0.25em] uppercase flex items-center gap-2">
+                <span className="w-1 h-1 rounded-full bg-mcvill-accent/60" />
+                Finanzas
+              </p>
+            )}
+            <SidebarItem icon={CircleDollarSign} label="Finanzas" active={activeView === 'finance'} onClick={() => navigate('finance')} collapsed={isSidebarCollapsed} />
+            <SidebarItem icon={BarChart3} label="Costos" active={activeView === 'costing'} onClick={() => navigate('costing')} collapsed={isSidebarCollapsed} />
+            <SidebarItem icon={Gauge} label="Costeo Live" active={activeView === 'costeo'} onClick={() => navigate('costeo')} collapsed={isSidebarCollapsed} />
+
+            {!isSidebarCollapsed && (
+              <p className="px-3 mt-3 mb-1 text-[9px] font-black text-mcvill-accent/70 tracking-[0.25em] uppercase flex items-center gap-2">
+                <span className="w-1 h-1 rounded-full bg-mcvill-accent/60" />
+                Sistema
+              </p>
+            )}
+            <SidebarItem icon={FileBarChart} label="Reportes" active={activeView === 'reports'} onClick={() => navigate('reports')} collapsed={isSidebarCollapsed} />
+            {isSuperAdmin && <SidebarItem icon={Settings2} label="CONFIGURACION" active={activeView === 'settings'} onClick={() => navigate('settings')} collapsed={isSidebarCollapsed} />}
+            <div
+              onClick={() => window.open(config.software_accelerator_url, '_blank')}
+              className={clsx(
+                "flex items-center gap-2.5 px-2 py-2 rounded-2xl cursor-pointer transition-all duration-300 group text-mcvill-text-muted hover:text-mcvill-text hover:bg-mcvill-accent/5 border border-transparent hover:border-mcvill-accent/20",
+                isSidebarCollapsed && "justify-center"
+              )}
+            >
+              <div className="w-7 h-7 rounded-2xl flex items-center justify-center bg-slate-900/50 group-hover:bg-slate-800/80 transition-all">
+                <Zap size={14} className="text-mcvill-accent group-hover:text-white" />
+              </div>
+              {!isSidebarCollapsed && <span className="text-[11px] font-bold tracking-wider uppercase">Acelerador</span>}
+            </div>
+          </div>
+        )}
+
         <div className="pt-3 border-t border-mcvill-accent/30">
           {!isSidebarCollapsed && (
             <p className="px-3 mb-1 text-[9px] font-black text-slate-500/70 tracking-[0.25em] uppercase flex items-center gap-2">
@@ -261,19 +354,12 @@ export const Sidebar = (props: {
               Inteligencia
             </p>
           )}
-          <SidebarItem 
-            icon={MessageSquare} 
-            label="Chat IA" 
-            active={isChatOpen} 
-            onClick={onToggleChat} 
+          <SidebarItem
+            icon={MessageSquare}
+            label="Chat IA"
+            active={isChatOpen}
+            onClick={onToggleChat}
             collapsed={isSidebarCollapsed}
-          />
-          <SidebarItem 
-            icon={BookOpen} 
-            label={`Manual ${config.systemName}`} 
-            active={false} 
-            onClick={handleOpenGuideModal} 
-            collapsed={isSidebarCollapsed} 
           />
           <SidebarItem
             icon={Zap}
@@ -289,81 +375,14 @@ export const Sidebar = (props: {
             onClick={() => navigate('minutas')}
             collapsed={isSidebarCollapsed}
           />
+          <SidebarItem
+            icon={BookOpen}
+            label={`Manual ${config.systemName}`}
+            active={false}
+            onClick={handleOpenGuideModal}
+            collapsed={isSidebarCollapsed}
+          />
         </div>
-        
-        {isGodmode && (
-          <div className="space-y-2 pt-3 border-t border-mcvill-accent/30">
-            {!isSidebarCollapsed && (
-              <p className="px-3 mb-1 text-[9px] font-black text-mcvill-accent/70 tracking-[0.25em] uppercase flex items-center gap-2">
-                <span className="w-1 h-1 rounded-full bg-mcvill-accent/60" />
-                Capital Humano
-              </p>
-            )}
-            <SidebarItem icon={MembersIcon} label="RH" active={activeView === 'rh'} onClick={() => navigate('rh')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={FileText} label="Nómina" active={activeView === 'payroll'} onClick={() => navigate('payroll')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={CalendarCheck} label="Asistencia" active={activeView === 'attendance'} onClick={() => navigate('attendance')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={UserSearch} label="Reclutamiento" active={activeView === 'recruitment'} onClick={() => navigate('recruitment')} collapsed={isSidebarCollapsed} />
-
-            {!isSidebarCollapsed && (
-              <p className="px-3 mt-3 mb-1 text-[9px] font-black text-mcvill-accent/70 tracking-[0.25em] uppercase flex items-center gap-2">
-                <span className="w-1 h-1 rounded-full bg-mcvill-accent/60" />
-                Comercial
-              </p>
-            )}
-            <SidebarItem icon={TrendingUp} label="Ventas" active={activeView === 'ventas'} onClick={() => navigate('ventas')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={ShoppingCart} label="Compras" active={activeView === 'compras'} onClick={() => navigate('compras')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={Sparkles} label="Agente Cot." active={activeView === 'agente_cot'} onClick={() => navigate('agente_cot')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={KanbanSquare} label="Kanban RFQ" active={activeView === 'rfq_kanban'} onClick={() => navigate('rfq_kanban')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={BrainCircuit} label="Fact. IA" active={activeView === 'factibilidad_ia'} onClick={() => navigate('factibilidad_ia')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={Calculator} label="Cotizador Metal" active={activeView === 'metal_quoter'} onClick={() => navigate('metal_quoter')} collapsed={isSidebarCollapsed} />
-
-            {!isSidebarCollapsed && (
-              <p className="px-3 mt-3 mb-1 text-[9px] font-black text-mcvill-accent/70 tracking-[0.25em] uppercase flex items-center gap-2">
-                <span className="w-1 h-1 rounded-full bg-mcvill-accent/60" />
-                Finanzas
-              </p>
-            )}
-            <SidebarItem icon={CircleDollarSign} label="Finanzas" active={activeView === 'finance'} onClick={() => navigate('finance')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={BarChart3} label="Costos" active={activeView === 'costing'} onClick={() => navigate('costing')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={Gauge} label="Costeo Live" active={activeView === 'costeo'} onClick={() => navigate('costeo')} collapsed={isSidebarCollapsed} />
-
-            {!isSidebarCollapsed && (
-              <p className="px-3 mt-3 mb-1 text-[9px] font-black text-mcvill-accent/70 tracking-[0.25em] uppercase flex items-center gap-2">
-                <span className="w-1 h-1 rounded-full bg-mcvill-accent/60" />
-                Avanzado
-              </p>
-            )}
-            <SidebarItem icon={Cpu} label="Ingeniería" active={activeView === 'engineering'} onClick={() => navigate('engineering')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={ClipboardList} label="Inst. Trabajo" active={activeView === 'work_instructions'} onClick={() => navigate('work_instructions')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={LineChart} label="SPC Alertas" active={activeView === 'spc'} onClick={() => navigate('spc')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={Medal} label="Desempeño" active={activeView === 'desempeno'} onClick={() => navigate('desempeno')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={GitBranch} label="Trazabilidad" active={activeView === 'trazabilidad'} onClick={() => navigate('trazabilidad')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={Library} label="Bib. Defectos" active={activeView === 'defect_library'} onClick={() => navigate('defect_library')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={FileCheck2} label="PPAP" active={activeView === 'ppap'} onClick={() => navigate('ppap')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={MessageCircle} label="VOC" active={activeView === 'voc'} onClick={() => navigate('voc')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={Layout} label="Layout Planta" active={activeView === 'layout_design'} onClick={() => navigate('layout_design')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={FlaskConical} label="Simulador" active={activeView === 'process_simulator'} onClick={() => navigate('process_simulator')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={Layers} label="Nesting" active={activeView === 'nesting'} onClick={() => navigate('nesting')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={ScanSearch} label="Inspección IA" active={activeView === 'visual_ia'} onClick={() => navigate('visual_ia')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={Scan} label="Shop Floor" active={activeView === 'shop_floor'} onClick={() => navigate('shop_floor')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={ShieldAlert} label="HSE" active={activeView === 'hse'} onClick={() => navigate('hse')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={Wrench} label="Mantto." active={activeView === 'maintenance'} onClick={() => navigate('maintenance')} collapsed={isSidebarCollapsed} />
-            {isSuperAdmin && <SidebarItem icon={Settings2} label="CONFIGURACION" active={activeView === 'settings'} onClick={() => navigate('settings')} collapsed={isSidebarCollapsed} />}
-            <SidebarItem icon={FileBarChart} label="Reportes" active={activeView === 'reports'} onClick={() => navigate('reports')} collapsed={isSidebarCollapsed} />
-            <div 
-              onClick={() => window.open(config.software_accelerator_url, '_blank')}
-              className={clsx(
-                "flex items-center gap-2.5 px-2 py-2 rounded-2xl cursor-pointer transition-all duration-300 group text-mcvill-text-muted hover:text-mcvill-text hover:bg-mcvill-accent/5 border border-transparent hover:border-mcvill-accent/20",
-                isSidebarCollapsed && "justify-center"
-              )}
-            >
-              <div className="w-7 h-7 rounded-2xl flex items-center justify-center bg-slate-900/50 group-hover:bg-slate-800/80 transition-all">
-                <Zap size={14} className="text-mcvill-accent group-hover:text-white" />
-              </div>
-              {!isSidebarCollapsed && <span className="text-[11px] font-bold tracking-wider uppercase">Acelerador</span>}
-            </div>
-          </div>
-        )}
       </div>
 
       <div className={clsx(
