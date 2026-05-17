@@ -422,7 +422,7 @@ function App() {
           )}>
             <div className="flex items-center gap-4">
               <div className="w-1.5 h-1.5 rounded-full bg-slate-700" />
-              <p>© 2026 <span className={isDarkMode ? "text-white" : "text-slate-900"}>{config.brandName} Control</span></p>
+              <p>© 2026 <span className={isDarkMode ? "text-white" : "text-slate-900"}>{config.brandName} {config.systemName}</span></p>
             </div>
             
             <div className="flex items-center gap-10">
