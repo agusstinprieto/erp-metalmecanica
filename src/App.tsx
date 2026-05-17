@@ -504,7 +504,7 @@ function App() {
               <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Cargando módulo...</p>
             </div>
           }>
-            {activeView === 'dashboard' && <Dashboard />}
+            {activeView === 'dashboard' && <Dashboard onNavigateToBanco={() => setActiveView('banco')} />}
             {activeView === 'inventory' && <InventoryView />}
             {activeView === 'payroll' && <PayrollView />}
             {activeView === 'rh' && <RHView />}

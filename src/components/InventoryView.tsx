@@ -460,7 +460,7 @@ Responde en español, formato conciso con bullets. Sé directo y específico.`;
         </div>
       )}
 
-      {showAIModal && <InventoryAIModal onClose={() => setShowAIModal(false)} onItemAdded={loadInventory} />}
+      {showAIModal && <InventoryAIModal onClose={() => setShowAIModal(false)} onItemAdded={loadInventory} items={items} />}
       <ScrapAnalyzerModal isOpen={showScrapAnalyzer} onClose={() => setShowScrapAnalyzer(false)} />
       {showImportModal && (
         <ImportDataModal
