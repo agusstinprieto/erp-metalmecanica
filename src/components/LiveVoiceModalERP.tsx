@@ -187,13 +187,28 @@ export const LiveVoiceModalERP: React.FC<LiveVoiceModalERPProps> = ({
   // Auto-connect and cleanup
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    if (isOpen) {
-      startSession();
-    }
+    // NOTA: Se removió el startSession automático para que el usuario pueda escoger la voz en el lobby.
     return () => {
       stopSession("Component Unmount");
+      window.speechSynthesis.cancel();
     };
   }, [isOpen]);
+
+  const playDemo = (voiceId: string, voiceName: string) => {
+    const text = `Hola, soy ${voiceName}. ¿En qué te puedo ayudar?`;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'es-MX';
+    
+    // Simulación aproximada de los tonos de Gemini
+    if (voiceId === 'Aoede') { utterance.pitch = 1.2; utterance.rate = 1.0; } // Femenina cálida
+    if (voiceId === 'Kore') { utterance.pitch = 1.5; utterance.rate = 1.1; } // Femenina clara
+    if (voiceId === 'Charon') { utterance.pitch = 0.5; utterance.rate = 0.9; } // Masculino grave
+    if (voiceId === 'Fenrir') { utterance.pitch = 0.3; utterance.rate = 1.0; } // Masculino imponente
+    if (voiceId === 'Puck') { utterance.pitch = 1.1; utterance.rate = 1.1; } // Masculino ágil
+
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+  };
 
   // Handle voice change
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -521,7 +536,7 @@ export const LiveVoiceModalERP: React.FC<LiveVoiceModalERPProps> = ({
                 {GEMINI_VOICES.map(voice => (
                   <button
                     key={voice.id}
-                    onClick={() => setSelectedVoice(voice.id)}
+                    onClick={() => { setSelectedVoice(voice.id); playDemo(voice.id, voice.name); }}
                     className={`flex flex-col items-center gap-1 py-1.5 px-1 rounded-lg border transition-all duration-200 ${
                       selectedVoice === voice.id
                         ? isDarkMode
@@ -566,8 +581,12 @@ export const LiveVoiceModalERP: React.FC<LiveVoiceModalERPProps> = ({
               </div>
             )}
             {!transcription.user && !transcription.model && (
-              <div className="h-full flex items-center justify-center opacity-25">
-                <p className="text-slate-500 text-[10px] italic">Esperando enlace...</p>
+              <div className="h-full flex flex-col items-center justify-center opacity-40 gap-2">
+                <Volume2 size={24} className="text-slate-500" />
+                <p className="text-slate-500 text-[10px] italic text-center px-4">
+                  Selecciona una voz para escuchar una demostración.<br/>
+                  Presiona "Iniciar Voz IA" para comenzar.
+                </p>
               </div>
             )}
           </div>
