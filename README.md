@@ -235,7 +235,7 @@ Todos los documentos están en la carpeta [`Archivos MD/`](./Archivos%20MD/):
 | Canal | Detalle |
 |---|---|
 | Web | [ia-agus.com](https://www.ia-agus.com) |
-| Soporte | soporte@ia-agus.com |
+| Ventas | ventas@ia-agus.com |
 | Desarrollador | [@agusstinprieto-eng](https://github.com/agusstinprieto-eng) |
 
 ---
