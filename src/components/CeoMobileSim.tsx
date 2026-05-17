@@ -118,7 +118,7 @@ export const CeoMobileSim: React.FC = () => {
     setTimeout(() => {
       let reply = '';
       if (queryText.includes('finanzas')) {
-        reply = 'El Margen Neto acumulado hoy entre Torreón y Monterrey es de $4,820 USD. Planta Monterrey lidera con anidamiento láser optimizado al 96%.';
+        reply = 'El Margen Neto acumulado hoy en Torreón es de $4,820 USD. Planta Torreón Forja lidera con anidamiento láser optimizado al 96%.';
       } else if (queryText.includes('alerta')) {
         reply = 'Directiva enviada: Se alertó al supervisor de Forja Pesada en Torreón sobre un desvío térmico del 4% en el Horno #2. Se programó paro de calibración de 10 min.';
       } else {
@@ -359,8 +359,8 @@ export const CeoMobileSim: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_6px_#fbbf24] animate-pulse" />
                         <div>
-                          <p className="text-[7px] font-black text-white uppercase leading-none">Forja Monterrey</p>
-                          <span className="text-[5px] font-mono text-slate-500 uppercase tracking-wider">Hornos de Inducción</span>
+                          <p className="text-[7px] font-black text-white uppercase leading-none">Forja Torreón</p>
+                          <span className="text-[5px] font-mono text-slate-500 uppercase tracking-wider">Hornos de Inducción - Planta #3</span>
                         </div>
                       </div>
                       <span className="text-[7px] font-mono font-black text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded">OEE 71%</span>
@@ -371,7 +371,7 @@ export const CeoMobileSim: React.FC = () => {
                   <div className="p-2 bg-red-950/20 border border-red-500/20 rounded-xl">
                     <span className="text-[6px] font-black text-red-400 uppercase tracking-widest block mb-0.5">Alerta Crítica:</span>
                     <p className="text-[6px] text-slate-400 font-mono leading-normal">
-                      Forja Monterrey reporta desvío térmico del 4% en el Horno #2. El OEE cayó a 71% por paros técnicos breves. Mantenimiento preventivo en camino.
+                      Forja Torreón reporta desvío térmico del 4% en el Horno #2. El OEE cayó a 71% por paros técnicos breves. Mantenimiento preventivo en camino.
                     </p>
                   </div>
                 </div>

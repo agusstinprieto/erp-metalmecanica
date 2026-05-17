@@ -397,7 +397,7 @@ const EnlazarBancoModal: React.FC<EnlazarBancoModalProps> = ({ onClose, onNaviga
 // ── DASHBOARD ─────────────────────────────────────────────────────────────────
 interface DashboardProps { onNavigateToBanco?: () => void; }
 
-type PlantaKey = 'todas' | 'torreon_laser' | 'torreon_mecanizado' | 'monterrey_forja';
+type PlantaKey = 'todas' | 'torreon_laser' | 'torreon_mecanizado' | 'torreon_forja';
 type TurnoKey = 'todos' | 'matutino' | 'vespertino' | 'nocturno';
 type CategoryKey = 'asistencia' | 'produccion' | 'calidad' | 'seguridad' | 'energia';
 
@@ -474,7 +474,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
       baseScrap = 1.95; // Virutas y retrabajos
       baseSafetyDays = 182;
       baseEnergyKWh = 120;
-    } else if (selectedPlanta === 'monterrey_forja') {
+    } else if (selectedPlanta === 'torreon_forja') {
       baseEmpleados = Math.round(baseEmpleados * 0.20);
       basePresentes = Math.round(basePresentes * 0.18);
       baseOEE = 89.1;
@@ -543,7 +543,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
         value = Math.max(2, Math.round(basePresent + variance));
         limitLine = metrics.empleados;
       } else if (selectedCategory === 'produccion') {
-        const baseTons = selectedPlanta === 'monterrey_forja' ? 45 : selectedPlanta === 'torreon_laser' ? 24 : 18;
+        const baseTons = selectedPlanta === 'torreon_forja' ? 45 : selectedPlanta === 'torreon_laser' ? 24 : 18;
         const shiftFactor = selectedTurno === 'nocturno' ? 0.78 : selectedTurno === 'vespertino' ? 0.92 : 1.0;
         const variance = getSeededValue(i, 6) - 3;
         value = Number((Math.max(4, (baseTons * shiftFactor) + variance)).toFixed(1));
@@ -581,7 +581,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
       todas: 'Todas las Plantas McVill',
       torreon_laser: 'Planta Torreón (Corte Láser)',
       torreon_mecanizado: 'Planta Torreón (Mecanizado CNC)',
-      monterrey_forja: 'Planta Monterrey (Forja Pesada)'
+      torreon_forja: 'Planta Torreón (Forja Pesada)'
     };
     const shiftNames: Record<TurnoKey, string> = {
       todos: 'Todos los Turnos',
@@ -597,7 +597,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
       return {
         score: 'A+',
         summary: 'Rendimiento general estable en planta. La integración de la Red Neuronal de Inspección Visual redujo el Scrap global un 1.2% esta semana.',
-        alert: 'Consumo energético en Planta Monterrey Forja muestra picos inusuales entre las 02:00 y 04:00 AM. Se sugiere validar el estado de los hornos de inducción.',
+        alert: 'Consumo energético en Planta Torreón Forja muestra picos inusuales entre las 02:00 y 04:00 AM. Se sugiere validar el estado de los hornos de inducción.',
         tag: 'ÓPTIMO GLOBAL'
       };
     }
@@ -659,7 +659,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
               <option value="todas">🏭 Todas las Plantas</option>
               <option value="torreon_laser">⚡ Torreón - Corte Láser</option>
               <option value="torreon_mecanizado">⚙️ Torreón - Mecanizado CNC</option>
-              <option value="monterrey_forja">🔥 Monterrey - Forja Pesada</option>
+              <option value="torreon_forja">🔥 Torreón - Forja Pesada</option>
             </select>
             <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
           </div>
