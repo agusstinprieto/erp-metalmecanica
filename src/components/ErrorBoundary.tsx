@@ -16,6 +16,20 @@ export class ErrorBoundary extends React.Component<{ children: React.ReactNode }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
     console.error('[McVill ERP] Unhandled error:', error, info);
+    
+    // Auto-reload on chunk load failures to fetch new production assets seamlessly
+    const isChunkError = error.message && (
+      error.message.includes('Failed to fetch dynamically imported module') ||
+      error.message.includes('Expected a JavaScript-or-Wasm module script') ||
+      error.message.includes('chunk') ||
+      error.message.includes('MIME type of "text/html"')
+    );
+    if (isChunkError) {
+      console.warn('[ErrorBoundary] Chunk load failed. Force reloading for new assets...');
+      window.location.reload();
+      return;
+    }
+    
     Sentry.captureException(error, { contexts: { react: { componentStack: info.componentStack } } });
   }
 
