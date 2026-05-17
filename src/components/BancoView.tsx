@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Landmark, Plus, RefreshCw, Trash2, ArrowUpCircle, ArrowDownCircle,
   X, Save, DollarSign, Calendar, AlertCircle, TrendingUp, CreditCard,
-  CheckCircle2, Search
+  CheckCircle2, Search, GitMerge
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { appConfirm } from '../lib/dialogs';
+const ConciliacionIA = lazy(() => import('./ConciliacionIA'));
 
-interface BankAccount {
+export interface BankAccount {
   id?: string;
   nombre: string;
   banco: string;
@@ -21,7 +22,7 @@ interface BankAccount {
   notas?: string;
 }
 
-interface BankTx {
+export interface BankTx {
   id?: string;
   account_id: string;
   fecha: string;
@@ -34,7 +35,7 @@ interface BankTx {
   notas?: string;
 }
 
-type Tab = 'cuentas' | 'movimientos';
+type Tab = 'cuentas' | 'movimientos' | 'conciliacion';
 
 const fmt = (n: number, cur = 'MXN') =>
   n.toLocaleString('es-MX', { style: 'currency', currency: cur, minimumFractionDigits: 2 });
@@ -204,14 +205,20 @@ export const BancoView: React.FC = () => {
 
       {/* Tabs */}
       <div className="flex items-end gap-1 px-4 pt-3 border-b border-mcvill-card-border/20 bg-mcvill-card/10 shrink-0">
-        {([['cuentas', 'Cuentas Bancarias', CreditCard], ['movimientos', 'Movimientos', TrendingUp]] as const).map(([id, label, Icon]) => (
+        {([
+          ['cuentas',      'Cuentas',       CreditCard],
+          ['movimientos',  'Movimientos',   TrendingUp],
+          ['conciliacion', 'Conciliación IA', GitMerge],
+        ] as const).map(([id, label, Icon]) => (
           <button key={id} onClick={() => setTab(id as Tab)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-t-xl border-x border-t text-[10px] font-black uppercase tracking-widest transition-all ${
+            className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-t-xl border-x border-t text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${
               tab === id
-                ? 'bg-mcvill-bg border-mcvill-card-border/30 text-mcvill-accent border-b-mcvill-bg'
+                ? id === 'conciliacion'
+                  ? 'bg-mcvill-bg border-mcvill-card-border/30 text-emerald-400 border-b-mcvill-bg'
+                  : 'bg-mcvill-bg border-mcvill-card-border/30 text-mcvill-accent border-b-mcvill-bg'
                 : 'bg-transparent border-transparent text-mcvill-text-muted hover:text-mcvill-text'
             }`}>
-            <Icon size={12} />{label}
+            <Icon size={12} /><span className="hidden sm:inline">{label}</span><span className="sm:hidden">{id === 'conciliacion' ? 'IA' : label}</span>
           </button>
         ))}
       </div>
@@ -331,8 +338,8 @@ export const BancoView: React.FC = () => {
                   <p className="text-sm font-black text-mcvill-text-muted uppercase tracking-widest">Sin movimientos</p>
                 </div>
               ) : (
-                <div className="overflow-hidden rounded-2xl border border-mcvill-card-border/20">
-                  <table className="w-full">
+                <div className="overflow-x-auto rounded-2xl border border-mcvill-card-border/20">
+                  <table className="w-full min-w-[640px]">
                     <thead>
                       <tr className="border-b border-mcvill-card-border/20 bg-mcvill-card/20">
                         {['Fecha', 'Cuenta', 'Concepto', 'Categoría', 'Tipo', 'Monto', 'Ref', '✓'].map(h => (
@@ -376,6 +383,22 @@ export const BancoView: React.FC = () => {
               )}
             </motion.div>
           )}
+          {tab === 'conciliacion' && (
+            <motion.div key="conciliacion" initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="h-full">
+              <Suspense fallback={<div className="flex items-center justify-center py-20"><RefreshCw className="animate-spin text-mcvill-accent" size={28} /></div>}>
+                <ConciliacionIA
+                  accounts={accounts}
+                  txs={txs}
+                  onMarkConciliado={async (ids) => {
+                    await Promise.all(ids.map(id =>
+                      supabase.from('bank_transactions').update({ conciliado: true }).eq('id', id)
+                    ));
+                    setTxs(prev => prev.map(t => ids.includes(t.id!) ? { ...t, conciliado: true } : t));
+                  }}
+                />
+              </Suspense>
+            </motion.div>
+          )}
         </AnimatePresence>
       </div>
 
@@ -391,8 +414,8 @@ export const BancoView: React.FC = () => {
                 <h3 className="text-sm font-black text-mcvill-text uppercase tracking-widest">{editAcc.id ? 'Editar Cuenta' : 'Nueva Cuenta Bancaria'}</h3>
                 <button onClick={() => setShowAccForm(false)} className="p-1.5 rounded-xl bg-white/5 text-mcvill-text-muted hover:text-mcvill-text"><X size={16} /></button>
               </div>
-              <div className="p-6 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 sm:p-6 space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {[['Nombre de la Cuenta', 'nombre', 'text', 'Ej: BBVA Principal'], ['Institución Bancaria', 'banco', 'text', 'Ej: BBVA, Banorte, HSBC']].map(([label, key, type, placeholder]) => (
                     <div key={key as string}>
                       <label className="text-[8px] font-black text-mcvill-text-muted uppercase tracking-widest mb-1.5 block">{label as string}</label>
@@ -451,8 +474,8 @@ export const BancoView: React.FC = () => {
                 <h3 className="text-sm font-black text-mcvill-text uppercase tracking-widest">Nuevo Movimiento</h3>
                 <button onClick={() => setShowTxForm(false)} className="p-1.5 rounded-xl bg-white/5 text-mcvill-text-muted hover:text-mcvill-text"><X size={16} /></button>
               </div>
-              <div className="p-6 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 sm:p-6 space-y-4 overflow-y-auto max-h-[70vh]">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="text-[8px] font-black text-mcvill-text-muted uppercase tracking-widest mb-1.5 block">Cuenta</label>
                     <select value={editTx.account_id} onChange={e => setEditTx({ ...editTx, account_id: e.target.value })}

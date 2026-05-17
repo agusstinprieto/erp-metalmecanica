@@ -557,16 +557,28 @@ export const MODULE_GUIDES: Record<string, ModuleGuide> = {
     moduleId: 'attendance',
     label: 'Control de Asistencia',
     emoji: '🕐',
-    description: 'Check-in, check-out y reportes de asistencia',
+    description: 'Check-in, check-out, Face ID Biométrico e IP Geofencing',
     steps: [
       {
         icon: 'CalendarCheck', color: 'text-mcvill-accent', bg: 'bg-mcvill-accent/10 border-mcvill-accent/30',
-        title: 'Registro de Entrada y Salida',
-        subtitle: 'Asistencia digital con código o QR',
+        title: 'Kiosco Face ID Biométrico',
+        subtitle: 'Asistencia rápida para personal de taller',
         tips: [
-          '📲 El empleado escanea su código o QR en la tablet de entrada para registrar su asistencia.',
-          '⏰ El sistema detecta automáticamente tardanzas (después de la hora de inicio de turno).',
-          '🟢 Verde = a tiempo | 🟡 Amarillo = tardanza | 🔴 Rojo = ausente.',
+          '👤 Pestaña "Face ID IA": Una tablet o pantalla única en la entrada actúa como Kiosco colectivo para operarios.',
+          '🤖 Usa una sola licencia global con supervisor: Sin necesidad de que los operarios tengan contraseñas o PCs.',
+          '⚡ Escaneo ultra veloz: Captura de rostro en <2s con mapa térmico corporal de 36.5 °C y prueba de vitalidad.',
+          '🔗 Integración neural: Gemini Vision reconoce al operario y procesa el fichaje directo en Supabase.',
+        ],
+      },
+      {
+        icon: 'Laptop', color: 'text-blue-400', bg: 'bg-blue-400/10 border-blue-400/30',
+        title: 'Fichaje de Escritorio con IP/GPS',
+        subtitle: 'Asistencia para personal administrativo',
+        tips: [
+          '💼 Los administrativos fichan directo con 1 clic desde el Dashboard del ERP con su usuario activo.',
+          '🔒 Blindaje Geográfico: El botón solo se habilita si se conectan desde la IP pública corporativa de la planta.',
+          '📍 Geocerca GPS: El sistema valida que el navegador esté dentro de un radio de 50 metros de las oficinas.',
+          '🚫 Evita el fraude: Bloquea automáticamente intentos de fichaje fuera de la zona autorizada.',
         ],
       },
       {
@@ -577,6 +589,7 @@ export const MODULE_GUIDES: Record<string, ModuleGuide> = {
           '📊 El reporte diario muestra quién está presente, con tardanza o ausente en tiempo real.',
           '📈 El reporte semanal identifica empleados con patrón de ausencias recurrentes.',
           '💬 Desde el chat IA puedes pedir "reporte de faltas de hoy" y lo obtienes al instante.',
+          '🎙️ Por Voice Link puedes preguntar: "Quién llegó tarde hoy" o "Lista de ausentes de la planta".',
         ],
       },
     ],
@@ -643,7 +656,7 @@ export const MODULE_GUIDES: Record<string, ModuleGuide> = {
 
   hse: {
     moduleId: 'hse',
-    label: 'Seguridad HSE',
+    label: 'SEGURIDAD',
     emoji: '🦺',
     description: 'Seguridad industrial, incidentes y cumplimiento NOM',
     steps: [
@@ -665,7 +678,18 @@ export const MODULE_GUIDES: Record<string, ModuleGuide> = {
           '🦺 Registro del EPP asignado a cada empleado con fecha de entrega y vida útil.',
           '📋 Las capacitaciones de seguridad se registran con fecha y vencimiento para renovación.',
           '🔔 Alertas automáticas cuando vence el EPP o la certificación de un empleado.',
-          '📑 Cumplimiento de NOMs: NOM-001, NOM-017, NOM-026 y más.',
+          '📑 Cumplimiento de NOMs: NOM-017-STPS-2008 (EPP), NOM-010-STPS-2014 (Sustancias), NOM-113-STPS-2009 (Calzado).',
+        ],
+      },
+      {
+        icon: 'Eye', color: 'text-cyan-400', bg: 'bg-cyan-400/10 border-cyan-400/30',
+        title: 'Inspección Neural EPP en Piso',
+        subtitle: 'Escaneo de seguridad automatizado con IA',
+        tips: [
+          '🤖 Escaneo de EPP por IA: El botón "Scan EPP" en las cámaras de seguridad analiza el equipo de los operarios.',
+          '📹 Simulación en planta: Celdas activas (Soldadura C2 con chispas, Almacén C3, Pintura C5) muestran estados de EPP.',
+          '⚡ Barrido Láser IA: Toma captura base64 y envía a Gemini Vision para auditar casco, guantes, careta y lentes.',
+          '🔊 Alarma Industrial: Web Audio API genera un zumbador nativo de 120dB si detecta operarios sin EPP.',
         ],
       },
     ],
@@ -1206,6 +1230,120 @@ export const MODULE_GUIDES: Record<string, ModuleGuide> = {
           '📋 El panel de acuerdos muestra todos los pendientes con semáforo de vencimiento.',
           '🔔 Notificación automática al responsable cuando se acerca la fecha límite.',
           '✅ Al marcar como cumplido, queda documentado quién y cuándo lo cerró.',
+        ],
+      },
+    ],
+  },
+
+  seguridad: {
+    moduleId: 'seguridad',
+    label: 'Cámaras & Seguridad Neural',
+    emoji: '📹',
+    description: 'Monitoreo de cámaras IP con escaneo de EPP por IA',
+    steps: [
+      {
+        icon: 'Camera', color: 'text-red-400', bg: 'bg-red-400/10 border-red-400/30',
+        title: 'Cámaras de Seguridad en Vivo',
+        subtitle: 'Monitoreo continuo del piso de planta',
+        tips: [
+          '📹 Panel de 4 cámaras en tiempo real: Soldadura C2, Almacén C3, Pintura C5 y Ensamble C7.',
+          '🟢 Indicador de estado por celda: PRODUCIENDO, SETUP, PARO o SIN SEÑAL.',
+          '🔊 Alarma Industrial: si detecta operario sin EPP, Web Audio genera alerta de 120dB.',
+          '📡 Las cámaras IP se conectan mediante RTSP — sin hardware propietario.',
+        ],
+      },
+      {
+        icon: 'ScanSearch', color: 'text-mcvill-accent', bg: 'bg-mcvill-accent/10 border-mcvill-accent/30',
+        title: 'Barrido Neural de EPP',
+        subtitle: 'IA detecta si el operario lleva el equipo de protección',
+        tips: [
+          '🤖 Botón "Scan EPP" captura el frame de la cámara y lo envía a Gemini Vision.',
+          '⚡ En menos de 3 segundos el sistema audita: casco, guantes, careta, lentes y calzado.',
+          '🔴 Si detecta incumplimiento, crea alerta HSE automáticamente con foto de evidencia.',
+          '📊 El registro diario de escaneos alimenta el dashboard de cumplimiento HSE.',
+        ],
+      },
+      {
+        icon: 'ShieldAlert', color: 'text-yellow-400', bg: 'bg-yellow-400/10 border-yellow-400/30',
+        title: 'Integración con HSE',
+        subtitle: 'Seguridad preventiva conectada al módulo HSE',
+        tips: [
+          '🔗 Cada alerta de EPP se registra automáticamente en el historial HSE del empleado.',
+          '📋 Reporte semanal de cumplimiento por área: % de escaneos con EPP completo.',
+          '🎯 Meta: 100% de cumplimiento — el sistema envía recordatorio si baja del 90%.',
+        ],
+      },
+    ],
+  },
+
+  banco: {
+    moduleId: 'banco',
+    label: 'Módulo de Banco',
+    emoji: '🏦',
+    description: 'Gestión de cuentas bancarias, movimientos y conciliación',
+    steps: [
+      {
+        icon: 'Landmark', color: 'text-mcvill-accent', bg: 'bg-mcvill-accent/10 border-mcvill-accent/30',
+        title: 'Cuentas Bancarias',
+        subtitle: 'Todas las cuentas de McVill en un solo lugar',
+        tips: [
+          '🏦 Registra tus cuentas: banco, número de cuenta, CLABE, moneda y saldo actual.',
+          '💳 Cuentas en MXN y USD — el saldo en USD se convierte al tipo de cambio del día.',
+          '📊 El saldo total consolidado aparece en el Dashboard de Finanzas automáticamente.',
+          '🔒 Solo roles CEO, Sistemas y Finanzas tienen acceso a este módulo.',
+        ],
+      },
+      {
+        icon: 'ArrowLeftRight', color: 'text-yellow-400', bg: 'bg-yellow-400/10 border-yellow-400/30',
+        title: 'Registro de Movimientos',
+        subtitle: 'Entradas y salidas bancarias con trazabilidad',
+        tips: [
+          '⬆️ Depósitos: abono de clientes, transferencias entrantes, intereses.',
+          '⬇️ Pagos: proveedores, nómina, impuestos, servicios.',
+          '🔗 Vincula cada movimiento con la factura, OC o nómina correspondiente.',
+          '📅 El estado de cuenta del ERP debe coincidir con el estado real del banco.',
+        ],
+      },
+      {
+        icon: 'GitCompare', color: 'text-green-400', bg: 'bg-green-400/10 border-green-400/30',
+        title: 'Conciliación Bancaria',
+        subtitle: 'Verifica que el ERP y el banco coincidan',
+        tips: [
+          '📄 Sube el estado de cuenta del banco (Excel o PDF) para iniciar la conciliación.',
+          '🤖 La IA cruza automáticamente los movimientos del ERP con los del estado de cuenta.',
+          '✅ Marca como conciliado cada movimiento que coincide — los no conciliados quedan pendientes.',
+          '📊 El reporte de conciliación muestra diferencias, partidas en tránsito y ajustes necesarios.',
+        ],
+      },
+    ],
+  },
+
+  conciliacion: {
+    moduleId: 'conciliacion',
+    label: 'Conciliación Bancaria',
+    emoji: '🔄',
+    description: 'Proceso formal de conciliación entre ERP y banco',
+    steps: [
+      {
+        icon: 'FileCheck2', color: 'text-mcvill-accent', bg: 'bg-mcvill-accent/10 border-mcvill-accent/30',
+        title: 'Proceso de Conciliación',
+        subtitle: 'Cierra el mes con el banco cuadrado',
+        tips: [
+          '📅 Abre una conciliación por período: selecciona cuenta, mes y saldo inicial del banco.',
+          '📄 Importa el estado de cuenta en formato Excel o CSV del banco.',
+          '🤖 El motor de matching IA empareja movimientos automáticamente por monto y fecha.',
+          '📊 Los no emparejados se listan para revisión manual — cheques en tránsito, depósitos pendientes.',
+        ],
+      },
+      {
+        icon: 'CheckCircle2', color: 'text-green-400', bg: 'bg-green-400/10 border-green-400/30',
+        title: 'Cierre y Certificación',
+        subtitle: 'Conciliación aprobada lista para contabilidad',
+        tips: [
+          '✅ El saldo conciliado del ERP debe igualar el saldo del estado de cuenta del banco.',
+          '📋 Genera el reporte de conciliación firmado digitalmente para el cierre contable.',
+          '🔒 Una conciliación cerrada no puede modificarse — auditoría completa de quién la aprobó.',
+          '📤 Exporta a Excel el reporte final para enviar al contador o auditor externo.',
         ],
       },
     ],

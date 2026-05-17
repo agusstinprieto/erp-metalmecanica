@@ -198,7 +198,7 @@ function getDepartments(brandName: string) { return [
   },
   {
     id: 'hse',
-    name: 'Seguridad HSE',
+    name: 'SEGURIDAD',
     icon: Shield,
     color: 'text-red-400',
     badge: 'NUEVO',

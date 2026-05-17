@@ -63,7 +63,8 @@ const MetalQuoterView        = lz(() => import('./components/MetalQuoterView'), 
 const RecruitmentView        = lz(() => import('./components/RecruitmentView'),        'RecruitmentView');
 const VisualIAInspection     = lz(() => import('./components/VisualIAInspection'),     'VisualIAInspection');
 const ShopFloorTracking      = lz(() => import('./components/ShopFloorTracking'),      'ShopFloorTracking');
-const BancoView              = lz(() => import('./components/BancoView'),              'BancoView');
+const BancoView               = lz(() => import('./components/BancoView'),               'BancoView');
+const SeguridadIndustrialView = lz(() => import('./components/SeguridadIndustrialView'), 'SeguridadIndustrialView');
 
 type UserRole = 'ceo' | 'gerente' | 'sistemas' | 'empleado' | 'rh' | 'finanzas' | 'contabilidad' | 'supervisor';
 
@@ -302,7 +303,7 @@ function App() {
                 isDarkMode ? "border-mcvill-card-border/30" : "border-slate-200"
               )}>
                 {/* Language Selector */}
-                <div className="relative">
+                <div className="relative hidden sm:block">
                   <select
                     value={language}
                     onChange={(e) => setLanguage(e.target.value as any)}
@@ -339,7 +340,7 @@ function App() {
                 </button>
 
                 {/* Theme Color Selector */}
-                <div className={clsx("flex items-center gap-1 p-1.5 rounded-2xl border", isDarkMode ? "border-white/5 bg-slate-900/50" : "border-slate-200 bg-slate-50")}>
+                <div className={clsx("hidden sm:flex items-center gap-1 p-1.5 rounded-2xl border", isDarkMode ? "border-white/5 bg-slate-900/50" : "border-slate-200 bg-slate-50")}>
                   {([
                     { id: 'blue',    color: '#4FA5FF', label: 'Azul Industrial' },
                     { id: 'slate',   color: '#94A3B8', label: 'Slate Neutro' },
@@ -496,7 +497,7 @@ function App() {
 
         {/* Operational Workspace Area */}
         <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar relative z-10">
-          <div key={activeView} className="p-4 lg:p-8 min-h-full">
+          <div key={activeView} className="p-3 sm:p-4 lg:p-8 min-h-full">
           <Suspense fallback={
             <div className="flex flex-col items-center justify-center h-64 gap-3">
               <div className="w-7 h-7 border-2 border-mcvill-accent/20 border-t-mcvill-accent rounded-full animate-spin" />
@@ -567,6 +568,7 @@ function App() {
             {activeView === 'visual_ia' && <VisualIAInspection onClose={() => setActiveView('dashboard')} onComplete={() => setActiveView('quality')} />}
             {activeView === 'shop_floor' && <ShopFloorTracking onBack={() => setActiveView('production')} />}
             {activeView === 'banco' && <BancoView />}
+            {activeView === 'seguridad' && <SeguridadIndustrialView />}
           </Suspense>
           </div>
         </div>
@@ -574,7 +576,7 @@ function App() {
         {/* Terminal Style Footer */}
         {!isTVMode && (
           <footer className={clsx(
-            "h-14 shrink-0 border-t flex justify-between items-center px-4 lg:px-10 text-[9px] font-black uppercase tracking-[0.4em] transition-colors duration-500",
+            "h-14 shrink-0 border-t hidden sm:flex justify-between items-center px-4 lg:px-10 text-[9px] font-black uppercase tracking-[0.4em] transition-colors duration-500",
             isDarkMode ? "bg-mcvill-bg border-mcvill-card-border/30 text-slate-500" : "bg-white border-slate-200 text-slate-400"
           )}>
             <div className="flex items-center gap-4">
@@ -601,17 +603,13 @@ function App() {
       <AnimatePresence>
         {isChatOpen && (
           <motion.div
-            initial={{ x: 400, opacity: 0 }}
-            animate={{ 
-              x: 0, 
-              opacity: 1,
-              width: isChatMaximized ? '100%' : '400px'
-            }}
-            exit={{ x: 400, opacity: 0 }}
+            initial={{ x: '100%', opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: '100%', opacity: 0 }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             className={clsx(
               "fixed right-0 top-0 bottom-0 z-[70] flex flex-col border-l border-mcvill-accent/30 bg-mcvill-bg/95 backdrop-blur-2xl shadow-2xl",
-              isChatMaximized ? "left-0" : ""
+              isChatMaximized ? "inset-0 w-full" : "w-full sm:w-[400px]"
             )}
           >
             {panelType === 'chat' ? (

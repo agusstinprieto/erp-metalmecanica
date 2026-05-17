@@ -295,7 +295,7 @@ CREATE POLICY "Public access" ON proveedores FOR ALL USING (true);`}
         {edit && (
           <Drawer title={isNew ? 'Nuevo Proveedor' : 'Editar Proveedor'} onClose={() => setEdit(null)}>
             <Field label="Razón Social *"><input value={edit.razon_social} onChange={e => setEdit(p => ({ ...p!, razon_social: e.target.value }))} className={inputCls + ' mt-1'} /></Field>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Field label="RFC"><input value={edit.rfc || ''} onChange={e => setEdit(p => ({ ...p!, rfc: e.target.value }))} className={inputCls + ' mt-1'} /></Field>
               <Field label="Ciudad"><input value={edit.ciudad || ''} onChange={e => setEdit(p => ({ ...p!, ciudad: e.target.value }))} className={inputCls + ' mt-1'} /></Field>
             </div>
@@ -304,7 +304,7 @@ CREATE POLICY "Public access" ON proveedores FOR ALL USING (true);`}
                 options={[['material','Material'],['servicio','Servicio'],['maquila','Maquila'],['herramienta','Herramienta'],['otro','Otro']]} />
             </Field>
             <Field label="Contacto"><input value={edit.nombre_contacto || ''} onChange={e => setEdit(p => ({ ...p!, nombre_contacto: e.target.value }))} className={inputCls + ' mt-1'} /></Field>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Field label="Email"><input type="email" value={edit.email || ''} onChange={e => setEdit(p => ({ ...p!, email: e.target.value }))} className={inputCls + ' mt-1'} /></Field>
               <Field label="Teléfono"><input value={edit.telefono || ''} onChange={e => setEdit(p => ({ ...p!, telefono: e.target.value }))} className={inputCls + ' mt-1'} /></Field>
             </div>
@@ -447,7 +447,7 @@ CREATE POLICY "Public access" ON materiales_catalogo FOR ALL USING (true);`}
       <AnimatePresence>
         {edit && (
           <Drawer title={isNew ? 'Nuevo Material' : 'Editar Material'} onClose={() => setEdit(null)}>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Field label="Clave *"><input value={edit.clave} onChange={e => setEdit(p => ({ ...p!, clave: e.target.value }))} className={inputCls + ' mt-1'} /></Field>
               <Field label="Unidad de Medida"><input value={edit.unidad_medida || ''} onChange={e => setEdit(p => ({ ...p!, unidad_medida: e.target.value }))} className={inputCls + ' mt-1'} placeholder="kg, pza, m, lt..." /></Field>
             </div>
@@ -580,12 +580,12 @@ CREATE POLICY "Public access" ON operaciones_catalogo FOR ALL USING (true);`}
       <AnimatePresence>
         {edit && (
           <Drawer title={isNew ? 'Nueva Operación' : 'Editar Operación'} onClose={() => setEdit(null)}>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Field label="Clave *"><input value={edit.clave} onChange={e => setEdit(p => ({ ...p!, clave: e.target.value }))} className={inputCls + ' mt-1'} placeholder="CNC-01, SOLD-01..." /></Field>
               <Field label="Centro de Trabajo"><input value={edit.centro_trabajo || ''} onChange={e => setEdit(p => ({ ...p!, centro_trabajo: e.target.value }))} className={inputCls + ' mt-1'} /></Field>
             </div>
             <Field label="Nombre *"><input value={edit.nombre} onChange={e => setEdit(p => ({ ...p!, nombre: e.target.value }))} className={inputCls + ' mt-1'} /></Field>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Field label="Tarifa por Hora ($)"><input type="number" value={edit.tarifa_hora ?? 0} onChange={e => setEdit(p => ({ ...p!, tarifa_hora: +e.target.value }))} className={inputCls + ' mt-1'} /></Field>
               <Field label="T. Configuración (min)"><input type="number" value={edit.tiempo_configuracion_default ?? 0} onChange={e => setEdit(p => ({ ...p!, tiempo_configuracion_default: +e.target.value }))} className={inputCls + ' mt-1'} /></Field>
             </div>

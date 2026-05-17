@@ -722,11 +722,11 @@ export const QualityView: React.FC = () => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar bg-slate-950/40">
+      <div className="flex-1 overflow-auto custom-scrollbar bg-slate-950/40">
 
         {/* ── Tab: Inspecciones ── */}
         {activeTab === 'inspections' && (
-          <table className="w-full text-left border-collapse">
+          <table className="w-full min-w-[540px] text-left border-collapse">
             <thead>
               <tr className="sticky top-0 z-10 border-b border-white/10 bg-slate-900 text-[9px] font-black uppercase tracking-widest text-slate-500">
                 <th className="px-4 py-2">Identificador</th>
@@ -788,7 +788,7 @@ export const QualityView: React.FC = () => {
 
         {/* ── Tab: No Conformidades ── */}
         {activeTab === 'nc' && (
-          <table className="w-full text-left border-collapse">
+          <table className="w-full min-w-[580px] text-left border-collapse">
             <thead>
               <tr className="sticky top-0 z-10 border-b border-white/10 bg-slate-900 text-[9px] font-black uppercase tracking-widest text-slate-500">
                 <th className="px-4 py-2">Número / Tipo</th>
@@ -853,7 +853,7 @@ export const QualityView: React.FC = () => {
 
         {/* ── Tab: Auditorías ── */}
         {activeTab === 'audits' && (
-          <table className="w-full text-left border-collapse">
+          <table className="w-full min-w-[620px] text-left border-collapse">
             <thead>
               <tr className="sticky top-0 z-10 border-b border-white/10 bg-slate-900 text-[9px] font-black uppercase tracking-widest text-slate-500">
                 <th className="px-4 py-2">Número / Tipo</th>
@@ -1001,7 +1001,7 @@ export const QualityView: React.FC = () => {
 
         {/* ── Tab: Six Sigma Metrics ── */}
         {activeTab === 'metrics' && (
-          <div className="p-6 grid grid-cols-2 gap-6">
+          <div className="p-4 sm:p-6 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             {/* Distribución de veredictos */}
             <div className="bg-white/[0.02] border border-white/5 rounded-xl p-5">
               <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2"><BarChart3 size={14} className="text-mcvill-accent" /> Distribución de Resultados</h3>
@@ -1074,8 +1074,8 @@ export const QualityView: React.FC = () => {
 
       {/* ── Modal: Inspección ── */}
       {showModal && (
-        <div className="fixed inset-0 top-16 left-0 md:left-64 z-[100] flex items-center justify-center p-6 backdrop-blur-2xl bg-slate-950/80">
-          <div className="w-full max-w-2xl bg-slate-900 border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-3 sm:p-6 backdrop-blur-2xl bg-slate-950/80">
+          <div className="w-full max-w-2xl bg-slate-900 border border-white/10 rounded-t-2xl sm:rounded-2xl overflow-hidden shadow-2xl">
             <div className="p-6 border-b border-white/5 flex justify-between items-center">
               <div>
                 <h3 className="text-xl font-black text-white tracking-tight uppercase">{editingInspection ? 'ACTUALIZAR' : 'NUEVA'} <span className="text-mcvill-accent">INSPECCIÓN</span></h3>
@@ -1124,8 +1124,8 @@ export const QualityView: React.FC = () => {
 
       {/* ── Modal: No Conformidad ── */}
       {showNCModal && (
-        <div className="fixed inset-0 top-16 left-0 md:left-64 z-[100] flex items-center justify-center p-6 backdrop-blur-2xl bg-slate-950/80">
-          <div className="w-full max-w-2xl bg-slate-900 border border-white/10 rounded-2xl overflow-hidden shadow-2xl max-h-[85vh] flex flex-col">
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-3 sm:p-6 backdrop-blur-2xl bg-slate-950/80">
+          <div className="w-full max-w-2xl bg-slate-900 border border-white/10 rounded-t-2xl sm:rounded-2xl overflow-hidden shadow-2xl max-h-[85vh] flex flex-col">
             <div className="p-6 border-b border-white/5 flex justify-between items-center shrink-0">
               <div>
                 <h3 className="text-xl font-black text-white tracking-tight uppercase">{editingNC ? 'EDITAR' : 'NUEVA'} <span className="text-rose-500">NO CONFORMIDAD</span></h3>
@@ -1133,8 +1133,8 @@ export const QualityView: React.FC = () => {
               </div>
               <button onClick={() => setShowNCModal(false)} className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/5 text-slate-500 hover:text-rose-500 transition-all"><X size={18} /></button>
             </div>
-            <form onSubmit={handleSaveNC} className="p-6 space-y-4 overflow-y-auto custom-scrollbar">
-              <div className="grid grid-cols-2 gap-4">
+            <form onSubmit={handleSaveNC} className="p-4 sm:p-6 space-y-4 overflow-y-auto custom-scrollbar">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 block">Tipo</label>
                   <select className="cyber-select w-full" value={ncForm.tipo} onChange={e => setNcForm({ ...ncForm, tipo: e.target.value })}>
@@ -1148,7 +1148,7 @@ export const QualityView: React.FC = () => {
                   </select>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 block">Origen</label>
                   <select className="cyber-select w-full" value={ncForm.origen} onChange={e => setNcForm({ ...ncForm, origen: e.target.value })}>
@@ -1162,7 +1162,7 @@ export const QualityView: React.FC = () => {
                   </select>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 block">Responsable</label>
                   <input className="cyber-input w-full" placeholder="NOMBRE..." value={ncForm.responsable} onChange={e => setNcForm({ ...ncForm, responsable: e.target.value })} />
@@ -1205,8 +1205,8 @@ export const QualityView: React.FC = () => {
 
       {/* ── Modal: Auditoría ── */}
       {showAuditModal && (
-        <div className="fixed inset-0 top-16 left-0 md:left-64 z-[100] flex items-center justify-center p-6 backdrop-blur-2xl bg-slate-950/80">
-          <div className="w-full max-w-2xl bg-slate-900 border border-white/10 rounded-2xl overflow-hidden shadow-2xl max-h-[85vh] flex flex-col">
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-3 sm:p-6 backdrop-blur-2xl bg-slate-950/80">
+          <div className="w-full max-w-2xl bg-slate-900 border border-white/10 rounded-t-2xl sm:rounded-2xl overflow-hidden shadow-2xl max-h-[85vh] flex flex-col">
             <div className="p-6 border-b border-white/5 flex justify-between items-center shrink-0">
               <div>
                 <h3 className="text-xl font-black text-white tracking-tight uppercase">{editingAudit ? 'EDITAR' : 'PROGRAMAR'} <span className="text-mcvill-accent">AUDITORÍA</span></h3>
@@ -1215,7 +1215,7 @@ export const QualityView: React.FC = () => {
               <button onClick={() => setShowAuditModal(false)} className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/5 text-slate-500 hover:text-rose-500 transition-all"><X size={18} /></button>
             </div>
             <form onSubmit={handleSaveAudit} className="p-6 space-y-4 overflow-y-auto custom-scrollbar">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 block">Tipo</label>
                   <select className="cyber-select w-full" value={auditForm.tipo} onChange={e => setAuditForm({ ...auditForm, tipo: e.target.value })}>
@@ -1233,7 +1233,7 @@ export const QualityView: React.FC = () => {
                 <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 block">Alcance *</label>
                 <input required className="cyber-input w-full" placeholder="EJ: PROCESO DE SOLDADURA MIG/MAG..." value={auditForm.alcance} onChange={e => setAuditForm({ ...auditForm, alcance: e.target.value })} />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 block">Auditor</label>
                   <input className="cyber-input w-full" placeholder="NOMBRE DEL AUDITOR..." value={auditForm.auditor} onChange={e => setAuditForm({ ...auditForm, auditor: e.target.value })} />
@@ -1243,7 +1243,7 @@ export const QualityView: React.FC = () => {
                   <input className="cyber-input w-full" placeholder="EJ: PRODUCCIÓN / CALIDAD..." value={auditForm.area_auditada} onChange={e => setAuditForm({ ...auditForm, area_auditada: e.target.value })} />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 block">Fecha Programada</label>
                   <input type="date" className="cyber-input w-full" value={auditForm.fecha_programada} onChange={e => setAuditForm({ ...auditForm, fecha_programada: e.target.value })} />

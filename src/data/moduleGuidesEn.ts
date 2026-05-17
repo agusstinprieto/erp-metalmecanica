@@ -539,16 +539,28 @@ export const MODULE_GUIDES_EN: Record<string, ModuleGuide> = {
     moduleId: 'attendance',
     label: 'Attendance Tracking',
     emoji: '🕐',
-    description: 'Log shop-floor check-ins and check-outs and attendance reports',
+    description: 'Check-in, check-out, Face ID Biometrics & IP Geofencing',
     steps: [
       {
         icon: 'CalendarCheck', color: 'text-mcvill-accent', bg: 'bg-mcvill-accent/10 border-mcvill-accent/30',
-        title: 'Clock-In Terminal',
-        subtitle: 'Quick attendance logging via barcode/QR badge scanning',
+        title: 'Kiosk Face ID Biometrics',
+        subtitle: 'High-speed check-ins for shop-floor operators',
         tips: [
-          '📲 Operators scan their ID cards at the tablet terminal station to clock in.',
-          '⏰ System automatically flags late arrivals against configured shift schedules.',
-          '🟢 Green = on time | 🟡 Yellow = late | 🔴 Red = absent.',
+          '👤 "Face ID AI" Tab: A single entrance tablet acts as a collective kiosk for shop-floor operators.',
+          '🤖 Single Supervisor Credentials: Low IT overhead; operators require no password logins or PCs.',
+          '⚡ High-Speed Scanning: Biometric face capture in <2s with 36.5 °C body temperature checks and liveness audits.',
+          '🔗 Neural Link: Gemini Vision identifies the operator and submits secure timecard updates to Supabase.',
+        ],
+      },
+      {
+        icon: 'Laptop', color: 'text-blue-400', bg: 'bg-blue-400/10 border-blue-400/30',
+        title: 'Desk Timecards via IP/GPS',
+        subtitle: 'Desktop check-ins for administrative offices',
+        tips: [
+          '💼 Corporate employees check in with 1 click directly from their logged-in active sessions on their PCs.',
+          '🔒 Network IP Locks: Check-in buttons are disabled if request traffic originates outside plant Wi-Fi.',
+          '📍 GPS Geofencing: Secure geofences enforce that browser coordinates fall within 50 meters of corporate offices.',
+          '🚫 Anti-Fraud Gates: Automatically rejects out-of-bounds attendance logging.',
         ],
       },
       {
@@ -559,6 +571,7 @@ export const MODULE_GUIDES_EN: Record<string, ModuleGuide> = {
           '📊 Daily logs list active on-site personnel and current shift coverage.',
           '📈 Weekly stats highlight employees showing chronic absenteeism patterns.',
           '💬 AI Chat command: "Who is absent today?" yields instant timecard results.',
+          '🎙️ Live Voice Link: Speak directly to the AI to query who is late or absent in real time.',
         ],
       },
     ],
@@ -625,7 +638,7 @@ export const MODULE_GUIDES_EN: Record<string, ModuleGuide> = {
 
   hse: {
     moduleId: 'hse',
-    label: 'Safety HSE',
+    label: 'SAFETY',
     emoji: '🦺',
     description: 'Industrial safety logs, safety incidents, and NOM regulatory compliance',
     steps: [
@@ -647,7 +660,18 @@ export const MODULE_GUIDES_EN: Record<string, ModuleGuide> = {
           '🦺 Logs PPE assignments detailing issue dates and service life thresholds.',
           '📋 Log safety training completions and renewal dates.',
           '🔔 Alerts notify officers when PPE reach replacement limits.',
-          '📑 Supports regulatory standards: NOM-001, NOM-017, and NOM-026.',
+          '📑 Supports regulatory standards: NOM-017-STPS-2008 (PPE), NOM-010-STPS-2014 (Chemicals), NOM-113-STPS-2009 (Footwear).',
+        ],
+      },
+      {
+        icon: 'Eye', color: 'text-cyan-400', bg: 'bg-cyan-400/10 border-cyan-400/30',
+        title: 'Neural Floor PPE Inspection',
+        subtitle: 'Autonomous AI-powered plant-floor safety audits',
+        tips: [
+          '🤖 AI Safety Inspection: The "Scan EPP" button on plant CCTV camera feeds monitors operator safety equipment.',
+          '📹 Shop-floor visual feeds: Active canvases (Welding C2 with sparks, Paint C5, Storage C3) trace PPE levels.',
+          '⚡ Laser Scan HUD: Renders base64 frames to Gemini Vision to verify hard hats, gloves, shields, and eyewear.',
+          '🔊 Web Audio Sirens: Web Audio dual-oscillators synthesize high-decibel acoustic warning beeps if EPP faults are detected.',
         ],
       },
     ],

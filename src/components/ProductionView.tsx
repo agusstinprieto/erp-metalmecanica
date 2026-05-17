@@ -203,7 +203,7 @@ export const ProductionView: React.FC = () => {
               <ClipboardList className="text-slate-500" size={16} />
               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tablero Operativo</span>
             </div>
-            <div className="relative group w-72">
+            <div className="relative group w-full max-w-xs">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-blue-500 transition-colors" size={14} />
               <input 
                 type="text" 
@@ -215,8 +215,8 @@ export const ProductionView: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto custom-scrollbar">
-            <table className="w-full text-left border-collapse">
+          <div className="flex-1 overflow-x-auto custom-scrollbar">
+            <table className="w-full min-w-[600px] text-left border-collapse">
               <thead>
                 <tr className="border-b border-white/5 bg-white/[0.01] sticky top-0 z-10 backdrop-blur-md">
                   <th className="px-4 py-3 text-[9px] font-black text-slate-500 uppercase tracking-widest">ID / Registro</th>
@@ -321,7 +321,7 @@ export const ProductionView: React.FC = () => {
                   </select>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Prioridad</label>
                     <select className="w-full bg-white/[0.04] border border-white/10 rounded-xl px-4 py-2.5 text-[11px] text-white font-bold outline-none focus:border-blue-500/40 transition-all" value={formData.priority} onChange={e => setFormData({...formData, priority: e.target.value as any})}>

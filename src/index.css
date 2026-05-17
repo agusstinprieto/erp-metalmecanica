@@ -132,6 +132,91 @@
 .border-emerald-400\/50 { border-color: color-mix(in srgb, var(--theme-accent), transparent 50%) !important; }
 .border-emerald-500\/50 { border-color: color-mix(in srgb, var(--theme-accent), transparent 50%) !important; }
 
+/* ── Remap sky — botones de acción secundarios → acento del tema ─────────
+   sky-600/sky-500 sólidos = botones primarios; variantes /10 /20 = ghost    */
+:not([data-theme="blue"]) .text-sky-400,
+:not([data-theme="blue"]) .text-sky-500   { color: var(--theme-accent) !important; }
+:not([data-theme="blue"]) .hover\:text-sky-400:hover { color: var(--theme-accent) !important; }
+
+:not([data-theme="blue"]) .border-sky-500\/20,
+:not([data-theme="blue"]) .border-sky-500\/30,
+:not([data-theme="blue"]) .border-sky-600\/30 { border-color: color-mix(in srgb, var(--theme-accent), transparent 68%) !important; }
+
+:not([data-theme="blue"]) .bg-sky-500\/5,
+:not([data-theme="blue"]) .bg-sky-500\/10,
+:not([data-theme="blue"]) .bg-sky-600\/10  { background-color: color-mix(in srgb, var(--theme-accent), transparent 90%) !important; }
+:not([data-theme="blue"]) .bg-sky-500\/20,
+:not([data-theme="blue"]) .bg-sky-600\/20  { background-color: color-mix(in srgb, var(--theme-accent), transparent 80%) !important; }
+
+:not([data-theme="blue"]) .bg-sky-600      { background-color: var(--theme-accent) !important; }
+:not([data-theme="blue"]) .bg-sky-500      { background-color: color-mix(in srgb, var(--theme-accent), white 12%) !important; }
+:not([data-theme="blue"]) .hover\:bg-sky-600:hover  { background-color: var(--theme-accent) !important; }
+:not([data-theme="blue"]) .hover\:bg-sky-500:hover  { background-color: color-mix(in srgb, var(--theme-accent), white 12%) !important; }
+:not([data-theme="blue"]) .hover\:bg-sky-600\/30:hover { background-color: color-mix(in srgb, var(--theme-accent), transparent 70%) !important; }
+:not([data-theme="blue"]) .hover\:bg-sky-500\/5:hover  { background-color: color-mix(in srgb, var(--theme-accent), transparent 95%) !important; }
+:not([data-theme="blue"]) .focus\:ring-sky-500:focus   { box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-accent), transparent 70%) !important; }
+:not([data-theme="blue"]) .shadow-sky-500\/30   { box-shadow: 0 0 20px color-mix(in srgb, var(--theme-accent), transparent 70%) !important; }
+
+/* ── Variantes blue faltantes (opacidades /10 /15 /20 usadas en paneles info) */
+:not([data-theme="blue"]) .text-blue-300  { color: color-mix(in srgb, var(--theme-accent), white 35%) !important; }
+:not([data-theme="blue"]) .bg-blue-500\/15 { background-color: color-mix(in srgb, var(--theme-accent), transparent 85%) !important; }
+:not([data-theme="blue"]) .bg-blue-500\/20 { background-color: color-mix(in srgb, var(--theme-accent), transparent 80%) !important; }
+:not([data-theme="blue"]) .border-blue-500\/10,
+:not([data-theme="blue"]) .border-blue-500\/15 { border-color: color-mix(in srgb, var(--theme-accent), transparent 85%) !important; }
+
+/* ══════════════════════════════════════════════════════════
+   BTN-IA  — Diferenciador visual para botones de Inteligencia Artificial
+   Glow pulsante + shimmer sweep. Usa --theme-accent automáticamente.
+   ══════════════════════════════════════════════════════════ */
+.btn-ia {
+  position: relative;
+  overflow: hidden;
+  animation: btn-ia-breathe 3s ease-in-out infinite;
+}
+
+/* Shimmer sweep de izquierda a derecha */
+.btn-ia::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 35%;
+  height: 200%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, white, transparent 62%),
+    transparent
+  );
+  transform: skewX(-18deg);
+  animation: btn-ia-shimmer 4.5s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Contenido del botón sobre el shimmer */
+.btn-ia > * { position: relative; z-index: 2; }
+
+@keyframes btn-ia-breathe {
+  0%, 100% {
+    box-shadow:
+      0 0  8px color-mix(in srgb, var(--theme-accent), transparent 50%),
+      0 0 20px color-mix(in srgb, var(--theme-accent), transparent 72%);
+  }
+  50% {
+    box-shadow:
+      0 0 12px color-mix(in srgb, var(--theme-accent), transparent 35%),
+      0 0 32px color-mix(in srgb, var(--theme-accent), transparent 58%),
+      0 0 60px color-mix(in srgb, var(--theme-accent), transparent 82%);
+  }
+}
+
+@keyframes btn-ia-shimmer {
+  0%         { left: -60%; opacity: 0; }
+  8%         { opacity: 1; }
+  38%, 100%  { left: 120%; opacity: 0; }
+}
+
 /* ── Global Border Overrides to prevent white borders */
 .dark .border-white\/5,
 .dark .border-white\/10,

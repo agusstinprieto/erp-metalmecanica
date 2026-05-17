@@ -47,6 +47,7 @@ import {
   Scan,
   Landmark,
   Search,
+  Camera,
 } from 'lucide-react';
 import { useConfig } from '../contexts/ConfigContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -433,6 +434,7 @@ export const Sidebar = (props: {
             <SidebarItem icon={FileCheck2} label={t('sidebar.ppap', 'PPAP')} active={activeView === 'ppap'} onClick={() => navigate('ppap')} collapsed={isSidebarCollapsed} />
             <SidebarItem icon={MessageCircle} label={t('sidebar.voc', 'VOC')} active={activeView === 'voc'} onClick={() => navigate('voc')} collapsed={isSidebarCollapsed} />
             <SidebarItem icon={Scan} label={t('sidebar.shop_floor', 'Shop Floor')} active={activeView === 'shop_floor'} onClick={() => navigate('shop_floor')} collapsed={isSidebarCollapsed} />
+            <SidebarItem icon={Camera} label={t('sidebar.seguridad', 'Seguridad')} active={activeView === 'seguridad'} onClick={() => navigate('seguridad')} collapsed={isSidebarCollapsed} />
 
             {!isSidebarCollapsed && (
               <p className="px-3 mt-3 mb-1 text-[9px] font-black text-mcvill-accent/70 tracking-[0.25em] uppercase flex items-center gap-2">
