@@ -69,7 +69,7 @@ export const ViajeroAdminPanel: React.FC<{
   });
 
   // Motor PDF: QuestPDF (Community) o MigraDoc (MIT, sin costo)
-  const [pdfEngine, setPdfEngine] = useState<'questpdf' | 'migradoc'>('questpdf');
+  const [pdfEngine, setPdfEngine] = useState<'questpdf' | 'migradoc'>('migradoc');
 
   // Paginación
   const PAGE_SIZE = 12;

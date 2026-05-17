@@ -258,8 +258,15 @@ app.MapPatch("/api/reports/viajero/{id}", async (string id, JsonElement data, Vi
 app.MapGet("/api/reports/viajero/{jobID}/migra", async (string jobID, ViajeroService db, HttpContext ctx) =>
 {
     Console.WriteLine($"📄 [MIGRADOC] Generando reporte para: {jobID}");
-    var data = await db.GetViajeroDataAsync(jobID);
-    if (data == null) return Results.NotFound($"Viajero '{jobID}' no encontrado.");
+    string targetID = jobID;
+    if (jobID.ToLower() == "latest")
+    {
+        targetID = await db.GetLatestJobIDAsync() ?? "";
+        if (string.IsNullOrEmpty(targetID)) return Results.NotFound("No se encontraron registros en la base de datos.");
+    }
+
+    var data = await db.GetViajeroDataAsync(targetID);
+    if (data == null) return Results.NotFound($"Viajero '{targetID}' no encontrado.");
 
     try
     {
