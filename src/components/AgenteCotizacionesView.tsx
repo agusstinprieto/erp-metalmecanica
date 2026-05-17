@@ -162,43 +162,140 @@ Genera la cotización industrial completa.`;
   };
 
   // ── PDF Export ────────────────────────────────────────────────────────────
-  const handlePDF = () => {
+  const handlePDF = async () => {
     if (!cotizacion) { notify('Genera una cotización primero', 'error'); return; }
     const { subtotal, iva, total } = calcTotales(cotizacion.partidas);
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'letter' });
     const W = doc.internal.pageSize.getWidth();
+    const H = doc.internal.pageSize.getHeight();
 
-    // ── Header band ──
+    // ── Load logo ──
+    let logoB64: string | null = null;
+    try {
+      const res = await fetch('/mcvill-logo-dark.png');
+      if (res.ok) {
+        const blob = await res.blob();
+        logoB64 = await new Promise<string>(resolve => {
+          const r = new FileReader();
+          r.onloadend = () => resolve(r.result as string);
+          r.onerror = () => resolve('');
+          r.readAsDataURL(blob);
+        });
+      }
+    } catch { /* sin logo */ }
+
+    // ══════════════════════════════════════════════════
+    // ENCABEZADO CORPORATIVO McVill
+    // ══════════════════════════════════════════════════
+    const HDR_H = 46; // altura total del encabezado corporativo
+
+    // Fondo blanco
+    doc.setFillColor(255, 255, 255);
+    doc.rect(0, 0, W, HDR_H, 'F');
+
+    // ── Columna izquierda: Logo + tagline ──
+    if (logoB64) {
+      try { doc.addImage(logoB64, 'PNG', 8, 4, 50, 26); } catch { /* skip */ }
+    } else {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(18);
+      doc.setTextColor(10, 18, 35);
+      doc.text(config.brandName, 10, 18);
+    }
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(6.5);
+    doc.setTextColor(100, 100, 110);
+    doc.text('Precision Metal Fabrication Solution', 10, 33);
+
+    // ── Columna centro: Datos de contacto ──
+    const cx = 68;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(50, 50, 60);
+    doc.text('Calle Allende # 280 , Ciudad Industrial Torreón,', cx, 10);
+    doc.text('Torreón, Coahuila Mexico. CP 27019.', cx, 15.5);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7.5);
+    doc.setTextColor(20, 20, 30);
+    doc.text('Tel. (871) 7508283 . 2288065 . 2240215', cx, 22);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7);
+    doc.setTextColor(0, 90, 200);
+    doc.text('mcvill.com', cx, 28);
+
+    // ── Columna derecha: Badges certificaciones ──
+    const badgeY = 5;
+    const badgeH = 22;
+    let bx = W - 72;
+
+    // ISO 9001
+    doc.setFillColor(248, 250, 255);
+    doc.setDrawColor(60, 90, 160);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(bx, badgeY, 21, badgeH, 2, 2, 'FD');
+    doc.setTextColor(60, 90, 160);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(5.5);
+    doc.text('ISO', bx + 10.5, badgeY + 5.5, { align: 'center' });
+    doc.setFontSize(9);
+    doc.text('9001', bx + 10.5, badgeY + 12, { align: 'center' });
+    doc.setFontSize(4.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(80, 80, 90);
+    doc.text('Cert no. 59273', bx + 10.5, badgeY + 17, { align: 'center' });
+
+    // AWS
+    bx += 23;
+    doc.setFillColor(255, 250, 250);
+    doc.setDrawColor(180, 40, 40);
+    doc.roundedRect(bx, badgeY, 21, badgeH, 2, 2, 'FD');
+    doc.setTextColor(180, 40, 40);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.text('AWS', bx + 10.5, badgeY + 8, { align: 'center' });
+    doc.setFontSize(4);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(60, 60, 60);
+    doc.text('American', bx + 10.5, badgeY + 13, { align: 'center' });
+    doc.text('Welding Society', bx + 10.5, badgeY + 17, { align: 'center' });
+
+    // JobBOSS
+    bx += 23;
+    doc.setFillColor(0, 90, 200);
+    doc.roundedRect(bx, badgeY, 23, badgeH, 2, 2, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7.5);
+    doc.text('JobBOSS', bx + 11.5, badgeY + 8, { align: 'center' });
+    doc.setFontSize(4);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Shop management', bx + 11.5, badgeY + 13, { align: 'center' });
+    doc.text('solutions.', bx + 11.5, badgeY + 17, { align: 'center' });
+
+    // ── Línea separadora azul ──
+    doc.setDrawColor(0, 100, 210);
+    doc.setLineWidth(1.2);
+    doc.line(0, HDR_H - 1, W, HDR_H - 1);
+
+    // ── Barra oscura con folio y fecha ──
+    const BAND_Y = HDR_H;
     doc.setFillColor(10, 18, 35);
-    doc.rect(0, 0, W, 42, 'F');
+    doc.rect(0, BAND_Y, W, 13, 'F');
 
     doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(20);
-    doc.text(config.brandName, 12, 15);
-
-    doc.setFontSize(8);
+    doc.setFontSize(10);
+    doc.text(`COTIZACIÓN  ${folio}`, 12, BAND_Y + 8.5);
     doc.setFont('helvetica', 'normal');
-    doc.setTextColor(100, 160, 220);
-    doc.text('S.A. DE C.V.', 12, 21);
-    doc.text('Ingeniería Industrial · Manufactura de Precisión', 12, 27);
-
-    doc.setFillColor(0, 128, 255);
-    doc.rect(0, 40, W, 2, 'F');
-
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(22);
-    doc.setTextColor(255, 255, 255);
-    const folioText = `COTIZACIÓN ${folio}`;
-    doc.text(folioText, W - 12, 16, { align: 'right' });
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
+    doc.setFontSize(7.5);
     doc.setTextColor(150, 200, 255);
-    doc.text(`Fecha: ${new Date().toLocaleDateString('es-MX')}`, W - 12, 22, { align: 'right' });
-    doc.text(`Vigencia: ${vigencia}`, W - 12, 28, { align: 'right' });
+    doc.text(
+      `Fecha: ${new Date().toLocaleDateString('es-MX')}   ·   Vigencia: ${vigencia}`,
+      W - 12, BAND_Y + 8.5, { align: 'right' }
+    );
 
     // ── Client + reference block ──
-    let y = 52;
+    let y = HDR_H + 13 + 5; // debajo del header corporativo + barra de folio
     doc.setFillColor(20, 30, 50);
     doc.roundedRect(10, y, W - 20, 28, 2, 2, 'F');
 
@@ -319,15 +416,23 @@ Genera la cotización industrial completa.`;
       doc.text(noteLines, 12, propY);
     }
 
-    // ── Footer ──
-    const pageH = doc.internal.pageSize.getHeight();
-    doc.setFillColor(10, 18, 35);
-    doc.rect(0, pageH - 14, W, 14, 'F');
-    doc.setTextColor(100, 160, 220);
+    // ── Footer corporativo ──
+    doc.setDrawColor(0, 100, 210);
+    doc.setLineWidth(0.5);
+    doc.line(10, H - 16, W - 10, H - 16);
+    doc.setFillColor(255, 255, 255);
+    doc.rect(0, H - 15, W, 15, 'F');
+    doc.setFont('helvetica', 'bold');
     doc.setFontSize(7);
+    doc.setTextColor(10, 18, 35);
+    doc.text(config.companyName, 10, H - 9);
     doc.setFont('helvetica', 'normal');
-    doc.text(`${config.companyName} · Manufactura Industrial · ${config.companyCity}`, W / 2, pageH - 8, { align: 'center' });
-    doc.text('Precios en MXN + IVA. Cotización válida según vigencia indicada.', W / 2, pageH - 4, { align: 'center' });
+    doc.setTextColor(80, 80, 90);
+    doc.text('Calle Allende # 280 · Ciudad Industrial Torreón, Coahuila, México · CP 27019', 10, H - 5);
+    doc.setTextColor(0, 90, 200);
+    doc.text('mcvill.com', W - 10, H - 7, { align: 'right' });
+    doc.setTextColor(100, 100, 110);
+    doc.text('Tel. (871) 7508283 · 2288065 · 2240215', W - 10, H - 3, { align: 'right' });
 
     doc.save(`${folio}_${(cliente || 'cliente').replace(/\s+/g, '_')}.pdf`);
     notify('PDF descargado');

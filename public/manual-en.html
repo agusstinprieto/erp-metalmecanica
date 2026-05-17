@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>McVill ERP Manual — Technical Documentation</title>
+<style>
+:root{
+  --bg:#020617;--card:#0f172a;--border:rgba(79,165,255,.18);--accent:#4FA5FF;
+  --text:#f1f5f9;--muted:#94a3b8;--success:#34d399;--warning:#fbbf24;
+  --danger:#f87171;--sidebar-w:280px;--header-h:60px;
+}
+[data-theme="light"]{
+  --bg:#f0f4f8;--card:#ffffff;--border:#cbd5e1;--accent:#1d4ed8;
+  --text:#0f172a;--muted:#475569;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.65}
+
+/* ── HEADER ───────────────────────────────────────────── */
+#topbar{position:fixed;top:0;left:0;right:0;height:var(--header-h);background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1.5rem;gap:1rem;z-index:100;backdrop-filter:blur(12px)}
+#topbar .logo{font-size:1.1rem;font-weight:900;letter-spacing:.12em;color:var(--accent);flex:1}
+#topbar .logo span{color:var(--muted);font-weight:400}
+#search-box{padding:.4rem .8rem;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:.85rem;width:220px;outline:none}
+#search-box:focus{border-color:var(--accent)}
+#theme-btn{padding:.4rem .7rem;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:.85rem}
+#theme-btn:hover{color:var(--accent);border-color:var(--accent)}
+
+/* ── LAYOUT ───────────────────────────────────────────── */
+#wrap{display:flex;padding-top:var(--header-h);min-height:100vh}
+#sidebar{width:var(--sidebar-w);flex-shrink:0;position:fixed;top:var(--header-h);bottom:0;overflow-y:auto;padding:1rem 0;border-right:1px solid var(--border);background:var(--card)}
+#sidebar::-webkit-scrollbar{width:4px}
+#sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+#content{margin-left:var(--sidebar-w);flex:1;padding:2.5rem 3rem 6rem;max-width:960px}
+@media(max-width:768px){#sidebar{display:none}#content{margin-left:0;padding:1.5rem 1rem 4rem}}
+
+/* ── SIDEBAR NAV ──────────────────────────────────────── */
+.nav-section{padding:.3rem 1rem .2rem;font-size:.65rem;font-weight:800;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;margin-top:.6rem}
+.nav-link{display:block;padding:.38rem 1.2rem;font-size:.82rem;color:var(--muted);text-decoration:none;border-left:2px solid transparent;transition:all .15s}
+.nav-link:hover{color:var(--text);background:rgba(255,255,255,.04);border-left-color:var(--accent)}
+.nav-link.active{color:var(--accent);border-left-color:var(--accent);font-weight:600;background:rgba(79,165,255,.07)}
+
+/* ── SECTIONS ─────────────────────────────────────────── */
+section{margin-bottom:3.5rem;scroll-margin-top:80px}
+h1{font-size:2rem;font-weight:900;letter-spacing:-.02em;margin-bottom:.5rem;color:var(--text)}
+h1 .badge{font-size:.65rem;font-weight:700;padding:.2rem .6rem;border-radius:99px;background:var(--accent);color:#fff;vertical-align:middle;margin-left:.5rem;letter-spacing:.08em}
+h2{font-size:1.35rem;font-weight:800;margin:2.5rem 0 .8rem;padding-bottom:.5rem;border-bottom:2px solid var(--border);color:var(--text)}
+h3{font-size:1.05rem;font-weight:700;margin:1.8rem 0 .6rem;color:var(--accent)}
+h4{font-size:.9rem;font-weight:700;margin:1.2rem 0 .4rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+p{margin-bottom:.8rem;color:var(--text);opacity:.92}
+ul,ol{padding-left:1.4rem;margin-bottom:.8rem}
+li{margin-bottom:.3rem;opacity:.9}
+strong{color:var(--text);opacity:1}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── CARDS & BOXES ────────────────────────────────────── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.4rem;margin-bottom:1rem}
+.card h3{margin-top:0}
+.tip{background:rgba(79,165,255,.08);border:1px solid rgba(79,165,255,.25);border-radius:8px;padding:.8rem 1rem;margin:.8rem 0;font-size:.88rem}
+.tip::before{content:"💡 ";font-size:.9rem}
+.warn{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:8px;padding:.8rem 1rem;margin:.8rem 0;font-size:.88rem}
+.warn::before{content:"⚠️ ";font-size:.9rem}
+.danger-box{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);border-radius:8px;padding:.8rem 1rem;margin:.8rem 0;font-size:.88rem}
+.danger-box::before{content:"🔴 "}
+
+/* ── CODE ─────────────────────────────────────────────── */
+pre,code{font-family:'Cascadia Code','Fira Code','Courier New',monospace}
+pre{background:#0a0f1e;border:1px solid var(--border);border-radius:10px;padding:1.2rem;overflow-x:auto;font-size:.82rem;line-height:1.7;margin:.8rem 0}
+code{background:rgba(79,165,255,.12);padding:.15em .45em;border-radius:4px;font-size:.85em;color:var(--accent)}
+pre code{background:none;padding:0;color:#c9d1d9}
+
+/* ── TABLES ───────────────────────────────────────────── */
+.table-wrap{overflow-x:auto;margin:.8rem 0}
+table{width:100%;border-collapse:collapse;font-size:.86rem}
+th{background:rgba(79,165,255,.12);color:var(--accent);font-weight:700;text-transform:uppercase;font-size:.72rem;letter-spacing:.06em;padding:.65rem .85rem;text-align:left;border-bottom:2px solid var(--border)}
+td{padding:.6rem .85rem;border-bottom:1px solid var(--border);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.03)}
+
+/* ── FORMULA BOX ──────────────────────────────────────── */
+.formula{background:linear-gradient(135deg,rgba(79,165,255,.06),rgba(52,211,153,.04));border:1px solid rgba(79,165,255,.2);border-radius:10px;padding:1.2rem 1.4rem;margin:1rem 0;font-family:'Cascadia Code','Fira Code',monospace;font-size:.9rem;line-height:2}
+.formula .eq{color:var(--accent);font-weight:700}
+.formula .comment{color:var(--muted);font-style:italic;font-size:.8rem}
+
+/* ── STATUS PILLS ─────────────────────────────────────── */
+.pill{display:inline-block;padding:.15rem .55rem;border-radius:99px;font-size:.72rem;font-weight:700;letter-spacing:.04em}
+.pill-blue{background:rgba(79,165,255,.15);color:var(--accent)}
+.pill-green{background:rgba(52,211,153,.15);color:#34d399}
+.pill-amber{background:rgba(251,191,36,.15);color:#fbbf24}
+.pill-red{background:rgba(248,113,113,.15);color:#f87171}
+.pill-purple{background:rgba(167,139,250,.15);color:#a78bfa}
+.pill-gray{background:rgba(148,163,184,.12);color:var(--muted)}
+
+/* ── MODULE GRID ──────────────────────────────────────── */
+.module-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.8rem;margin:.8rem 0}
+.module-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.9rem 1rem;font-size:.82rem}
+.module-card .icon{font-size:1.2rem;margin-bottom:.3rem;display:block}
+.module-card .name{font-weight:700;color:var(--text);margin-bottom:.2rem}
+.module-card .desc{color:var(--muted);font-size:.75rem}
+
+/* ── STEP LIST ────────────────────────────────────────── */
+.steps{counter-reset:step;list-style:none;padding:0}
+.steps li{counter-increment:step;padding:.5rem 0 .5rem 3rem;position:relative;border-left:2px solid var(--border);margin-left:1rem;padding-left:2rem}
+.steps li::before{content:counter(step);position:absolute;left:-1rem;top:.45rem;width:2rem;height:2rem;border-radius:50%;background:var(--accent);color:#fff;font-size:.75rem;font-weight:800;display:flex;align-items:center;justify-content:center}
+.steps li:last-child{border-left:2px solid transparent}
+
+/* ── HERO ─────────────────────────────────────────────── */
+.hero{background:linear-gradient(135deg,rgba(79,165,255,.1),rgba(52,211,153,.05));border:1px solid var(--border);border-radius:16px;padding:2rem;margin-bottom:2rem;text-align:center}
+.hero .version{font-size:.72rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem}
+.hero h1{font-size:2.4rem;margin-bottom:.6rem}
+.hero p{color:var(--muted);max-width:600px;margin:0 auto}
+
+/* ── SEARCH HIGHLIGHT ─────────────────────────────────── */
+mark{background:rgba(251,191,36,.35);color:var(--text);border-radius:2px;padding:0 .1em}
+
+/* ── PRINT ────────────────────────────────────────────── */
+@media print{
+  #topbar,#sidebar{display:none}
+  #content{margin:0;max-width:none;padding:1rem}
+  section{page-break-inside:avoid}
+  pre{white-space:pre-wrap}
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <div class="logo">MCVILL <span>ERP</span> &nbsp;·&nbsp; Technical Manual</div>
+  <input id="search-box" type="search" placeholder="🔍  Search the manual..." oninput="doSearch(this.value)"/>
+  <button id="theme-btn" onclick="toggleTheme()">☀ Light Mode</button>
+  <button id="theme-btn" style="margin-left:.4rem" onclick="window.print()">🖨 Print</button>
+</div>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="nav-section">Introduction</div>
+  <a class="nav-link" href="#intro">What is McVill ERP?</a>
+  <a class="nav-link" href="#architecture">Architecture</a>
+  <a class="nav-link" href="#roles">Roles &amp; Permissions</a>
+  <a class="nav-link" href="#themes">Color Themes</a>
+
+  <div class="nav-section">Operations</div>
+  <a class="nav-link" href="#dashboard">Dashboard</a>
+  <a class="nav-link" href="#produccion">Shop Floor Control</a>
+  <a class="nav-link" href="#viajeros">Industrial Travelers</a>
+  <a class="nav-link" href="#planeacion">AI Planning &amp; Gantt</a>
+  <a class="nav-link" href="#inventario">Pro Inventories</a>
+  <a class="nav-link" href="#calidad">Quality SGC</a>
+  <a class="nav-link" href="#hse">Safety HSE</a>
+  <a class="nav-link" href="#mantenimiento">Maintenance</a>
+
+  <div class="nav-section">Human Capital</div>
+  <a class="nav-link" href="#asistencia">Attendance &amp; Clock-in</a>
+  <a class="nav-link" href="#nomina">Payroll &amp; Formulas</a>
+  <a class="nav-link" href="#rh">Human Resources</a>
+  <a class="nav-link" href="#desempeno">Performance &amp; Incentives</a>
+  <a class="nav-link" href="#reclutamiento">AI Recruitment</a>
+
+  <div class="nav-section">Commercial</div>
+  <a class="nav-link" href="#ventas">Sales &amp; CRM</a>
+  <a class="nav-link" href="#compras">Purchasing</a>
+  <a class="nav-link" href="#cotizaciones">AI Quoting Agent</a>
+  <a class="nav-link" href="#rfq">RFQ Kanban</a>
+  <a class="nav-link" href="#factibilidad">AI Feasibility</a>
+  <a class="nav-link" href="#metal-quoter">Metal Quoter</a>
+
+  <div class="nav-section">Engineering</div>
+  <a class="nav-link" href="#ingenieria">Engineering &amp; Design</a>
+  <a class="nav-link" href="#instrucciones">Work Instructions</a>
+  <a class="nav-link" href="#nesting">Nesting &amp; Optimizer</a>
+  <a class="nav-link" href="#layout">Plant Layout Design</a>
+  <a class="nav-link" href="#simulador">Process Simulator</a>
+
+  <div class="nav-section">Advanced Quality</div>
+  <a class="nav-link" href="#spc">SPC — Statistical Control</a>
+  <a class="nav-link" href="#visual-ia">AI Visual Inspection</a>
+  <a class="nav-link" href="#trazabilidad">Traceability</a>
+  <a class="nav-link" href="#defectos">Defect Library</a>
+  <a class="nav-link" href="#ppap">PPAP / FAI</a>
+  <a class="nav-link" href="#voc">VOC — Voice of Client</a>
+
+  <div class="nav-section">Finance &amp; Analytics</div>
+  <a class="nav-link" href="#finanzas">Finance &amp; ROI</a>
+  <a class="nav-link" href="#costos">Cost Control</a>
+  <a class="nav-link" href="#costeo-vivo">Live Costing</a>
+  <a class="nav-link" href="#reportes">KPI Reports</a>
+
+  <div class="nav-section">Artificial Intelligence</div>
+  <a class="nav-link" href="#chat-ia">AI Chat &amp; Voice Link</a>
+  <a class="nav-link" href="#minutas">AI Minutes</a>
+  <a class="nav-link" href="#shop-floor">Shop Floor Monitor</a>
+
+  <div class="nav-section">Hardware &amp; IoT</div>
+  <a class="nav-link" href="#hw-escaner">Barcode Scanners</a>
+  <a class="nav-link" href="#hw-camaras">IP Cameras</a>
+  <a class="nav-link" href="#hw-tablets">Shop Floor Tablets</a>
+  <a class="nav-link" href="#hw-impresora">Label Printers</a>
+  <a class="nav-link" href="#hw-proyectos">Pending IoT Projects</a>
+
+  <div class="nav-section">Reference Formulas</div>
+  <a class="nav-link" href="#form-nomina">Complete Payroll</a>
+  <a class="nav-link" href="#form-spc">Complete SPC</a>
+  <a class="nav-link" href="#form-oee">OEE &amp; Performance</a>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main id="content">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="version">Industrial ERP System · IA.AGUS · v2.6</div>
+  <h1>McVill ERP Technical Manual</h1>
+  <p>Complete documentation of modules, formulas, hardware interfaces, process flows, and AI integrations for industrial metalworking manufacturing.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="intro">
+<h1>What is McVill ERP? <span class="badge">Introduction</span></h1>
+<p><strong>McVill ERP</strong> is an enterprise resource planning system designed specifically for the metalworking and precision manufacturing industry. It integrates production, quality, human capital, sales, engineering, and financial analytics into a single platform powered by Artificial Intelligence.</p>
+
+<div class="card">
+  <h3>Core Capabilities</h3>
+  <ul>
+    <li><strong>+35 Integrated Modules</strong> — from high-level dashboards to industrial PPAP approvals</li>
+    <li><strong>Gemini AI Integration</strong> in production, quality, automated quoting, visual inspection, and voice control</li>
+    <li><strong>Multi-tenant Architecture</strong> — each company’s data is completely isolated and secure</li>
+    <li><strong>Real-time Sychronization</strong> — Supabase Realtime updates system state instantly across devices</li>
+    <li><strong>Hardware Ready</strong> — native support for barcode scanners, IP cameras, tablets, and label printers</li>
+    <li><strong>Fully Responsive Web Portal</strong> — access from any device anywhere, no client installation required</li>
+  </ul>
+</div>
+
+<div class="module-grid">
+  <div class="module-card"><span class="icon">🏭</span><div class="name">Shop Floor Control</div><div class="desc">Work orders, process stages, real-time tracking</div></div>
+  <div class="module-card"><span class="icon">🗂️</span><div class="name">Industrial Travelers</div><div class="desc">Trace every single part through the plant floor</div></div>
+  <div class="module-card"><span class="icon">🤖</span><div class="name">Integrated AI</div><div class="desc">Gemini Vision + Text Chat + Voice Link</div></div>
+  <div class="module-card"><span class="icon">📊</span><div class="name">Real-Time SPC</div><div class="desc">Automated statistical control charts (Cp/Cpk)</div></div>
+  <div class="module-card"><span class="icon">💰</span><div class="name">Automated Payroll</div><div class="desc">Calculate base salary, overtime, and tax deductions</div></div>
+  <div class="module-card"><span class="icon">📸</span><div class="name">AI Visual Inspection</div><div class="desc">Identify part defects via photo analysis</div></div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="architecture">
+<h1>System Architecture</h1>
+<div class="card">
+<pre>
+┌─────────────────────────────────────────────────────────┐
+│            FRONTEND — React 19 + Vite + TypeScript       │
+│      Tailwind CSS v4  ·  Framer Motion  ·  Lucide Icons  │
+│                                                         │
+│                      HTTPS / WebSockets                 │
+└────────────────────────┬────────────────────────────────┘
+                         │
+┌────────────────────────▼────────────────────────────────┐
+│           SUPABASE (Backend as a Service)                │
+│  PostgreSQL · Auth · RLS · Realtime · Storage · Edge Fn  │
+└──────────┬─────────────────────────────┬────────────────┘
+           │ REST API                    │ API Key
+┌──────────▼──────────┐    ┌─────────────▼──────────────┐
+│  Database           │    │  Google Gemini AI          │
+│  Multi-tenant RLS   │    │  gemini-2.5-flash-lite     │
+│  SQL Migrations     │    │  Gemini Vision (Images)    │
+│                     │    │  Gemini Audio (Voice Link) │
+└─────────────────────┘    └────────────────────────────┘
+</pre>
+</div>
+<div class="table-wrap"><table>
+<tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr>
+<tr><td>Frontend</td><td>React 19, TypeScript, Tailwind CSS v4</td><td>Responsive and premium user interface</td></tr>
+<tr><td>Backend</td><td>Supabase (PostgreSQL 15)</td><td>Multi-tenant database, authentication, RLS, Storage</td></tr>
+<tr><td>Auth</td><td>Supabase Auth + JWT</td><td>Secure login sessions per tenant</td></tr>
+<tr><td>General AI</td><td>Google Gemini 2.5 Flash Lite</td><td>Chat, data analysis, automated quoting, minutes</td></tr>
+<tr><td>AI Vision</td><td>Gemini Vision</td><td>Part inspection, blueprints, and document OCR</td></tr>
+<tr><td>AI Voice</td><td>Gemini Flash Native Audio</td><td>Voice Link (hands-free plant voice commands)</td></tr>
+<tr><td>Deployment</td><td>Vercel (Frontend) + Supabase Cloud</td><td>Global CDN, automated staging/production build</td></tr>
+<tr><td>Real-Time</td><td>Supabase Realtime</td><td>Instant live synchronization of processes</td></tr>
+</table></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="roles">
+<h1>Roles &amp; Permissions</h1>
+<div class="table-wrap"><table>
+<tr><th>Role</th><th>Level</th><th>Access Mapped Modules</th></tr>
+<tr><td><span class="pill pill-purple">CEO</span></td><td>Max</td><td>All modules + Complete configuration + Total Root Godmode</td></tr>
+<tr><td><span class="pill pill-blue">Systems</span></td><td>Admin</td><td>Same as CEO — technical administrator access</td></tr>
+<tr><td><span class="pill pill-green">Manager</span></td><td>High</td><td>All modules + Executive reports (excluding raw system keys)</td></tr>
+<tr><td><span class="pill pill-amber">Supervisor</span></td><td>Mid-High</td><td>Shop floor, Travelers, Quality SGC, Engineering, Maintenance</td></tr>
+<tr><td><span class="pill pill-amber">HR</span></td><td>Mid</td><td>Human Capital, Directory, Payroll, Attendance</td></tr>
+<tr><td><span class="pill pill-amber">Finance</span></td><td>Mid</td><td>Finance, Costing, Live costing, Payroll (read-only)</td></tr>
+<tr><td><span class="pill pill-gray">Employee</span></td><td>Basic</td><td>Dashboard, Inventory, Production, Travelers, HSE</td></tr>
+</table></div>
+<div class="tip">Modules marked "Godmode Access" in the sidebar are strictly visible to CEO, Systems, and Manager accounts.</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="themes">
+<h1>Color Themes</h1>
+<p>Each user can switch their preferred visual palette from the upper-right header. Changes apply instantly and persist in the database.</p>
+<div class="table-wrap"><table>
+<tr><th>Theme</th><th>Dark Mode</th><th>Light Mode</th><th>Visual Profile</th></tr>
+<tr><td>🔵 <strong>Industrial Blue</strong></td><td>Background #020617 · Accent #4FA5FF</td><td>Background #F0F4F8 · Accent #1D4ED8</td><td>Corporate · Standard default</td></tr>
+<tr><td>⚫ <strong>Neutral Slate</strong></td><td>Background #0F172A · Accent #94A3B8</td><td>Background #F8FAFC · Accent #475569</td><td>Minimalist · Balanced high contrast</td></tr>
+<tr><td>🟢 <strong>Emerald</strong></td><td>Background #020617 · Accent #34D399</td><td>Background #F0FDF9 · Accent #059669</td><td>Production · Plant-floor style</td></tr>
+<tr><td>🟠 <strong>Carbon</strong></td><td>Background #0A0A0A · Accent #FF6B00</td><td>Background #FAFAF9 · Accent #C2410C</td><td>Deep black · High impact orange</td></tr>
+</table></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="dashboard">
+<h2>Dashboard — Central View</h2>
+<p>The central command view of the ERP. Displays the live operational health of the factory using high-impact KPIs, alerts, and quick actions.</p>
+<h3>Real-Time KPIs</h3>
+<ul>
+  <li><strong>OEE</strong> (Overall Equipment Effectiveness) — global plant equipment efficiency</li>
+  <li><strong>FTT</strong> (First Time Through) — % parts produced correctly on the first pass</li>
+  <li><strong>On-Time Delivery</strong> — % work orders delivered strictly on or before customer deadline</li>
+  <li><strong>Average Margin</strong> — live profitability index across active production lines</li>
+</ul>
+<h3>Predictive Alerts</h3>
+<ul>
+  <li>🔴 Red = immediate administrative action required</li>
+  <li>🟡 Yellow = caution — parameters approaching limits</li>
+  <li>🟢 Green = operating smoothly within standard parameters</li>
+</ul>
+<div class="tip">The brain icon (🧠) on each KPI initiates a deep context analysis with Gemini AI to locate root causes and suggest solutions.</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="produccion">
+<h2>Shop Floor Control</h2>
+<p>Complete lifecycle management of Work Orders (WO) from initial customer request to dispatch, tracked stage by stage.</p>
+<h3>Lifecycle of a Work Order</h3>
+<ol class="steps">
+  <li>WO is created with part number, customer ID, batch size, and target delivery date</li>
+  <li>Process route is assigned: Cutting → Bending → Welding → Machining → Painting → Assembly</li>
+  <li>Operator checks in: inputs employee ID to begin the assigned step</li>
+  <li>Step completion: system logs actual processing time and forwards piece to the next stage</li>
+  <li>AI visual inspection flags quality status at crucial nodes — auto-generates NCR on FAIL</li>
+  <li>WO complete: updates finished goods inventory and closes the ledger</li>
+</ol>
+<h3>Work Centers</h3>
+<div class="table-wrap"><table>
+<tr><th>Work Center</th><th>Code</th><th>Standard Processes</th></tr>
+<tr><td>Laser Cutting</td><td>LASER</td><td>CNC Laser cutting, engraving, profiling</td></tr>
+<tr><td>Bending</td><td>BENDING</td><td>Cold forming, CNC bending and pressing</td></tr>
+<tr><td>Welding</td><td>WELDING</td><td>MIG, TIG, Spot welding, Arc welding</td></tr>
+<tr><td>CNC Machining</td><td>CNC</td><td>Milling, turning, drilling, boring</td></tr>
+<tr><td>Painting</td><td>PAINTING</td><td>Sandblasting, primer application, powder coating</td></tr>
+<tr><td>Assembly</td><td>ASSEMBLY</td><td>Final assembly, mechanical fastening, packing</td></tr>
+</table></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="viajeros">
+<h2>Industrial Travelers</h2>
+<p>The <strong>Traveler</strong> acts as the digital passport for every batch. It physically and digitally accompanies the order through the plant floor, recording every single timestamp, operator check-in, and quality inspection.</p>
+
+<h3>Traveler Data Schema</h3>
+<div class="card">
+<pre>
+Header Details:
+  customer · part_number · revision · customer_PO
+  order_qty · finished_qty · order_date · delivery_date
+  quoting_id · total_estimated_hours · notes
+
+Operations List:
+  work_center · estimated_time · actual_time
+  status (pending|in_progress|completed) · operator_id · sequence
+
+Materials / Pickings:
+  material_id · description · quantity · gauge / thickness
+  warehouse barcode for automatic stock deduction
+
+BOM — Subcomponents:
+  child_orders · description · quantity · target_dates
+</pre>
+</div>
+
+<h3>Traveler States and Indicators</h3>
+<div class="table-wrap"><table>
+<tr><th>State</th><th>Color</th><th>Trigger Condition</th></tr>
+<tr><td>PENDING</td><td><span class="pill pill-gray">Gray</span></td><td>Work has not started yet</td></tr>
+<tr><td>IN PROGRESS</td><td><span class="pill pill-blue">Blue</span></td><td>Manufacturing active, on-schedule</td></tr>
+<tr><td>AT RISK</td><td><span class="pill pill-amber">Amber</span></td><td>Less than 48 hours remaining to delivery deadline</td></tr>
+<tr><td>DELAYED</td><td><span class="pill pill-red">Red</span></td><td>Estimated completion time exceeds deadline</td></tr>
+<tr><td>PAUSED</td><td><span class="pill pill-amber">Orange</span></td><td>Batch held manually for technical adjustments</td></tr>
+<tr><td>COMPLETED</td><td><span class="pill pill-green">Green</span></td><td>Finished successfully on time</td></tr>
+<tr><td>REJECTED</td><td><span class="pill pill-red">Dark Red</span></td><td>Failed critical QC inspection — held in quarantine</td></tr>
+</table></div>
+
+<h3>Delayed Status Detection Logic</h3>
+<div class="formula">
+  <span class="eq">remaining_hours</span> = estimated_hours × (1 - progress_percentage/100)<br>
+  <span class="eq">days_to_finish</span> = remaining_hours / 8<br>
+  <span class="eq">est_completion_date</span> = today + days_to_finish<br><br>
+  <span class="comment">— Algorithm:</span><br>
+  If est_completion_date &gt; delivery_date → <span style="color:#f87171">DELAYED</span><br>
+  If remaining_days &lt; 2 → <span style="color:#fbbf24">AT RISK</span><br>
+  Otherwise → <span style="color:#34d399">ON TIME</span>
+</div>
+
+<h3>Traveler QR Code System</h3>
+<p>Each traveler generates a unique QR code. Scanning it with any mobile device or tablet on the plant floor opens the traveler's active status inside the ShopFloor Tracking screen instantly. Perfect for printing on labels or the traveler's PDF sheet.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="planeacion">
+<h2>AI Planning &amp; Gantt</h2>
+<h3>Production Gantt Charts</h3>
+<p>An interactive, drag-and-drop Gantt chart for all active WOs. The built-in AI automatically reschedules WOs to minimize machine setup times, grouping by gauge and material thickness.</p>
+<h3>MRP — Material Requirements Planning</h3>
+<p>Cross-references open shop orders with raw inventory levels. Auto-generates prioritized purchasing requests: red for critical deficits, yellow for low stock.</p>
+<h3>S&OP Capacity Forecast</h3>
+<p>Consolidates quoted pipelines against real machine availability. Instantly answers: <em>"Can we commit to this new order without delaying existing client orders?"</em></p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="inventario">
+<h2>Pro Inventories</h2>
+<h3>Raw Materials Catalog</h3>
+<ul>
+  <li>Filter by description, part key, or certified supplier</li>
+  <li>Visual stock meter indicating real-time warehouse utilization</li>
+  <li>🔴 Red indicators highlight items falling below defined minimum stock levels</li>
+  <li>AI Material Recognition: upload a raw material photo to automatically classify and inventory it</li>
+</ul>
+<h3>Alert Threshold Logic</h3>
+<div class="formula">
+  Minimum Stock (configured per material)<br>
+  If <span class="eq">current_stock</span> &lt; <span class="eq">min_stock</span> → <span style="color:#f87171">CRITICAL ALERt</span><br>
+  If <span class="eq">current_stock</span> &lt; <span class="eq">min_stock × 1.2</span> → <span style="color:#fbbf24">LOW STOCK ALERT</span>
+</div>
+<h3>Stock Movements</h3>
+<p>Every single transaction is logged with operator ID, timestamp, related work order, and transfer reason, maintaining a bulletproof audit trail.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="calidad">
+<h2>Quality SGC</h2>
+<h3>AI Visual Quality Control</h3>
+<p>6 specialized inspection modes, each utilizing custom system prompts configured with industrial quality standards:</p>
+<div class="table-wrap"><table>
+<tr><th>Inspection Type</th><th>Industrial Standard</th><th>Identified Anomalies</th></tr>
+<tr><td>Welding</td><td>AWS D1.1 / ISO 5817</td><td>Porosity, cracking, undercutting, slag, spatter, fusion gaps</td></tr>
+<tr><td>Assembly</td><td>Internal Specs</td><td>Missing fasteners, wrong parts, component misalignment, surface damage</td></tr>
+<tr><td>Painting</td><td>Surface Coatings</td><td>Paint runs, bubbles, orange peel, chips, delamination</td></tr>
+<tr><td>Dimensional</td><td>GD&amp;T / ASME Y14.5</td><td>Burrs, bending deformation, misaligned holes</td></tr>
+<tr><td>Raw Material</td><td>Material Specs</td><td>Corrosion, scale, deep pitting, surface contamination</td></tr>
+<tr><td>General</td><td>Multi-purpose</td><td>Any visible anomaly violating master control specs</td></tr>
+</table></div>
+<h3>Non-Conformance Report (NCR) Flow</h3>
+<ol class="steps">
+  <li>AI Vision flags FAIL → NCR is automatically generated with photo evidence attached</li>
+  <li>System assigns severity: Critical (&gt;85% confidence) · Major (&gt;60%) · Minor (&lt;60%)</li>
+  <li>Quality supervisor receives an instant push notification on the dashboard</li>
+  <li>Root Cause Analysis (RCA) and Corrective Action (CAPA) are logged</li>
+  <li>Workflow tracking: Open → Investigating → Verifying → Closed</li>
+</ol>
+<div class="warn">A Critical NCR immediately locks the active Traveler, preventing further processing until a supervisor bypasses or resolves the issue.</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="hse">
+<h2>Safety HSE</h2>
+<h3>Regulatory Compliance</h3>
+<ul>
+  <li><strong>NOM-001-STPS</strong> — Electrical installation safety standards</li>
+  <li><strong>NOM-017-STPS</strong> — PPE (Personal Protective Equipment) compliance</li>
+  <li><strong>NOM-026-STPS</strong> — Safety symbols, piping, and floor signs</li>
+</ul>
+<h3>Incident Log</h3>
+<p>Records all safety incidents with area mapping, employee ID, corrective actions, and RCA. The dashboard displays a live hazard heat map of the plant floor.</p>
+<h3>PPE Certification</h3>
+<p>Alerts safety officers when an operator's safety certification is close to expiring, or when specialized PPE reaches its operational service life limit.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="mantenimiento">
+<h2>Maintenance</h2>
+<h3>Equipment Health Score</h3>
+<div class="formula">
+  <span class="eq">Health Score</span> = Compound index of availability, operational age, and mean time between failures (MTBF)<br><br>
+  <span style="color:#34d399">80 – 100:</span> Healthy — standard monitoring<br>
+  <span style="color:#fbbf24">60 – 79:</span> Maintenance due — schedule preventive servicing<br>
+  <span style="color:#f87171">0 – 59:</span> Critical — high risk of breakdown; immediate action required
+</div>
+<h3>Preventive Maintenance Tasks</h3>
+<p>Define recurring plans (daily, weekly, monthly, or by runtime hours). The system auto-assigns work orders to maintenance technicians, tracking spare parts consumption and downtime.</p>
+<div class="tip">The system's AI predicts component failures by analyzing historical performance anomalies and vibration logs.</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="asistencia">
+<h1>Attendance &amp; Clock-in <span class="badge">Hardware Integration</span></h1>
+<p>The attendance module logs operator clock-ins and clock-outs on the plant floor using barcode badge scanning, feeding the payroll engine automatically.</p>
+
+<h2>Required Hardware</h2>
+
+<h3>1. USB Barcode Scanners (HID Mode)</h3>
+<p>The station accepts any standard <strong>USB HID barcode reader</strong>. It acts as a keyboard emulator, compatible with any tablet, client PC, or laptop running Google Chrome.</p>
+
+<div class="table-wrap"><table>
+<tr><th>Spec</th><th>Minimum Requirement</th><th>Recommended Standard</th></tr>
+<tr><td>Type</td><td>1D Barcode (Code 128)</td><td>1D &amp; 2D (Code 128 + QR)</td></tr>
+<tr><td>Interface</td><td>USB HID</td><td>USB HID (Wireless / Bluetooth option)</td></tr>
+<tr><td>Scan Rate</td><td>100 scans/min</td><td>300+ scans/min</td></tr>
+<tr><td>Suggested Models</td><td>Honeywell 1250g · Datalogic QD2430</td><td>Zebra DS2208 · Motorola DS9208</td></tr>
+<tr><td>Approx. Cost</td><td>$80–$150 USD</td><td>$200–$400 USD</td></tr>
+</table></div>
+
+<div class="tip">HID scanners send barcode strings as keyboard inputs — no custom drivers or proprietary software needed. Plug-and-play ready.</div>
+
+<h3>2. Barcoded PVC Badges</h3>
+<p>Each employee is issued a permanent ID badge displaying their <strong>Employee Number</strong> in Code 128 format.</p>
+
+<h4>Barcode Specifications</h4>
+<div class="formula">
+  Format: <span class="eq">EMP-001</span>, <span class="eq">EMP-002</span>, etc.<br>
+  Symbology: <span class="eq">Code 128</span> (High-density alpha-numeric)<br>
+  Barcode Dimensions: Minimum <span class="eq">25mm width × 12mm height</span><br>
+  Module Width: <span class="eq">0.25 mm</span> (enables instant reading at 5 to 30 cm)
+</div>
+
+<h4>Badge Layout Reference</h4>
+<div class="card">
+<pre>
+┌────────────────────────────────────┐
+│  🏭  McVill S.A. de C.V.          │
+│                                    │
+│  JOHN DOE                          │
+│  Senior Welder  ·  WELDING DEPT    │
+│  Morning Shift                     │
+│                                    │
+│  ║║║║║║║║║║║║║║║║║║║║║║           │
+│         EMP-001                    │
+└────────────────────────────────────┘
+  CR80 Credit Card Format
+  Material: PVC 30 mil (0.76 mm)
+</pre>
+</div>
+
+<h3>3. Badge Printers &amp; Label Makers</h3>
+<div class="table-wrap"><table>
+<tr><th>Printer Type</th><th>Suggested Model</th><th>Approx. Cost</th><th>Application</th></tr>
+<tr><td>PVC ID Card Printer</td><td>Zebra ZC300 · Evolis Primacy 2</td><td>$800–$2,000 USD</td><td>Durable edge-to-edge color badge printing</td></tr>
+<tr><td>Desktop Label Printer</td><td>Zebra ZD411 · Brother QL-820</td><td>$250–$500 USD</td><td>Printable adhesive barcode labels</td></tr>
+<tr><td>Paper Printer</td><td>Any office laser printer</td><td>Already in house</td><td>Budget option — laminating paper badges</td></tr>
+</table></div>
+
+<h4>Zebra Label Format (ZPL code)</h4>
+<pre>
+^XA
+^FO20,20^BY2^BCN,60,Y,N,N^FD${employee_number}^FS
+^FO20,100^A0N,20,20^FD${full_name}^FS
+^FO20,125^A0N,16,16^FD${job_title} · ${department}^FS
+^XZ
+</pre>
+
+<h3>4. Terminal Tablets</h3>
+<div class="table-wrap"><table>
+<tr><th>Device Option</th><th>Hardware Selection</th><th>Typical Mount Location</th></tr>
+<tr><td>Industrial Tablet</td><td>iPad 10.9" or Samsung Tab A9+ in rugged enclosure</td><td>Main plant entry gates / locker room</td></tr>
+<tr><td>All-in-One PC</td><td>Mini PC with a 21" touch monitor</td><td>Security gatehouse desk</td></tr>
+<tr><td>Standard Laptop</td><td>Any office laptop running Chrome</td><td>HR main desk</td></tr>
+</table></div>
+<div class="tip">The terminal station shows a digital clock. Upon badge scanning, it displays the employee's photo with a high-visibility green checkmark (Check-In) or blue banner (Check-Out).</div>
+
+<h2>Clock-in Operational Flow</h2>
+<ol class="steps">
+  <li><strong>Employee arrives at work</strong> — approaches the attendance terminal</li>
+  <li><strong>Badge Scan</strong> — operator places badge under the scanner; code `EMP-001` is captured</li>
+  <li><strong>Database Validation</strong> — system queries the <code>profiles</code> table in real time</li>
+  <li><strong>Auto Check-in</strong> — if no entry exists for the calendar date, it logs CHECK-IN with exact timestamp</li>
+  <li><strong>Visual Confirmation</strong> — terminal displays the employee's profile card in green</li>
+  <li><strong>End of Shift</strong> — employee scans badge again at exit</li>
+  <li><strong>Auto Check-out</strong> — logs exit timestamp, calculating total daily runtime minutes</li>
+  <li><strong>Payroll Sync</strong> — logs are committed to the secure ledger for payroll processing</li>
+</ol>
+
+<h3>Automated Anomaly Detection</h3>
+<div class="table-wrap"><table>
+<tr><th>Event Condition</th><th>Logic Check</th><th>Result logged</th></tr>
+<tr><td>On-Time Arrival</td><td>check_in ≤ shift_start + 5 minutes</td><td><span class="pill pill-green">✓ On Time</span></td></tr>
+<tr><td>Late Arrival</td><td>check_in &gt; shift_start + 5 minutes</td><td><span class="pill pill-amber">⚠ Late</span></td></tr>
+<tr><td>Absence</td><td>No check-in logged by mid-shift</td><td><span class="pill pill-red">✗ Absent</span></td></tr>
+<tr><td>Overtime Triggered</td><td>check_out &gt; shift_end + 30 minutes</td><td><span class="pill pill-blue">OT Detected</span></td></tr>
+<tr><td>Unregistered Badge</td><td>Scanned string not found in DB</td><td>Error prompt "Not Found"</td></tr>
+</table></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="nomina">
+<h1>Payroll &amp; Formulas <span class="badge">Reference Guide</span></h1>
+<p>The payroll processor uses timecard records from the attendance station to compute the net wages, including overtime, performance bonuses, and local tax deductions.</p>
+
+<h2>Base Variables</h2>
+<div class="table-wrap"><table>
+<tr><th>Variable Key</th><th>Value (Configurable)</th><th>Description</th></tr>
+<tr><td><code>DAILY_WAGE</code></td><td>$450 MXN</td><td>Base daily wage, configured individually per profile</td></tr>
+<tr><td><code>OVERTIME_RATE</code></td><td>× 2.0</td><td>Standard multiplier for normal overtime hours</td></tr>
+<tr><td><code>OEE_BONUS_THRESHOLD</code></td><td>85%</td><td>Target OEE required to unlock productivity bonuses</td></tr>
+<tr><td><code>OEE_BONUS_PCT</code></td><td>5%</td><td>Productivity bonus percentage applied to gross salary</td></tr>
+<tr><td><code>UMA Daily Index</code></td><td>$108.57 MXN</td><td>Unit of Measure and Indexation (Reference index)</td></tr>
+</table></div>
+
+<h2>Step 1 — Fetching Timecard Summaries</h2>
+<div class="formula">
+  <span class="eq">days_worked</span> = COUNT(valid logs containing check_in AND check_out for the pay period)<br>
+  <span class="eq">overtime_hours</span> = SUM(daily_overtime_minutes) / 60  &nbsp;<span class="comment">→ triggers only if daily OT &gt; 30 min</span><br>
+  <span class="eq">days_absent</span> = business_days - days_worked<br>
+  <span class="eq">days_late</span> = COUNT(records with check_in &gt; shift_start + 5 min)
+</div>
+
+<h2>Step 2 — Base Wage Calculation</h2>
+<div class="formula">
+  <span class="eq">base_wage</span> = daily_wage × days_worked<br><br>
+  <span class="comment">Example: $450 × 22 days = $9,900</span>
+</div>
+
+<h2>Step 3 — Overtime Payments</h2>
+<div class="formula">
+  <span class="eq">hourly_rate</span> = daily_wage / 8<br>
+  <span class="eq">overtime_amount</span> = overtime_hours × hourly_rate × 2.0<br><br>
+  <span class="comment">Example: 10 hrs OT × ($450/8) × 2 = $1,125</span>
+</div>
+
+<h2>Step 4 — Productivity OEE Bonus</h2>
+<div class="formula">
+  If <span class="eq">oee_percentage</span> ≥ 85% :<br>
+  &nbsp;&nbsp;<span class="eq">bonus_oee</span> = (base_wage + overtime_amount) × 0.05<br>
+  If <span class="eq">oee_percentage</span> &lt; 85% :<br>
+  &nbsp;&nbsp;<span class="eq">bonus_oee</span> = $0<br><br>
+  <span class="comment">Example: ($9,900 + $1,125) × 0.05 = $550.25</span>
+</div>
+
+<h2>Step 5 — Absence Deductions</h2>
+<div class="formula">
+  <span class="eq">deductions_absence</span> = days_absent × daily_wage<br><br>
+  <span class="comment">Example: 2 absences × $450 = $900 deduction</span>
+</div>
+
+<h2>Step 6 — Gross Salary Sum</h2>
+<div class="formula">
+  <span class="eq">gross_salary</span> = base_wage + overtime_amount + bonus_oee - deductions_absence<br><br>
+  <span class="comment">Example: $9,900 + $1,125 + $550 - $900 = $10,675 gross</span>
+</div>
+
+<h2>Step 7 — Tax &amp; Social Deductions</h2>
+<p>Applies local tax brackets and mandatory social security contributions (e.g. IMSS) on the calculated gross wage.</p>
+<div class="formula">
+  <span class="eq">taxable_income</span> = gross_salary - exempt_allowances<br>
+  <span class="eq">net_tax</span> = calculated_tax_bracket - tax_subsidies<br>
+  <span class="eq">social_contribution</span> = gross_salary × 0.01875  &nbsp;<span class="comment">→ Standard social security index rate</span>
+</div>
+
+<h2>Step 8 — Net Payable Salary</h2>
+<div class="formula">
+  <span class="eq">total_deductions</span> = net_tax + social_contribution + deductions_absence<br>
+  <span class="eq">net_salary</span> = gross_salary - total_deductions<br><br>
+  <span class="comment">Example: $10,675 gross - $336.67 tax - $203.26 insurance = $10,135.07 NET</span>
+</div>
+
+<h2>Paystub Layout Reference</h2>
+<div class="card">
+<pre>
+EARNINGS                              DEDUCTIONS
+──────────────────────────────────    ───────────────────────
+Base salary (22 days)     $9,900.00   Withheld Tax      $336.67
+Overtime (10h)            $1,125.00   Social Security   $203.26
+OEE Bonus (95% achieved)    $550.25   Absences (0)        $0.00
+──────────────────────────────────    ───────────────────────
+Gross Salary             $11,575.25   Total Deductions  $539.93
+                                      ───────────────────────
+                                      NET WAGE       $11,035.32
+</pre>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="rh">
+<h2>Human Resources</h2>
+<h3>Employee Expediente Digital</h3>
+<p>Each profile holds verified digital attachments: photo, certifications, ID, contract, hire date, salary history, department, and direct reports.</p>
+<h3>Skills Matrix</h3>
+<p>Defines which operators are certified for specific tasks (e.g., MIG welding, CNC lathe operation). The planning engine uses this matrix to prevent assigning unqualified operators to complex WOs.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="desempeno">
+<h2>Performance &amp; Incentives</h2>
+<h3>Operator KPIs</h3>
+<div class="formula">
+  <span class="eq">Efficiency</span> = (actual_parts / target_parts) × 100%<br>
+  <span class="eq">Quality Rate</span> = (conforming_parts / total_parts) × 100%<br>
+  <span class="eq">Availability</span> = (runtime_hours - down_hours) / runtime_hours<br>
+  <span class="eq">OEE</span> = Efficiency × Quality_Rate × Availability<br><br>
+  <span class="comment">World Class: &gt; 85% · Good: 60–85% · Needs Action: &lt; 60%</span>
+</div>
+
+<h3>Incentive Bonuses Scheme</h3>
+<div class="table-wrap"><table>
+<tr><th>Bonus Type</th><th>Unlock Criteria</th><th>Reward Amount</th></tr>
+<tr><td>Productivity</td><td>Efficiency ≥ 100%</td><td>5% of bi-weekly wage</td></tr>
+<tr><td>Productivity Plus</td><td>Efficiency ≥ 110%</td><td>10% of bi-weekly wage</td></tr>
+<tr><td>Quality</td><td>Quality Rate ≥ 98%</td><td>3% of bi-weekly wage</td></tr>
+<tr><td>Safety</td><td>0 safety incidents in shift</td><td>2% of bi-weekly wage</td></tr>
+<tr><td>5S Audit</td><td>Score 5S ≥ 90%</td><td>1% of bi-weekly wage</td></tr>
+</table></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="reclutamiento">
+<h2>AI Recruitment</h2>
+<ol class="steps">
+  <li>Post job openings with structured requirements</li>
+  <li>Upload multiple candidate resumes in PDF format</li>
+  <li>AI analyzes CV contents and scores candidates from 0 to 100 with detailed rationale</li>
+  <li>System generates customized interview questions based on candidate resume gaps</li>
+  <li>Track hiring via Kanban board: New → Screened → Interviewed → Offered → Hired</li>
+</ol>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="ventas">
+<h2>Sales &amp; CRM</h2>
+<p>Manage customer profiles, credit terms, and days-to-pay indexes. Pipeline tracker aggregates quoting values and forecasts revenue in real time.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="compras">
+<h2>Purchasing</h2>
+<p>Purchase Order lifecycle: <strong>Draft → Approved → Sent to Supplier → Materials Received → Closed</strong>. Incoming stock updates warehouse quantities automatically.</p>
+<h3>Supplier Performance Rating</h3>
+<p>Calculates a performance score based on: delivery timeliness (40%), material quality (40%), and cost competitiveness (20%), assisting purchasing managers during restocking.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="cotizaciones">
+<h2>AI Quoting Agent</h2>
+<p>Describe in natural language the parts to be manufactured, and the AI agent computes cost estimates, formats a PDF proposal, and converts the draft into a live Work Order on approval.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="rfq">
+<h2>RFQ Kanban</h2>
+<p>Visual pipeline for requests for quotation: <strong>New → Analysis → Proposal → Negotiation → Won/Lost</strong>. Syncs with the Quoting Agent to draft automated bids.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="factibilidad">
+<h2>AI Feasibility</h2>
+<p>An intelligent filter for RFQs. Evaluates manufacturing capabilities against specifications to calculate a feasibility score following the <strong>PM_F001</strong> standard.</p>
+<div class="formula">
+  Score calculation weighting: technical complexity, plant capacity, market risk, and margin potential.<br><br>
+  ≥ 70 → <span style="color:#34d399">VIABLE — proceed with quotation</span><br>
+  45–69 → <span style="color:#fbbf24">CONDITIONAL — review required</span><br>
+  &lt; 45 → <span style="color:#f87171">HIGH RISK — decline or renegotiate terms</span>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="metal-quoter">
+<h2>Metal Quoter</h2>
+<p>Step-by-step costing calculator. Input process parameters to yield precise, modular estimations.</p>
+<div class="table-wrap"><table>
+<tr><th>Manufacturing Process</th><th>Input Variables</th><th>Calculated Cost Basis</th></tr>
+<tr><td>Laser Cutting</td><td>Material gauge, perimeter length, gas selection</td><td>Laser runtime × cost per machine-hour</td></tr>
+<tr><td>Bending</td><td>Number of bends, material thickness</td><td>Strikes × setup cost factors</td></tr>
+<tr><td>Welding</td><td>Weld length, joint style, welding wire spec</td><td>Weld linear meters × operator hourly rate</td></tr>
+<tr><td>CNC Machining</td><td>Metal volume, operation types</td><td>Cycle time × CNC hourly rate</td></tr>
+<tr><td>Surface Finishing</td><td>Surface area, powder coat type</td><td>m² area × paint cost per m²</td></tr>
+</table></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="ingenieria">
+<h2>Engineering &amp; Design</h2>
+<h3>AI Blueprint Analyzer</h3>
+<p>Upload a technical drawing PDF or image; the AI model extracts drawing specs within seconds:</p>
+<ul>
+  <li>Title block details (Part number, revisions, client ID)</li>
+  <li>GD&amp;T dimension tolerances</li>
+  <li>Raw material grades and plating finishes</li>
+  <li>Critical technical notes</li>
+  <li>Automatic Bills of Materials (BOM) creation</li>
+</ul>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="instrucciones">
+<h2>Work Instructions</h2>
+<p>Digital standard operating procedures (SOPs) for the plant floor. Operators must confirm reading critical tolerances and safety guidelines on their terminals before starting a fabrication stage.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="nesting">
+<h2>Nesting &amp; Cut Optimizer</h2>
+<p>Arranges 2D profiles onto sheet metal layouts to maximize material yield and reduce waste.</p>
+<div class="formula">
+  <span class="eq">Material Yield</span> = (Total Parts Area / Sheet Metal Area) × 100%<br>
+  <span class="eq">Scrap Rate</span> = 100% - Material Yield<br>
+  Average savings achieved with nesting: <span style="color:#34d399">15% to 30%</span> reduction in sheet metal waste
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="layout">
+<h2>Plant Layout Design</h2>
+<p>A drag-and-drop spatial editor for the factory floor. Model machine placements and trace transport paths to identify material handling bottlenecks. The AI tool reviews floor plans to recommend optimal layouts that minimize work-in-progress (WIP) transport paths.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="simulador">
+<h2>Process Simulator</h2>
+<p>Model manufacturing steps, setup times, machine buffer limits, and cycle variations. Execute Monte Carlo simulations of the monthly schedule to forecast bottleneck locations, WIP accumulation, and total lead times.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="spc">
+<h1>Statistical Process Control (SPC) <span class="badge">Advanced Quality</span></h1>
+<p>SPC detects manufacturing variation anomalies <em>before</em> they lead to out-of-spec defects, using X̄-R control charts to track dimensions, bore sizes, and thickness.</p>
+
+<h2>Shewhart Control Chart Constants</h2>
+<div class="table-wrap"><table>
+<tr><th>Sample size (n)</th><th>A2 factor</th><th>D3 factor</th><th>D4 factor</th><th>d2 factor</th></tr>
+<tr><td>2</td><td>1.880</td><td>0.000</td><td>3.267</td><td>1.128</td></tr>
+<tr><td>3</td><td>1.023</td><td>0.000</td><td>2.574</td><td>1.693</td></tr>
+<tr><td>4</td><td>0.729</td><td>0.000</td><td>2.282</td><td>2.059</td></tr>
+<tr><td>5</td><td>0.577</td><td>0.000</td><td>2.114</td><td>2.326</td></tr>
+<tr><td>6</td><td>0.483</td><td>0.000</td><td>2.004</td><td>2.534</td></tr>
+<tr><td>7</td><td>0.419</td><td>0.076</td><td>1.924</td><td>2.704</td></tr>
+<tr><td>8</td><td>0.373</td><td>0.136</td><td>1.864</td><td>2.847</td></tr>
+</table></div>
+
+<h2>Control Limit Calculations</h2>
+<div class="formula">
+  <span class="eq">X̄̄</span> = Grand average of all subgroup averages<br>
+  <span class="eq">R̄</span> = Average range of all subgroups<br><br>
+  <span class="eq">UCL_X̄</span> = X̄̄ + A2 × R̄  &nbsp;<span class="comment">← Upper Control Limit for X̄</span><br>
+  <span class="eq">LCL_X̄</span> = X̄̄ − A2 × R̄  &nbsp;<span class="comment">← Lower Control Limit for X̄</span><br><br>
+  <span class="eq">UCL_R</span> = D4 × R̄  &nbsp;<span class="comment">← Upper Control Limit for R</span><br>
+  <span class="eq">LCL_R</span> = D3 × R̄  &nbsp;<span class="comment">← Lower Control Limit for R (0 if n ≤ 6)</span><br><br>
+  <span class="eq">σ</span> = R̄ / d2  &nbsp;<span class="comment">← Process standard deviation</span>
+</div>
+
+<h2>Process Capability Indexes</h2>
+<div class="formula">
+  <span class="eq">Cp</span> = (USL − LSL) / (6 × σ)  &nbsp;<span class="comment">← Potential Capability</span><br>
+  <span class="eq">Cpk</span> = min( (USL − X̄̄)/(3σ) , (X̄̄ − LSL)/(3σ) )  &nbsp;<span class="comment">← Actual Process Capability</span>
+</div>
+
+<h3>Interpretation Matrix</h3>
+<div class="table-wrap"><table>
+<tr><th>Cpk Value</th><th>Classification</th><th>Estimated Reject Rate</th><th>Corrective Action</th></tr>
+<tr><td>Cpk ≥ 1.67</td><td><span class="pill pill-green">Excellent</span></td><td>&lt; 0.57 PPM</td><td>Standard control</td></tr>
+<tr><td>Cpk 1.33–1.67</td><td><span class="pill pill-green">Capable</span></td><td>&lt; 63 PPM</td><td>Maintain chart frequency</td></tr>
+<tr><td>Cpk 1.00–1.33</td><td><span class="pill pill-amber">Marginal</span></td><td>&lt; 2,700 PPM</td><td>Monitor drift closely</td></tr>
+<tr><td>Cpk &lt; 1.00</td><td><span class="pill pill-red">Not Capable</span></td><td>&gt; 2,700 PPM</td><td>Halt line, adjust process parameters</td></tr>
+</table></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="visual-ia">
+<h2>AI Visual Inspection</h2>
+<p>Utilizes advanced Gemini Vision models to inspect physical items. Instantly logs an NCR on defect detection and warns the floor manager.</p>
+
+<h3>Defect Severity Mapping</h3>
+<div class="formula">
+  Anomalies identified with confidence &gt; 85% → <span style="color:#f87171">CRITICAL — halt production line</span><br>
+  Anomalies identified with confidence 60%–85% → <span style="color:#fbbf24">MAJOR — supervisor review</span><br>
+  Anomalies identified with confidence &lt; 60% → <span style="color:#94a3b8">MINOR — standard tracking log</span>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="trazabilidad">
+<h2>Traceability</h2>
+<p>Bulletproof forward and backward tracking. Trace raw material heats to specific parts, operations, and final inspection logs, letting you quarantine affected parts instantly in the event of a field failure.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="defectos">
+<h2>Defect Library</h2>
+<p>Visual library containing verified photo references, root cause analyses, and correction actions. The system automatically associates new NCRs with historical cases to recommend solutions.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="ppap">
+<h2>PPAP / FAI</h2>
+<p>Manage the Production Part Approval Process (PPAP) documents, maintaining the required 18 elements. Integrates First Article Inspection (FAI) dimensional results against blueprint dimensions.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="voc">
+<h2>VOC — Voice of Client</h2>
+<p>Record customer reviews, feedback, and product returns. Quality complaints trigger CAPA workflows automatically. Computes real-time NPS indexes for executive management.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="finanzas">
+<h2>Finance &amp; ROI</h2>
+<h3>Financial Dashboards</h3>
+<ul>
+  <li><strong>Cash Flow Forecasts:</strong> Projections of upcoming payments and collections over an 8-week horizon</li>
+  <li><strong>AR Ledger:</strong> Accounts receivable aging logs</li>
+  <li><strong>AP Ledger:</strong> Accounts payable calendar</li>
+  <li><strong>ERP ROI Tracker:</strong> Real-time financial analysis of returns on investment achieved via operational savings</li>
+</ul>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="costos">
+<h2>Cost Control</h2>
+<div class="formula">
+  <span class="eq">Actual Cost</span> = Raw Materials consumed + (Hours spent × Workstation rate) + Applied Overhead<br>
+  <span class="eq">Profit Margin</span> = (Sales price − Actual Cost) / Sales price × 100%<br>
+  <span class="eq">Margin Erosion:</span> Alerts managers if actual costs exceed the budgeted benchmark by &gt; 5%
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="costeo-vivo">
+<h2>Live Costing</h2>
+<p>Adjusts sheet metal and component base costs in real time. Changes in global raw metal index pricing instantly cascade to active quotes and raw sheet stock values, safeguarding profit margins.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="reportes">
+<h2>KPI Reports</h2>
+<p>Generates detailed PDF executive summaries for any fiscal period. The AI assistant adds a 3-point brief outlining highlights and warning indicators.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="chat-ia">
+<h2>AI Chat &amp; Voice Link</h2>
+<h3>AI Chat (McVill Chat)</h3>
+<p>A context-aware industrial chatbot. Answers query prompts such as: <em>"Which work orders are delayed?"</em>, <em>"Draft the attendance report for this shift"</em>, <em>"Which raw materials are near their minimum stock levels?"</em>.</p>
+<h3>Voice Link</h3>
+<p>Hands-free voice control terminal powered by Gemini Flash Native Audio. Operators can speak verbal commands to record operational steps directly on the shop floor.</p>
+<h3>Available AI Models</h3>
+<div class="table-wrap"><table>
+<tr><th>AI Model</th><th>Typical Application</th><th>Latency / Performance</th></tr>
+<tr><td>gemini-2.5-flash-lite</td><td>General chat, automated costing, reports (default)</td><td>Sub-second response</td></tr>
+<tr><td>gemini-2.5-flash-native</td><td>Voice Link (native audio processing)</td><td>Real-time streaming</td></tr>
+<tr><td>text-embedding-004</td><td>RAG semantic vector database indexing</td><td>Background processing</td></tr>
+</table></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="minutas">
+<h2>AI Minutes</h2>
+<p>Paste transcripts or notes from team meetings. The AI assistant structures it into a standard PDF template with lists of attendees, agreements, task deadlines, and assigned employee IDs.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="shop-floor">
+<h2>Shop Floor Monitor</h2>
+<p>Live plant floor visualization showing machinery operational statuses: 🟢 Running · 🟡 Setup · 🔴 Down. The <strong>TV Mode</strong> displays clean data optimized for plant overhead television displays.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="hw-escaner">
+<h1>Hardware — Barcode Scanners</h1>
+<p>The system natively supports three scanning configurations:</p>
+<h3>1. USB HID Scanners (Recommended)</h3>
+<p>Scanners emulate a standard keyboard. Reading a code inputs its value and triggers the `Enter` action. The browser captures this string instantly without requiring clicking the input field.</p>
+<h3>2. BarcodeDetector API (Built-in Cameras)</h3>
+<p>Chrome 83+ uses native device cameras to scan 1D and 2D codes through the hardware interface without third-party plugins.</p>
+<h3>3. Manual Input Fallback</h3>
+<p>Operators can manually type employee numbers or part keys using on-screen keyboards.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="hw-camaras">
+<h2>Hardware — IP Cameras</h2>
+<p>The <strong>CameraFeedPanel</strong> pulls video streams from MJPEG camera hardware for automated surveillance and AI Vision inspection.</p>
+<h3>Hardware Requirements</h3>
+<ul>
+  <li>Protocol: <strong>MJPEG stream</strong> accessible via internal network URL</li>
+  <li>JPEG Snapshot URL: <code>http://192.168.1.x/jpg/image.jpg</code></li>
+  <li>MJPEG Stream URL: <code>http://192.168.1.x/mjpg/video.mjpg</code></li>
+  <li>Network: Wired Ethernet recommended (avoids Wi-Fi lag on floor)</li>
+</ul>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="hw-tablets">
+<h2>Hardware — Shop Floor Tablets</h2>
+<p>Used for traveler scanning, viewing SOPs, and logging visual QC checks at assembly lines.</p>
+<div class="table-wrap"><table>
+<tr><th>Suggested Tablet</th><th>Target Workstation Application</th><th>Approx. Price</th></tr>
+<tr><td>Apple iPad 10th Gen</td><td>AI Vision inspections, CAD drawing viewing</td><td>$450–$550 USD</td></tr>
+<tr><td>Samsung Galaxy Tab A9+</td><td>Rugged shop floor traveler scanning</td><td>$300–$400 USD</td></tr>
+<tr><td>Lenovo Tab M10 Plus</td><td>Budget attendance terminal mounting</td><td>$180–$220 USD</td></tr>
+</table></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="hw-impresora">
+<h2>Hardware — Label &amp; Badge Printers</h2>
+<div class="table-wrap"><table>
+<tr><th>Equipment Type</th><th>Suggested Model</th><th>Target Application</th><th>Approx. Price</th></tr>
+<tr><td>PVC Badge Printer</td><td>Zebra ZC300</td><td>Durable employee ID badges</td><td>$1,200–$2,000 USD</td></tr>
+<tr><td>Thermal Label Printer</td><td>Zebra ZD411</td><td>Printing traveler labels, raw stock tags, QRs</td><td>$300–$500 USD</td></tr>
+<tr><td>Paper Laser Printer</td><td>Standard office printer</td><td>Temporary paper badges (requires laminating)</td><td>$150–$250 USD</td></tr>
+</table></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="hw-proyectos">
+<h2>Pending IoT Projects</h2>
+<div class="table-wrap"><table>
+<tr><th>Project Scope</th><th>Operational Status</th><th>Required Hardware Component</th><th>Est. Hardware Cost</th></tr>
+<tr><td>AI Video Surveillance (P3)</td><td><span class="pill pill-amber">Pending Hardware</span></td><td>2 to 4 MJPEG IP cameras per cell</td><td>$600–$1,200 USD</td></tr>
+<tr><td>Micro-Defect Imaging (P9)</td><td><span class="pill pill-amber">Pending Hardware</span></td><td>USB Digital Microscope (1080p, 50-500x)</td><td>$80–$150 USD</td></tr>
+<tr><td>Go/No-Go Inspection Gates (P13)</td><td><span class="pill pill-amber">Pending Hardware</span></td><td>Fixed smart cameras + specialized lighting</td><td>$1,500–$3,000 USD</td></tr>
+<tr><td>Weld Arc Quality Vision (P14)</td><td><span class="pill pill-amber">Pending Hardware</span></td><td>High frame-rate macro camera + UV/IR welding filter</td><td>$800–$1,500 USD</td></tr>
+<tr><td>Shop Floor IoT Sensors (P15)</td><td><span class="pill pill-amber">Pending Hardware</span></td><td>ESP32 microcontrollers, pressure sensors, heat probes</td><td>$500–$1,000 USD</td></tr>
+</table></div>
+<div class="tip">The ERP software is fully pre-configured to receive data streams for all pending IoT projects. Only the physical hardware installation remains.</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="form-nomina">
+<h1>Reference Formulas — Payroll Ledger</h1>
+<div class="formula">
+  <span class="comment">═ GROSS EARNINGS ══════════════════════════════</span><br>
+  base_wage = daily_wage × days_worked<br>
+  hourly_rate = daily_wage / 8<br>
+  overtime_amount = overtime_hours × hourly_rate × 2.0<br>
+  bonus_oee = (oee ≥ 85%) ? (base + overtime) × 0.05 : 0.0<br>
+  gross_salary = base_wage + overtime_amount + bonus_oee<br><br>
+  <span class="comment">═ DEDUCTIONS &amp; TAX ═══════════════════════════</span><br>
+  deductions_absence = days_absent × daily_wage<br>
+  withheld_tax = tax_rate_bracket × (gross_salary - LI) + base_tax  [SAT bracket Table]<br>
+  IMSS_base = gross_salary × 0.01875<br>
+  IMSS_excess = max(0, gross_salary - UMA_threshold) × 0.004<br>
+  IMSS_total = IMSS_base + IMSS_excess<br>
+  total_deductions = withheld_tax + IMSS_total + deductions_absence<br><br>
+  <span class="comment">═ NET ════════════════════════════════════════</span><br>
+  net_salary = gross_salary - total_deductions
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="form-spc">
+<h1>Reference Formulas — Statistical Process Control</h1>
+<div class="formula">
+  X̄̄ = Σ(X̄ᵢ) / k  &nbsp;<span class="comment">where k is the count of subgroups</span><br>
+  R̄ = Σ(Rᵢ) / k<br><br>
+  UCL_X̄ = X̄̄ + A2·R̄  &nbsp;&nbsp;  LCL_X̄ = X̄̄ − A2·R̄<br>
+  UCL_R = D4·R̄  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  LCL_R = D3·R̄<br><br>
+  σ = R̄ / d2<br>
+  Cp = (USL − LSL) / 6σ<br>
+  Cpk = min( (USL − X̄̄)/3σ , (X̄̄ − LSL)/3σ )
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="form-oee">
+<h1>Reference Formulas — OEE &amp; Incentives</h1>
+<div class="formula">
+  <span class="comment">═ OEE METRIC ═════════════════════════════════</span><br>
+  Availability = (total_time − downtime) / total_time<br>
+  Performance = (actual_parts × target_cycle_time) / runtime_available<br>
+  Quality = conforming_parts / total_parts<br>
+  <span class="eq">OEE = Availability × Performance × Quality</span><br><br>
+  <span class="comment">World Class benchmark: OEE &gt; 85%  ·  Good: 60% - 85%</span><br><br>
+  <span class="comment">═ INCENTIVES WAGES ═══════════════════════════</span><br>
+  Productivity Bonus = (efficiency ≥ 100%) ? gross_wage × 0.05 : 0.0<br>
+  Quality Bonus = (quality_rate ≥ 98%) ? gross_wage × 0.03 : 0.0<br>
+  Safety Bonus = (accidents = 0) ? gross_wage × 0.02 : 0.0<br>
+  5S Cleanliness Bonus = (score_5s ≥ 90%) ? gross_wage × 0.01 : 0.0
+</div>
+
+<div style="margin-top:4rem;padding-top:2rem;border-top:1px solid var(--border);text-align:center;color:var(--muted);font-size:.8rem">
+  <strong style="color:var(--accent)">McVill ERP</strong> &nbsp;·&nbsp; Technical Manual v2.6 &nbsp;·&nbsp;
+  Developed by <strong>IA.AGUS</strong> &nbsp;·&nbsp; 2026<br>
+  <span style="font-size:.75rem">This manual is dynamically rendered from the ERP core documentation files.</span>
+</div>
+</section>
+
+</main>
+
+<!-- SCRIPTS -->
+<script>
+// ── Theme toggle ──────────────────────────────────────
+function toggleTheme(){
+  const h=document.documentElement;
+  const dark=h.getAttribute('data-theme')==='dark';
+  h.setAttribute('data-theme',dark?'light':'dark');
+  document.getElementById('theme-btn').textContent=dark?'🌙 Dark Mode':'☀ Light Mode';
+}
+
+// ── Active nav on scroll ──────────────────────────────
+const sections=[...document.querySelectorAll('section[id]')];
+const navLinks=[...document.querySelectorAll('.nav-link')];
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      navLinks.forEach(l=>l.classList.remove('active'));
+      const a=document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+      if(a){a.classList.add('active');a.scrollIntoView({block:'nearest'})}
+    }
+  });
+},{rootMargin:'-60px 0px -60% 0px'});
+sections.forEach(s=>obs.observe(s));
+
+// ── Search ────────────────────────────────────────────
+let prevMarks=[];
+function doSearch(q){
+  prevMarks.forEach(el=>{
+    const p=el.parentNode;
+    p.replaceChild(document.createTextNode(el.textContent),el);
+    p.normalize();
+  });
+  prevMarks=[];
+  if(!q||q.length<2)return;
+  const walker=document.createTreeWalker(document.getElementById('content'),NodeFilter.SHOW_TEXT);
+  const regex=new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
+  const nodes=[];
+  while(walker.nextNode())nodes.push(walker.currentNode);
+  nodes.forEach(node=>{
+    if(!regex.test(node.textContent))return;
+    regex.lastIndex=0;
+    const frag=document.createDocumentFragment();
+    let last=0,m;
+    while((m=regex.exec(node.textContent))!==null){
+      frag.appendChild(document.createTextNode(node.textContent.slice(last,m.index)));
+      const mark=document.createElement('mark');
+      mark.textContent=m[0];
+      frag.appendChild(mark);
+      prevMarks.push(mark);
+      last=m.index+m[0].length;
+    }
+    frag.appendChild(document.createTextNode(node.textContent.slice(last)));
+    node.parentNode.replaceChild(frag,node);
+  });
+  if(prevMarks.length)prevMarks[0].scrollIntoView({behavior:'smooth',block:'center'});
+}
+</script>
+</body>
+</html>

@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { supabase } from './lib/supabase';
 import { eventBus } from './utils/eventBus';
 import { useConfig } from './contexts/ConfigContext';
+import { useLanguage, SUPPORTED_LANGUAGES } from './contexts/LanguageContext';
 import { Sidebar } from './components/Sidebar';
 import { LoginView } from './components/LoginView';
 import { GlobalNotifications } from './components/common/GlobalNotifications';
@@ -90,6 +91,7 @@ function App() {
   }, []);
   const [isTVMode, setIsTVMode] = useState(false);
   const { config, isDarkMode, toggleTheme, setThemeName } = useConfig();
+  const { language, setLanguage, t } = useLanguage();
 
   useEffect(() => {
     // Restore session on page load
@@ -262,15 +264,15 @@ function App() {
                 )}
               >
                 <span className="text-sm leading-none">{MODULE_GUIDES[activeView]?.emoji ?? '⚡'}</span>
-                <span className="hidden sm:inline">Guía</span>
+                <span className="hidden sm:inline">{t('topbar.guide', 'Guía')}</span>
               </button>
 
               {/* Manual Link */}
               <a
-                href="/manual.html"
+                href={language === 'en' ? '/manual-en.html' : '/manual.html'}
                 target="_blank"
                 rel="noopener noreferrer"
-                title="Manual del Sistema"
+                title={t('topbar.manual', 'Manual')}
                 className={clsx(
                   "flex items-center gap-2 px-3 py-1.5 rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all",
                   isDarkMode
@@ -279,7 +281,7 @@ function App() {
                 )}
               >
                 <span className="text-sm leading-none">📖</span>
-                <span className="hidden lg:inline">Manual</span>
+                <span className="hidden lg:inline">{t('topbar.manual', 'Manual')}</span>
               </a>
             </div>
 
@@ -290,15 +292,38 @@ function App() {
                   <p className={clsx(
                     "text-[11px] font-black tracking-tight uppercase",
                     isDarkMode ? "text-white" : "text-slate-900"
-                  )}>Control Maestro</p>
+                  )}>{t('topbar.master_control', 'Control Maestro')}</p>
                 </div>
-                <p className="text-[8px] font-black text-mcvill-accent uppercase tracking-[0.4em]">Orquestador Raíz</p>
+                <p className="text-[8px] font-black text-mcvill-accent uppercase tracking-[0.4em]">{t('topbar.orchestrator', 'Orquestador Raíz')}</p>
               </div>
               
               <div className={clsx(
-                "flex items-center gap-2 lg:gap-6 lg:pl-8 lg:border-l",
+                "flex items-center gap-2 lg:gap-4 lg:pl-8 lg:border-l",
                 isDarkMode ? "border-mcvill-card-border/30" : "border-slate-200"
               )}>
+                {/* Language Selector */}
+                <div className="relative">
+                  <select
+                    value={language}
+                    onChange={(e) => setLanguage(e.target.value as any)}
+                    className={clsx(
+                      "appearance-none pl-3 pr-8 py-2 rounded-2xl border text-[10px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer focus:outline-none focus:ring-1 focus:ring-mcvill-accent",
+                      isDarkMode
+                        ? "bg-slate-950 border-white/10 text-slate-300 hover:border-mcvill-accent/40"
+                        : "bg-white border-slate-200 text-slate-600 hover:border-blue-300"
+                    )}
+                  >
+                    {SUPPORTED_LANGUAGES.map(lang => (
+                      <option key={lang.code} value={lang.code} className={isDarkMode ? "bg-slate-950 text-white" : "bg-white text-slate-900"}>
+                        {lang.flag} {lang.code.toUpperCase()}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                    <ChevronDown size={10} className={isDarkMode ? "text-slate-400" : "text-slate-500"} />
+                  </div>
+                </div>
+
                 {/* Theme Toggle */}
                 <button
                   onClick={toggleTheme}
@@ -308,7 +333,7 @@ function App() {
                       ? "border-white/5 bg-slate-900/50 text-amber-400 hover:border-amber-400/30"
                       : "border-slate-200 bg-slate-50 text-blue-500 hover:border-blue-300"
                   )}
-                  title={isDarkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+                  title={isDarkMode ? t('topbar.light_mode', 'Cambiar a modo claro') : t('topbar.dark_mode', 'Cambiar a modo oscuro')}
                 >
                   {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
                 </button>

@@ -5,6 +5,7 @@ import './index.css'
 import App from './App.tsx'
 import { ConfigProvider } from './contexts/ConfigContext'
 import { SearchProvider } from './contexts/SearchContext'
+import { LanguageProvider } from './contexts/LanguageContext'
 
 // Gracefully handle dynamic chunk loading errors (Vite Chunk Load Failures after new deployments)
 window.addEventListener('error', (e) => {
@@ -52,9 +53,11 @@ if (import.meta.env.VITE_SENTRY_DSN) {
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ConfigProvider>
-      <SearchProvider>
-        <App />
-      </SearchProvider>
+      <LanguageProvider>
+        <SearchProvider>
+          <App />
+        </SearchProvider>
+      </LanguageProvider>
     </ConfigProvider>
   </StrictMode>,
 )
