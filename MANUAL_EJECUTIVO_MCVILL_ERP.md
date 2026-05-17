@@ -1,6 +1,6 @@
 # MANUAL EJECUTIVO — McVill ERP con Inteligencia Artificial
 ### Sistema de Gestión Empresarial para la Industria Metalmecánica
-**Versión 2.5 — Mayo 2026**
+**Versión 2.6 — Mayo 2026**
 **Desarrollado por IA.AGUS — ia-agus.com**
 
 ---
@@ -10,7 +10,7 @@
 1. [¿Qué es un ERP para la Industria Metalmecánica?](#1-qué-es-un-erp-para-la-industria-metalmecánica)
 2. [Arquitectura Tecnológica del Sistema](#2-arquitectura-tecnológica-del-sistema)
 3. [Base de Datos, Seguridad y Plan de Respaldo](#3-base-de-datos-seguridad-y-plan-de-respaldo)
-4. [Módulos del ERP — Descripción Completa](#4-módulos-del-erp--descripción-completa)
+4. [Módulos del ERP — 36 Módulos Descripción Completa](#4-módulos-del-erp--descripción-completa)
 5. [Cómo se Conecta Todo el ERP](#5-cómo-se-conecta-todo-el-erp)
 6. [Inteligencia Artificial por Módulo](#6-inteligencia-artificial-por-módulo)
 7. [Agente de Acción IA — 19 Comandos Disponibles](#7-agente-de-acción-ia--19-comandos-disponibles)
@@ -70,7 +70,7 @@ McVill ERP es una aplicación web moderna basada en tecnología de nube, accesib
                        │ HTTPS
 ┌──────────────────────▼──────────────────────────────────┐
 │               FRONTEND — Vercel CDN                     │
-│   React 18 + TypeScript + Vite + TailwindCSS            │
+│   React 19 + TypeScript + Vite + TailwindCSS v4          │
 │   Desplegado globalmente en Edge Network de Vercel      │
 │   URL: mcvill-erp.vercel.app                            │
 └──────────────────────┬──────────────────────────────────┘
@@ -240,8 +240,50 @@ Generador de actas con IA. Registra los puntos de la reunión y la IA estructura
 ### 📐 Instrucciones de Trabajo
 Procedimientos paso a paso con puntos de control, imágenes y operaciones de ruta. Estados: Borrador → Activo → Obsoleto.
 
-### 🔍 Trazabilidad
-Rastreo de lotes de materia prima desde recepción hasta producto terminado. ECOs (Engineering Change Orders) con historial de revisiones.
+### 🔍 Trazabilidad de Partes
+Rastreo completo de cada número de parte desde la materia prima de origen hasta la entrega al cliente. Árbol BOM que muestra relaciones entre componentes y ensambles. En caso de detectarse un defecto en campo, el sistema identifica en segundos todos los productos del mismo lote que pudieran estar afectados. ECOs (Engineering Change Orders) con historial de revisiones controladas.
+
+### 👁️ Inspección Visual IA (Módulo Dedicado)
+Módulo independiente para detección automática de defectos por visión neural. Funciona desde celular, tablet o PC sin cámaras especiales. Modos de inspección:
+- **Soldadura:** porosidades, fisuras, socavación, penetración incompleta, spatter
+- **Ensamble:** piezas faltantes, tornillos sueltos, desalineaciones
+- **Pintura:** chorreos, burbujas, cáscara de naranja, delaminación
+- **Dimensional:** rebabas, deformaciones, perforaciones mal ubicadas
+
+Si la IA detecta FAIL (confianza >60%), crea automáticamente una No Conformidad con número único y notifica al supervisor.
+
+### 📚 Biblioteca de Defectos y Lecciones Aprendidas
+Catálogo visual de todos los defectos históricos con foto de referencia, descripción, causa raíz y acción correctiva documentada. Cuando se abre una nueva No Conformidad, el sistema sugiere automáticamente los defectos similares del catálogo para acelerar el diagnóstico. Las lecciones aprendidas quedan vinculadas a procesos, materiales y operadores para que el conocimiento institucional no se pierda.
+
+### 📋 PPAP / FAI
+Gestión completa del **Production Part Approval Process** y **First Article Inspection**. Genera el paquete de aprobación con todos los elementos del nivel requerido: plano de control, FMEA, mediciones dimensionales, muestras y certificados. Flujo de aprobación con el cliente: En Preparación → Enviado → En Revisión → Aprobado / Rechazado. Archivo digital de todos los PPAPs por parte y cliente para auditorías internas y de cliente.
+
+### 💬 VOC — Voz del Cliente
+Captura, clasifica y da seguimiento a toda la retroalimentación del cliente: quejas, sugerencias y felicitaciones. Las quejas se convierten automáticamente en No Conformidades con seguimiento CAPA. Dashboard de NPS y satisfacción del cliente actualizado en tiempo real. Análisis de Pareto por tipo de queja para priorizar acciones de mejora. La IA analiza el sentimiento de los comentarios y genera resumen ejecutivo para revisión de dirección.
+
+### 🛒 Gestión de Compras
+Gestión completa del ciclo de compras desde la solicitud hasta la recepción. Las alertas de stock crítico del módulo de Inventarios generan solicitudes de compra automáticamente. El módulo genera PDF de Orden de Compra profesional con términos y condiciones. Al registrar la recepción, el inventario se actualiza automáticamente. Directorio de proveedores con **score de desempeño** (cumplimiento, calidad, precio) para seleccionar siempre la mejor opción. La IA sugiere el proveedor óptimo para cada material basado en historial.
+
+### 📈 Cotizador ROI
+Herramienta para calcular el Retorno de Inversión de proyectos de capital, propuestas de mejora o nuevas líneas de producto. Ingresa el costo del proyecto y los ahorros/ingresos esperados y el sistema calcula automáticamente: ROI, Payback Period y Valor Presente Neto (VPN). Permite crear múltiples escenarios comparativos y genera reporte ejecutivo en PDF listo para presentar a dirección o al cliente.
+
+### 🔩 Cotizador Metalmecánico (Metal Quoter)
+Cotizador especializado para piezas metálicas con desglose detallado por proceso productivo: Corte Láser, Doblez, Soldadura, Maquinado CNC, Pintura y Ensamble. Calcula el costo de materia prima según dimensiones, calibre y material. Aplica automáticamente los tiempos estándar y tasas de planta configuradas por McVill. Soporta cotizaciones multi-partida para ensambles completos y genera PDF con logo listo para el cliente.
+
+### 💲 Control de Costos
+Análisis en tiempo real del costo real vs presupuestado por cada Orden de Trabajo. Acumula: material consumido + horas-hombre reales + overhead aplicado. Si el costo real supera el presupuesto, genera alerta de erosión de margen. Ranking de órdenes por margen para identificar las más y menos rentables. Análisis de rentabilidad por cliente para identificar quiénes generan más valor real para McVill.
+
+### ⚡ Costeo en Vivo (Dynamic Costing)
+Costeo dinámico donde los precios de materia prima se actualizan en tiempo real. Al cambiar el precio del acero, todas las cotizaciones activas se recalculan automáticamente. **Simulador de escenarios:** ajusta sliders de materia prima y mano de obra para ver el impacto en el margen antes de firmar un contrato a largo plazo. Ideal para negociaciones con clientes donde el precio del material es volátil.
+
+### 🗺️ Diseño de Layout de Planta
+Herramienta visual para diseñar y optimizar el flujo de estaciones de trabajo. Arrastra y posiciona estaciones en el plano de planta; las flechas de flujo muestran el recorrido del material. El análisis de distancias detecta movimientos innecesarios (muda de transporte según Lean Manufacturing). La IA sugiere reordenamientos para minimizar la distancia total recorrida por pieza. El gráfico de balance de línea muestra qué estaciones son el cuello de botella.
+
+### 🧪 Simulador de Procesos
+Permite simular y optimizar procesos productivos antes de implementarlos en la planta real. Define el proceso con sus etapas, tiempos, recursos y tasas de fallo, luego ejecuta la simulación con el volumen de producción objetivo y obtiene métricas: throughput, WIP promedio, utilización de recursos y tiempo de ciclo. Compara el proceso actual vs el proceso propuesto y calcula el impacto económico de la mejora en horas y pesos.
+
+### 🏭 Shop Floor Monitor
+Panel de monitoreo del piso de producción en tiempo real. Muestra el estado de cada estación: 🟢 Produciendo / 🟡 Setup-Cambio / 🔴 Paro-Falla. Los datos se actualizan cada 30 segundos desde los registros de producción. **Modo TV:** proyecta el estado en la pantalla del piso de planta. Al detectar un paro, genera alerta automática al supervisor del área. Métricas de OEE en vivo y Pareto de tiempos muertos por categoría (mecánico, material, operador, cambio).
 
 ---
 
@@ -322,6 +364,18 @@ El siguiente diagrama muestra el flujo de información entre módulos:
 | Chat IA | Agente de acción con 19 herramientas del ERP | Gemini Flash |
 | RAG | Búsqueda semántica en documentos corporativos | text-embedding-004 |
 | Minutas | Estructuración automática de actas de reunión | Gemini Flash |
+| Reclutamiento | Análisis y puntuación de CVs contra perfil de puesto | Gemini Flash |
+| VOC | Análisis de sentimiento de retroalimentación de clientes | Gemini Flash |
+| Inspección Visual IA | Detección de defectos por visión neural (módulo dedicado) | Gemini Vision |
+| PPAP / FAI | Verificación de completitud de elementos del paquete | Automatización |
+| Biblioteca Defectos | Vinculación automática de NCs con defectos históricos similares | Gemini Flash |
+| Cotizador ROI | Cálculo de VPN y análisis de escenarios | Algoritmos |
+| Metal Quoter | Cálculo de tiempos estándar y costos por proceso metalmecánico | Algoritmos + IA |
+| Costeo en Vivo | Recálculo automático de cotizaciones ante cambios de precios | Automatización |
+| Layout Planta | Sugerencias de reordenamiento para minimizar distancias | Gemini Flash |
+| Simulador | Análisis de throughput y detección de cuellos de botella | Algoritmos + IA |
+| Shop Floor | Detección automática de paros y alertas en tiempo real | Automatización |
+| Compras | Sugerencia de proveedor óptimo por historial de desempeño | Gemini Flash |
 
 ---
 
@@ -416,16 +470,17 @@ Asistente de voz en tiempo real usando Gemini Live API (la misma tecnología det
 
 | Rol | Módulos Disponibles | Puede Crear | Puede Aprobar |
 |---|---|---|---|
-| **CEO** | Todos | Todo | Todo |
+| **CEO** | Todos + Configuración | Todo | Todo |
+| **Sistemas** | Todos + Configuración | Configuración del tenant | Todo |
+| **Admin** | Todos + Configuración | Todo | Todo |
 | **Gerente** | Todos excepto Configuración | Órdenes, cotizaciones, reportes | Nóminas, NCs, compras |
-| **Supervisor** | Producción, Calidad, Asistencia, Mantenimiento | OTs, viajeros, inspecciones | NCs menores |
-| **Operador** | Su estación de trabajo, Asistencia | Registro de etapas completadas | — |
-| **RH** | Capital Humano, Asistencia, Nómina, Desempeño | Empleados, nóminas | Incidencias |
-| **Finanzas** | Finanzas, Costos, Reportes | Transacciones | Pagos |
-| **Sistemas** | Configuración, Todos (lectura) | Configuración del tenant | — |
-| **Contabilidad** | Finanzas, Nómina (lectura), Reportes | — | — |
+| **Supervisor** | Producción, Calidad, Asistencia, Mantenimiento, Ingeniería | OTs, viajeros, inspecciones | NCs menores |
+| **RH** | Dashboard, Capital Humano, Asistencia, Nómina, Desempeño | Empleados, nóminas | Incidencias |
+| **Finanzas** | Dashboard, Finanzas, Costos, Costeo, Nómina, Reportes | Transacciones | Pagos |
+| **Contabilidad** | Dashboard, Finanzas, Costos, Nómina (lectura), Reportes | — | — |
+| **Empleado** | Dashboard, Inventarios, Planta, Viajeros, Calidad, HSE | Registro de etapas completadas | — |
 
-> Los roles se asignan desde **Configuración → Administración de Usuarios**. Solo el CEO y Sistemas pueden modificar roles.
+> **Nota:** Los roles CEO, Sistemas y Admin tienen acceso total incluyendo el módulo de **Configuración** del sistema (branding, API Keys, multi-tenant). Los roles se asignan desde **Configuración → Administración de Usuarios**.
 
 ---
 
@@ -649,23 +704,36 @@ Para una planta con $2-5M MXN de facturación mensual:
 
 ## 16. Roadmap — Versiones Futuras
 
+### v2.5 — Entregado (Mayo 2026) ✅
+- [x] 36 módulos en producción (30 listos, 5 pendientes de hardware McVill, 1 en progreso)
+- [x] Tema visual "Acero Azul Profesional" — interfaz clara para entorno de oficina
+- [x] Multi-tenant dinámico — 100% white-label configurable desde Supabase
+- [x] Sidebar reorganizado por áreas lógicas industriales (Operaciones, Calidad, Comercial, etc.)
+- [x] Guías de módulo específicas para los 36 módulos (cada panel muestra su propia guía)
+- [x] Fix de permisos por rol (Admin, CEO, Sistemas con acceso total a Configuración)
+- [x] Inspección Visual IA como módulo independiente
+- [x] PPAP/FAI, VOC, Biblioteca de Defectos, Shop Floor Monitor completados
+- [x] Cotizador ROI, Metal Quoter, Control de Costos, Costeo en Vivo completados
+- [x] Layout de Planta, Simulador de Procesos completados
+
 ### v2.6 — Q3 2026
-- [ ] App móvil nativa (iOS/Android) para operadores de piso
-- [ ] Notificaciones push para alertas críticas
+- [ ] App móvil nativa (iOS/Android) para operadores de piso — en progreso
+- [ ] Notificaciones push para alertas críticas en celular
 - [ ] Integración con CFDI 4.0 para facturación electrónica
-- [ ] Módulo de Proyectos con Gantt colaborativo
+- [ ] Videograbadores IA en líneas de producción (requiere hardware McVill)
+- [ ] Microscopía de microdefectos (requiere microscopio digital McVill)
 
 ### v3.0 — Q4 2026
-- [ ] IA predictiva de mantenimiento (machine learning propio con datos históricos)
-- [ ] Integración con básculas y sensores IoT en planta
+- [ ] Cámaras Go/No-Go en ensamble (requiere cámaras industriales McVill)
+- [ ] Visión en soldadura con cámara industrial/IR (requiere hardware McVill)
+- [ ] Sensores IoT en ensamble/soldadura + gateway (requiere hardware McVill)
 - [ ] Portal de clientes (cliente consulta estado de su orden directamente)
-- [ ] Módulo de Exportaciones (T-MEC, documentación aduanal)
-- [ ] BI avanzado con gráficas interactivas y drill-down
+- [ ] Integración con PEMEX, T-MEC y clientes tier-1 (Vitro, etc.)
+- [ ] BI avanzado con drill-down interactivo
 
 ### v3.5 — 2027
 - [ ] Agente autónomo de producción (ajusta el plan de producción sin intervención humana)
-- [ ] Visión computacional en tiempo real (cámaras en planta conectadas al ERP)
-- [ ] Integración ERP-to-ERP con clientes principales (PEMEX, Vitro, etc.)
+- [ ] Integración ERP-to-ERP con clientes principales via EDI
 
 ---
 
@@ -763,4 +831,4 @@ Las actualizaciones se despliegan automáticamente en Vercel sin tiempo de inact
 
 *Manual preparado por IA.AGUS — ia-agus.com*
 *Para soporte: soporte@ia-agus.com*
-*McVill ERP v2.5 — Mayo 2026*
+*McVill ERP v2.6 — Mayo 2026*
