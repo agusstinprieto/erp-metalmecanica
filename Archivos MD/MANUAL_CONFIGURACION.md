@@ -77,7 +77,8 @@ Cada cuenta de correo registrada en Supabase Auth cuenta con un perfil asociado 
 | **`ceo`** | Acceso absoluto a reportes, finanzas, costos, planificación, auditoría total, bypass de límites y configuración de tenant. |
 | **`sistemas`** | Administrador técnico total. Gestión de API keys, bases de datos, integraciones externas (WhatsApp, Teams) y administración de usuarios. |
 | **`admin`** | Operación y lectura en todos los módulos operativos y comerciales sin acceso a la configuración del core de base de datos. |
-| **`gerente`** | Control de producción, calidad, Gantt interactivo, aprobación de compras e incidencias de nómina. Sin visualización de secrets de IT. |
+| **`gerencia`** | Control de producción, calidad, Gantt interactivo, aprobación de compras e incidencias de nómina. Sin visualización de secrets de IT. |
+| **`ingenieria`** | Acceso total a módulos técnicos: Instrucciones de trabajo, Layout de planta, Simulador de procesos, Nesting de placa, Monitor de energía y Mantenimiento predictivo IA. |
 | **`supervisor`** | Registro de etapas de viajeros, inspecciones visuales en piso, solicitudes de mantenimiento y control de incidentes HSE. |
 | **`rh`** | Gestión total de empleados, recibos de nómina, control de asistencia por QR, KPIs de operadores y módulo de reclutamiento IA. |
 | **`finanzas`** | Control de cajas chicas, cuentas bancarias, pasarelas de pago, análisis de costos reales vs presupuestados y cotizaciones. |

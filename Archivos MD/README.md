@@ -148,7 +148,7 @@ El prefijo interno de clases CSS es solo el namespace del design system — ning
 
 - **RLS (Row Level Security)** en todas las tablas — cada tenant aislado completamente
 - Función `auth_user_role()` con `SECURITY DEFINER` para evitar recursión en políticas
-- Roles: `ceo`, `gerente`, `sistemas`, `rh`, `finanzas`, `contabilidad`, `supervisor`, `empleado`
+- Roles: `ceo`, `gerencia`, `sistemas`, `rh`, `finanzas`, `contabilidad`, `supervisor`, `empleado`, `ingenieria`
 - Sidebar con visibilidad condicional por rol
 - Auto-reload ante errores de chunk dinámico post-deploy (sin pantallas rotas al actualizar versión)
 

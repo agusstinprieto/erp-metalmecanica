@@ -181,9 +181,9 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({ isOpen, onClose, o
                 onChange={e => setFormData({...formData, role: e.target.value as any})}
               >
                 <option value="ceo">CEO / Dirección</option>
-                <option value="gerente">Gerencia General</option>
+                <option value="gerencia">Gerencia General</option>
                 <option value="finanzas">Finanzas y Contabilidad</option>
-                <option value="rrhh">Recursos Humanos</option>
+                <option value="rh">Recursos Humanos</option>
                 <option value="operaciones">Operaciones / Logística</option>
                 <option value="ventas">Ventas y Comercial</option>
                 <option value="compras">Compras y Adquisiciones</option>

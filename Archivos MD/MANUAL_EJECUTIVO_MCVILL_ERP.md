@@ -163,7 +163,7 @@ Supabase utiliza **PostgreSQL 16**, el motor de base de datos relacional más co
 ## 4. Módulos del ERP — Descripción Completa
 
 ### 📊 Tablero Principal (Dashboard)
-Centro de comando ejecutivo en tiempo real. Muestra KPIs críticos: OEE de planta, eficiencia de producción, órdenes activas, stock crítico, alertas de mantenimiento y ROI del ERP. Pensado para la revisión diaria de 10 minutos del gerente o director.
+Centro de comando ejecutivo en tiempo real. Muestra KPIs críticos: OEE de planta, eficiencia de producción, órdenes activas, stock crítico, alertas de mantenimiento y ROI del ERP. Pensado para la revisión diaria de 10 minutos de la gerencia o director.
 
 ### 📦 Inventarios Pro
 Control absoluto de materia prima. Registro de entradas y salidas, alertas de stock mínimo, historial de movimientos por orden de producción, e identificación visual de materiales por IA (sube foto del material para identificarlo).
@@ -473,7 +473,8 @@ Asistente de voz en tiempo real usando Gemini Live API (la misma tecnología det
 | **CEO** | Todos + Configuración | Todo | Todo |
 | **Sistemas** | Todos + Configuración | Configuración del tenant | Todo |
 | **Admin** | Todos + Configuración | Todo | Todo |
-| **Gerente** | Todos excepto Configuración | Órdenes, cotizaciones, reportes | Nóminas, NCs, compras |
+| **Gerencia** | Todos excepto Configuración | Órdenes, cotizaciones, reportes | Nóminas, NCs, compras |
+| **Ingeniería** | Dashboard, Inventarios, Planta, Viajeros, Calidad, HSE, Ingeniería, Mantenimiento | Instrucciones de trabajo, Layouts, Simulaciones | Procesos técnicos |
 | **Supervisor** | Producción, Calidad, Asistencia, Mantenimiento, Ingeniería | OTs, viajeros, inspecciones | NCs menores |
 | **RH** | Dashboard, Capital Humano, Asistencia, Nómina, Desempeño | Empleados, nóminas | Incidencias |
 | **Finanzas** | Dashboard, Finanzas, Costos, Costeo, Nómina, Reportes | Transacciones | Pagos |

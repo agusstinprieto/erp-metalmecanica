@@ -30,7 +30,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
       }
       if (username.trim() === 'demo' && password === 'demo123') {
         setNotification({ message: 'Acceso demo autorizado', type: 'success' });
-        setTimeout(() => onLogin('gerente'), 1000);
+        setTimeout(() => onLogin('gerencia'), 1000);
         return;
       }
 

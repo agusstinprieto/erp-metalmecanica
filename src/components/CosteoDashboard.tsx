@@ -144,7 +144,7 @@ export const CosteoDashboard: React.FC<{ userRole?: string }> = ({ userRole = 'e
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<CosteoDashboardRow | null>(null);
 
-  const canApprove = ['ceo', 'gerente', 'finanzas', 'sistemas'].includes(userRole);
+  const canApprove = ['ceo', 'gerencia', 'finanzas', 'sistemas'].includes(userRole);
 
   const load = useCallback(async () => {
     setLoading(true);

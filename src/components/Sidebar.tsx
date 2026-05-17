@@ -165,8 +165,16 @@ export const Sidebar = (props: {
   const { config, isDarkMode } = useConfig();
   const { t } = useLanguage();
   const role = userRole?.toLowerCase() || 'empleado';
-  const isGodmode    = role === 'ceo' || role === 'sistemas' || role === 'gerente';
+  const isGodmode    = role === 'ceo' || role === 'sistemas' || role === 'gerencia';
   const isSuperAdmin = role === 'ceo' || role === 'sistemas';
+
+  const showQualitySection = isGodmode || ['calidad', 'auditoria', 'soporte', 'seguridad'].includes(role);
+  const showCommercialSection = isGodmode || ['operaciones', 'ventas', 'compras', 'marketing'].includes(role);
+  const showEngineeringSection = isGodmode || ['ingenieria', 'supervisor'].includes(role);
+  const showHRSection = isGodmode || ['rh'].includes(role);
+  const showFinanceSection = isGodmode || ['finanzas', 'contabilidad'].includes(role);
+  const showSystemSection = isGodmode || ['auditoria'].includes(role);
+  const showAdvancedContainer = showQualitySection || showCommercialSection || showEngineeringSection || showHRSection || showFinanceSection || showSystemSection;
 
   const ALL_NAV_ITEMS: { id: string; label: string; icon: any; godmode?: boolean; superadmin?: boolean; special?: 'chat' | 'voice' }[] = [
     { id: 'dashboard',         label: 'Tablero',         icon: LayoutDashboard },
@@ -218,9 +226,8 @@ export const Sidebar = (props: {
   const q = searchQuery.trim().toLowerCase();
   const searchResults = q
     ? ALL_NAV_ITEMS.filter(item => {
-        if (item.godmode && !isGodmode) return false;
         if (item.superadmin && !isSuperAdmin) return false;
-        return item.label.toLowerCase().includes(q) || item.id.toLowerCase().includes(q);
+        return hasAccess(item.id) && (item.label.toLowerCase().includes(q) || item.id.toLowerCase().includes(q));
       })
     : [];
 
@@ -233,12 +240,23 @@ export const Sidebar = (props: {
 
   const hasAccess = (module: string) => {
     if (isGodmode) return true;
+    if (['chat_ia', 'voice_link'].includes(module)) return true;
     const permissions: Record<string, string[]> = {
       empleado:     ['dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse'],
       supervisor:   ['dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse', 'engineering', 'maintenance'],
-      rh:           ['dashboard', 'rh', 'payroll'],
-      finanzas:     ['dashboard', 'finance', 'costing', 'costeo', 'payroll'],
-      contabilidad: ['dashboard', 'finance', 'costing', 'costeo', 'payroll'],
+      ingenieria:   ['dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse', 'engineering', 'maintenance', 'work_instructions', 'layout_design', 'process_simulator', 'nesting', 'energy_monitor', 'preventive_maintenance_ia'],
+      calidad:      ['dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse', 'spc', 'visual_ia', 'trazabilidad', 'defect_library', 'ppap', 'voc', 'seguridad', 'preventive_maintenance_ia'],
+      operaciones:  ['dashboard', 'inventory', 'production', 'viajeros', 'shop_floor', 'compras', 'ventas', 'agente_cot', 'rfq_kanban', 'factibilidad', 'factibilidad_ia', 'metal_quoter', 'roi', 'maintenance'],
+      ventas:       ['dashboard', 'ventas', 'agente_cot', 'rfq_kanban', 'factibilidad', 'factibilidad_ia', 'metal_quoter', 'roi'],
+      compras:      ['dashboard', 'compras', 'inventory'],
+      almacen:      ['dashboard', 'inventory', 'viajeros', 'hse'],
+      rh:           ['dashboard', 'rh', 'payroll', 'attendance', 'recruitment', 'desempeno'],
+      finanzas:     ['dashboard', 'finance', 'banco', 'costing', 'costeo', 'payroll'],
+      contabilidad: ['dashboard', 'finance', 'banco', 'costing', 'payroll'],
+      auditoria:    ['dashboard', 'reports', 'quality', 'spc', 'trazabilidad'],
+      soporte:      ['dashboard', 'voc', 'quality'],
+      marketing:    ['dashboard', 'ventas', 'voc'],
+      seguridad:    ['dashboard', 'hse', 'seguridad'],
     };
     return permissions[role]?.includes(module) ?? false;
   };
@@ -421,83 +439,113 @@ export const Sidebar = (props: {
           />
         </div>
 
-        {isGodmode && (
+        {showAdvancedContainer && (
           <div className="space-y-2 pt-3 border-t border-mcvill-accent/30">
-            {!isSidebarCollapsed && (
-              <p className="px-3 mb-1 text-[9px] font-black text-mcvill-accent/70 tracking-[0.25em] uppercase flex items-center gap-2">
-                <span className="w-1 h-1 rounded-full bg-mcvill-accent/60" />
-                {t('section.advanced_quality', 'Calidad Avanzada')}
-              </p>
+            {/* Calidad Avanzada */}
+            {showQualitySection && (
+              <>
+                {!isSidebarCollapsed && (
+                  <p className="px-3 mb-1 text-[9px] font-black text-mcvill-accent/70 tracking-[0.25em] uppercase flex items-center gap-2">
+                    <span className="w-1 h-1 rounded-full bg-mcvill-accent/60" />
+                    {t('section.advanced_quality', 'Calidad Avanzada')}
+                  </p>
+                )}
+                {hasAccess('spc') && <SidebarItem icon={LineChart} label={t('sidebar.spc', 'SPC Alertas')} active={activeView === 'spc'} onClick={() => navigate('spc')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('visual_ia') && <SidebarItem icon={ScanSearch} label={t('sidebar.visual_ia', 'Inspección IA')} active={activeView === 'visual_ia'} onClick={() => navigate('visual_ia')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('trazabilidad') && <SidebarItem icon={GitBranch} label={t('sidebar.trazabilidad', 'Trazabilidad')} active={activeView === 'trazabilidad'} onClick={() => navigate('trazabilidad')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('defect_library') && <SidebarItem icon={Library} label={t('sidebar.defect_library', 'Bib. Defectos')} active={activeView === 'defect_library'} onClick={() => navigate('defect_library')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('ppap') && <SidebarItem icon={FileCheck2} label={t('sidebar.ppap', 'PPAP')} active={activeView === 'ppap'} onClick={() => navigate('ppap')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('voc') && <SidebarItem icon={MessageCircle} label={t('sidebar.voc', 'VOC')} active={activeView === 'voc'} onClick={() => navigate('voc')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('shop_floor') && <SidebarItem icon={Scan} label={t('sidebar.shop_floor', 'Shop Floor')} active={activeView === 'shop_floor'} onClick={() => navigate('shop_floor')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('seguridad') && <SidebarItem icon={Camera} label={t('sidebar.seguridad', 'Seguridad')} active={activeView === 'seguridad'} onClick={() => navigate('seguridad')} collapsed={isSidebarCollapsed} />}
+              </>
             )}
-            <SidebarItem icon={LineChart} label={t('sidebar.spc', 'SPC Alertas')} active={activeView === 'spc'} onClick={() => navigate('spc')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={ScanSearch} label={t('sidebar.visual_ia', 'Inspección IA')} active={activeView === 'visual_ia'} onClick={() => navigate('visual_ia')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={GitBranch} label={t('sidebar.trazabilidad', 'Trazabilidad')} active={activeView === 'trazabilidad'} onClick={() => navigate('trazabilidad')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={Library} label={t('sidebar.defect_library', 'Bib. Defectos')} active={activeView === 'defect_library'} onClick={() => navigate('defect_library')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={FileCheck2} label={t('sidebar.ppap', 'PPAP')} active={activeView === 'ppap'} onClick={() => navigate('ppap')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={MessageCircle} label={t('sidebar.voc', 'VOC')} active={activeView === 'voc'} onClick={() => navigate('voc')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={Scan} label={t('sidebar.shop_floor', 'Shop Floor')} active={activeView === 'shop_floor'} onClick={() => navigate('shop_floor')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={Camera} label={t('sidebar.seguridad', 'Seguridad')} active={activeView === 'seguridad'} onClick={() => navigate('seguridad')} collapsed={isSidebarCollapsed} />
 
-            {!isSidebarCollapsed && (
-              <p className="px-3 mt-3 mb-1 text-[9px] font-black text-mcvill-accent/70 tracking-[0.25em] uppercase flex items-center gap-2">
-                <span className="w-1 h-1 rounded-full bg-mcvill-accent/60" />
-                {t('section.commercial', 'Comercial')}
-              </p>
+            {/* Comercial */}
+            {showCommercialSection && (
+              <>
+                {!isSidebarCollapsed && (
+                  <p className="px-3 mt-3 mb-1 text-[9px] font-black text-mcvill-accent/70 tracking-[0.25em] uppercase flex items-center gap-2">
+                    <span className="w-1 h-1 rounded-full bg-mcvill-accent/60" />
+                    {t('section.commercial', 'Comercial')}
+                  </p>
+                )}
+                {hasAccess('ventas') && <SidebarItem icon={TrendingUp} label={t('sidebar.ventas', 'Ventas')} active={activeView === 'ventas'} onClick={() => navigate('ventas')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('compras') && <SidebarItem icon={ShoppingCart} label={t('sidebar.compras', 'Compras')} active={activeView === 'compras'} onClick={() => navigate('compras')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('agente_cot') && <SidebarItem icon={Sparkles} label={t('sidebar.agente_cot', 'Agente Cot.')} active={activeView === 'agente_cot'} onClick={() => navigate('agente_cot')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('rfq_kanban') && <SidebarItem icon={KanbanSquare} label={t('sidebar.rfq_kanban', 'Kanban RFQ')} active={activeView === 'rfq_kanban'} onClick={() => navigate('rfq_kanban')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('factibilidad') && <SidebarItem icon={ShieldCheck} label={t('sidebar.factibilidad', 'Factibilidad')} active={activeView === 'factibilidad'} onClick={() => navigate('factibilidad')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('factibilidad_ia') && <SidebarItem icon={BrainCircuit} label={t('sidebar.factibilidad_ia', 'Fact. IA')} active={activeView === 'factibilidad_ia'} onClick={() => navigate('factibilidad_ia')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('metal_quoter') && <SidebarItem icon={Calculator} label={t('sidebar.metal_quoter', 'Cotizador Metal')} active={activeView === 'metal_quoter'} onClick={() => navigate('metal_quoter')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('roi') && <SidebarItem icon={TrendingUp} label={t('sidebar.roi', 'Cotizador ROI')} active={activeView === 'roi'} onClick={() => navigate('roi')} collapsed={isSidebarCollapsed} />}
+              </>
             )}
-            <SidebarItem icon={TrendingUp} label={t('sidebar.ventas', 'Ventas')} active={activeView === 'ventas'} onClick={() => navigate('ventas')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={ShoppingCart} label={t('sidebar.compras', 'Compras')} active={activeView === 'compras'} onClick={() => navigate('compras')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={Sparkles} label={t('sidebar.agente_cot', 'Agente Cot.')} active={activeView === 'agente_cot'} onClick={() => navigate('agente_cot')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={KanbanSquare} label={t('sidebar.rfq_kanban', 'Kanban RFQ')} active={activeView === 'rfq_kanban'} onClick={() => navigate('rfq_kanban')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={ShieldCheck} label={t('sidebar.factibilidad', 'Factibilidad')} active={activeView === 'factibilidad'} onClick={() => navigate('factibilidad')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={BrainCircuit} label={t('sidebar.factibilidad_ia', 'Fact. IA')} active={activeView === 'factibilidad_ia'} onClick={() => navigate('factibilidad_ia')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={Calculator} label={t('sidebar.metal_quoter', 'Cotizador Metal')} active={activeView === 'metal_quoter'} onClick={() => navigate('metal_quoter')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={TrendingUp} label={t('sidebar.roi', 'Cotizador ROI')} active={activeView === 'roi'} onClick={() => navigate('roi')} collapsed={isSidebarCollapsed} />
 
-            {!isSidebarCollapsed && (
-              <p className="px-3 mt-3 mb-1 text-[9px] font-black text-mcvill-accent/70 tracking-[0.25em] uppercase flex items-center gap-2">
-                <span className="w-1 h-1 rounded-full bg-mcvill-accent/60" />
-                {t('section.engineering', 'Ingeniería')}
-              </p>
+            {/* Ingeniería */}
+            {showEngineeringSection && (
+              <>
+                {!isSidebarCollapsed && (
+                  <p className="px-3 mt-3 mb-1 text-[9px] font-black text-mcvill-accent/70 tracking-[0.25em] uppercase flex items-center gap-2">
+                    <span className="w-1 h-1 rounded-full bg-mcvill-accent/60" />
+                    {t('section.engineering', 'Ingeniería')}
+                  </p>
+                )}
+                {hasAccess('engineering') && <SidebarItem icon={Cpu} label={t('sidebar.engineering', 'Ingeniería')} active={activeView === 'engineering'} onClick={() => navigate('engineering')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('work_instructions') && <SidebarItem icon={ClipboardList} label={t('sidebar.work_instructions', 'Inst. Trabajo')} active={activeView === 'work_instructions'} onClick={() => navigate('work_instructions')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('layout_design') && <SidebarItem icon={Layout} label={t('sidebar.layout_design', 'Layout Planta')} active={activeView === 'layout_design'} onClick={() => navigate('layout_design')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('process_simulator') && <SidebarItem icon={FlaskConical} label={t('sidebar.process_simulator', 'Simulador')} active={activeView === 'process_simulator'} onClick={() => navigate('process_simulator')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('nesting') && <SidebarItem icon={Layers} label={t('sidebar.nesting', 'Nesting')} active={activeView === 'nesting'} onClick={() => navigate('nesting')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('energy_monitor') && <SidebarItem icon={Zap} label={t('sidebar.energy_monitor', 'Energía IA')} active={activeView === 'energy_monitor'} onClick={() => navigate('energy_monitor')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('preventive_maintenance_ia') && <SidebarItem icon={Wrench} label={t('sidebar.preventive_maintenance_ia', 'Mantto. Predictivo')} active={activeView === 'preventive_maintenance_ia'} onClick={() => navigate('preventive_maintenance_ia')} collapsed={isSidebarCollapsed} />}
+              </>
             )}
-            <SidebarItem icon={Cpu} label={t('sidebar.engineering', 'Ingeniería')} active={activeView === 'engineering'} onClick={() => navigate('engineering')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={ClipboardList} label={t('sidebar.work_instructions', 'Inst. Trabajo')} active={activeView === 'work_instructions'} onClick={() => navigate('work_instructions')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={Layout} label={t('sidebar.layout_design', 'Layout Planta')} active={activeView === 'layout_design'} onClick={() => navigate('layout_design')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={FlaskConical} label={t('sidebar.process_simulator', 'Simulador')} active={activeView === 'process_simulator'} onClick={() => navigate('process_simulator')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={Layers} label={t('sidebar.nesting', 'Nesting')} active={activeView === 'nesting'} onClick={() => navigate('nesting')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={Zap} label={t('sidebar.energy_monitor', 'Energía IA')} active={activeView === 'energy_monitor'} onClick={() => navigate('energy_monitor')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={Wrench} label={t('sidebar.preventive_maintenance_ia', 'Mantto. Predictivo')} active={activeView === 'preventive_maintenance_ia'} onClick={() => navigate('preventive_maintenance_ia')} collapsed={isSidebarCollapsed} />
 
-            {!isSidebarCollapsed && (
-              <p className="px-3 mt-3 mb-1 text-[9px] font-black text-mcvill-accent/70 tracking-[0.25em] uppercase flex items-center gap-2">
-                <span className="w-1 h-1 rounded-full bg-mcvill-accent/60" />
-                {t('section.hr', 'Capital Humano')}
-              </p>
+            {/* Capital Humano */}
+            {showHRSection && (
+              <>
+                {!isSidebarCollapsed && (
+                  <p className="px-3 mt-3 mb-1 text-[9px] font-black text-mcvill-accent/70 tracking-[0.25em] uppercase flex items-center gap-2">
+                    <span className="w-1 h-1 rounded-full bg-mcvill-accent/60" />
+                    {t('section.hr', 'Capital Humano')}
+                  </p>
+                )}
+                {hasAccess('rh') && <SidebarItem icon={MembersIcon} label={t('sidebar.rh', 'RH')} active={activeView === 'rh'} onClick={() => navigate('rh')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('payroll') && <SidebarItem icon={FileText} label={t('sidebar.payroll', 'Nómina')} active={activeView === 'payroll'} onClick={() => navigate('payroll')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('attendance') && <SidebarItem icon={CalendarCheck} label={t('sidebar.attendance', 'Asistencia')} active={activeView === 'attendance'} onClick={() => navigate('attendance')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('recruitment') && <SidebarItem icon={UserSearch} label={t('sidebar.recruitment', 'Reclutamiento')} active={activeView === 'recruitment'} onClick={() => navigate('recruitment')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('desempeno') && <SidebarItem icon={Medal} label={t('sidebar.desempeno', 'Desempeño')} active={activeView === 'desempeno'} onClick={() => navigate('desempeno')} collapsed={isSidebarCollapsed} />}
+              </>
             )}
-            <SidebarItem icon={MembersIcon} label={t('sidebar.rh', 'RH')} active={activeView === 'rh'} onClick={() => navigate('rh')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={FileText} label={t('sidebar.payroll', 'Nómina')} active={activeView === 'payroll'} onClick={() => navigate('payroll')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={CalendarCheck} label={t('sidebar.attendance', 'Asistencia')} active={activeView === 'attendance'} onClick={() => navigate('attendance')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={UserSearch} label={t('sidebar.recruitment', 'Reclutamiento')} active={activeView === 'recruitment'} onClick={() => navigate('recruitment')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={Medal} label={t('sidebar.desempeno', 'Desempeño')} active={activeView === 'desempeno'} onClick={() => navigate('desempeno')} collapsed={isSidebarCollapsed} />
 
-            {!isSidebarCollapsed && (
-              <p className="px-3 mt-3 mb-1 text-[9px] font-black text-mcvill-accent/70 tracking-[0.25em] uppercase flex items-center gap-2">
-                <span className="w-1 h-1 rounded-full bg-mcvill-accent/60" />
-                {t('section.finance', 'Finanzas')}
-              </p>
+            {/* Finanzas */}
+            {showFinanceSection && (
+              <>
+                {!isSidebarCollapsed && (
+                  <p className="px-3 mt-3 mb-1 text-[9px] font-black text-mcvill-accent/70 tracking-[0.25em] uppercase flex items-center gap-2">
+                    <span className="w-1 h-1 rounded-full bg-mcvill-accent/60" />
+                    {t('section.finance', 'Finanzas')}
+                  </p>
+                )}
+                {hasAccess('finance') && <SidebarItem icon={CircleDollarSign} label={t('sidebar.finance', 'Finanzas')} active={activeView === 'finance'} onClick={() => navigate('finance')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('banco') && <SidebarItem icon={Landmark} label={t('sidebar.banco', 'Banco')} active={activeView === 'banco'} onClick={() => navigate('banco')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('costing') && <SidebarItem icon={BarChart3} label={t('sidebar.costing', 'Costos')} active={activeView === 'costing'} onClick={() => navigate('costing')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('costeo') && <SidebarItem icon={Gauge} label={t('sidebar.costeo', 'Costeo Live')} active={activeView === 'costeo'} onClick={() => navigate('costeo')} collapsed={isSidebarCollapsed} />}
+              </>
             )}
-            <SidebarItem icon={CircleDollarSign} label={t('sidebar.finance', 'Finanzas')} active={activeView === 'finance'} onClick={() => navigate('finance')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={Landmark} label={t('sidebar.banco', 'Banco')} active={activeView === 'banco'} onClick={() => navigate('banco')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={BarChart3} label={t('sidebar.costing', 'Costos')} active={activeView === 'costing'} onClick={() => navigate('costing')} collapsed={isSidebarCollapsed} />
-            <SidebarItem icon={Gauge} label={t('sidebar.costeo', 'Costeo Live')} active={activeView === 'costeo'} onClick={() => navigate('costeo')} collapsed={isSidebarCollapsed} />
 
-            {!isSidebarCollapsed && (
-              <p className="px-3 mt-3 mb-1 text-[9px] font-black text-mcvill-accent/70 tracking-[0.25em] uppercase flex items-center gap-2">
-                <span className="w-1 h-1 rounded-full bg-mcvill-accent/60" />
-                {t('section.system', 'Sistema')}
-              </p>
+            {/* Sistema */}
+            {showSystemSection && (
+              <>
+                {!isSidebarCollapsed && (
+                  <p className="px-3 mt-3 mb-1 text-[9px] font-black text-mcvill-accent/70 tracking-[0.25em] uppercase flex items-center gap-2">
+                    <span className="w-1 h-1 rounded-full bg-mcvill-accent/60" />
+                    {t('section.system', 'Sistema')}
+                  </p>
+                )}
+                {hasAccess('reports') && <SidebarItem icon={FileBarChart} label={t('sidebar.reports', 'Reportes')} active={activeView === 'reports'} onClick={() => navigate('reports')} collapsed={isSidebarCollapsed} />}
+                {isSuperAdmin && <SidebarItem icon={Settings2} label={t('sidebar.settings', 'CONFIGURACION')} active={activeView === 'settings'} onClick={() => navigate('settings')} collapsed={isSidebarCollapsed} />}
+              </>
             )}
-            <SidebarItem icon={FileBarChart} label={t('sidebar.reports', 'Reportes')} active={activeView === 'reports'} onClick={() => navigate('reports')} collapsed={isSidebarCollapsed} />
-            {isSuperAdmin && <SidebarItem icon={Settings2} label={t('sidebar.settings', 'CONFIGURACION')} active={activeView === 'settings'} onClick={() => navigate('settings')} collapsed={isSidebarCollapsed} />}
           </div>
         )}
           </>

@@ -68,7 +68,7 @@ const SeguridadIndustrialView = lz(() => import('./components/SeguridadIndustria
 const EnergyMonitorView      = lz(() => import('./components/EnergyMonitorView'),      'EnergyMonitorView');
 const PreventiveMaintenanceIAView = lz(() => import('./components/PreventiveMaintenanceIAView'), 'PreventiveMaintenanceIAView');
 
-type UserRole = 'ceo' | 'gerente' | 'sistemas' | 'empleado' | 'rh' | 'finanzas' | 'contabilidad' | 'supervisor';
+type UserRole = 'ceo' | 'gerencia' | 'sistemas' | 'empleado' | 'rh' | 'finanzas' | 'contabilidad' | 'supervisor' | 'ingenieria' | 'calidad' | 'operaciones' | 'ventas' | 'compras' | 'almacen' | 'auditoria' | 'soporte' | 'marketing' | 'seguridad';
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);

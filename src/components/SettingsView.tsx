@@ -55,24 +55,34 @@ interface UserConfig {
   id: string;
   name: string;
   email: string;
-  role: 'ceo' | 'gerente' | 'sistemas' | 'empleado' | 'rh' | 'finanzas' | 'contabilidad' | 'supervisor';
+  role: 'ceo' | 'gerencia' | 'sistemas' | 'empleado' | 'rh' | 'finanzas' | 'contabilidad' | 'supervisor' | 'ingenieria' | 'calidad' | 'operaciones' | 'ventas' | 'compras' | 'almacen' | 'auditoria' | 'soporte' | 'marketing' | 'seguridad';
   status: 'active' | 'pending' | 'suspended';
   lastActive: string;
 }
 
 const ROLES_CONFIG = {
   ceo: { color: 'text-mcvill-accent bg-mcvill-accent/10 border-mcvill-accent/20 shadow-[0_0_10px_rgba(var(--mcvill-accent-rgb),0.1)]', label: 'CEO / DIRECTOR', level: 10 },
-  gerente: { color: 'text-mcvill-accent bg-mcvill-accent/10 border-mcvill-accent/20', label: 'GERENCIA GENERAL', level: 8 },
+  gerencia: { color: 'text-mcvill-accent bg-mcvill-accent/10 border-mcvill-accent/20', label: 'GERENCIA GENERAL', level: 8 },
   sistemas: { color: 'text-green-400 bg-green-400/10 border-green-400/20', label: 'ADMIN SISTEMAS', level: 9 },
   rh: { color: 'text-pink-400 bg-pink-400/10 border-pink-400/20', label: 'TALENTO HUMANO', level: 7 },
   finanzas: { color: 'text-blue-400 bg-blue-400/10 border-blue-400/20', label: 'FINANZAS', level: 7 },
   contabilidad: { color: 'text-mcvill-accent bg-mcvill-accent/10 border-mcvill-accent/20', label: 'CONTABILIDAD', level: 6 },
   supervisor: { color: 'text-mcvill-accent bg-mcvill-accent/10 border-mcvill-accent/20', label: 'SUPERVISOR', level: 5 },
+  ingenieria: { color: 'text-orange-400 bg-orange-400/10 border-orange-400/20', label: 'INGENIERÍA / PROCESOS', level: 7 },
+  calidad: { color: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20', label: 'CONTROL DE CALIDAD', level: 7 },
+  operaciones: { color: 'text-indigo-400 bg-indigo-400/10 border-indigo-400/20', label: 'OPERACIONES / LOG.', level: 7 },
+  ventas: { color: 'text-cyan-400 bg-cyan-400/10 border-cyan-400/20', label: 'VENTAS / COMERCIAL', level: 6 },
+  compras: { color: 'text-teal-400 bg-teal-400/10 border-teal-400/20', label: 'COMPRAS / ADQ.', level: 6 },
+  almacen: { color: 'text-amber-500 bg-amber-500/10 border-amber-500/20', label: 'INVENTARIO / ALMACÉN', level: 5 },
+  auditoria: { color: 'text-purple-400 bg-purple-400/10 border-purple-400/20', label: 'AUDITORÍA / COMPLIANCE', level: 8 },
+  soporte: { color: 'text-violet-400 bg-violet-400/10 border-violet-400/20', label: 'SOPORTE CLIENTE', level: 4 },
+  marketing: { color: 'text-pink-500 bg-pink-500/10 border-pink-500/20', label: 'MARKETING / VENTAS', level: 5 },
+  seguridad: { color: 'text-red-400 bg-red-400/10 border-red-400/20', label: 'SEGURIDAD / HSE', level: 5 },
   empleado: { color: 'text-slate-400 bg-slate-400/10 border-slate-400/20', label: 'COLABORADOR', level: 1 },
 };
 
 interface SettingsViewProps {
-  userRole: 'ceo' | 'gerente' | 'sistemas' | 'empleado' | 'rh' | 'finanzas' | 'contabilidad' | 'supervisor';
+  userRole: 'ceo' | 'gerencia' | 'sistemas' | 'empleado' | 'rh' | 'finanzas' | 'contabilidad' | 'supervisor' | 'ingenieria' | 'calidad' | 'operaciones' | 'ventas' | 'compras' | 'almacen' | 'auditoria' | 'soporte' | 'marketing' | 'seguridad';
 }
 
 // ─── Tarifas Tab ─────────────────────────────────────────────────────────────
