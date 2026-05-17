@@ -86,7 +86,7 @@ const STATUS_CFG: Record<string, { label: string; cls: string }> = {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export const AttendanceView: React.FC = () => {
-  useConfig();
+  const { config } = useConfig();
 
   const [records, setRecords]         = useState<AttendanceRecord[]>([]);
   const [loading, setLoading]         = useState(true);
@@ -241,7 +241,7 @@ export const AttendanceView: React.FC = () => {
     setAiInsight('');
     try {
       const top3Absent = absenceReport.slice(0, 3).map(r => `${r.employee_name}: ${r.absences} faltas, ${r.late_count} retardos`).join('; ');
-      const prompt = `Eres analista de RH industrial en McVill. Resumen de asistencia últimos 7 días: ${records.length} registros. Hoy: ${kpis.present} presentes, ${kpis.late} retardos, ${kpis.absent} ausentes, ${kpis.missing_checkout} sin check-out. Empleados con mayor ausentismo: ${top3Absent || 'sin datos suficientes'}. Genera un análisis breve (máx 3 puntos) con acciones concretas para RH. Responde en español.`;
+      const prompt = `Eres analista de RH industrial en ${config.companyName}. Resumen de asistencia últimos 7 días: ${records.length} registros. Hoy: ${kpis.present} presentes, ${kpis.late} retardos, ${kpis.absent} ausentes, ${kpis.missing_checkout} sin check-out. Empleados con mayor ausentismo: ${top3Absent || 'sin datos suficientes'}. Genera un análisis breve (máx 3 puntos) con acciones concretas para RH. Responde en español.`;
       const insight = await geminiService.generateText(prompt);
       setAiInsight(insight);
     } catch {
@@ -293,7 +293,7 @@ export const AttendanceView: React.FC = () => {
             <h2 className="text-base font-black text-white tracking-tight uppercase">
               CONTROL DE <span className="text-blue-500">ASISTENCIA</span>
             </h2>
-            <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Gestión de Personal · NOM-STPS · McVill</p>
+            <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">{`Gestión de Personal · NOM-STPS · ${config.brandName}`}</p>
           </div>
         </div>
         

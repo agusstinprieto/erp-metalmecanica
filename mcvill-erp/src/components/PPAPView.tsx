@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FileCheck, ChevronDown, CheckCircle, Circle, AlertCircle, Download, Plus, Loader2, X } from 'lucide-react';
 import clsx from 'clsx';
 import { reportUtils } from '../utils/reportUtils';
+import { supabase } from '../lib/supabase';
 
 interface PPAPItem {
   numero: number;
@@ -57,21 +58,14 @@ const statusColor: Record<string, string> = {
   RECHAZADO:     'text-rose-400 bg-rose-500/10 border-rose-500/20',
 };
 
-function makeItems(completionRate = 0): PPAPItem[] {
-  return PPAP_ELEMENTOS.map(e => ({
-    ...e,
-    completado: Math.random() < completionRate,
-  }));
+function makeItems(completado = false): PPAPItem[] {
+  return PPAP_ELEMENTOS.map(e => ({ ...e, completado }));
 }
 
-const INIT_RECORDS: PPAPRecord[] = [
-  { id: 'ppap-001', parte: 'AC-2304', cliente: 'CAT',    nivel: 3, fecha: '2026-05-10', estatus: 'EN REVISIÓN', items: makeItems(0.7) },
-  { id: 'ppap-002', parte: 'WT-0812', cliente: 'WABTEC', nivel: 2, fecha: '2026-04-22', estatus: 'APROBADO',    items: makeItems(1.0) },
-];
-
 export const PPAPView: React.FC = () => {
-  const [records, setRecords]         = useState<PPAPRecord[]>(INIT_RECORDS);
-  const [selected, setSelected]       = useState<PPAPRecord>(INIT_RECORDS[0]);
+  const [records, setRecords]         = useState<PPAPRecord[]>([]);
+  const [selected, setSelected]       = useState<PPAPRecord | null>(null);
+  const [loading, setLoading]         = useState(true);
   const [showNew, setShowNew]         = useState(false);
   const [generating, setGenerating]   = useState(false);
   const [expandedItem, setExpanded]   = useState<number | null>(null);
@@ -79,18 +73,36 @@ export const PPAPView: React.FC = () => {
   const [newCliente, setNewCliente]   = useState('CAT');
   const [newNivel, setNewNivel]       = useState<1|2|3|4|5>(3);
 
+  const loadRecords = useCallback(async () => {
+    setLoading(true);
+    const { data } = await supabase.from('ppap_records').select('*').order('created_at', { ascending: false });
+    const rows = (data ?? []) as PPAPRecord[];
+    setRecords(rows);
+    if (rows.length > 0 && !selected) setSelected(rows[0]);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { loadRecords(); }, [loadRecords]);
+
+  const persistToggle = async (updated: PPAPRecord) => {
+    await supabase.from('ppap_records').update({ items: updated.items as unknown as object }).eq('id', updated.id);
+  };
+
   const completados    = selected.items.filter(i => i.completado).length;
   const requeridos     = selected.items.filter(i => i.requerido).length;
   const requeridosOk   = selected.items.filter(i => i.requerido && i.completado).length;
   const pct            = Math.round((completados / selected.items.length) * 100);
 
   const toggleItem = (num: number) => {
+    if (!selected) return;
     const updated = { ...selected, items: selected.items.map(i => i.numero === num ? { ...i, completado: !i.completado } : i) };
     setSelected(updated);
     setRecords(rs => rs.map(r => r.id === updated.id ? updated : r));
+    persistToggle(updated);
   };
 
   const generatePSW = () => {
+    if (!selected) return;
     setGenerating(true);
     reportUtils.exportToPDF(
       `PSW — ${selected.parte} — ${selected.cliente} — Nivel ${selected.nivel}`,
@@ -105,14 +117,24 @@ export const PPAPView: React.FC = () => {
     setTimeout(() => setGenerating(false), 800);
   };
 
-  const createPPAP = () => {
+  const createPPAP = async () => {
     if (!newParte) return;
-    const nr: PPAPRecord = {
-      id: `ppap-${Date.now()}`, parte: newParte.toUpperCase(), cliente: newCliente, nivel: newNivel,
-      fecha: new Date().toISOString().split('T')[0], estatus: 'BORRADOR', items: makeItems(0),
-    };
-    setRecords(r => [...r, nr]);
-    setSelected(nr);
+    const { data: tenant } = await supabase.from('tenants').select('id').limit(1).maybeSingle();
+    const newItems = makeItems(false);
+    const { data, error } = await supabase.from('ppap_records').insert({
+      tenant_id: tenant?.id,
+      parte: newParte.toUpperCase(),
+      cliente: newCliente,
+      nivel: newNivel,
+      fecha: new Date().toISOString().split('T')[0],
+      estatus: 'BORRADOR',
+      items: newItems as unknown as object,
+    }).select().single();
+    if (!error && data) {
+      const nr = data as PPAPRecord;
+      setRecords(r => [nr, ...r]);
+      setSelected(nr);
+    }
     setShowNew(false);
     setNewParte('');
   };

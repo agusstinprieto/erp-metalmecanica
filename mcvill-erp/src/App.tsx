@@ -408,9 +408,9 @@ function App() {
                 <div className="w-1 h-1 rounded-full bg-mcvill-accent animate-pulse" />
                 <span className="opacity-40">Latencia: 12ms</span>
               </div>
-              <a href="https://ia-agus.com" target="_blank" rel="noopener noreferrer" className="text-mcvill-accent flex items-center gap-2">
+              <a href={config.developerUrl} target="_blank" rel="noopener noreferrer" className="text-mcvill-accent flex items-center gap-2">
                 <Zap size={10} className="fill-mcvill-accent" />
-                IA.AGUS.COM
+                {config.developerName}
               </a>
             </div>
           </footer>

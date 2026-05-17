@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Layout, MousePointer2, Info, RotateCcw, Save } from 'lucide-react';
+import { Layout, MousePointer2, Info, RotateCcw, Save, CheckCircle } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 type CellType = 'vacio' | 'cnc' | 'laser' | 'soldadura' | 'almacen' | 'calidad' | 'ensamble' | 'pasillo';
 
@@ -66,14 +67,41 @@ export const LayoutDesignView: React.FC = () => {
   const [grid, setGrid] = useState<GridCell[][]>(makeGrid(ROWS, COLS));
   const [selectedTool, setSelectedTool] = useState<CellType>('cnc');
   const [painting, setPainting] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   const paint = (r: number, c: number) => {
+    setSaved(false);
     setGrid(g => g.map((row, ri) => row.map((cell, ci) =>
       ri === r && ci === c ? { ...cell, tipo: selectedTool, etiqueta: cellConfig[selectedTool].etiqueta } : cell
     )));
   };
 
-  const reset = () => setGrid(makeGrid(ROWS, COLS));
+  const reset = () => { setGrid(makeGrid(ROWS, COLS)); setSaved(false); };
+
+  const saveLayout = useCallback(async () => {
+    setSaving(true);
+    try {
+      const { data: tenant } = await supabase.from('tenants').select('id').limit(1).maybeSingle();
+      const { data: userRes } = await supabase.auth.getUser();
+      const payload = {
+        tenant_id: tenant?.id,
+        nombre: `Layout ${new Date().toLocaleDateString('es-MX')}`,
+        grid: grid as unknown as object,
+        rows: ROWS,
+        cols: COLS,
+        created_by: userRes?.user?.email ?? 'sistema',
+      };
+      const { error } = await supabase.from('plant_layouts').insert(payload);
+      if (error) throw error;
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (e: any) {
+      alert(`Error al guardar: ${e.message}`);
+    } finally {
+      setSaving(false);
+    }
+  }, [grid]);
 
   return (
     <div className="h-full flex flex-col bg-slate-950 overflow-hidden -m-8">
@@ -91,8 +119,10 @@ export const LayoutDesignView: React.FC = () => {
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800 border border-white/10 text-slate-300 text-xs hover:border-white/20 transition-all">
             <RotateCcw size={12} /> Reset
           </button>
-          <button className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 text-xs font-bold hover:bg-indigo-500/30 transition-all">
-            <Save size={12} /> Guardar Layout
+          <button onClick={saveLayout} disabled={saving}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 text-xs font-bold hover:bg-indigo-500/30 transition-all disabled:opacity-50">
+            {saved ? <CheckCircle size={12} className="text-emerald-400" /> : <Save size={12} />}
+            {saving ? 'Guardando…' : saved ? 'Guardado' : 'Guardar Layout'}
           </button>
         </div>
       </div>

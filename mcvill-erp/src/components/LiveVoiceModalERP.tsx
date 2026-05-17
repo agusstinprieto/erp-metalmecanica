@@ -32,13 +32,13 @@ interface LiveVoiceModalERPProps {
 
 const APP_VERSION = '2.5.0-ERP';
 
-function buildSystemInstruction(moduleId?: string): string {
+function buildSystemInstruction(moduleId?: string, brandName?: string): string {
   const guide = moduleId ? (MODULE_GUIDES[moduleId] ?? DEFAULT_GUIDE) : DEFAULT_GUIDE;
   const moduleContext = moduleId
     ? `MÓDULO ACTIVO: ${guide.label} ${guide.emoji}\n${guide.description}\n\nCÓMO ENSEÑAR ESTE MÓDULO (cuando el usuario pregunte cómo usarlo):\n${guide.steps.map((s, i) => `${i + 1}. ${s.title} — ${s.subtitle}:\n   ${s.tips.join('\n   ')}`).join('\n\n')}`
     : 'El usuario no está en ningún módulo específico.';
 
-  return `Eres el Cerebro Neural de Control ERP McVill (IA PRO). Un asistente de voz de élite especializado en operaciones industriales.
+  return `Eres el Cerebro Neural de Control ERP ${brandName || 'McVill'} (IA PRO). Un asistente de voz de élite especializado en operaciones industriales.
 Tu tono es profesional, eficiente, directo y tecnológico (Agus Pro Standard).
 
 ${moduleContext}
@@ -75,7 +75,7 @@ export const LiveVoiceModalERP: React.FC<LiveVoiceModalERPProps> = ({
   isPanel = false,
   currentModule,
 }) => {
-  const { isDarkMode } = useConfig();
+  const { isDarkMode, config } = useConfig();
   // ... (rest of state)
   const [isActive, setIsActive] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
@@ -297,7 +297,7 @@ export const LiveVoiceModalERP: React.FC<LiveVoiceModalERPProps> = ({
           speechConfig: {
             voiceConfig: { prebuiltVoiceConfig: { voiceName: selectedVoice } },
           },
-          systemInstruction: { parts: [{ text: `${buildSystemInstruction(currentModule)}\n\n${systemSnapshot}` }] },
+          systemInstruction: { parts: [{ text: `${buildSystemInstruction(currentModule, config.brandName)}\n\n${systemSnapshot}` }] },
           inputAudioTranscription: {},
           outputAudioTranscription: {},
         },

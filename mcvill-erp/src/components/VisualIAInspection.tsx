@@ -7,6 +7,7 @@ import { aiService } from '../services/aiService';
 import { qualityService } from '../services/qualityService';
 import { eventBus } from '../utils/eventBus';
 import clsx from 'clsx';
+import { useConfig } from '../contexts/ConfigContext';
 
 interface IAInspectionResult {
   decision: 'PASS' | 'FAIL';
@@ -27,11 +28,11 @@ const INSPECTION_TYPES: { id: InspectionType; label: string; emoji: string; colo
   { id: 'general',    label: 'General',     emoji: '🔍', color: 'border-slate-500/40 bg-slate-500/10 text-slate-400' },
 ];
 
-const getPromptForType = (type: InspectionType, notes: string): string => {
+const getPromptForType = (type: InspectionType, notes: string, companyName: string = 'McVill'): string => {
   const noteBlock = notes ? `\n\nNOTA DEL INSPECTOR: "${notes}"` : '';
 
   const prompts: Record<InspectionType, string> = {
-    soldadura: `Actúa como Inspector de Soldadura Certificado CWI (Certified Welding Inspector) de McVill.
+    soldadura: `Actúa como Inspector de Soldadura Certificado CWI (Certified Welding Inspector) de ${companyName}.
 Analiza esta imagen de soldadura e identifica específicamente:
 - Porosidades (poros superficiales o subsuperficiales)
 - Fisuras / grietas (longitudinales, transversales, de cráter)
@@ -51,7 +52,7 @@ Responde ÚNICAMENTE con JSON válido (sin texto extra):
   "measurements": {"cordón_ancho_mm": "estimación", "penetración": "adecuada|insuficiente"}
 }`,
 
-    ensamble: `Actúa como Inspector de Calidad Industrial de McVill especializado en ensamble.
+    ensamble: `Actúa como Inspector de Calidad Industrial de ${companyName} especializado en ensamble.
 Analiza esta imagen de un ensamble y detecta:
 - Piezas faltantes o incorrectas
 - Tornillos/tuercas sin apretar o ausentes
@@ -70,7 +71,7 @@ Responde ÚNICAMENTE con JSON válido:
   "measurements": {"componentes_verificados": "estimación"}
 }`,
 
-    pintura: `Actúa como Inspector de Acabados Superficiales de McVill.
+    pintura: `Actúa como Inspector de Acabados Superficiales de ${companyName}.
 Analiza esta imagen e identifica defectos de pintura o recubrimiento:
 - Chorreos o escurrimientos
 - Burbujas o ampollas (solvent popping, blistering)
@@ -90,7 +91,7 @@ Responde ÚNICAMENTE con JSON válido:
   "measurements": {"cobertura_estimada": "porcentaje"}
 }`,
 
-    dimensional: `Actúa como Metróloga Industrial de McVill.
+    dimensional: `Actúa como Metróloga Industrial de ${companyName}.
 Analiza esta imagen y detecta desviaciones dimensionales visibles:
 - Deformaciones plásticas o pandeo
 - Perforaciones en posición incorrecta
@@ -108,7 +109,7 @@ Responde ÚNICAMENTE con JSON válido:
   "measurements": {"desviacion_estimada": "mm", "rebabas": "sí|no"}
 }`,
 
-    material: `Actúa como Inspector de Recepción de Materia Prima de McVill.
+    material: `Actúa como Inspector de Recepción de Materia Prima de ${companyName}.
 Analiza esta imagen e identifica problemas en el material:
 - Corrosión, oxidación o manchas
 - Golpes, rayaduras o deformaciones en el material crudo
@@ -126,7 +127,7 @@ Responde ÚNICAMENTE con JSON válido:
   "measurements": {"estado_superficie": "bueno|regular|malo"}
 }`,
 
-    general: `Actúa como Inspector de Calidad Industrial de McVill.
+    general: `Actúa como Inspector de Calidad Industrial de ${companyName}.
 Analiza esta imagen e identifica cualquier defecto visible:
 - Defectos de superficie (rayaduras, golpes, corrosión)
 - Defectos de forma o geometría
@@ -148,6 +149,7 @@ Responde ÚNICAMENTE con JSON válido:
 };
 
 export const VisualIAInspection: React.FC<{ onClose: () => void; onComplete: () => void }> = ({ onClose, onComplete }) => {
+  const { config } = useConfig();
   const [images, setImages] = useState<{ dataUrl: string; file: File }[]>([]);
   const [activeImageIdx, setActiveImageIdx] = useState(0);
   const [inspectionType, setInspectionType] = useState<InspectionType>('soldadura');
@@ -181,7 +183,7 @@ export const VisualIAInspection: React.FC<{ onClose: () => void; onComplete: () 
     setLoading(true);
     setResult(null);
     try {
-      const prompt = getPromptForType(inspectionType, notes);
+      const prompt = getPromptForType(inspectionType, notes, config.companyName);
       const activeImage = images[activeImageIdx]?.dataUrl || images[0].dataUrl;
       const response = await aiService.analyzeVision(activeImage, prompt);
       const raw = typeof response === 'string' ? response : JSON.stringify(response);

@@ -1,6 +1,12 @@
 import { supabase } from '../lib/supabase';
 
-const TENANT = 'mcvill';
+let _cachedTenant: string | null = null;
+async function getTenant(): Promise<string> {
+  if (_cachedTenant) return _cachedTenant;
+  const { data } = await supabase.from('tenants').select('id').limit(1).maybeSingle();
+  _cachedTenant = data?.id ?? 'mcvill';
+  return _cachedTenant;
+}
 
 export type TipoPeriodo = 'diario' | 'semanal' | 'mensual';
 export type TipoIncentivo = 'productividad' | 'calidad' | 'seguridad' | 'puntualidad' | '5s' | 'especial';
@@ -156,7 +162,8 @@ const DEMO_KPIS: DesempenoKPI[] = DEMO_OPERADORES.map((op, i) => {
 
 // ── Supabase CRUD ─────────────────────────────────────────────────────────────
 export async function fetchOperadores(celula?: string): Promise<Operador[]> {
-  let q = supabase.from('operadores').select('*').eq('tenant_id', TENANT).eq('activo', true).order('nombre');
+  const tenant = await getTenant();
+  let q = supabase.from('operadores').select('*').eq('tenant_id', tenant).eq('activo', true).order('nombre');
   if (celula) q = q.eq('celula', celula);
   const { data, error } = await q;
   if (error || !data?.length) return celula ? DEMO_OPERADORES.filter(o => o.celula === celula) : DEMO_OPERADORES;
@@ -164,14 +171,16 @@ export async function fetchOperadores(celula?: string): Promise<Operador[]> {
 }
 
 export async function fetchKPIs(periodo: string, tipoPeriodo: TipoPeriodo = 'semanal'): Promise<DesempenoKPI[]> {
+  const tenant = await getTenant();
   const { data, error } = await supabase.from('desempeno_kpis').select('*')
-    .eq('tenant_id', TENANT).eq('periodo', periodo).eq('tipo_periodo', tipoPeriodo);
+    .eq('tenant_id', tenant).eq('periodo', periodo).eq('tipo_periodo', tipoPeriodo);
   if (error || !data?.length) return DEMO_KPIS;
   return data as DesempenoKPI[];
 }
 
 export async function fetchIncentivos(periodo?: string): Promise<Incentivo[]> {
-  let q = supabase.from('incentivos').select('*').eq('tenant_id', TENANT).order('created_at', { ascending: false });
+  const tenant = await getTenant();
+  let q = supabase.from('incentivos').select('*').eq('tenant_id', tenant).order('created_at', { ascending: false });
   if (periodo) q = q.eq('periodo', periodo);
   const { data, error } = await q;
   if (error || !data) return [];
@@ -179,27 +188,31 @@ export async function fetchIncentivos(periodo?: string): Promise<Incentivo[]> {
 }
 
 export async function upsertKPI(kpi: Omit<DesempenoKPI, 'id' | 'tenant_id' | 'created_at' | 'updated_at'>): Promise<DesempenoKPI> {
+  const tenant = await getTenant();
   const computed = calcularKPIs(kpi);
-  const row = { ...computed, tenant_id: TENANT };
+  const row = { ...computed, tenant_id: tenant };
   const { data, error } = await supabase.from('desempeno_kpis').upsert(row, { onConflict: 'operador_id,periodo,tipo_periodo' }).select().single();
   if (error || !data) return { id: `kpi-local-${Date.now()}`, ...row, created_at: new Date().toISOString() } as DesempenoKPI;
   return data as DesempenoKPI;
 }
 
 export async function createIncentivo(input: Omit<Incentivo, 'id' | 'tenant_id' | 'created_at'>): Promise<Incentivo> {
-  const row = { ...input, tenant_id: TENANT };
+  const tenant = await getTenant();
+  const row = { ...input, tenant_id: tenant };
   const { data, error } = await supabase.from('incentivos').insert(row).select().single();
   if (error || !data) return { id: `inc-local-${Date.now()}`, ...row, created_at: new Date().toISOString() };
   return data as Incentivo;
 }
 
 export async function aprobarIncentivo(id: string, aprobado_por: string): Promise<void> {
-  await supabase.from('incentivos').update({ aprobado: true, aprobado_por }).eq('id', id).eq('tenant_id', TENANT);
+  const tenant = await getTenant();
+  await supabase.from('incentivos').update({ aprobado: true, aprobado_por }).eq('id', id).eq('tenant_id', tenant);
 }
 
 export async function fetchCelulaDesempeno(periodo: string): Promise<CelulaDesempeno[]> {
+  const tenant = await getTenant();
   const { data, error } = await supabase.from('celulas_desempeno').select('*')
-    .eq('tenant_id', TENANT).eq('periodo', periodo).order('celula');
+    .eq('tenant_id', tenant).eq('periodo', periodo).order('celula');
   if (error || !data?.length) {
     return CELULAS.map(celula => ({
       id: `cel-${celula}`, celula, periodo, tipo_periodo: 'semanal' as TipoPeriodo,
@@ -207,7 +220,7 @@ export async function fetchCelulaDesempeno(periodo: string): Promise<CelulaDesem
       calidad_prom: [99.0, 98.7, 98.9, 98.4, 98.8][CELULAS.indexOf(celula)],
       oee_prom: [98.3, 91.5, 103.1, 90.1, 105.2][CELULAS.indexOf(celula)],
       bono_celula: [1200, 0, 1000, 0, 1400][CELULAS.indexOf(celula)],
-      tenant_id: TENANT, created_at: new Date().toISOString(),
+      tenant_id: tenant, created_at: new Date().toISOString(),
     }));
   }
   return data as CelulaDesempeno[];

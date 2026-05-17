@@ -380,7 +380,7 @@ export const Sidebar = (props: {
                 Diseñado por
               </span>
               <a
-                href="https://ia-agus.com"
+                href={config.developerUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group relative"
@@ -389,7 +389,7 @@ export const Sidebar = (props: {
                   "relative text-[10px] font-black tracking-[0.3em] uppercase transition-all duration-500 group-hover:text-mcvill-accent",
                   isDarkMode ? "text-white/80" : "text-slate-900"
                 )}>
-                  IA.AGUS
+                  {config.developerName}
                 </span>
               </a>
             </div>

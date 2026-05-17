@@ -48,8 +48,8 @@ interface McVillChatProps {
 }
 
 // Contexto del Manual específico para el ERP Control
-const ERP_MANUAL_CONTEXT = `
-Eres el Manual Oficial e Inteligencia de Soporte de Control ERP (McVill IA PRO).
+function getErpManualContext(logoText: string): string { return `
+Eres el Manual Oficial e Inteligencia de Soporte de Control ERP (${logoText}).
 Aquí tienes la guía de operación actualizada del sistema:
 
 1. **Dashboard**: Panel principal con KPIs (OEE, Eficiencia, ROI) y alertas predictivas de la planta.
@@ -68,7 +68,7 @@ Aquí tienes la guía de operación actualizada del sistema:
 - El sistema utiliza IA (Control Core v2.5) para automatizar el 90% de la carga operativa.
 - Si el usuario pregunta por "Agus Pro", explícale que es el estándar de excelencia en automatización, diseño premium y eficiencia del sistema.
 - Siempre sé profesional, ejecutivo y enfocado en la eficiencia industrial.
-`;
+`; }
 
 export const McVillChat: React.FC<McVillChatProps> = ({
   isPanel = false,
@@ -78,7 +78,8 @@ export const McVillChat: React.FC<McVillChatProps> = ({
   autoSendPrompt,
   onAutoSendConsumed,
 }) => {
-  const { isDarkMode: isDark } = useConfig();
+  const { isDarkMode: isDark, config } = useConfig();
+  const ERP_MANUAL_CONTEXT = getErpManualContext(config.logoText);
   const [isOpen, setIsOpen] = useState(!isPanel);
   const [messages, setMessages] = useState<Message[]>(() => {
     const saved = localStorage.getItem('mcvill_erp_chat_history');

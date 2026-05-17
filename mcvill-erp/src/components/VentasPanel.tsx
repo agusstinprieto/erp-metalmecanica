@@ -207,13 +207,15 @@ const ErrorBar: React.FC<{ msg: string; onClose: () => void }> = ({ msg, onClose
   </div>
 );
 
-const Drawer: React.FC<{ 
-  title: string; 
-  onClose: () => void; 
-  children: React.ReactNode; 
+const Drawer: React.FC<{
+  title: string;
+  onClose: () => void;
+  children: React.ReactNode;
   footer?: React.ReactNode;
   wide?: boolean;
-}> = ({ title, onClose, children, footer, wide }) => (
+}> = ({ title, onClose, children, footer, wide }) => {
+  const { config } = useConfig();
+  return (
   <>
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       onClick={onClose} className="fixed inset-0 top-16 left-64 bg-black/70 backdrop-blur-sm z-40" />
@@ -229,7 +231,7 @@ const Drawer: React.FC<{
           </div>
           <div>
             <h3 className="text-xs font-black text-white uppercase tracking-widest leading-none">{title}</h3>
-            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1">McVill ERP Flow</p>
+            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1">{`${config.logoText} Flow`}</p>
           </div>
         </div>
         <button onClick={onClose} className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all border border-transparent hover:border-white/10">
@@ -250,7 +252,8 @@ const Drawer: React.FC<{
       )}
     </motion.div>
   </>
-);
+  );
+};
 
 const SaveBtn: React.FC<{ saving: boolean; onClick: () => void; label?: string }> = ({ saving, onClick, label = 'Guardar Cambios' }) => (
   <button onClick={onClick} disabled={saving}
@@ -559,7 +562,7 @@ const ClientesTab: React.FC = () => {
 
 // ─── PDF Generator ───────────────────────────────────────────────────────────
 
-function generateCotizacionPDF(cot: Cotizacion, clienteInfo?: Cliente | null) {
+function generateCotizacionPDF(cot: Cotizacion, clienteInfo?: Cliente | null, brandConfig?: { brandName: string; companyCity: string; supportEmail: string }) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const pageW = 210;
   const margin = 15;
@@ -585,12 +588,12 @@ function generateCotizacionPDF(cot: Cotizacion, clienteInfo?: Cliente | null) {
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(22);
   doc.setTextColor(255, 255, 255);
-  doc.text('MCVILL', textX, 19);
+  doc.text(brandConfig ? brandConfig.brandName.toUpperCase() : 'MCVILL', textX, 19);
   doc.setFontSize(7.5);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(160, 190, 220);
   doc.text('MANUFACTURING EXCELLENCE · TORREÓN, MX', textX, 26);
-  doc.text('soporte@mcvill.mx  ·  www.mcvill.mx', textX, 33);
+  doc.text(`${brandConfig ? brandConfig.supportEmail : 'soporte@mcvill.mx'}`, textX, 33);
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(15);
@@ -740,7 +743,7 @@ function generateCotizacionPDF(cot: Cotizacion, clienteInfo?: Cliente | null) {
   doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(190, 210, 235);
   doc.text(`Cotización válida por ${cot.vigencia_horas ?? 72} horas. Precios en MXN + IVA. Sujeto a disponibilidad.`, margin, footerY + 7);
   doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(220, 235, 255);
-  doc.text('McVill Manufacturing — Torreón, Coah.  ·  soporte@mcvill.mx', margin, footerY + 13);
+  doc.text(`${brandConfig ? brandConfig.brandName : 'McVill'} Manufacturing — ${brandConfig ? brandConfig.companyCity : 'Torreón, Coah.'}  ·  ${brandConfig ? brandConfig.supportEmail : 'soporte@mcvill.mx'}`, margin, footerY + 13);
   doc.setTextColor(59, 130, 246);
   doc.save(`${cot.numero_cotizacion || 'Cotizacion'}_${cot.cliente_nombre || 'Cliente'}.pdf`);
 }
@@ -1053,6 +1056,7 @@ const EMPTY_COT: Cotizacion = {
 };
 
 const CotizacionesTab: React.FC = () => {
+  const { tenantId, config } = useConfig();
   const [rows, setRows]         = useState<Cotizacion[]>([]);
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState<string | null>(null);
@@ -1185,7 +1189,7 @@ const CotizacionesTab: React.FC = () => {
 
   const downloadPDF = (r: Cotizacion) => {
     const cliente = clientes.find(c => c.razon_social === r.cliente_nombre) || null;
-    generateCotizacionPDF(r, cliente);
+    generateCotizacionPDF(r, cliente, { brandName: config.brandName, companyCity: config.companyCity, supportEmail: config.supportEmail });
   };
 
   // Opciones de clientes para el combobox

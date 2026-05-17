@@ -135,7 +135,7 @@ export const ViajeroManagerModal: React.FC<ViajeroManagerModalProps> = ({
   onPrint,
   initialTab = 'general',
 }) => {
-  const { isDarkMode } = useConfig();
+  const { isDarkMode, config } = useConfig();
   const [tab, setTab]               = useState(initialTab);
   const [form, setForm]             = useState({ ...EMPTY_FORM });
   const [operaciones, setOps]       = useState<any[]>([]);
@@ -673,7 +673,7 @@ export const ViajeroManagerModal: React.FC<ViajeroManagerModalProps> = ({
     setAiLoading(true);
     try {
       const input = form.descripcion || form.numero_parte;
-      const prompt = `Eres experto en manufactura industrial metalmecánica para la empresa McVill en México.
+      const prompt = `Eres experto en manufactura industrial metalmecánica para la empresa ${config.companyName} en México.
 Con base en esta descripción/referencia de pieza: "${input}"
 
 Genera un análisis técnico completo de manufactura. Responde TODO en ESPAÑOL excepto el image_prompt.
@@ -708,7 +708,7 @@ Sé específico y realista para fabricación industrial mexicana (centros de tra
     setAiCostLoading(true);
     try {
       const ctList = [...new Set(operaciones.map(o => o.centro_trabajo).filter(Boolean))];
-      const prompt = `Eres experto en costos de manufactura industrial mexicana para la empresa McVill.
+      const prompt = `Eres experto en costos de manufactura industrial mexicana para la empresa ${config.companyName}.
 Viajero/Pieza: "${form.descripcion || form.numero_parte || form.id}"
 Centros de trabajo activos: ${ctList.length > 0 ? ctList.join(', ') : 'LASER, DOBLEZ, CNC, SOLDADURA, PINTURA, ENSAMBLE'}
 
@@ -757,7 +757,7 @@ Considera: mano de obra directa, overhead de maquinaria, insumos y gastos de ope
         descripcion: m.descripcion || '',
         unidad: m.unidad || 'pza',
       }));
-      const prompt = `Eres experto en costos de materiales industriales para manufactura metalmecánica en México (empresa McVill).
+      const prompt = `Eres experto en costos de materiales industriales para manufactura metalmecánica en México (empresa ${config.companyName}).
 Viajero/Pieza: "${form.descripcion || form.numero_parte || form.id}"
 Lista de materiales:
 ${matList.map((m, i) => `${i + 1}. ${m.clave} — ${m.descripcion} (por ${m.unidad})`).join('\n')}

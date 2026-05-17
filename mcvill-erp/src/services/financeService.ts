@@ -74,8 +74,8 @@ export const financeService = {
       .select('*')
       .order('date', { ascending: false });
     if (!error && data) return data as Transaction[];
-    console.warn('[financeService] financial_transactions no disponible, usando demo.');
-    return DEMO_TRANSACTIONS;
+    console.error('[financeService] financial_transactions no disponible:', error?.message);
+    return [];
   },
 
   // alias for backward compat
@@ -170,6 +170,40 @@ export const financeService = {
   async deleteCxP(id: string): Promise<void> {
     const { error } = await supabase.from('cuentas_pagar').delete().eq('id', id);
     if (error) throw error;
+  },
+
+  // ─── Aging Analysis ──────────────────────────────────────────────────────────
+  // Agrupa CxC o CxP en 5 cubetas por días de antigüedad vencida
+
+  getAgingBuckets(
+    list: CuentaCobrar[] | CuentaPagar[],
+    type: 'cxc' | 'cxp'
+  ): { label: string; days: number; total: number; count: number }[] {
+    const today = new Date();
+    const buckets = [
+      { label: 'Al día',   days: 0,  min: -Infinity, max: 0  },
+      { label: '1–30 d',  days: 30, min: 1,          max: 30 },
+      { label: '31–60 d', days: 60, min: 31,         max: 60 },
+      { label: '61–90 d', days: 90, min: 61,         max: 90 },
+      { label: '+90 d',   days: 91, min: 91,         max: Infinity },
+    ];
+
+    return buckets.map(b => {
+      const items = list.filter(item => {
+        const due = new Date((item as any).fecha_vencimiento);
+        const overdue = Math.floor((today.getTime() - due.getTime()) / 86_400_000);
+        return overdue >= b.min && overdue <= b.max;
+      });
+      const total = items.reduce((sum, item) => {
+        if (type === 'cxc') {
+          const c = item as CuentaCobrar;
+          return sum + (c.monto - c.monto_cobrado);
+        }
+        const p = item as CuentaPagar;
+        return sum + (p.monto - p.monto_pagado);
+      }, 0);
+      return { label: b.label, days: b.days, total, count: items.length };
+    });
   },
 
   // ─── Flujo de Caja Proyectado ─────────────────────────────────────────────────

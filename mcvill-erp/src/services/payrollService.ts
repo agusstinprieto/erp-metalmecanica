@@ -176,9 +176,8 @@ export const payrollService = {
 
     if (!simpleErr && simple && simple.length > 0) return simple as Payroll[];
 
-    // Fallback: datos demo si nada funciona
-    console.warn('[payrollService] Tablas de nómina no encontradas, usando datos demo.');
-    return DEMO_PAYROLLS;
+    console.error('[payrollService] Tablas de nómina no encontradas. Verifica que existan las tablas nominas o payrolls en Supabase.');
+    return [];
   },
 
   /**

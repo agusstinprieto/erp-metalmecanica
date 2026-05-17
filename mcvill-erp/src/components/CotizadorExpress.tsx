@@ -35,8 +35,7 @@ export const CotizadorExpress: React.FC = () => {
           .limit(1)
           .single();
 
-        if (paramsError) console.error("[DEBUG-SUPABASE] Error Params:", paramsError);
-        console.log("[DEBUG-SUPABASE] Params Data:", paramsData);
+        if (paramsError) setErrorMessage(`Error parámetros: ${paramsError.message}`);
 
         if (paramsData) {
           setExchangeRate(Number(paramsData.tipo_cambio) || 19.56);
@@ -52,21 +51,17 @@ export const CotizadorExpress: React.FC = () => {
           .order('descripcion_mp', { ascending: true });
 
         if (matError) {
-          console.error("[DEBUG-SUPABASE] Error Materiales:", matError);
           setErrorMessage(`Error Materiales: ${matError.message}`);
         }
-        console.log("[DEBUG-SUPABASE] Materiales Data:", matData);
 
         if (matData && matData.length > 0) {
           setMateriales(matData);
           setSelectedMaterialId(matData[0].id);
           setErrorMessage(null);
         } else {
-          console.warn("[DEBUG-SUPABASE] No se encontraron materiales en la tabla.");
           if (!matError) setErrorMessage("La tabla de materiales está vacía en Supabase.");
         }
       } catch (err: any) {
-        console.error("[DEBUG-SUPABASE] Error crítico en fetchData:", err);
         setErrorMessage(`Error crítico: ${err.message || 'Desconocido'}`);
       } finally {
         setLoadingParams(false);

@@ -13,7 +13,7 @@ interface ERPGuideModalProps {
   onClose: () => void;
 }
 
-const DEPARTMENTS = [
+function getDepartments(brandName: string) { return [
   {
     id: 'dashboard',
     name: 'Dashboard Maestro',
@@ -65,7 +65,7 @@ const DEPARTMENTS = [
     description: 'IA que genera cotizaciones profesionales desde lenguaje natural.',
     features: [
       'Describe el proyecto en español y la IA calcula material, procesos y overhead.',
-      'Genera PDF profesional con logo McVill listo para enviar al cliente.',
+      `Genera PDF profesional con logo ${brandName} listo para enviar al cliente.`,
       'Slider de margen: ajusta la utilidad y el precio se recalcula al instante.',
       'Convierte cotizaciones aprobadas en Órdenes de Producción con un clic.',
     ],
@@ -238,7 +238,7 @@ const DEPARTMENTS = [
       'Análisis de datos avanzado mediante preguntas en español.',
     ],
   },
-];
+]; }
 
 const BADGE_COLORS: Record<string, string> = {
   'CORE':     'bg-blue-500/20 text-blue-400 border-blue-500/30',
@@ -248,7 +248,8 @@ const BADGE_COLORS: Record<string, string> = {
 };
 
 export const ERPGuideModal: React.FC<ERPGuideModalProps> = ({ isOpen, onClose }) => {
-  const { isDarkMode } = useConfig();
+  const { isDarkMode, config } = useConfig();
+  const DEPARTMENTS = getDepartments(config.brandName);
   const [filter, setFilter] = useState<'ALL' | 'CORE' | 'IA' | 'NUEVO' | 'MEJORADO'>('ALL');
 
   if (!isOpen) return null;
@@ -272,7 +273,7 @@ export const ERPGuideModal: React.FC<ERPGuideModalProps> = ({ isOpen, onClose })
             <div>
               <h3 className="text-lg font-black text-white uppercase tracking-tight">Manual Operativo — ERP MetalMecánica</h3>
               <p className="text-mcvill-accent text-[9px] font-black uppercase tracking-[0.4em] mt-0.5">
-                McVill S.A. de C.V. · {DEPARTMENTS.length} Módulos · v2.5
+                {`${config.companyName} · ${DEPARTMENTS.length} Módulos · v2.5`}
               </p>
             </div>
           </div>
@@ -359,7 +360,7 @@ export const ERPGuideModal: React.FC<ERPGuideModalProps> = ({ isOpen, onClose })
         <div className="px-8 py-4 border-t border-mcvill-card-border bg-slate-950/40 flex justify-between items-center shrink-0">
           <div className="flex items-center gap-3">
             <ShieldCheck size={14} className="text-emerald-500" />
-            <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">McVill ERP MetalMecánica · v2.5 · Desarrollado por IA.AGUS</span>
+            <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">{`${config.logoText} MetalMecánica · v2.5 · Desarrollado por ${config.developerName}`}</span>
           </div>
           <button
             onClick={onClose}

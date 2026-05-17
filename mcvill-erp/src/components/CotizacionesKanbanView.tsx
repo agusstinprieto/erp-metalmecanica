@@ -18,6 +18,7 @@ import {
 import type { RFQCotizacion, RFQEstado, NewRFQInput } from '../types/quote.types';
 import { useQuoteStatus } from '../hooks/useQuoteStatus';
 import { useTenant } from '../hooks/useTenant';
+import { useConfig } from '../contexts/ConfigContext';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -200,6 +201,7 @@ const EMPTY_FORM: NewRFQInput = {
 const F001Modal = ({
   onClose, onSave, tenantId
 }: { onClose: () => void; onSave: (rfq: RFQCotizacion) => void; tenantId: string }) => {
+  const { config } = useConfig();
   const [form, setForm] = useState<NewRFQInput>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
 
@@ -237,7 +239,7 @@ const F001Modal = ({
         <div className="flex items-center justify-between p-5 border-b border-slate-800 sticky top-0 bg-slate-950 z-10">
           <div>
             <h2 className="text-sm font-black text-white uppercase tracking-widest">Nueva Solicitud RFQ</h2>
-            <p className="text-[10px] text-mcvill-accent/70 mt-0.5 tracking-widest uppercase">Formato PM_F001 • McVill S.A. de C.V.</p>
+            <p className="text-[10px] text-mcvill-accent/70 mt-0.5 tracking-widest uppercase">{`Formato PM_F001 • ${config.companyName}`}</p>
           </div>
           <button onClick={onClose} className="p-2 rounded-xl text-slate-500 hover:text-white hover:bg-white/5 transition-all">
             <X size={16} />
@@ -587,6 +589,7 @@ export const CotizacionesKanbanView: React.FC<{
   const [filterPM, setFilterPM] = useState('');
   const [filterRisk, setFilterRisk] = useState('');
   const tenantId = useTenant();
+  const { config } = useConfig();
   const { moveTo, movingId } = useQuoteStatus(rfqs, setRfqs, tenantId);
   const guia = useGuiaCotizaciones();
 
@@ -641,7 +644,7 @@ export const CotizacionesKanbanView: React.FC<{
                 TABLERO DE <span className="text-mcvill-accent">COTIZACIONES</span>
               </h2>
               <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">
-                Kanban RFQ · Formato PM_F001 · McVill S.A. de C.V.
+                {`Kanban RFQ · Formato PM_F001 · ${config.companyName}`}
               </p>
             </div>
           </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
+import { useConfig } from '../contexts/ConfigContext';
 import {
   X, ChevronDown, ChevronRight,
   FileText, Upload, BrainCircuit, DollarSign,
@@ -26,7 +27,7 @@ interface Paso {
   tips: string[];
 }
 
-const PASOS: Paso[] = [
+function getPasos(brandName: string, companyName: string): Paso[] {
   {
     id: 'nueva_rfq',
     num: 1,
@@ -61,7 +62,7 @@ const PASOS: Paso[] = [
     dot: 'bg-violet-400',
     border: 'border-violet-500/40',
     bg: 'bg-violet-500/8',
-    descripcion: 'Antes de cotizar, McVill evalúa si el proyecto es técnicamente viable. La IA analiza la complejidad, procesos requeridos y capacidad de planta para emitir un veredicto: VIABLE, CONDICIONADA o NO VIABLE.',
+    descripcion: `Antes de cotizar, ${brandName} evalúa si el proyecto es técnicamente viable. La IA analiza la complejidad, procesos requeridos y capacidad de planta para emitir un veredicto: VIABLE, CONDICIONADA o NO VIABLE.`,
     acciones: [
       'Abre la tarjeta del RFQ y ve al tab "Documentos"',
       'Sube los archivos técnicos que el cliente mandó (ver sección de documentos)',
@@ -184,6 +185,7 @@ const PASOS: Paso[] = [
     ],
   },
 ];
+}
 
 // ─── Componente ───────────────────────────────────────────────────────────────
 
@@ -194,6 +196,8 @@ interface Props {
 }
 
 export const CotizacionesGuiaModal: React.FC<Props> = ({ onClose }) => {
+  const { config } = useConfig();
+  const PASOS = getPasos(config.brandName, config.companyName);
   const [pasoActivo, setPasoActivo] = useState(0);
   const [expandidos, setExpandidos] = useState<Set<string>>(new Set(['acciones']));
 
@@ -248,7 +252,7 @@ export const CotizacionesGuiaModal: React.FC<Props> = ({ onClose }) => {
                 Guía de Cotizaciones
               </h2>
               <p className="text-[9px] text-slate-500 uppercase tracking-widest">
-                Flujo completo · McVill S.A. de C.V.
+                {`Flujo completo · ${config.companyName}`}
               </p>
             </div>
           </div>

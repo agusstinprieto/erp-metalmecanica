@@ -99,7 +99,7 @@ export const PayrollCalculatorModal: React.FC<PayrollCalculatorModalProps> = ({
   onSave,
   employees = []
 }) => {
-  const { isDarkMode } = useConfig();
+  const { isDarkMode, config } = useConfig();
   const [selectedEmployees, setSelectedEmployees] = useState<string[]>([]);
   const [calculations, setCalculations] = useState<PayrollCalculation[]>([]);
   const [calculating, setCalculating] = useState(false);
@@ -296,7 +296,7 @@ export const PayrollCalculatorModal: React.FC<PayrollCalculatorModalProps> = ({
         </div>
         
         <div class="footer">
-          <p>Este recibo es un documento informativo. McVill Control ERP v6.2</p>
+          <p>Este recibo es un documento informativo. ${config.logoText} v6.2</p>
           <p>Generado el ${new Date().toLocaleString()}</p>
         </div>
       </body>

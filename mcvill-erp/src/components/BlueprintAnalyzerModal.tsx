@@ -33,7 +33,7 @@ export const BlueprintAnalyzerModal: React.FC<BlueprintAnalyzerModalProps> = ({
   projectId,
   onSuccess 
 }) => {
-  const { isDarkMode } = useConfig();
+  const { isDarkMode, config } = useConfig();
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -226,7 +226,7 @@ export const BlueprintAnalyzerModal: React.FC<BlueprintAnalyzerModalProps> = ({
                   {isAnalyzing ? (
                     <>
                       <Loader2 className="animate-spin" size={20} />
-                      IA McVill Analizando Planimetría...
+                      {`IA ${config.brandName} Analizando Planimetría...`}
                     </>
                   ) : (
                     <>

@@ -77,6 +77,7 @@ export const productionService = {
     await supabase.from('manufacturing_stages').insert(
       standardStages.map(s => ({
         work_order_id: data.id,
+        tenant_id: wo.tenant_id,
         ...s,
         status: 'pending'
       }))

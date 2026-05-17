@@ -57,9 +57,10 @@ serve(async (req: Request) => {
       temperature = 0.7, maxTokens = 4096,
       model = 'gemini-2.5-flash-lite', provider = 'google',
       useRag = false,
+      image, mimeType = 'image/jpeg',
     } = await req.json();
 
-    if (!prompt && (!contents || contents.length === 0)) throw new Error('Prompt o contenidos requeridos');
+    if (!prompt && !image && (!contents || contents.length === 0)) throw new Error('Prompt, imagen o contenidos requeridos');
     if (IS_DEV) { debug.params = { provider, model, temperature, useRag }; debug.steps.push('Payload parsed'); }
 
     // 3. Resolve tenant & API key
@@ -155,9 +156,13 @@ serve(async (req: Request) => {
       targetModel = modelMap[model] || model || 'gemini-2.5-flash-lite';
       apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${apiKey}`;
 
+      const userParts: any[] = [];
+      if (prompt) userParts.push({ text: prompt });
+      if (image)  userParts.push({ inlineData: { mimeType, data: image } });
+
       const requestContents = contents?.length > 0
         ? contents
-        : [{ role: 'user', parts: [{ text: prompt }] }];
+        : [{ role: 'user', parts: userParts }];
 
       requestPayload = {
         contents: requestContents,

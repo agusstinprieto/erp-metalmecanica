@@ -9,6 +9,7 @@ import autoTable from 'jspdf-autotable';
 import { aiService } from '../services/aiService';
 import { supabase } from '../lib/supabase';
 import { Toast } from './common/Toast';
+import { useConfig } from '../contexts/ConfigContext';
 
 interface Partida {
   concepto: string;
@@ -27,7 +28,7 @@ interface CotizacionGenerada {
 const IVA = 0.16;
 const VIGENCIAS = ['24 horas', '48 horas', '72 horas', '7 días', '15 días', '30 días'];
 
-const SYSTEM_PROMPT = `Eres el agente de cotizaciones de McVill S.A. de C.V., empresa metalmecánica industrial especializada en fabricación de piezas industriales: corte láser/plasma, soldadura MIG/TIG, maquinado CNC, tratamientos superficiales y ensamble.
+function getSystemPrompt(companyName: string): string { return `Eres el agente de cotizaciones de ${companyName}, empresa metalmecánica industrial especializada en fabricación de piezas industriales: corte láser/plasma, soldadura MIG/TIG, maquinado CNC, tratamientos superficiales y ensamble.
 
 Cuando el vendedor describe un proyecto, generas una cotización profesional estructurada.
 Responde ÚNICAMENTE con JSON válido. Sin markdown, sin texto extra, solo el objeto JSON.
@@ -43,7 +44,7 @@ Estructura obligatoria:
 
 Usa precios en MXN realistas para manufactura industrial mexicana 2026.
 Incluye TODAS las operaciones necesarias según la descripción: material, corte, maquinado, soldadura, tratamiento superficial, ingeniería.
-El subtotal de cada partida debe ser cantidad × precio_unitario.`;
+El subtotal de cada partida debe ser cantidad × precio_unitario.`; }
 
 const fmt = (n: number) => `$${n.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const pad = (n: number) => String(n).padStart(4, '0');
@@ -57,6 +58,8 @@ function calcTotales(partidas: Partida[]) {
 }
 
 export const AgenteCotizacionesView: React.FC = () => {
+  const { config } = useConfig();
+  const SYSTEM_PROMPT = getSystemPrompt(config.companyName);
   const [descripcion, setDescripcion] = useState('');
   const [cliente, setCliente] = useState('');
   const [numeroParte, setNumeroParte] = useState('');
@@ -172,7 +175,7 @@ Genera la cotización industrial completa.`;
     doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(20);
-    doc.text('McVill', 12, 15);
+    doc.text(config.brandName, 12, 15);
 
     doc.setFontSize(8);
     doc.setFont('helvetica', 'normal');
@@ -323,7 +326,7 @@ Genera la cotización industrial completa.`;
     doc.setTextColor(100, 160, 220);
     doc.setFontSize(7);
     doc.setFont('helvetica', 'normal');
-    doc.text('McVill S.A. de C.V. · Manufactura Industrial · Torreón, Coah., México', W / 2, pageH - 8, { align: 'center' });
+    doc.text(`${config.companyName} · Manufactura Industrial · ${config.companyCity}`, W / 2, pageH - 8, { align: 'center' });
     doc.text('Precios en MXN + IVA. Cotización válida según vigencia indicada.', W / 2, pageH - 4, { align: 'center' });
 
     doc.save(`${folio}_${(cliente || 'cliente').replace(/\s+/g, '_')}.pdf`);
@@ -441,7 +444,7 @@ Necesito cotizar 200 piezas de brida ciega DN100, material acero al carbono A36,
                   '1. Describe el proyecto con detalle (materiales, operaciones, cantidad, acabado)',
                   '2. La IA genera partidas con precios industriales realistas',
                   '3. Edita precios y partidas si es necesario',
-                  '4. Descarga el PDF profesional con logo McVill',
+                  `4. Descarga el PDF profesional con logo ${config.brandName}`,
                 ].map((step, i) => (
                   <div key={i} className="flex items-start gap-2">
                     <div className="w-4 h-4 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0 mt-0.5">

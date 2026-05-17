@@ -5,7 +5,7 @@ import { MODULE_GUIDES } from '../data/moduleGuides';
 import clsx from 'clsx';
 
 export const HelpView = () => {
-  const { isDarkMode } = useConfig();
+  const { isDarkMode, config } = useConfig();
   const [search, setSearch] = useState('');
 
   const allModules = useMemo(() => Object.values(MODULE_GUIDES), []);
@@ -44,7 +44,7 @@ export const HelpView = () => {
               'text-2xl font-black uppercase tracking-tight leading-none mb-1',
               isDarkMode ? 'text-white' : 'text-slate-900'
             )}>
-              Manual y Soporte <span className="text-mcvill-accent">McVill ERP</span>
+              Manual y Soporte <span className="text-mcvill-accent">{config.logoText}</span>
             </h1>
             <p className={clsx(
               'text-sm font-medium',
@@ -206,12 +206,12 @@ export const HelpView = () => {
           'text-[11px] leading-relaxed',
           isDarkMode ? 'text-slate-500' : 'text-slate-500'
         )}>
-          El sistema de IA de McVill ERP utiliza{' '}
+          {`El sistema de IA de ${config.logoText} utiliza`}{' '}
           <span className={isDarkMode ? 'text-white font-bold' : 'text-slate-800 font-bold'}>
             Retrieval-Augmented Generation (RAG)
           </span>{' '}
           para acceder a documentos internos de la empresa en tiempo real. Al subir documentos a la memoria corporativa,
-          el asistente IA puede responder preguntas basadas en el contenido real de McVill.
+          {`el asistente IA puede responder preguntas basadas en el contenido real de ${config.brandName}.`}
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -284,7 +284,7 @@ export const HelpView = () => {
         <div className="flex flex-col sm:flex-row gap-4">
           {/* Email */}
           <a
-            href="mailto:soporte@ia-agus.com"
+            href={`mailto:${config.supportEmail}`}
             className={clsx(
               'flex items-center gap-3 px-4 py-3 rounded-xl border transition-all flex-1',
               isDarkMode
@@ -304,7 +304,7 @@ export const HelpView = () => {
                 'text-[11px] font-bold',
                 isDarkMode ? 'text-white' : 'text-slate-900'
               )}>
-                soporte@ia-agus.com
+                {config.supportEmail}
               </p>
             </div>
             <ExternalLink size={12} className={clsx('ml-auto', isDarkMode ? 'text-slate-700' : 'text-slate-400')} />
@@ -312,7 +312,7 @@ export const HelpView = () => {
 
           {/* Web */}
           <a
-            href="https://ia-agus.com"
+            href={config.developerUrl}
             target="_blank"
             rel="noopener noreferrer"
             className={clsx(
@@ -334,7 +334,7 @@ export const HelpView = () => {
                 'text-[11px] font-bold',
                 isDarkMode ? 'text-white' : 'text-slate-900'
               )}>
-                ia-agus.com
+                {config.developerUrl.replace('https://', '')}
               </p>
             </div>
             <ExternalLink size={12} className={clsx('ml-auto', isDarkMode ? 'text-slate-700' : 'text-slate-400')} />

@@ -16,6 +16,7 @@ import { qualityService } from '../services/qualityService';
 import { whatsappService } from '../services/whatsappService';
 import { format } from 'date-fns';
 import { Toast } from './common/Toast';
+import { useConfig } from '../contexts/ConfigContext';
 
 type Tab = 'kpis' | 'production' | 'inventory' | 'payroll' | 'finance' | 'envio';
 type PeriodFilter = 'week' | 'month' | 'quarter' | 'year';
@@ -61,6 +62,7 @@ const KPICard: React.FC<{ label: string; value: string | number; color: string }
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export const ReportsView = () => {
+  const { config } = useConfig();
   const [activeTab, setActiveTab]   = useState<Tab>('kpis');
   const [period, setPeriod]         = useState<PeriodFilter>('month');
   const [loading, setLoading]       = useState(true);
@@ -176,7 +178,7 @@ export const ReportsView = () => {
   const buildMessage = () => {
     if (!kpis) return 'Cargando datos del sistema...';
     return [
-      `📊 *REPORTE KPI EJECUTIVO — McVill ERP*`,
+      `📊 *REPORTE KPI EJECUTIVO — ${config.logoText}*`,
       `📅 ${new Date().toLocaleDateString('es-MX', { day:'2-digit', month:'long', year:'numeric' })}`,
       ``,
       `🏭 *PRODUCCIÓN*`,
@@ -197,8 +199,8 @@ export const ReportsView = () => {
       `• Inspecciones: ${kpis.calidad.inspecciones} · Tasa pase: ${kpis.calidad.tasa_pase}%`,
       kpis.calidad.ncs_abiertas > 0 ? `• ⚠️ NCs abiertas: ${kpis.calidad.ncs_abiertas}` : `• ✅ Sin NCs activas`,
       ``,
-      `_Generado automáticamente por McVill Control ERP_`,
-      `_Desarrollado por IA.AGUS_`,
+      `_Generado automáticamente por ${config.logoText}_`,
+      `_Desarrollado por ${config.developerName}_`,
     ].join('\n');
   };
 
@@ -210,7 +212,7 @@ export const ReportsView = () => {
 
   const handleSendEmail = () => {
     if (!envioForm.email) { notify('Ingresa un correo electrónico', 'error'); return; }
-    const subject = encodeURIComponent('Reporte KPI Ejecutivo — McVill ERP');
+    const subject = encodeURIComponent(`Reporte KPI Ejecutivo — ${config.logoText}`);
     const body = encodeURIComponent(buildMessage().replace(/\*/g, '').replace(/_/g, ''));
     window.open(`mailto:${envioForm.email}?subject=${subject}&body=${body}`, '_blank');
     notify('Cliente de correo abierto');
@@ -262,7 +264,7 @@ export const ReportsView = () => {
 
   const handleExport = () => {
     if (activeTab === 'kpis' && kpis) {
-      reportUtils.exportToPDF('KPI Ejecutivo McVill', [
+      reportUtils.exportToPDF(`KPI Ejecutivo ${config.brandName}`, [
         { MÓDULO: 'Producción',  TOTAL: kpis.produccion.total,          COMPLETADAS: kpis.produccion.completadas },
         { MÓDULO: 'Inventario',  MATERIALES: kpis.inventario.total,     VALOR: fmtK(kpis.inventario.valor) },
         { MÓDULO: 'Finanzas',    INGRESOS: fmtK(kpis.finanzas.ingresos), BALANCE: fmtK(kpis.finanzas.balance) },
@@ -508,7 +510,7 @@ export const ReportsView = () => {
                   <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
                     <Mail size={10} /> Email
                   </label>
-                  <input className="cyber-input w-full" type="email" placeholder="gerencia@mcvill.com"
+                  <input className="cyber-input w-full" type="email" placeholder={`gerencia@${config.supportEmail.split('@')[1]}`}
                     value={envioForm.email} onChange={e => setEnvioForm({ ...envioForm, email: e.target.value })} />
                   <button onClick={handleSendEmail}
                     className="w-full py-2 bg-mcvill-accent hover:opacity-90 text-white text-[9px] font-black uppercase tracking-widest rounded-lg transition-all active:scale-95 flex items-center justify-center gap-1.5">
@@ -534,7 +536,7 @@ export const ReportsView = () => {
                   <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
                     <Zap size={10} /> Teams
                   </label>
-                  <input className="cyber-input w-full" type="email" placeholder="usuario@mcvill.com"
+                  <input className="cyber-input w-full" type="email" placeholder={`usuario@${config.supportEmail.split('@')[1]}`}
                     value={envioForm.teams} onChange={e => setEnvioForm({ ...envioForm, teams: e.target.value })} />
                   <button onClick={handleSendTeams}
                     className="w-full py-2 bg-violet-600 hover:bg-violet-500 text-white text-[9px] font-black uppercase tracking-widest rounded-lg transition-all active:scale-95 flex items-center justify-center gap-1.5">

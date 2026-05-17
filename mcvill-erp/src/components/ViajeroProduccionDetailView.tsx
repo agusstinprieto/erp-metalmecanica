@@ -15,7 +15,7 @@ interface Props {
 }
 
 export const ViajeroProduccionDetailView: React.FC<Props> = ({ viajeroId, onBack }) => {
-  const { isDarkMode } = useConfig();
+  const { isDarkMode, config } = useConfig();
   const [data, setData] = useState<any>(null);
   const [ops, setOps] = useState<any[]>([]);
   const [mats, setMats] = useState<any[]>([]);
@@ -356,7 +356,7 @@ Dame recomendaciones de optimización, posibles riesgos de calidad y sugerencias
       <div className="px-6 py-3 border-t border-white/5 bg-slate-900/60 flex items-center justify-between text-[9px] font-black text-slate-600 uppercase tracking-[0.4em]">
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          CONSULTA TÉCNICA AUTORIZADA · MCVILL ERP PRO
+          {`CONSULTA TÉCNICA AUTORIZADA · ${config.logoText} PRO`}
         </div>
         <div>Creado: {new Date(data.created_at).toLocaleString()}</div>
       </div>

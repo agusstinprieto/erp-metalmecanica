@@ -16,7 +16,7 @@ interface Props {
 }
 
 export const ViajeroQRModal: React.FC<Props> = ({ viajero, onClose }) => {
-  const { isDarkMode } = useConfig();
+  const { isDarkMode, config } = useConfig();
   const printRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = () => {
@@ -39,7 +39,7 @@ export const ViajeroQRModal: React.FC<Props> = ({ viajero, onClose }) => {
         </head>
         <body>
           <div class="qr-wrap">
-            <div class="label">McVill ERP — Viajero Industrial</div>
+            <div class="label">${config.logoText} — Viajero Industrial</div>
             <div class="border-box">${printContent}</div>
             <div class="id">${viajero.id}</div>
             <div class="meta">${viajero.numero_parte || ''} · ${viajero.cliente || ''}</div>

@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import { aiService } from '../services/aiService';
 import { qualityService } from '../services/qualityService';
 import { eventBus } from '../utils/eventBus';
+import { useConfig } from '../contexts/ConfigContext';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -37,6 +38,7 @@ const CameraCard: React.FC<{
   cam: CameraConfig;
   onDelete: (id: string) => void;
 }> = ({ cam, onDelete }) => {
+  const { config } = useConfig();
   const imgRef = useRef<HTMLImageElement>(null);
   const [online, setOnline] = useState(true);
   const [analyzing, setAnalyzing] = useState(false);
@@ -70,7 +72,7 @@ const CameraCard: React.FC<{
         base64 = canvas.toDataURL('image/jpeg', 0.9).replace(/^data:[^;]+;base64,/, '');
       }
 
-      const prompt = `Actúa como Inspector de Calidad de McVill. Analiza este frame en vivo de cámara de piso de planta.
+      const prompt = `Actúa como Inspector de Calidad de ${config.companyName}. Analiza este frame en vivo de cámara de piso de planta.
 Identifica cualquier anomalía, defecto, situación de riesgo o no conformidad visible.
 Responde ÚNICAMENTE con JSON:
 {

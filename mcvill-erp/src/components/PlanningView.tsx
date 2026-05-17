@@ -1039,17 +1039,18 @@ const SOPTab: React.FC = () => {
       setLoading(true);
       try {
         const [quotesRes, ordersRes, stagesRes] = await Promise.all([
-          supabase.from('cotizaciones').select('id, folio, cliente, total, status, created_at').order('created_at', { ascending: false }).limit(8),
+          supabase.from('cotizaciones').select('id, numero_cotizacion, cliente_nombre, precio_total, estado, created_at').order('created_at', { ascending: false }).limit(8),
           supabase.from('work_orders').select('id, status').limit(100),
-          supabase.from('manufacturing_stages').select('id, status').eq('status', 'in_progress').limit(100),
+          supabase.from('work_orders').select('id, status').eq('status', 'in_progress').limit(100),
         ]);
 
         setPipeline(quotesRes.data ?? []);
-        const orders = ordersRes.data ?? [];
+        const orders    = ordersRes.data ?? [];
+        const inProgRes = stagesRes.data ?? [];
         setCapacity({
           totalOrders:    orders.length,
           inProgress:     orders.filter((o: any) => o.status === 'in_progress').length,
-          stationsActive: (stagesRes.data ?? []).length,
+          stationsActive: inProgRes.length,
         });
       } catch {
         setPipeline([]);
@@ -1062,8 +1063,8 @@ const SOPTab: React.FC = () => {
   const analyzeSOp = async () => {
     setAnalyzing(true);
     try {
-      const pipeSummary = pipeline.slice(0, 5).map(q =>
-        `${q.folio ?? q.id} — ${q.cliente ?? 'Cliente'}: $${Number(q.total ?? 0).toLocaleString()} (${q.status})`
+      const pipeSummary = pipeline.slice(0, 5).map((q: any) =>
+        `${q.numero_cotizacion ?? q.id} — ${q.cliente_nombre ?? 'Cliente'}: $${Number(q.precio_total ?? 0).toLocaleString()} (${q.estado})`
       ).join('\n');
       const capSummary = `Órdenes activas: ${capacity.inProgress}/${capacity.totalOrders}, Estaciones ocupadas: ${capacity.stationsActive}`;
       const res = await aiService.askGemini(

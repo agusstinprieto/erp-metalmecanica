@@ -10,6 +10,7 @@ import {
     AlertTriangle,
     Info
 } from 'lucide-react';
+import { useConfig } from '../contexts/ConfigContext';
 
 interface AnalysisResultProps {
     data: AnalysisData;
@@ -18,6 +19,7 @@ interface AnalysisResultProps {
 }
 
 export const AnalysisResult: React.FC<AnalysisResultProps> = ({ data, onConfirm, onEdit }) => {
+    const { config } = useConfig();
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -27,7 +29,7 @@ export const AnalysisResult: React.FC<AnalysisResultProps> = ({ data, onConfirm,
                         ANÁLISIS DE <span className="text-mcvill-accent">INGENIERÍA COMPLETADO</span>
                     </h2>
                     <p className="text-slate-500 font-black uppercase tracking-widest text-[9px] mt-1">
-                        PROCESADO POR MCVILL IA CORE v2.5 FLASH
+                        {`PROCESADO POR ${config.brandName} IA CORE v2.5 FLASH`}
                     </p>
                 </div>
                 <div className="flex gap-3">

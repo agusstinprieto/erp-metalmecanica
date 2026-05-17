@@ -678,7 +678,7 @@ async function toolGenerarOrdenCompra(args: Record<string, any>): Promise<ToolRe
 async function toolPipelineVentas(): Promise<ToolResult> {
   const { data: cots } = await supabase
     .from('cotizaciones')
-    .select('status, monto_total, cliente_nombre, numero_cotizacion')
+    .select('estado, precio_total, cliente_nombre, numero_cotizacion')
     .order('created_at', { ascending: false })
     .limit(50);
 
@@ -686,13 +686,13 @@ async function toolPipelineVentas(): Promise<ToolResult> {
   const byStatus: Record<string, { count: number; total: number }> = {};
 
   list.forEach((c: any) => {
-    const s = c.status ?? 'sin_estado';
+    const s = c.estado ?? 'sin_estado';
     if (!byStatus[s]) byStatus[s] = { count: 0, total: 0 };
     byStatus[s].count++;
-    byStatus[s].total += Number(c.monto_total ?? 0);
+    byStatus[s].total += Number(c.precio_total ?? 0);
   });
 
-  const totalPipeline = list.reduce((acc, c: any) => acc + Number(c.monto_total ?? 0), 0);
+  const totalPipeline = list.reduce((acc, c: any) => acc + Number(c.precio_total ?? 0), 0);
   const aprobadas = byStatus['aprobada']?.count ?? 0;
 
   const statusLabels: Record<string, string> = {

@@ -16,7 +16,7 @@ interface Props {
 }
 
 export const ViajeroKPIPanel: React.FC<Props> = ({ viajeros, onBack }) => {
-  const { isDarkMode } = useConfig();
+  const { isDarkMode, config } = useConfig();
 
   const TOOLTIP_STYLE = {
     backgroundColor: isDarkMode ? '#0f172a' : '#ffffff',
@@ -293,7 +293,7 @@ export const ViajeroKPIPanel: React.FC<Props> = ({ viajeros, onBack }) => {
 
         {/* Footer */}
         <div className="text-center text-[9px] font-black text-slate-700 uppercase tracking-[0.25em] pb-4">
-          IA.AGUS — McVill KPIs 2026 · calculado sobre {total} viajeros en base
+          {`${config.developerName} — ${config.brandName} KPIs 2026`} · calculado sobre {total} viajeros en base
         </div>
 
       </div>

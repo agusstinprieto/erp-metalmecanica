@@ -212,13 +212,13 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
               Acceso Demo
             </button>
 
-            <a 
-              href="https://ia-agus.com" 
-              target="_blank" 
+            <a
+              href={config.developerUrl}
+              target="_blank"
               rel="noopener noreferrer"
               className="mt-2 text-[8px] text-slate-600 uppercase tracking-[0.4em] font-black opacity-40 hover:opacity-100 hover:text-mcvill-accent transition-all cursor-pointer"
             >
-              Diseñado por IA.AGUS
+              {`Diseñado por ${config.developerName}`}
             </a>
           </div>
         </div>

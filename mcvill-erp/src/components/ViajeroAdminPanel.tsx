@@ -441,7 +441,7 @@ export const ViajeroAdminPanel: React.FC<{
       pdfWindow.document.write(`
         <html>
         <head>
-          <title>Generando PDF - McVill</title>
+          <title>Generando PDF - ${config.brandName}</title>
           <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
             body {
@@ -534,7 +534,7 @@ export const ViajeroAdminPanel: React.FC<{
       pdfWindow.document.write(`
         <html>
         <head>
-          <title>Generando PDF - McVill</title>
+          <title>Generando PDF - ${config.brandName}</title>
           <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
             body {
@@ -621,7 +621,7 @@ export const ViajeroAdminPanel: React.FC<{
             </div>
             <h1 className="text-base font-black uppercase tracking-tighter text-white leading-none flex items-center gap-2 truncate">
               Viajeros <span className="text-blue-500">Inteligentes</span>
-              <span className="text-[8px] px-1.5 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded tracking-[0.2em] font-black hidden sm:inline">IA.AGUS</span>
+              <span className="text-[8px] px-1.5 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded tracking-[0.2em] font-black hidden sm:inline">{config.developerName}</span>
             </h1>
           </div>
 
@@ -1330,7 +1330,7 @@ export const ViajeroAdminPanel: React.FC<{
         <div className="flex items-center justify-between text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] px-4 pt-4">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Sistema Activo • McVill 2026</span>
+            <span>{`Sistema Activo • ${config.brandName} 2026`}</span>
           </div>
           <div className="flex gap-8">
             <span className="flex items-center gap-2"><Database size={12} className="text-blue-500" /> {viajeros.length} Total</span>

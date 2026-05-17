@@ -4,6 +4,10 @@ import { supabase } from '../lib/supabase';
 interface BrandConfig {
   brandName: string;
   systemName: string;
+  companyName: string;
+  companyCity: string;
+  developerName: string;
+  developerUrl: string;
   slogan: string;
   logoText: string;
   version: string;
@@ -31,6 +35,10 @@ interface ConfigContextType {
 const defaultConfig: BrandConfig = {
   brandName: 'MCVILL',
   systemName: 'ERP',
+  companyName: 'McVill S.A. de C.V.',
+  companyCity: 'Torreón, Coah., México',
+  developerName: 'IA.AGUS',
+  developerUrl: 'https://ia-agus.com',
   slogan: 'Industrial Intelligence Ecosystem',
   logoText: 'MCVILL ERP',
   version: 'SYSTEM OS v2.5',
@@ -136,6 +144,10 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             themeColorLight: supabaseConfig.themeColorLight || config.themeColorLight,
             logo: supabaseConfig.logo_url || config.logo,
             logoDark: supabaseConfig.logo_url || config.logoDark,
+            companyName: supabaseConfig.company_name || config.companyName,
+            companyCity: supabaseConfig.company_city || config.companyCity,
+            developerName: supabaseConfig.developer_name || config.developerName,
+            developerUrl: supabaseConfig.developer_url || config.developerUrl,
           };
           
           setConfig(remoteConfig);
@@ -179,6 +191,10 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               themeColor: updated.themeColor,
               themeColorLight: updated.themeColorLight,
               ...(updated.logo ? { logo_url: updated.logo } : {}),
+              company_name: updated.companyName,
+              company_city: updated.companyCity,
+              developer_name: updated.developerName,
+              developer_url: updated.developerUrl,
             }
           })
           .eq('id', tenant.id);

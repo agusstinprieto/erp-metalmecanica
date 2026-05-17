@@ -11,6 +11,7 @@ import { whatsappService } from '../services/whatsappService';
 import { reportUtils } from '../utils/reportUtils';
 import { appConfirm } from '../lib/dialogs';
 import { Toast } from './common/Toast';
+import { useConfig } from '../contexts/ConfigContext';
 
 type Tab = 'nueva' | 'historial';
 
@@ -63,13 +64,13 @@ const emptyForm: MinutaForm = {
   seguimiento: '',
 };
 
-const SYSTEM_PROMPT = `Eres el asistente ejecutivo de McVill S.A. de C.V., empresa metalmecánica industrial.
+function getSystemPrompt(companyName: string, logoText: string, developerName: string): string { return `Eres el asistente ejecutivo de ${companyName}, empresa metalmecánica industrial.
 Tu única función es generar ACTAS DE REUNIÓN formales, ejecutivas y completas en español.
 
 El formato obligatorio de cada acta es:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-ACTA DE REUNIÓN — **McVill S.A. de C.V.**
+ACTA DE REUNIÓN — **${companyName}**
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 **Tipo:** [tipo]            **Fecha:** [fecha]     **Hora:** [hora]
 **Proyecto / Tema:** [proyecto]
@@ -92,11 +93,11 @@ ACTA DE REUNIÓN — **McVill S.A. de C.V.**
 _________________________          _________________________
 [Primer participante]               [Segundo participante]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-*Generado por McVill Control ERP | IA.AGUS*
+*Generado por ${logoText} | ${developerName}*
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Usa lenguaje formal y conciso. Desarrolla cada punto con claridad. No omitas ninguna sección. Usa **Markdown** para resaltar lo importante.
-Usa lenguaje formal y conciso. Desarrolla cada punto con claridad. No omitas ninguna sección.`;
+Usa lenguaje formal y conciso. Desarrolla cada punto con claridad. No omitas ninguna sección.`; }
 
 // Convert a MinutaDB row → the local Minuta shape used by UI
 function dbToMinuta(row: MinutaDB): Minuta {
@@ -111,6 +112,8 @@ function dbToMinuta(row: MinutaDB): Minuta {
 }
 
 export const MinutasView: React.FC = () => {
+  const { config } = useConfig();
+  const SYSTEM_PROMPT = getSystemPrompt(config.companyName, config.logoText, config.developerName);
   const [activeTab, setActiveTab]         = useState<Tab>('nueva');
   const [form, setForm]                   = useState<MinutaForm>({ ...emptyForm });
   const [generatedText, setGeneratedText] = useState('');
@@ -179,7 +182,7 @@ export const MinutasView: React.FC = () => {
 TIPO: ${form.tipo}
 FECHA: ${form.fecha}   HORA: ${form.hora}
 PROYECTO / TEMA: ${form.proyecto}
-LUGAR / MODALIDAD: ${form.lugar || 'Oficinas McVill'}
+LUGAR / MODALIDAD: ${form.lugar || `Oficinas ${config.brandName}`}
 PARTICIPANTES: ${form.asistentes}
 PUNTOS TRATADOS: ${form.puntos || '(No especificados)'}
 ACUERDOS Y COMPROMISOS: ${form.acuerdos || '(No especificados)'}
@@ -433,7 +436,7 @@ PRÓXIMO SEGUIMIENTO: ${form.seguimiento || '(No especificado)'}`;
                   </div>
                   <div>
                     <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 block">Lugar / Modalidad</label>
-                    <input className="cyber-input w-full" placeholder="Oficinas McVill / Teams"
+                    <input className="cyber-input w-full" placeholder={`Oficinas ${config.brandName} / Teams`}
                       value={form.lugar} onChange={e => setForm({ ...form, lugar: e.target.value })} />
                   </div>
                 </div>
@@ -538,7 +541,7 @@ PRÓXIMO SEGUIMIENTO: ${form.seguimiento || '(No especificado)'}`;
 
                   {/* Email */}
                   <div className="flex gap-2">
-                    <input className="cyber-input flex-1 text-[10px]" type="email" placeholder="correo@mcvill.com"
+                    <input className="cyber-input flex-1 text-[10px]" type="email" placeholder={`correo@${config.supportEmail.split('@')[1]}`}
                       value={shareEmail} onChange={e => setShareEmail(e.target.value)} />
                     <button onClick={() => handleShareEmail()}
                       className="px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white text-[9px] font-black uppercase rounded-lg transition-all active:scale-95 flex items-center gap-1">
@@ -558,7 +561,7 @@ PRÓXIMO SEGUIMIENTO: ${form.seguimiento || '(No especificado)'}`;
 
                   {/* Teams */}
                   <div className="flex gap-2">
-                    <input className="cyber-input flex-1 text-[10px]" type="email" placeholder="usuario@mcvill.com"
+                    <input className="cyber-input flex-1 text-[10px]" type="email" placeholder={`usuario@${config.supportEmail.split('@')[1]}`}
                       value={shareTeams} onChange={e => setShareTeams(e.target.value)} />
                     <button onClick={() => handleShareTeams()}
                       className="px-3 py-2 bg-violet-600 hover:bg-violet-500 text-white text-[9px] font-black uppercase rounded-lg transition-all active:scale-95 flex items-center gap-1.5">

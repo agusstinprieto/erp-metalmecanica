@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useTenant } from '../hooks/useTenant';
+import { useConfig } from '../contexts/ConfigContext';
 
 interface Cliente {
   id?: string;
@@ -40,6 +41,7 @@ const CIUDADES_MX = [
 
 export const ClientManagerModal: React.FC<ClientManagerModalProps> = ({ isOpen, onClose, onSuccess }) => {
   const tenantId = useTenant();
+  const { config } = useConfig();
   const [form, setForm] = useState<Cliente>({
     razon_social: '',
     rfc: '',
@@ -134,7 +136,7 @@ export const ClientManagerModal: React.FC<ClientManagerModalProps> = ({ isOpen, 
                 value={form.razon_social}
                 onChange={e => setForm(f => ({ ...f, razon_social: e.target.value.toUpperCase() }))}
                 className={inputCls}
-                placeholder="MCVILL SOLUTIONS S.A. DE C.V."
+                placeholder={`${config.companyName.toUpperCase()}`}
               />
             </div>
 

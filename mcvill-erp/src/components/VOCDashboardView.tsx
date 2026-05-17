@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, Brain, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Loader2, Mail } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import geminiService from '../services/geminiService';
+import { supabase } from '../lib/supabase';
+import { useConfig } from '../contexts/ConfigContext';
 
 interface VOCEntry {
   id: string;
@@ -95,11 +97,24 @@ const PIE_DATA = [
 const panel = 'bg-slate-900/40 border border-white/5 rounded-xl';
 
 export const VOCDashboardView: React.FC = () => {
-  const [vocEntries, setVocEntries] = useState(MOCK_VOC);
+  const { config } = useConfig();
+  const [vocEntries, setVocEntries] = useState<VOCEntry[]>(MOCK_VOC);
   const [selected, setSelected] = useState<VOCEntry | null>(null);
   const [analyzing, setAnalyzing] = useState<string | null>(null);
   const [emailText, setEmailText] = useState('');
   const [showAnalyzer, setShowAnalyzer] = useState(false);
+
+  useEffect(() => {
+    supabase.from('voc_entries').select('*').order('fecha', { ascending: false })
+      .then(({ data }) => {
+        if (data && data.length > 0) setVocEntries(data as VOCEntry[]);
+        // Si no hay datos en DB, deja el MOCK_VOC como seed visual hasta que el usuario agregue datos reales
+      });
+  }, []);
+
+  const persistChecklist = async (entry: VOCEntry) => {
+    await supabase.from('voc_entries').update({ checklist: entry.checklist as unknown as object }).eq('id', entry.id);
+  };
 
   const negativos = vocEntries.filter(v => v.sentimiento === 'NEGATIVO').length;
   const positivos = vocEntries.filter(v => v.sentimiento === 'POSITIVO').length;
@@ -120,26 +135,35 @@ export const VOCDashboardView: React.FC = () => {
     };
     setSelected(updated);
     setVocEntries(vs => vs.map(v => v.id === updated.id ? updated : v));
+    persistChecklist(updated);
   };
 
   const analyzeNew = async () => {
     if (!emailText.trim()) return;
     setAnalyzing('new');
     try {
-      const prompt = `Analiza este correo de cliente para una empresa de manufactura metal-mecánica (McVill). Responde SOLO JSON:
+      const prompt = `Analiza este correo de cliente para una empresa de manufactura metal-mecánica (${config.companyName}). Responde SOLO JSON:
 Correo: "${emailText}"
 Esquema: {"categoria":"ENTREGA|CALIDAD|PRECIO|COMUNICACIÓN|OTRO","sentimiento":"POSITIVO|NEUTRAL|NEGATIVO","prioridad":"ALTA|MEDIA|BAJA","checklist":["accion1","accion2","accion3"]}`;
       const raw = await geminiService.generateText(prompt);
       const match = raw.match(/\{[\s\S]*\}/);
       if (match) {
         const parsed = JSON.parse(match[0]);
-        const newEntry: VOCEntry = {
-          id: `voc-${Date.now()}`, cliente: 'Nuevo', fecha: new Date().toISOString().split('T')[0],
-          asunto: emailText.slice(0, 60) + '...', cuerpo: emailText,
-          categoria: parsed.categoria, sentimiento: parsed.sentimiento, prioridad: parsed.prioridad,
-          checklist: (parsed.checklist as string[]).map(a => ({ accion: a, completada: false })),
+        const { data: tenant } = await supabase.from('tenants').select('id').limit(1).maybeSingle();
+        const payload = {
+          tenant_id: tenant?.id,
+          cliente: 'Nuevo',
+          fecha: new Date().toISOString().split('T')[0],
+          asunto: emailText.slice(0, 60) + '...',
+          cuerpo: emailText,
+          categoria: parsed.categoria,
+          sentimiento: parsed.sentimiento,
+          prioridad: parsed.prioridad,
+          checklist: (parsed.checklist as string[]).map((a: string) => ({ accion: a, completada: false })),
           analizado: true,
         };
+        const { data: saved } = await supabase.from('voc_entries').insert(payload).select().single();
+        const newEntry: VOCEntry = (saved ?? { id: `voc-${Date.now()}`, ...payload }) as VOCEntry;
         setVocEntries(vs => [newEntry, ...vs]);
         setSelected(newEntry);
         setEmailText('');

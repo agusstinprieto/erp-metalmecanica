@@ -90,17 +90,20 @@ export const aiService = {
       }
 
       // Forzar modelo con capacidad de visión
-      const model = 'gemini-2.5-pro';
+      const model = 'gemini-2.5-flash';
       const provider = 'google';
 
-      // Limpiar prefijo data:image/...;base64, si existe
+      // Extraer mimeType antes de limpiar el prefijo
+      const mimeMatch = base64Image.match(/^data:(image\/\w+);base64,/);
+      const mimeType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
       const base64Content = base64Image.replace(/^data:image\/\w+;base64,/, '');
 
       const { data, error } = await supabase.functions.invoke('gemini-generate', {
         body: {
-          prompt: prompt,
+          prompt,
           image: base64Content,
-          model, 
+          mimeType,
+          model,
           provider,
           language: 'json'
         }
