@@ -705,16 +705,21 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
         {/* ── 5 PREMIUM INDUSTRIAL KPI CARDS ─────────────────────────────────── */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           
-          {/* Card 1: Asistencia */}
+          {/* Card 1: Asistencia & Ausentismo */}
           <div className="bg-slate-900/40 border border-slate-800/40 p-3.5 rounded-2xl hover:border-slate-700/60 transition-all group relative overflow-hidden">
             <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl group-hover:bg-blue-500/10 transition-all" />
             <div className="flex items-center justify-between mb-3 relative z-10">
               <div className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400">
                 <Users size={15} />
               </div>
-              <span className="text-[8px] font-mono text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded uppercase font-black">
-                {Math.round((metrics.presentes / metrics.empleados) * 100)}% PRES
-              </span>
+              <div className="flex gap-1.5">
+                <span className="text-[8px] font-mono text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded uppercase font-black">
+                  {Math.round((metrics.presentes / metrics.empleados) * 100)}% PRES
+                </span>
+                <span className="text-[8px] font-mono text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded uppercase font-black">
+                  {Math.round(((metrics.empleados - metrics.presentes) / metrics.empleados) * 100)}% AUS
+                </span>
+              </div>
             </div>
             <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Asistencia Operativa</p>
             <p className="text-xl font-black text-white tracking-tight leading-none">
