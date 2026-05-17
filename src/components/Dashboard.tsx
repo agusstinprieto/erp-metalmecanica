@@ -424,6 +424,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
     stockCritico: 0,
   });
   
+  const [telemetryData, setTelemetryData] = useState<any[]>([]);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [isBancoModalOpen, setIsBancoModalOpen] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -431,6 +432,45 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
   useEffect(() => {
     loadDbStats();
   }, []);
+
+  useEffect(() => {
+    loadTelemetryData();
+  }, [selectedPlanta, selectedTurno, timeRange]);
+
+  const loadTelemetryData = async () => {
+    try {
+      let query = supabase.from('telemetry_records').select('*').order('created_at', { ascending: true });
+      
+      if (selectedPlanta !== 'todas') {
+        query = query.eq('planta_slug', selectedPlanta);
+      }
+      
+      if (selectedTurno !== 'todos') {
+        query = query.eq('turno', selectedTurno);
+      }
+      
+      const now = new Date();
+      if (timeRange === '1d') {
+        const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
+        query = query.gte('created_at', oneDayAgo);
+      } else if (timeRange === '7d') {
+        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+        query = query.gte('created_at', sevenDaysAgo);
+      } else if (timeRange === '30d') {
+        const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
+        query = query.gte('created_at', thirtyDaysAgo);
+      } else if (timeRange === '365d') {
+        const oneYearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000).toISOString();
+        query = query.gte('created_at', oneYearAgo);
+      }
+      
+      const { data, error } = await query;
+      if (error) throw error;
+      setTelemetryData(data ?? []);
+    } catch (e) {
+      console.error('Error loading telemetry data:', e);
+    }
+  };
 
   const loadDbStats = async () => {
     try {
@@ -460,56 +500,70 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
 
   // ── DYNAMIC METRIC GENERATORS (FILTER BASED) ────────────────────────────────
   const getFilteredMetrics = () => {
+    const lastRecord = telemetryData.length > 0 ? telemetryData[telemetryData.length - 1] : null;
+
     // Base standard values
     let baseEmpleados = dbStats.empleados > 0 ? dbStats.empleados : 45;
     let basePresentes = dbStats.presentes > 0 ? dbStats.presentes : 42;
-    let baseOEE = 84.6;
-    let baseScrap = 1.62;
+    let baseOEE = lastRecord ? Number(lastRecord.oee_pct) : 84.6;
+    let baseScrap = lastRecord ? Number(lastRecord.scrap_pct) : 1.62;
     let baseSafetyDays = 412;
-    let baseEnergyKWh = 185; // KWh por tonelada procesada
+    let baseEnergyKWh = lastRecord ? Number(lastRecord.consumo_kwh) : 185; // KWh por tonelada procesada
 
-    // Apply Plant Modifiers
-    if (selectedPlanta === 'torreon_laser') {
-      baseEmpleados = Math.round(baseEmpleados * 0.35);
-      basePresentes = Math.round(basePresentes * 0.33);
-      baseOEE = 86.8;
-      baseScrap = 1.15; // Láser es más preciso
-      baseSafetyDays = 230;
-      baseEnergyKWh = 295; // Láser consume mucha más electricidad
-    } else if (selectedPlanta === 'torreon_mecanizado') {
-      baseEmpleados = Math.round(baseEmpleados * 0.45);
-      basePresentes = Math.round(basePresentes * 0.42);
-      baseOEE = 81.2;
-      baseScrap = 1.95; // Virutas y retrabajos
-      baseSafetyDays = 182;
-      baseEnergyKWh = 120;
-    } else if (selectedPlanta === 'torreon_forja') {
-      baseEmpleados = Math.round(baseEmpleados * 0.20);
-      basePresentes = Math.round(basePresentes * 0.18);
-      baseOEE = 89.1;
-      baseScrap = 1.75;
-      baseSafetyDays = 412;
-      baseEnergyKWh = 380; // Forja pesada gasta energía extrema
-    }
+    // Apply Plant Modifiers only if there is no real telemetry in DB (Fallback)
+    if (!lastRecord) {
+      if (selectedPlanta === 'torreon_laser') {
+        baseEmpleados = Math.round(baseEmpleados * 0.35);
+        basePresentes = Math.round(basePresentes * 0.33);
+        baseOEE = 86.8;
+        baseScrap = 1.15; // Láser es más preciso
+        baseSafetyDays = 230;
+        baseEnergyKWh = 295; // Láser consume mucha más electricidad
+      } else if (selectedPlanta === 'torreon_mecanizado') {
+        baseEmpleados = Math.round(baseEmpleados * 0.45);
+        basePresentes = Math.round(basePresentes * 0.42);
+        baseOEE = 81.2;
+        baseScrap = 1.95; // Virutas y retrabajos
+        baseSafetyDays = 182;
+        baseEnergyKWh = 120;
+      } else if (selectedPlanta === 'torreon_forja') {
+        baseEmpleados = Math.round(baseEmpleados * 0.20);
+        basePresentes = Math.round(basePresentes * 0.18);
+        baseOEE = 89.1;
+        baseScrap = 1.75;
+        baseSafetyDays = 412;
+        baseEnergyKWh = 380; // Forja pesada gasta energía extrema
+      }
 
-    // Apply Shift Modifiers
-    if (selectedTurno === 'matutino') {
-      // Turno principal, más gente, OEE óptimo
-      baseOEE += 2.1;
-      baseScrap -= 0.15;
-      baseEnergyKWh -= 15; // Mejor clima, menos gasto térmico
-    } else if (selectedTurno === 'vespertino') {
-      basePresentes = Math.round(basePresentes * 0.94);
-      baseOEE -= 1.4;
-      baseScrap += 0.25;
-      baseSafetyDays = Math.max(12, baseSafetyDays - 4);
-    } else if (selectedTurno === 'nocturno') {
-      // Menos asistencia, OEE suele bajar por fatiga, scrap sube levemente
-      basePresentes = Math.round(basePresentes * 0.81);
-      baseOEE -= 5.8;
-      baseScrap += 0.65;
-      baseSafetyDays = Math.max(8, baseSafetyDays - 15);
-      baseEnergyKWh += 25; // Iluminación artificial a tope
+      // Apply Shift Modifiers
+      if (selectedTurno === 'matutino') {
+        baseOEE += 2.1;
+        baseScrap -= 0.15;
+        baseEnergyKWh -= 15;
+      } else if (selectedTurno === 'vespertino') {
+        basePresentes = Math.round(basePresentes * 0.94);
+        baseOEE -= 1.4;
+        baseScrap += 0.25;
+        baseSafetyDays = Math.max(12, baseSafetyDays - 4);
+      } else if (selectedTurno === 'nocturno') {
+        basePresentes = Math.round(basePresentes * 0.81);
+        baseOEE -= 5.8;
+        baseScrap += 0.65;
+        baseSafetyDays = Math.max(8, baseSafetyDays - 15);
+        baseEnergyKWh += 25;
+      }
+    } else {
+      // If we have database stats, we still want to apply active headcount limits
+      if (selectedPlanta === 'torreon_laser') {
+        baseEmpleados = Math.round(baseEmpleados * 0.35);
+        basePresentes = Math.min(basePresentes, baseEmpleados);
+      } else if (selectedPlanta === 'torreon_mecanizado') {
+        baseEmpleados = Math.round(baseEmpleados * 0.45);
+        basePresentes = Math.min(basePresentes, baseEmpleados);
+      } else if (selectedPlanta === 'torreon_forja') {
+        baseEmpleados = Math.round(baseEmpleados * 0.20);
+        basePresentes = Math.min(basePresentes, baseEmpleados);
+      }
     }
 
     return {
@@ -543,6 +597,41 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
       if (timeRange === 'all')  { d.setMonth(d.getMonth() - (pts - 1 - i)); return ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][d.getMonth()]; }
       d.setDate(d.getDate() - (pts - 1 - i)); return DAY_LABELS[d.getDay()];
     };
+
+    if (telemetryData.length > 0) {
+      const slotSize = Math.max(1, Math.floor(telemetryData.length / pts));
+      return Array.from({ length: pts }, (_, i) => {
+        const startIdx = i * slotSize;
+        const endIdx = Math.min(telemetryData.length, (i + 1) * slotSize);
+        const subset = telemetryData.slice(startIdx, endIdx);
+        const label = getLabel(i);
+
+        if (subset.length > 0) {
+          const avgOEE = subset.reduce((acc, r) => acc + Number(r.oee_pct), 0) / subset.length;
+          const avgScrap = subset.reduce((acc, r) => acc + Number(r.scrap_pct), 0) / subset.length;
+          const avgEnergy = subset.reduce((acc, r) => acc + Number(r.consumo_kwh), 0) / subset.length;
+          const sumProd = subset.reduce((acc, r) => acc + Number(r.piezas_producidas), 0);
+          return {
+            name: label,
+            oee: Number(avgOEE.toFixed(1)),
+            asistencia: Math.max(1, Math.round(metrics.presentes + seed(i, 2) - 1)),
+            scrap: Number(avgScrap.toFixed(2)),
+            produccion: Number((sumProd / subset.length).toFixed(1)),
+            energia: Math.round(avgEnergy),
+          };
+        } else {
+          return {
+            name: label,
+            oee: Number(Math.max(70, metrics.oee + seed(i, 6) - 3).toFixed(1)),
+            asistencia: Math.max(1, Math.round(metrics.presentes + seed(i, 4) - 2)),
+            scrap: Number(Math.max(0.3, metrics.scrap + seed(i, 0.8) - 0.4).toFixed(2)),
+            produccion: Number(Math.max(4, 20 + seed(i, 6) - 3).toFixed(1)),
+            energia: Math.round(Math.max(60, metrics.energy + seed(i, 30) - 15)),
+          };
+        }
+      });
+    }
+
     return Array.from({ length: pts }, (_, i) => {
       const label = getLabel(i);
       const baseTons = selectedPlanta === 'torreon_forja' ? 45 : selectedPlanta === 'torreon_laser' ? 24 : 18;
