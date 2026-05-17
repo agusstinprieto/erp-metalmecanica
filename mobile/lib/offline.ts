@@ -18,9 +18,12 @@ export interface QueueItem {
   createdAt: string;
 }
 
-// Generador de UUIDs temporales ligero para modo offline
+// Generador de IDs temporales seguros para modo offline
 export function generateTempId(): string {
-  return 'temp_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+  const bytes = new Uint8Array(8);
+  crypto.getRandomValues(bytes);
+  const hex = Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+  return `temp_${hex}_${Date.now()}`;
 }
 
 // Verifica la conectividad real con ping ligero

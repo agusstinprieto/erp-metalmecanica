@@ -110,9 +110,12 @@ export const PayrollView = () => {
   };
 
   const handleSavePayrollCalculations = async (calculations: any[]) => {
+    const now = new Date();
+    const periodStart = format(startOfMonth(now), 'yyyy-MM-dd');
+    const periodEnd   = format(endOfMonth(now),   'yyyy-MM-dd');
     try {
       setLoading(true);
-      await payrollService.bulkSavePayrolls(calculations);
+      await payrollService.bulkSavePayrolls(calculations, periodStart, periodEnd);
       await fetchPayrolls();
     } catch (err) {
       console.error('Error saving payroll calculations:', err);

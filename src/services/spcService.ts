@@ -1,5 +1,20 @@
 import { supabase } from '../lib/supabase';
 
+// ── Dynamic tenant resolution (Zero Hardcoding — Regla 16) ───────────────────
+let _cachedSPCTenant: string | null = null;
+async function getTenant(): Promise<string> {
+  if (_cachedSPCTenant) return _cachedSPCTenant;
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session?.user) {
+    const { data: profile } = await supabase
+      .from('profiles').select('tenant_id').eq('id', session.user.id).maybeSingle();
+    if (profile?.tenant_id) { _cachedSPCTenant = profile.tenant_id; return _cachedSPCTenant; }
+  }
+  const { data: tenant } = await supabase.from('tenants').select('id').limit(1).maybeSingle();
+  _cachedSPCTenant = tenant?.id ?? 'default';
+  return _cachedSPCTenant;
+}
+/** @deprecated Use getTenant() — kept for demo data labels only */
 const TENANT = 'mcvill';
 
 export interface SPCCaracteristica {

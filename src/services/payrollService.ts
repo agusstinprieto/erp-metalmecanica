@@ -312,15 +312,23 @@ export const payrollService = {
     return result;
   },
 
-  async bulkSavePayrolls(calculations: any[]): Promise<void> {
+  async bulkSavePayrolls(
+    calculations: any[],
+    periodStart?: string,
+    periodEnd?: string,
+  ): Promise<void> {
     const { data: tenantData } = await supabase.from('tenants').select('id').single();
     if (!tenantData) throw new Error('No active tenant found');
+
+    const today = new Date();
+    const defaultStart = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
+    const defaultEnd   = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split('T')[0];
 
     const payloads = calculations.map(calc => ({
       tenant_id: tenantData.id,
       employee_id: calc.employee_id,
-      period_start: new Date().toISOString().split('T')[0], // TODO: use actual period
-      period_end: new Date().toISOString().split('T')[0],
+      period_start: periodStart ?? defaultStart,
+      period_end:   periodEnd   ?? defaultEnd,
       days_worked: calc.worked_days,
       hours_worked: (calc.worked_days * 8) + calc.overtime_hours,
       overtime_hours: calc.overtime_hours,

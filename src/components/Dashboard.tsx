@@ -293,7 +293,7 @@ const EnlazarBancoModal: React.FC<EnlazarBancoModalProps> = ({ onClose, onNaviga
                       type="password"
                       value={apiKey}
                       onChange={e => setApiKey(e.target.value)}
-                      placeholder="eyJhbGciOiJIUzI1NiIs..."
+                      placeholder="Token de integración bancaria..."
                       className="w-full cyber-input pl-8 text-[11px] font-mono"
                     />
                   </div>

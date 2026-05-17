@@ -3,10 +3,23 @@ import json
 import urllib.request
 import urllib.error
 import math
+import os
 
-# Configuración de Supabase
-SUPABASE_URL = "https://kfdbgvyeomoewzmhkbsn.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmZGJndnllb21vZXd6bWhrYnNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3ODIyMTgsImV4cCI6MjA5MjM1ODIxOH0.jFUjtbPOTUiNesoy6Su3k1gTDoO5tv8ZotVFw7Ffb5Q"
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass  # python-dotenv no instalado — usar variables de entorno del sistema
+
+# Configuración de Supabase — definir en .env o variables de entorno del sistema
+SUPABASE_URL = os.getenv("SUPABASE_URL", "")
+SUPABASE_KEY = os.getenv("SUPABASE_ANON_KEY", "")
+
+if not SUPABASE_URL or not SUPABASE_KEY:
+    raise EnvironmentError(
+        "Faltan SUPABASE_URL y/o SUPABASE_ANON_KEY. "
+        "Crea un archivo .env con esas variables o expórtalas en tu entorno."
+    )
 
 def send_to_supabase(table, data):
     url = f"{SUPABASE_URL}/rest/v1/{table}"

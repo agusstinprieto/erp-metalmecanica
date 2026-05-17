@@ -98,10 +98,18 @@ function App() {
   const { language, setLanguage, t } = useLanguage();
 
   useEffect(() => {
-    // Restore session on page load
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Restore session on page load — verify role against profiles table (not just JWT metadata)
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session?.user) {
-        const role = (session.user.user_metadata?.role as UserRole) || 'empleado';
+        let role = (session.user.user_metadata?.role as UserRole) || 'empleado';
+        try {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', session.user.id)
+            .single();
+          if (profile?.role) role = profile.role as UserRole;
+        } catch { /* profiles query failed — fall back to JWT role */ }
         setLoggedIn(true);
         setUserRole(role);
         setUserEmail(session.user.email || '');

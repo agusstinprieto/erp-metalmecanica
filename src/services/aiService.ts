@@ -89,8 +89,8 @@ export const aiService = {
         base64Image = imageFile;
       }
 
-      // Forzar modelo con capacidad de visión
-      const model = 'gemini-2.5-flash';
+      // Forzar modelo con capacidad de visión (Regla 12: siempre 2.5-flash-lite)
+      const model = 'gemini-2.5-flash-lite';
       const provider = 'google';
 
       // Extraer mimeType antes de limpiar el prefijo

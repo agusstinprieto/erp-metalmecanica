@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { logger } from '../utils/logger';
 
 export class GeminiLiveService {
   private static instance: GeminiLiveService;
@@ -24,7 +25,7 @@ export class GeminiLiveService {
 
   public async connect(apiKey: string, model: string, systemInstruction: string) {
     if (this.isConnected || this.isConnecting || GeminiLiveService.isGlobalConnecting) {
-      console.log("⚠️ Gemini Live: Conexión ya activa o en proceso.");
+      logger.debug("⚠️ Gemini Live: Conexión ya activa o en proceso.");
       return;
     }
 
@@ -32,7 +33,7 @@ export class GeminiLiveService {
       this.isConnecting = true;
       GeminiLiveService.isGlobalConnecting = true;
       
-      console.log(`🔌 Gemini Live [ERP]: Conectando con modelo [${model}]`);
+      logger.debug(`🔌 Gemini Live [ERP]: Conectando con modelo [${model}]`);
       
       this.client = new GoogleGenerativeAI(apiKey);
       const generativeModel = this.client.getGenerativeModel({ 
@@ -49,7 +50,7 @@ export class GeminiLiveService {
       });
 
       this.isConnected = true;
-      console.log("🔌 Gemini Live [ERP]: Conectado exitosamente");
+      logger.debug("🔌 Gemini Live [ERP]: Conectado exitosamente");
       return this.session;
 
     } catch (error) {
@@ -83,7 +84,7 @@ export class GeminiLiveService {
               }
             }]);
           } catch (e) {
-            console.warn("⚠️ Error enviando audio (posible socket cerrado)");
+            logger.warn("⚠️ Error enviando audio (posible socket cerrado)");
           }
           onAudioData(new Int16Array(event.data.audio));
         }
@@ -109,7 +110,7 @@ export class GeminiLiveService {
   }
 
   public cleanup() {
-    console.log("🔌 Gemini Live [ERP]: Ejecutando limpieza de recursos...");
+    logger.debug("🔌 Gemini Live [ERP]: Ejecutando limpieza de recursos...");
     
     this.isConnected = false;
     this.isConnecting = false;

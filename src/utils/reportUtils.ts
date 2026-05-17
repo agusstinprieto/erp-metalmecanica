@@ -27,12 +27,31 @@ async function loadPDF() {
   return { jsPDF, autoTable };
 }
 
-// ── Colores corporativos McVill ───────────────────────────────────────────────
-const BLUE_DARK  = [26,  74,  138] as [number, number, number]; // encabezado
-const BLUE_MID   = [37,  99,  235] as [number, number, number]; // subencabezado
-const SLATE_900  = [15,  23,  42]  as [number, number, number]; // texto oscuro
-const SLATE_400  = [148, 163, 184] as [number, number, number]; // texto sutil
+// ── Colores corporativos — dinámicos según el tema activo del usuario ─────────
+const SLATE_900  = [15,  23,  42]  as [number, number, number];
+const SLATE_400  = [148, 163, 184] as [number, number, number];
 const WHITE      = [255, 255, 255] as [number, number, number];
+
+// Paleta de temas: [header_dark, header_mid]
+const THEME_PALETTE: Record<string, [[number,number,number],[number,number,number]]> = {
+  blue:    [[26,  74,  138], [37,  99,  235]],
+  emerald: [[5,   78,  52 ], [16,  185, 129]],
+  carbon:  [[15,  23,  42 ], [51,  65,  85 ]],
+  slate:   [[30,  41,  59 ], [71,  85,  105]],
+  violet:  [[46,  16,  101], [109, 40,  217]],
+  rose:    [[136, 19,  55 ], [225, 29,  72 ]],
+};
+
+function getThemeColors(): { dark: [number,number,number]; mid: [number,number,number] } {
+  try {
+    const saved = localStorage.getItem('mcvill-config');
+    const cfg = saved ? JSON.parse(saved) : {};
+    const [dark, mid] = THEME_PALETTE[cfg.themeName as string] ?? THEME_PALETTE.blue;
+    return { dark, mid };
+  } catch {
+    return { dark: THEME_PALETTE.blue[0], mid: THEME_PALETTE.blue[1] };
+  }
+}
 
 // ── Carga del logo (cacheado en módulo) ──────────────────────────────────────
 let _logoBase64: string | null = null;
@@ -82,7 +101,8 @@ async function drawHeader(
 ): Promise<number> {
   const pageW = doc.internal.pageSize.getWidth();
 
-  // Barra azul oscura
+  // Barra de encabezado con el color del tema activo del usuario
+  const { dark: BLUE_DARK, mid: BLUE_MID } = getThemeColors();
   doc.setFillColor(...BLUE_DARK);
   doc.rect(0, 0, pageW, 32, 'F');
 
