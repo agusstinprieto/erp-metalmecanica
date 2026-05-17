@@ -82,21 +82,51 @@ public static class ViajeroMigraDocument
         section.PageSetup.LeftMargin   = "1.2cm";
         section.PageSetup.RightMargin  = "1.2cm";
 
-        // Pie de página
-        var ftPara = section.Footers.Primary.AddParagraph();
-        ftPara.Format.Alignment = ParagraphAlignment.Center;
-        ftPara.AddText($"{companyName.ToUpper()}  |  VIAJERO INDUSTRIAL  |  Página ");
-        ftPara.AddPageField();
-        ftPara.AddText(" de ");
-        ftPara.AddNumPagesField();
-        ftPara.Format.Font.Size  = 7;
-        ftPara.Format.Font.Color = Color.FromRgb(100, 116, 139);
+        // Pie de página premium de 3 columnas (QuestPDF Clone)
+        var footerTable = section.Footers.Primary.AddTable();
+        footerTable.Borders.Width = 0;
+        footerTable.Borders.Top.Width = 0.5;
+        footerTable.Borders.Top.Color = Color.FromRgb(191, 219, 254); // Blue-200
+        
+        footerTable.AddColumn("5.5cm");  // Izquierda: Padre
+        footerTable.AddColumn("7.6cm");  // Centro: Empresa y Páginas
+        footerTable.AddColumn("5.5cm");  // Derecha: Job y Parte
+
+        var fRow = footerTable.AddRow();
+        fRow.VerticalAlignment = VerticalAlignment.Top;
+        fRow.Height = "0.6cm";
+
+        // Celdas
+        var pLeft = fRow.Cells[0].AddParagraph();
+        pLeft.Format.Font.Size = 6.5;
+        pLeft.Format.Font.Color = Color.FromRgb(100, 116, 139); // Slate-500
+        var padreStr = string.IsNullOrEmpty(m.EnsamblePadre) ? "—" : m.EnsamblePadre;
+        pLeft.AddText($"Padre: {padreStr}");
+
+        var pCenter = fRow.Cells[1].AddParagraph();
+        pCenter.Format.Alignment = ParagraphAlignment.Center;
+        pCenter.Format.Font.Size = 6.5;
+        pCenter.Format.Font.Color = Color.FromRgb(100, 116, 139);
+        pCenter.AddText($"{companyName.ToUpper()} — IA.AGUS\n");
+        pCenter.AddText("Pág. ");
+        pCenter.AddPageField();
+        pCenter.AddText(" de ");
+        pCenter.AddNumPagesField();
+        pCenter.AddText(" | RUTA | MAT | BOM");
+
+        var pRight = fRow.Cells[2].AddParagraph();
+        pRight.Format.Alignment = ParagraphAlignment.Right;
+        pRight.Format.Font.Size = 6.5;
+        pRight.Format.Font.Color = Color.FromRgb(100, 116, 139);
+        pRight.AddText($"Job: {m.JobID}\n");
+        var partRev = string.IsNullOrEmpty(m.Revision) ? "0" : m.Revision;
+        pRight.AddText($"Parte: {m.NumeroParte} Rev: {partRev}");
 
         AddHeader(section, m, companyName, tempFiles);
         AddInfoCard(section, m);
 
         if (m.Operaciones.Any())
-            AddOperationsTable(section, m.Operaciones);
+            AddOperationsTable(section, m.Operaciones, tempFiles);
 
         if (m.Materiales.Any())
             AddMaterialsTable(section, m.Materiales);
@@ -263,33 +293,46 @@ public static class ViajeroMigraDocument
         section.AddParagraph().Format.SpaceAfter = "0.2cm";
     }
 
-    // ── Ficha Informativa Compacta (Rejilla QuestPDF Clone con color #eff6ff) ─
+    // ── Ficha Informativa Compacta (Rejilla QuestPDF Clone con color #eff6ff y sin bordes internos) ─
     private static void AddInfoCard(Section section, ViajeroModel m)
     {
         var table = section.AddTable();
-        table.Borders.Color  = Color.FromRgb(191, 219, 254); // Blue-200 (#bfdbfe)
-        table.Borders.Width  = 0.75;
+        table.Borders.Width = 0; // Sin bordes internos
+        
+        // Borde exterior azul claro (#bfdbfe)
+        table.Borders.Top.Width = 0.75;
+        table.Borders.Top.Color = Color.FromRgb(191, 219, 254);
+        table.Borders.Bottom.Width = 0.75;
+        table.Borders.Bottom.Color = Color.FromRgb(191, 219, 254);
+        table.Borders.Left.Width = 0.75;
+        table.Borders.Left.Color = Color.FromRgb(191, 219, 254);
+        table.Borders.Right.Width = 0.75;
+        table.Borders.Right.Color = Color.FromRgb(191, 219, 254);
+
         table.LeftPadding    = Unit.FromCentimeter(0.25);
         table.RightPadding   = Unit.FromCentimeter(0.25);
-        table.TopPadding     = Unit.FromPoint(3);
-        table.BottomPadding  = Unit.FromPoint(3);
+        table.TopPadding     = Unit.FromPoint(4);
+        table.BottomPadding  = Unit.FromPoint(4);
 
-        // 4 Columnas perfectas
-        table.AddColumn("2.8cm");
-        table.AddColumn("6.5cm");
-        table.AddColumn("2.8cm");
-        table.AddColumn("6.5cm");
+        // 8 Columnas perfectas (Label + Value pairs)
+        table.AddColumn("2.0cm"); // L1
+        table.AddColumn("2.8cm"); // V1
+        table.AddColumn("1.8cm"); // L2
+        table.AddColumn("2.8cm"); // V2
+        table.AddColumn("2.2cm"); // L3
+        table.AddColumn("2.8cm"); // V3
+        table.AddColumn("1.4cm"); // L4
+        table.AddColumn("2.8cm"); // V4
 
         void Cell(Row r, int colLabel, int colVal, string label, string? value, bool bold = false, string? subVal = null)
         {
-            // Fondo de la celda de etiqueta y valor a azul claro
             r.Cells[colLabel].Shading.Color = Color.FromRgb(239, 246, 255); // Blue-50 (#eff6ff)
             r.Cells[colVal].Shading.Color   = Color.FromRgb(239, 246, 255);
 
             var pL = r.Cells[colLabel].AddParagraph(label.ToUpper());
             pL.Format.Font.Bold  = true;
             pL.Format.Font.Size  = 7;
-            pL.Format.Font.Color = Color.FromRgb(30, 64, 175); // Blue-700 (#1e40af)
+            pL.Format.Font.Color = Color.FromRgb(30, 64, 175); // Blue-700
 
             var pV = r.Cells[colVal].AddParagraph();
             var valSpan = pV.AddFormattedText(string.IsNullOrWhiteSpace(value) ? "—" : value);
@@ -311,49 +354,37 @@ public static class ViajeroMigraDocument
         var r1 = table.AddRow(); r1.Height = "0.55cm"; r1.VerticalAlignment = VerticalAlignment.Center;
         Cell(r1, 0, 1, "PARTE:", m.NumeroParte, bold: true);
         Cell(r1, 2, 3, "REVISIÓN:", m.Revision, bold: true);
+        Cell(r1, 4, 5, "CANT. ORDEN:", m.CantidadOrden.HasValue ? $"{m.CantidadOrden:N0} / PZ" : "—", bold: true);
+        Cell(r1, 6, 7, "FECHA ORDEN:", m.FechaOrden?.ToString("dd-MMM-yyyy") ?? "—", bold: true);
 
-        // Fila 2: Cantidad y Fechas
+        // Fila 2: Referencias y Compromiso
         var r2 = table.AddRow(); r2.Height = "0.55cm"; r2.VerticalAlignment = VerticalAlignment.Center;
-        Cell(r2, 0, 1, "CANT. ORDEN:", m.CantidadOrden.HasValue ? $"{m.CantidadOrden:N0} / PZ" : "—", bold: true);
-        Cell(r2, 2, 3, "FECHA ORDEN:", m.FechaOrden?.ToString("dd-MMM-yyyy") ?? "—", bold: true);
+        Cell(r2, 0, 1, "CLIENTE:", m.Cliente, bold: true);
+        Cell(r2, 2, 3, "DIBUJO:", string.IsNullOrWhiteSpace(m.Dibujo) ? m.NumeroParte : m.Dibujo, bold: true);
+        Cell(r2, 4, 5, "OC CLIENTE:", m.OCCliente, bold: true);
+        Cell(r2, 6, 7, "ENTREGA:", m.FechaEntrega?.ToString("dd-MMM-yyyy") ?? "—", bold: true);
 
-        // Fila 3: Cliente
-        var r3 = table.AddRow(); r3.Height = "0.55cm"; r3.VerticalAlignment = VerticalAlignment.Center;
-        Cell(r3, 0, 1, "CLIENTE:", m.Cliente, bold: true);
-        Cell(r3, 2, 3, "DIBUJO:", string.IsNullOrWhiteSpace(m.Dibujo) ? m.NumeroParte : m.Dibujo, bold: true);
-
-        // Fila 4: OC
-        var r4 = table.AddRow(); r4.Height = "0.55cm"; r4.VerticalAlignment = VerticalAlignment.Center;
-        Cell(r4, 0, 1, "OC CLIENTE:", m.OCCliente, bold: true);
-        Cell(r4, 2, 3, "ENTREGA:", m.FechaEntrega?.ToString("dd-MMM-yyyy") ?? "—", bold: true);
-
-        // Fila 5: Ensamble Padre / TL
-        var r5 = table.AddRow(); r5.Height = "0.75cm"; r5.VerticalAlignment = VerticalAlignment.Center;
+        // Fila 3: Jerarquía Industrial
+        var r3 = table.AddRow(); r3.Height = "0.75cm"; r3.VerticalAlignment = VerticalAlignment.Center;
         var padre = string.IsNullOrEmpty(m.EnsamblePadre) ? "N/A" : m.EnsamblePadre;
-        Cell(r5, 0, 1, "E. PADRE:", padre, bold: true, subVal: m.EnsamblePadreDesc);
+        Cell(r3, 0, 1, "E. PADRE:", padre, bold: true, subVal: m.EnsamblePadreDesc);
         var tl = string.IsNullOrEmpty(m.EnsambleTL) || m.EnsambleTL == "N/A" ? "TOP LEVEL" : m.EnsambleTL;
-        Cell(r5, 2, 3, "E. T/L:", tl, bold: true, subVal: m.EnsambleTLDesc);
+        Cell(r3, 2, 3, "E. T/L:", tl, bold: true, subVal: m.EnsambleTLDesc);
+        Cell(r3, 4, 5, "LÍNEA:", m.Linea ?? "ESTÁNDAR", bold: true);
+        Cell(r3, 6, 7, "HORAS EST.:", m.HorasEstTotales.HasValue ? $"{m.HorasEstTotales:N2} HRS" : "—", bold: true);
 
-        // Fila 6: Línea y Horas
-        var r6 = table.AddRow(); r6.Height = "0.55cm"; r6.VerticalAlignment = VerticalAlignment.Center;
-        Cell(r6, 0, 1, "LÍNEA:", m.Linea ?? "ESTÁNDAR", bold: true);
-        Cell(r6, 2, 3, "HORAS EST.:", m.HorasEstTotales.HasValue ? $"{m.HorasEstTotales:N2} HRS" : "—", bold: true);
+        // Fila 4: Control Interno
+        var r4 = table.AddRow(); r4.Height = "0.55cm"; r4.VerticalAlignment = VerticalAlignment.Center;
+        Cell(r4, 0, 1, "JOB ID:", m.JobID, bold: true);
+        Cell(r4, 2, 3, "COTIZACIÓN:", m.Cotizacion, bold: true);
+        Cell(r4, 4, 5, "CANT. FAB.:", m.CantFabricada.HasValue ? $"{m.CantFabricada:N0}" : "0", bold: true);
+        Cell(r4, 6, 7, "ESTATUS:", "PENDIENTE", bold: true);
 
-        // Fila 7: Control
-        var r7 = table.AddRow(); r7.Height = "0.55cm"; r7.VerticalAlignment = VerticalAlignment.Center;
-        Cell(r7, 0, 1, "JOB ID:", m.JobID, bold: true);
-        Cell(r7, 2, 3, "COTIZACIÓN:", m.Cotizacion, bold: true);
-
-        // Fila 8: Estatus
-        var r8 = table.AddRow(); r8.Height = "0.55cm"; r8.VerticalAlignment = VerticalAlignment.Center;
-        Cell(r8, 0, 1, "CANT. FAB.:", m.CantFabricada.HasValue ? $"{m.CantFabricada:N0}" : "0", bold: true);
-        Cell(r8, 2, 3, "ESTATUS:", "PENDIENTE", bold: true);
-
-        // Fila 9: Descripción Larga (Merged)
+        // Fila 5: Descripción Larga (Merged)
         var rDesc = table.AddRow();
         rDesc.Height = "0.65cm";
         rDesc.VerticalAlignment = VerticalAlignment.Center;
-        rDesc.Cells[0].MergeRight = 3;
+        rDesc.Cells[0].MergeRight = 7;
         rDesc.Cells[0].Shading.Color = Color.FromRgb(239, 246, 255);
 
         var pDesc = rDesc.Cells[0].AddParagraph();
@@ -400,39 +431,101 @@ public static class ViajeroMigraDocument
     }
 
     // ── Tabla de operaciones ──────────────────────────────────────────────────
-    private static void AddOperationsTable(Section section, List<OperacionModel> ops)
+    private static void AddOperationsTable(Section section, List<OperacionModel> ops, List<string> tempFiles)
     {
         AddSectionTitle(section, "RUTA DE PROCESO");
 
         var table = CreateDataTable(section);
-        table.AddColumn("1.2cm"); // SEQ
-        table.AddColumn("3.3cm"); // CENTRO TRAB
-        table.AddColumn("8.1cm"); // INSTRUCCIONES DETALLADAS DE OPERACIÓN
-        table.AddColumn("2.0cm"); // Configurar
-        table.AddColumn("2.0cm"); // Tasa Proceso
-        table.AddColumn("2.0cm"); // Minutos Est.
+        table.AddColumn("0.8cm"); // SEQ
+        table.AddColumn("2.5cm"); // CENTRO TRAB
+        table.AddColumn("8.3cm"); // INSTRUCCIONES DETALLADAS DE OPERACIÓN
+        table.AddColumn("1.7cm"); // Configurar
+        table.AddColumn("2.3cm"); // Tasa Proceso
+        table.AddColumn("3.0cm"); // Minutos Est.
 
         AddTableHeader(table, new[] { "SEQ", "CENTRO TRAB", "INSTRUCCIONES DETALLADAS DE OPERACIÓN", "CONFIGURAR", "TASA PROCESO", "MINUTOS EST." });
 
         foreach (var op in ops)
         {
             var row = table.AddRow();
-            row.Height = "0.55cm";
             row.VerticalAlignment = VerticalAlignment.Center;
             row.Borders.Bottom.Width = 0.5;
             row.Borders.Bottom.Color = Color.FromRgb(191, 219, 254); // Blue-200
 
+            // 1. SEQ
             SetCell(row, 0, op.Orden?.ToString() ?? "", ParagraphAlignment.Center);
-            SetCell(row, 1, op.CentroTrabajo, ParagraphAlignment.Center);
-            
-            // Descripción en negrita oscura
-            var pDetail = row.Cells[2].AddParagraph(op.NombreOperacion ?? "");
-            pDetail.Format.Font.Size = 7.5;
-            pDetail.Format.Font.Color = Color.FromRgb(15, 23, 42);
 
-            SetCell(row, 3, "—", ParagraphAlignment.Center);
-            SetCell(row, 4, "—", ParagraphAlignment.Center);
-            SetCell(row, 5, op.TiempoEstimado.HasValue ? $"{op.TiempoEstimado * 60:N0} MIN" : "—", ParagraphAlignment.Center);
+            // 2. CENTRO TRAB (Nombre + Barcode + Nombre pequeño)
+            var cellCT = row.Cells[1];
+            cellCT.Format.Alignment = ParagraphAlignment.Center;
+            
+            var pCT = cellCT.AddParagraph();
+            var runCT = pCT.AddFormattedText(op.CentroTrabajo);
+            runCT.Bold = true;
+            runCT.Font.Size = 7.5;
+            runCT.Font.Color = Color.FromRgb(0, 0, 0);
+
+            var barcodePath = GenerateBarcodeImage(op.CentroTrabajo, tempFiles);
+            if (barcodePath != null)
+            {
+                try
+                {
+                    var pBar = cellCT.AddParagraph();
+                    pBar.Format.Alignment = ParagraphAlignment.Center;
+                    pBar.Format.SpaceBefore = Unit.FromPoint(2);
+                    pBar.Format.SpaceAfter = Unit.FromPoint(2);
+                    var imgBar = pBar.AddImage(barcodePath);
+                    imgBar.Height = "0.4cm";
+                    imgBar.LockAspectRatio = true;
+                }
+                catch { }
+            }
+
+            var pCTSub = cellCT.AddParagraph(op.CentroTrabajo);
+            pCTSub.Format.Font.Size = 5;
+            pCTSub.Format.Font.Color = Color.FromRgb(100, 116, 139); // Slate-500
+            pCTSub.Format.Alignment = ParagraphAlignment.Center;
+
+            // 3. INSTRUCCIONES DETALLADAS DE OPERACIÓN
+            var cellDesc = row.Cells[2];
+            var pOpName = cellDesc.AddParagraph();
+            if (!string.IsNullOrWhiteSpace(op.ClaveOperacion))
+            {
+                var runClave = pOpName.AddFormattedText($"[{op.ClaveOperacion}] ");
+                runClave.Bold = true;
+                runClave.Font.Size = 7.5;
+                runClave.Font.Color = Color.FromRgb(0, 0, 0);
+            }
+            if (!string.IsNullOrWhiteSpace(op.NombreOperacion))
+            {
+                var runName = pOpName.AddFormattedText(op.NombreOperacion);
+                runName.Bold = true;
+                runName.Font.Size = 7.5;
+                runName.Font.Color = Color.FromRgb(0, 0, 0);
+            }
+
+            if (!string.IsNullOrWhiteSpace(op.DescripcionDetallada))
+            {
+                string[] lines = op.DescripcionDetallada.Split(new[] { "\\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var lineText in lines)
+                {
+                    if (string.IsNullOrWhiteSpace(lineText)) continue;
+                    var pLine = cellDesc.AddParagraph(lineText.Trim());
+                    pLine.Format.Font.Size = 7;
+                    pLine.Format.Font.Color = Color.FromRgb(30, 41, 59); // Slate-800 (#1e293b)
+                    pLine.Format.SpaceBefore = Unit.FromPoint(1);
+                }
+            }
+
+            // 4. CONFIGURAR
+            SetCell(row, 3, op.Configuracion?.ToString("F2") ?? "0.00", ParagraphAlignment.Center);
+
+            // 5. TASA PROCESO
+            SetCell(row, 4, string.IsNullOrWhiteSpace(op.TasaProceso) ? "0.00 Min/Part" : op.TasaProceso, ParagraphAlignment.Center);
+
+            // 6. MINUTOS EST.
+            SetCell(row, 5, op.TiempoEstimado.HasValue ? op.TiempoEstimado.Value.ToString("N2") : "0.00", ParagraphAlignment.Center);
+            row.Cells[5].Format.Font.Bold = true;
         }
 
         section.AddParagraph().Format.SpaceAfter = "0.3cm";
@@ -551,8 +644,7 @@ public static class ViajeroMigraDocument
     private static Table CreateDataTable(Section section)
     {
         var table = section.AddTable();
-        table.Borders.Color = Color.FromRgb(191, 219, 254); // Blue-200 (#bfdbfe)
-        table.Borders.Width = 0.5;
+        table.Borders.Width = 0; // Sin bordes por defecto, los manejamos por fila (solo horizontales)
         table.LeftPadding   = Unit.FromPoint(4);
         table.RightPadding  = Unit.FromPoint(4);
         table.TopPadding    = Unit.FromPoint(4);
