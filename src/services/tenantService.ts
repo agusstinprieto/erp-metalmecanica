@@ -26,7 +26,7 @@ export interface TenantConfig {
   theme_name?: 'blue' | 'slate' | 'emerald' | 'carbon';
 }
 
-const CEO_ROLES = new Set(['ceo', 'admin']);
+const CEO_ROLES = new Set(['ceo', 'sistemas']);
 
 async function getCurrentUserRole(): Promise<string> {
   const { data: { user } } = await supabase.auth.getUser();

@@ -59,14 +59,7 @@ export const auditService = {
   async getLogs(limit = 50) {
     const { data, error } = await supabase
       .from('audit_logs')
-      .select(`
-        *,
-        profiles (
-          full_name,
-          email,
-          role
-        )
-      `)
+      .select('*')
       .order('created_at', { ascending: false })
       .limit(limit);
 
@@ -75,6 +68,21 @@ export const auditService = {
       throw error;
     }
 
-    return data as AuditLog[];
+    if (!data || data.length === 0) return [];
+
+    // audit_logs.user_id → auth.users, no hay FK directo a profiles,
+    // así que hacemos un segundo query para enriquecer con datos del perfil
+    const userIds = [...new Set(data.map((l: any) => l.user_id).filter(Boolean))];
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, full_name, email, role')
+      .in('id', userIds);
+
+    const profileMap = Object.fromEntries((profiles ?? []).map((p: any) => [p.id, p]));
+
+    return data.map((log: any) => ({
+      ...log,
+      profiles: profileMap[log.user_id] ?? undefined,
+    })) as AuditLog[];
   }
 };
