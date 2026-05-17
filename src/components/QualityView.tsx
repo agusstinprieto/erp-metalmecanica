@@ -29,6 +29,379 @@ const emptyAuditForm = {
   no_conformidades_encontradas: 0, resultado: 'pendiente', status: 'programada'
 };
 
+// ─── Assembly Line Simulator ──────────────────────────────────────────────────
+const AssemblyLineSimulator: React.FC<{ canvasRef: React.RefObject<HTMLCanvasElement> }> = ({ canvasRef }) => {
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animId: number;
+    let frame = 0;
+
+    const parts = [
+      { x: 50, y: 190, type: 'plate', status: 'PASS' },
+      { x: 250, y: 190, type: 'gear', status: 'PASS' },
+      { x: 450, y: 190, type: 'chassis', status: 'PASS' },
+    ];
+
+    const render = () => {
+      frame++;
+      const w = canvas.width = 640;
+      const h = canvas.height = 360;
+
+      ctx.fillStyle = '#020617';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.strokeStyle = 'rgba(30, 41, 59, 0.4)';
+      ctx.lineWidth = 1;
+      const grid = 25;
+      for (let x = 0; x < w; x += grid) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, h);
+        ctx.stroke();
+      }
+      for (let y = 0; y < h; y += grid) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(w, y);
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(0, 210, w, 24);
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 216, w, 12);
+
+      ctx.fillStyle = '#475569';
+      for (let rx = 30; rx < w; rx += 70) {
+        ctx.beginPath();
+        ctx.arc(rx, 222, 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(rx, 222);
+        const angle = (frame * 0.04) % (Math.PI * 2);
+        ctx.lineTo(rx + Math.cos(angle) * 7, 222 + Math.sin(angle) * 7);
+        ctx.stroke();
+      }
+
+      parts.forEach(p => {
+        p.x += 1.8;
+        if (p.x > w + 60) {
+          p.x = -60;
+          p.status = Math.random() > 0.08 ? 'PASS' : 'FAIL';
+        }
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+
+        if (p.type === 'plate') {
+          ctx.fillStyle = '#64748b';
+          ctx.fillRect(-30, -18, 60, 24);
+          ctx.strokeStyle = '#94a3b8';
+          ctx.lineWidth = 1.5;
+          ctx.strokeRect(-30, -18, 60, 24);
+          ctx.fillStyle = '#cbd5e1';
+          ctx.beginPath();
+          ctx.arc(-22, -12, 2.5, 0, Math.PI * 2);
+          ctx.arc(22, -12, 2.5, 0, Math.PI * 2);
+          ctx.arc(-22, 0, 2.5, 0, Math.PI * 2);
+          ctx.arc(22, 0, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (p.type === 'gear') {
+          ctx.fillStyle = '#475569';
+          ctx.beginPath();
+          ctx.arc(0, -6, 18, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#64748b';
+          ctx.lineWidth = 3;
+          ctx.stroke();
+          ctx.fillStyle = '#475569';
+          ctx.save();
+          ctx.rotate(frame * 0.03);
+          for (let i = 0; i < 8; i++) {
+            ctx.rotate(Math.PI / 4);
+            ctx.fillRect(-5, -24, 10, 10);
+          }
+          ctx.restore();
+          ctx.fillStyle = '#020617';
+          ctx.beginPath();
+          ctx.arc(0, -6, 5, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          ctx.fillStyle = '#334155';
+          ctx.fillRect(-40, -22, 80, 28);
+          ctx.strokeStyle = '#475569';
+          ctx.lineWidth = 1.5;
+          ctx.strokeRect(-40, -22, 80, 28);
+          ctx.fillStyle = '#020617';
+          ctx.fillRect(-25, -16, 20, 12);
+          ctx.fillRect(5, -16, 20, 12);
+        }
+
+        ctx.restore();
+
+        if (p.x > 260 && p.x < 380) {
+          ctx.strokeStyle = p.status === 'PASS' ? '#10b981' : '#f43f5e';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(p.x - 45, p.y - 30, 90, 50);
+          
+          ctx.fillStyle = p.status === 'PASS' ? 'rgba(16, 185, 129, 0.95)' : 'rgba(244, 63, 94, 0.95)';
+          ctx.fillRect(p.x - 45, p.y - 50, 75, 18);
+          ctx.fillStyle = '#ffffff';
+          ctx.font = 'bold 9px monospace';
+          ctx.fillText(`${p.type.toUpperCase()}:${p.status}`, p.x - 41, p.y - 37);
+        }
+      });
+
+      const armX = 320;
+      const armY = 55;
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 10;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(armX, 0);
+      ctx.lineTo(armX, armY);
+      ctx.stroke();
+
+      ctx.fillStyle = '#1e293b';
+      ctx.strokeStyle = '#3b82f6';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.rect(armX - 35, armY, 70, 18);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#3b82f6';
+      ctx.beginPath();
+      ctx.arc(armX, armY + 9, 5, 0, Math.PI * 2);
+      ctx.fill();
+
+      const laserScanY = 175 + Math.sin(frame * 0.08) * 40;
+      const scanGrad = ctx.createLinearGradient(0, armY + 18, 0, 230);
+      scanGrad.addColorStop(0, 'rgba(59, 130, 246, 0.35)');
+      scanGrad.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+      ctx.fillStyle = scanGrad;
+      ctx.beginPath();
+      ctx.moveTo(armX - 6, armY + 18);
+      ctx.lineTo(armX + 6, armY + 18);
+      ctx.lineTo(armX + 130, 230);
+      ctx.lineTo(armX - 130, 230);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.strokeStyle = '#60a5fa';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(armX - 90, laserScanY);
+      ctx.lineTo(armX + 90, laserScanY);
+      ctx.stroke();
+
+      ctx.fillStyle = 'rgba(59, 130, 246, 0.8)';
+      ctx.font = 'bold 9px monospace';
+      ctx.fillText('SYS_STAT: ACTIVE_FLOW', 15, 25);
+      ctx.fillText('CAM_SOURCE: ASSEMBLY_LINE_1', 15, 38);
+      ctx.fillText(`FPS: 30`, 15, 51);
+      ctx.fillText('RESOLUTION: 1080p', 15, 64);
+
+      ctx.fillStyle = 'rgba(16, 185, 129, 0.8)';
+      ctx.fillText('PROCESS: SCANNING', w - 130, 25);
+      ctx.fillText('QUALITY ENGINE: ACTIVE', w - 130, 38);
+      ctx.fillText('CORS STATUS: EMBEDDED', w - 130, 51);
+
+      ctx.strokeStyle = '#3b82f6';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(0, 0, w, h);
+
+      animId = requestAnimationFrame(render);
+    };
+
+    render();
+    return () => cancelAnimationFrame(animId);
+  }, []);
+
+  return <canvas ref={canvasRef} className="w-full h-full object-cover" />;
+};
+
+
+// ─── Welding Simulator ────────────────────────────────────────────────────────
+const WeldingSimulator: React.FC<{ canvasRef: React.RefObject<HTMLCanvasElement> }> = ({ canvasRef }) => {
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animId: number;
+    let frame = 0;
+
+    interface Spark {
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      life: number;
+      maxLife: number;
+      color: string;
+    }
+    const sparks: Spark[] = [];
+
+    const render = () => {
+      frame++;
+      const w = canvas.width = 640;
+      const h = canvas.height = 360;
+
+      ctx.fillStyle = '#0b0f19';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.strokeStyle = 'rgba(249, 115, 22, 0.06)';
+      ctx.lineWidth = 1;
+      const grid = 25;
+      for (let x = 0; x < w; x += grid) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, h);
+        ctx.stroke();
+      }
+      for (let y = 0; y < h; y += grid) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(w, y);
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(50, 200, 540, 45);
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(50, 200, 540, 45);
+
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(50, 200);
+      ctx.lineTo(590, 200);
+      ctx.stroke();
+
+      const weldSpeed = 1.6;
+      const weldRangeX = 460;
+      const weldStartX = 90;
+      const cycle = (frame * weldSpeed) % (weldRangeX * 2);
+      const weldX = cycle < weldRangeX ? weldStartX + cycle : weldStartX + (weldRangeX * 2 - cycle);
+      const weldY = 200;
+
+      ctx.strokeStyle = '#f97316';
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.moveTo(weldStartX, 200);
+      ctx.lineTo(weldX, 200);
+      ctx.stroke();
+
+      ctx.strokeStyle = '#3f3f46';
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.moveTo(weldStartX, 200);
+      ctx.lineTo(Math.max(weldStartX, weldX - 120), 200);
+      ctx.stroke();
+
+      if (frame % 1 === 0) {
+        for (let i = 0; i < 5; i++) {
+          sparks.push({
+            x: weldX,
+            y: weldY,
+            vx: (Math.random() - 0.5) * 7,
+            vy: -Math.random() * 7 - 2,
+            life: 0,
+            maxLife: 25 + Math.random() * 35,
+            color: Math.random() > 0.35 ? '#f97316' : '#facc15'
+          });
+        }
+      }
+
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const s = sparks[i];
+        s.x += s.vx;
+        s.y += s.vy;
+        s.vy += 0.16;
+        s.life++;
+
+        if (s.life >= s.maxLife) {
+          sparks.splice(i, 1);
+        } else {
+          ctx.fillStyle = s.color;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      ctx.save();
+      ctx.translate(weldX, weldY);
+      
+      ctx.strokeStyle = '#64748b';
+      ctx.lineWidth = 7;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(35, -60);
+      ctx.lineTo(0, 0);
+      ctx.stroke();
+
+      ctx.fillStyle = '#334155';
+      ctx.fillRect(-5, -12, 10, 12);
+
+      ctx.restore();
+
+      const arcRadius = 15 + Math.random() * 10;
+      const grad = ctx.createRadialGradient(weldX, weldY, 1, weldX, weldY, arcRadius);
+      grad.addColorStop(0, '#ffffff');
+      grad.addColorStop(0.3, '#38bdf8');
+      grad.addColorStop(0.6, 'rgba(56, 189, 248, 0.45)');
+      grad.addColorStop(1, 'rgba(56, 189, 248, 0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(weldX, weldY, arcRadius, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#f97316';
+      ctx.font = 'bold 9px monospace';
+      ctx.fillText('SYS_STAT: MONITORING', 15, 25);
+      ctx.fillText('CAM_SOURCE: WELD_STATION_4', 15, 38);
+      ctx.fillText('TEMPERATURE: 1690°C', 15, 51);
+      ctx.fillText('CURRENT: 145A', 15, 64);
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillText('SPECTROMETRY: ACTIVE', w - 140, 25);
+      ctx.fillText('ALERTS: ZERO DEFECTS', w - 140, 38);
+      ctx.fillText('SHIELDING GAS: ACTIVE', w - 140, 51);
+
+      ctx.strokeStyle = 'rgba(249, 115, 22, 0.5)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(weldX - 35, weldY - 35, 70, 70);
+
+      ctx.beginPath();
+      ctx.moveTo(weldX - 12, weldY); ctx.lineTo(weldX + 12, weldY);
+      ctx.moveTo(weldX, weldY - 12); ctx.lineTo(weldX, weldY + 12);
+      ctx.stroke();
+
+      ctx.strokeStyle = '#f97316';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(0, 0, w, h);
+
+      animId = requestAnimationFrame(render);
+    };
+
+    render();
+    return () => cancelAnimationFrame(animId);
+  }, []);
+
+  return <canvas ref={canvasRef} className="w-full h-full object-cover" />;
+};
+
+
 export const QualityView: React.FC = () => {
   const { isDarkMode } = useConfig();
   const { searchTerm, setSearchTerm } = useSearch();
@@ -67,15 +440,28 @@ export const QualityView: React.FC = () => {
       const saved = localStorage.getItem('mcvill_quality_feeds');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map(f => {
+            if (f.url.includes('buffalotrace') || f.id === 'cam-1') {
+              return { ...f, url: 'demo-assembly' };
+            }
+            if (f.url.includes('pendelcam') || f.url.includes('uni-heidelberg') || f.id === 'cam-2') {
+              return { ...f, url: 'demo-welding' };
+            }
+            return f;
+          });
+        }
       }
     } catch {}
     return [
-      { id: 'cam-1', url: 'http://camera.buffalotrace.com/mjpg/video.mjpg', label: 'LÍNEA ENSAMBLE 1' },
-      { id: 'cam-2', url: 'http://pendelcam.kip.uni-heidelberg.de/mjpg/video.mjpg', label: 'ESTACIÓN SOLDADURA 4' },
+      { id: 'cam-1', url: 'demo-assembly', label: 'LÍNEA ENSAMBLE 1' },
+      { id: 'cam-2', url: 'demo-welding', label: 'ESTACIÓN SOLDADURA 4' },
     ];
   });
   const [selectedFeedId, setSelectedFeedId] = useState<string | null>(null);
+  
+  const canvasRef1 = React.useRef<HTMLCanvasElement>(null);
+  const canvasRef2 = React.useRef<HTMLCanvasElement>(null);
 
   const updateFeeds = (feeds: typeof activeFeeds) => {
     setActiveFeeds(feeds);
@@ -539,7 +925,13 @@ export const QualityView: React.FC = () => {
                   </div>
                   <div className="relative flex-1 bg-black aspect-video flex items-center justify-center overflow-hidden">
                     {feed.url ? (
-                      <img src={feed.url} className="w-full h-full object-contain" alt={feed.label} />
+                      feed.id === 'cam-1' || feed.url === 'demo-assembly' ? (
+                        <AssemblyLineSimulator canvasRef={canvasRef1} />
+                      ) : feed.id === 'cam-2' || feed.url === 'demo-welding' ? (
+                        <WeldingSimulator canvasRef={canvasRef2} />
+                      ) : (
+                        <img src={feed.url} className="w-full h-full object-contain" alt={feed.label} />
+                      )
                     ) : (
                       <div className="text-center p-8">
                         <AlertTriangle className="text-amber-500/40 mx-auto mb-2" size={32} />
