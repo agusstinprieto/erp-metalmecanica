@@ -40,9 +40,18 @@ export interface AnalisisRecord {
 
 const LS_KEY = 'mcvill_factibilidad_historial';
 
-const SYSTEM_PROMPT = `Eres el analista de factibilidad de manufactura de McVill S.A. de C.V., empresa metal-mecánica en Coahuila, México especializada en manufactura de precisión para clientes industriales.
+// Dynamically gets company brand info from localStorage (Rule 16)
+function getBrandConfig() {
+  try {
+    const saved = localStorage.getItem('mcvill-config');
+    if (saved) return JSON.parse(saved);
+  } catch {}
+  return { brandName: 'la empresa metal-mecánica', companyName: 'la empresa metal-mecánica' };
+}
 
-CAPACIDADES DE PLANTA McVill:
+const SYSTEM_PROMPT = `Eres el analista de factibilidad de manufactura de una empresa metal-mecánica en Coahuila, México especializada en manufactura de precisión para clientes industriales.
+
+CAPACIDADES DE PLANTA:
 - Corte: oxicorte, plasma CNC, láser Trumpf 3kW (hasta 12mm acero)
 - Maquinado CNC: tornos Mazak, fresadoras CNC, centros de maquinado
 - Soldadura: MIG/TIG certificada AWS, soldadura estructural, puntos resistencia
@@ -52,7 +61,7 @@ CAPACIDADES DE PLANTA McVill:
 
 CLIENTES ACTIVOS: CAT CMSA, CAT Acuña, WABTEC, KOMATSU, JOHN DEERE, KONE, BUHLER, ALFAGOMMA, New Standard
 
-REFERENCIA DE COSTOS McVill (aproximados por proceso):
+REFERENCIA DE COSTOS (aproximados por proceso):
 - Corte oxicorte/plasma: $80–$200 MXN/kg procesado
 - Maquinado CNC: $400–$800 MXN/hr máquina
 - Soldadura estructural: $250–$500 MXN/hr
@@ -60,7 +69,7 @@ REFERENCIA DE COSTOS McVill (aproximados por proceso):
 - Pintura en polvo: $120–$250 MXN/m²
 - Materia prima acero: $22–$35 MXN/kg
 
-CRITERIOS DE FACTIBILIDAD (basados en Matriz F001 McVill):
+CRITERIOS DE FACTIBILIDAD (basados en Matriz F001):
 - Aceros únicos > 2: riesgo elevado de proveeduría
 - Procesos distintos ≥ 6: alta complejidad operativa
 - Sub-ensambles ≥ 4: integración compleja, cuellos potenciales
@@ -74,8 +83,9 @@ REGLAS DE DECISIÓN:
 Responde ÚNICAMENTE con JSON válido. Sin markdown, sin texto fuera del JSON, sin comentarios.`;
 
 export async function analyzeRFQ(rfq: RFQCotizacion): Promise<FactibilidadAnalisis> {
+  const brand = getBrandConfig();
   const eau_str = rfq.eau ? `\nEAU (unidades/año): ${rfq.eau}` : '';
-  const prompt = `Analiza la factibilidad de manufactura para este RFQ de McVill:
+  const prompt = `Analiza la factibilidad de manufactura para este RFQ de ${brand.companyName || 'la empresa'}:
 
 CLIENTE: ${rfq.cliente}
 DESCRIPCIÓN: ${rfq.descripcion || rfq.alcance_general || 'No especificada'}

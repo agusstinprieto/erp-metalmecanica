@@ -1,6 +1,23 @@
 import type { jsPDF as jsPDFType } from 'jspdf';
 import { eventBus } from './eventBus';
 
+// Dynamically gets company brand info from localStorage (Rule 16)
+function getBrandConfig() {
+  try {
+    const saved = localStorage.getItem('mcvill-config');
+    if (saved) {
+      return JSON.parse(saved);
+    }
+  } catch (e) {
+    console.error('Error reading brand config', e);
+  }
+  return {
+    brandName: 'METALMECÁNICA',
+    companyName: 'ERP Industrial',
+    systemName: 'ERP',
+  };
+}
+
 // Lazily loads jsPDF + autotable — only downloaded when user triggers an export
 async function loadPDF() {
   const [{ jsPDF }, { default: autoTable }] = await Promise.all([
@@ -78,15 +95,16 @@ async function drawHeader(
 
   // Nombre empresa
   const textX = logo ? 52 : 14;
+  const brand = getBrandConfig();
   doc.setTextColor(...WHITE);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(14);
-  doc.text('McVill SA de CV', textX, 14);
+  doc.text(brand.companyName || 'ERP Industrial', textX, 14);
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
   doc.setTextColor(147, 197, 253); // azul claro
-  doc.text('McVill Industrial • Sistema ERP', textX, 21);
+  doc.text(`${brand.brandName || 'METALMECÁNICA'} • Sistema ${brand.systemName || 'ERP'}`, textX, 21);
 
   // Fecha y reporte ID en la derecha
   const now  = new Date();
@@ -128,10 +146,11 @@ function drawFooters(doc: jsPDFType) {
     doc.setLineWidth(0.3);
     doc.line(10, pageH - 12, pageW - 10, pageH - 12);
 
+    const brand = getBrandConfig();
     doc.setFontSize(7);
     doc.setTextColor(...SLATE_400);
     doc.setFont('helvetica', 'normal');
-    doc.text('McVill SA de CV  •  Documento de Uso Interno Confidencial', 10, pageH - 7);
+    doc.text(`${brand.companyName || 'ERP Industrial'}  •  Documento de Uso Interno Confidencial`, 10, pageH - 7);
     doc.text(`Página ${i} de ${pageCount}`, pageW - 10, pageH - 7, { align: 'right' });
   }
 }
