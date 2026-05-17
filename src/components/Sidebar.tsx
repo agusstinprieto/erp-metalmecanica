@@ -259,6 +259,43 @@ export const Sidebar = (props: {
           </div>
         ))}
         
+        <div className="pt-3 border-t border-mcvill-accent/30">
+          {!isSidebarCollapsed && (
+            <p className="px-3 mb-1 text-[9px] font-black text-slate-500/70 tracking-[0.25em] uppercase flex items-center gap-2">
+              <span className="w-1 h-1 rounded-full bg-slate-600/50" />
+              Inteligencia
+            </p>
+          )}
+          <SidebarItem
+            icon={MessageSquare}
+            label="Chat IA"
+            active={isChatOpen}
+            onClick={onToggleChat}
+            collapsed={isSidebarCollapsed}
+          />
+          <SidebarItem
+            icon={Zap}
+            label="Voice Link"
+            active={isChatOpen && panelType === 'voice'}
+            onClick={onOpenVoice}
+            collapsed={isSidebarCollapsed}
+          />
+          <SidebarItem
+            icon={ScrollText}
+            label="Minutas IA"
+            active={activeView === 'minutas'}
+            onClick={() => navigate('minutas')}
+            collapsed={isSidebarCollapsed}
+          />
+          <SidebarItem
+            icon={BookOpen}
+            label={`Manual ${config.systemName}`}
+            active={false}
+            onClick={handleOpenGuideModal}
+            collapsed={isSidebarCollapsed}
+          />
+        </div>
+
         {isGodmode && (
           <div className="space-y-2 pt-3 border-t border-mcvill-accent/30">
             {!isSidebarCollapsed && (
@@ -346,43 +383,6 @@ export const Sidebar = (props: {
             </div>
           </div>
         )}
-
-        <div className="pt-3 border-t border-mcvill-accent/30">
-          {!isSidebarCollapsed && (
-            <p className="px-3 mb-1 text-[9px] font-black text-slate-500/70 tracking-[0.25em] uppercase flex items-center gap-2">
-              <span className="w-1 h-1 rounded-full bg-slate-600/50" />
-              Inteligencia
-            </p>
-          )}
-          <SidebarItem
-            icon={MessageSquare}
-            label="Chat IA"
-            active={isChatOpen}
-            onClick={onToggleChat}
-            collapsed={isSidebarCollapsed}
-          />
-          <SidebarItem
-            icon={Zap}
-            label="Voice Link"
-            active={isChatOpen && panelType === 'voice'}
-            onClick={onOpenVoice}
-            collapsed={isSidebarCollapsed}
-          />
-          <SidebarItem
-            icon={ScrollText}
-            label="Minutas IA"
-            active={activeView === 'minutas'}
-            onClick={() => navigate('minutas')}
-            collapsed={isSidebarCollapsed}
-          />
-          <SidebarItem
-            icon={BookOpen}
-            label={`Manual ${config.systemName}`}
-            active={false}
-            onClick={handleOpenGuideModal}
-            collapsed={isSidebarCollapsed}
-          />
-        </div>
       </div>
 
       <div className={clsx(
