@@ -58,7 +58,7 @@ export const tenantService = {
     // Verificar permisos en el cliente antes de llamar al servidor
     // La RLS en Supabase también lo refuerza en el servidor como segunda capa
     const role = await getCurrentUserRole();
-    if (!CEO_ROLES.has(role)) {
+    if (!CEO_ROLES.has(role.toLowerCase())) {
       throw new Error('Permisos insuficientes: solo CEO o Admin puede modificar la configuración.');
     }
 

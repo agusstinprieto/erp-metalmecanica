@@ -176,7 +176,7 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
     // Persist to Supabase
     try {
-      const { data: tenant } = await supabase.from('tenants').select('id, config').single();
+      const { data: tenant } = await supabase.from('tenants').select('id, config').eq('id', tenantId ?? 'mcvill').maybeSingle();
       if (tenant) {
         const currentSupabaseConfig = tenant.config || {};
         await supabase
