@@ -400,13 +400,22 @@ interface DashboardProps { onNavigateToBanco?: () => void; }
 type PlantaKey = 'todas' | 'torreon_laser' | 'torreon_mecanizado' | 'torreon_forja';
 type TurnoKey = 'todos' | 'matutino' | 'vespertino' | 'nocturno';
 type CategoryKey = 'asistencia' | 'produccion' | 'calidad' | 'seguridad' | 'energia';
+type TimeRange = '1d' | '7d' | '30d' | '365d' | 'all';
+
+const TIME_RANGES: { id: TimeRange; label: string; points: number }[] = [
+  { id: '1d',   label: 'Día',       points: 8  },
+  { id: '7d',   label: 'Semana',    points: 7  },
+  { id: '30d',  label: 'Mes',       points: 12 },
+  { id: '365d', label: 'Año',       points: 12 },
+  { id: 'all',  label: 'Histórico', points: 18 },
+];
 
 export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
   const { config } = useConfig();
   const [selectedPlanta, setSelectedPlanta] = useState<PlantaKey>('todas');
   const [selectedTurno, setSelectedTurno] = useState<TurnoKey>('todos');
-  const [selectedCategory, setSelectedCategory] = useState<CategoryKey>('produccion');
-  const [timeRange, setTimeRange] = useState<'7d' | '30d'>('7d');
+  const [timeRange, setTimeRange] = useState<TimeRange>('7d');
+
 
   const [dbStats, setDbStats] = useState({
     empleados: 0,
@@ -517,63 +526,38 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
 
   const metrics = getFilteredMetrics();
 
-  // ── DYNAMIC CHART DATA GENERATION ──────────────────────────────────────────
-  const getChartData = () => {
-    const days = timeRange === '7d' ? 7 : 14;
-    const series = [];
+  // ── MULTI-CHART DATA GENERATION (all 5 KPIs, dynamic range) ──────────────
+  const getAllChartsData = () => {
     const today = new Date();
-    
-    // Seeded random helper for smooth curves
-    const getSeededValue = (dayOffset: number, factor: number) => {
-      const x = Math.sin(dayOffset + (selectedPlanta.length * 2) + (selectedTurno.length * 3)) * 1000;
-      return Math.abs(x - Math.floor(x)) * factor;
+    const cfg = TIME_RANGES.find(t => t.id === timeRange) ?? TIME_RANGES[1];
+    const pts = cfg.points;
+    const seed = (i: number, f: number) => {
+      const x = Math.sin(i + selectedPlanta.length * 2 + selectedTurno.length * 3) * 1000;
+      return Math.abs(x - Math.floor(x)) * f;
     };
-
-    for (let i = days - 1; i >= 0; i--) {
+    const getLabel = (i: number) => {
       const d = new Date(today);
-      d.setDate(today.getDate() - i);
-      const dayLabel = DAY_LABELS[d.getDay()] + (days === 14 ? `-${d.getDate()}` : '');
-
-      let value = 0;
-      let limitLine = 0;
-
-      if (selectedCategory === 'asistencia') {
-        const basePresent = metrics.presentes;
-        const variance = getSeededValue(i, 4) - 2;
-        value = Math.max(2, Math.round(basePresent + variance));
-        limitLine = metrics.empleados;
-      } else if (selectedCategory === 'produccion') {
-        const baseTons = selectedPlanta === 'torreon_forja' ? 45 : selectedPlanta === 'torreon_laser' ? 24 : 18;
-        const shiftFactor = selectedTurno === 'nocturno' ? 0.78 : selectedTurno === 'vespertino' ? 0.92 : 1.0;
-        const variance = getSeededValue(i, 6) - 3;
-        value = Number((Math.max(4, (baseTons * shiftFactor) + variance)).toFixed(1));
-        limitLine = baseTons; // Target tons
-      } else if (selectedCategory === 'calidad') {
-        // PPM Defective parts
-        const basePPM = metrics.scrap * 1500; 
-        const variance = getSeededValue(i, 400) - 200;
-        value = Math.round(Math.max(50, basePPM + variance));
-        limitLine = 2000; // Calidad Tolerable PPM limit
-      } else if (selectedCategory === 'seguridad') {
-        // Near Misses / Reportes HSE
-        value = Math.round(getSeededValue(i, 3.2));
-        if (selectedTurno === 'nocturno') value += 1;
-        limitLine = 4; // Umbral de alerta roja
-      } else if (selectedCategory === 'energia') {
-        // KWh por Tonelada
-        const baseKWh = metrics.energy;
-        const variance = getSeededValue(i, 30) - 15;
-        value = Math.round(Math.max(60, baseKWh + variance));
-        limitLine = baseKWh * 1.1; // Consumo crítico
-      }
-
-      series.push({ name: dayLabel, value, limitLine });
-    }
-    return series;
+      if (timeRange === '1d')   { d.setHours(d.getHours() - (pts - 1 - i) * 3); return `${String(d.getHours()).padStart(2,'0')}h`; }
+      if (timeRange === '30d')  { d.setDate(d.getDate() - (pts - 1 - i) * 2); return `${d.getDate()}/${d.getMonth()+1}`; }
+      if (timeRange === '365d') { d.setMonth(d.getMonth() - (pts - 1 - i)); return ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][d.getMonth()]; }
+      if (timeRange === 'all')  { d.setMonth(d.getMonth() - (pts - 1 - i)); return ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][d.getMonth()]; }
+      d.setDate(d.getDate() - (pts - 1 - i)); return DAY_LABELS[d.getDay()];
+    };
+    return Array.from({ length: pts }, (_, i) => {
+      const label = getLabel(i);
+      const baseTons = selectedPlanta === 'torreon_forja' ? 45 : selectedPlanta === 'torreon_laser' ? 24 : 18;
+      const shiftFactor = selectedTurno === 'nocturno' ? 0.78 : selectedTurno === 'vespertino' ? 0.92 : 1.0;
+      return {
+        name: label,
+        oee: Number(Math.max(70, metrics.oee + seed(i, 6) - 3).toFixed(1)),
+        asistencia: Math.max(1, Math.round(metrics.presentes + seed(i, 4) - 2)),
+        scrap: Number(Math.max(0.3, metrics.scrap + seed(i, 0.8) - 0.4).toFixed(2)),
+        produccion: Number(Math.max(4, baseTons * shiftFactor + seed(i, 6) - 3).toFixed(1)),
+        energia: Math.round(Math.max(60, metrics.energy + seed(i, 30) - 15)),
+      };
+    });
   };
-
-  const chartData = getChartData();
-  const maxChartValue = Math.max(...chartData.map(d => d.value), ...chartData.map(d => d.limitLine), 10);
+  const allCharts = getAllChartsData();
 
   // ── AI REAL-TIME DIAGNOSTIC GENERATION (DYNAMIC TEXT) ─────────────────────
   const getAIDiagnostic = () => {
@@ -679,21 +663,30 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
             <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
           </div>
 
-          {/* Time & Action Button */}
-          <div className="flex gap-1.5">
-            <button
-              onClick={() => setTimeRange(timeRange === '7d' ? '30d' : '7d')}
-              className="flex-1 px-3 py-2 bg-slate-900 border border-slate-800 hover:border-slate-700 text-[9px] font-black uppercase text-slate-300 rounded-xl transition-all"
-            >
-              📅 {timeRange.toUpperCase()}
-            </button>
-            <button
-              onClick={() => setIsOrderModalOpen(true)}
-              className="px-4 bg-mcvill-accent hover:opacity-90 text-slate-950 text-[9px] font-black uppercase rounded-xl tracking-wider transition-all flex items-center gap-1.5 shadow-[0_0_12px_var(--theme-glow)]"
-            >
-              <Plus size={12} /> ORDEN
-            </button>
+          {/* Time Range Pills */}
+          <div className="flex gap-1 bg-slate-900 border border-slate-800 rounded-xl p-1">
+            {TIME_RANGES.map(t => (
+              <button
+                key={t.id}
+                onClick={() => setTimeRange(t.id)}
+                className={`px-2.5 py-1 rounded-lg text-[8px] font-black uppercase tracking-wider transition-all ${
+                  timeRange === t.id
+                    ? 'bg-mcvill-accent/20 border border-mcvill-accent/40 text-mcvill-accent'
+                    : 'text-slate-500 hover:text-slate-300'
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
           </div>
+
+          {/* Action Button */}
+          <button
+            onClick={() => setIsOrderModalOpen(true)}
+            className="px-4 py-2 bg-mcvill-accent hover:opacity-90 text-slate-950 text-[9px] font-black uppercase rounded-xl tracking-wider transition-all flex items-center gap-1.5 shadow-[0_0_12px_var(--theme-glow)]"
+          >
+            <Plus size={12} /> ORDEN
+          </button>
 
         </div>
 
@@ -801,93 +794,66 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
 
         </div>
 
-        {/* ── TWO-COLUMN INTERACTIVE CONTROL CENTER ─────────────────────────── */}
+        {/* ── MULTI-CHART GRID + AI PANEL ─────────────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          
-          {/* Main Visualizer Area: Column 1 & 2 */}
-          <div className="lg:col-span-2 bg-slate-900/30 border border-slate-800/40 rounded-2xl p-4 flex flex-col justify-between">
-            
-            {/* Visualizer Header Tabs */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/50 pb-3 mb-4">
-              
-              <div className="flex items-center gap-2">
-                <BarChart3 className="text-mcvill-accent" size={15} />
-                <h3 className="text-[10px] font-black text-white uppercase tracking-widest">Panel Gráfico Interactivo</h3>
-              </div>
 
-              {/* KPI Filter Categories */}
-              <div className="flex flex-wrap gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800/50">
-                {([
-                  { id: 'produccion', label: 'Producción' },
-                  { id: 'asistencia', label: 'Asistencia' },
-                  { id: 'calidad', label: 'Calidad' },
-                  { id: 'seguridad', label: 'HSE Alertas' },
-                  { id: 'energia', label: 'Energía' },
-                ] as const).map(tab => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setSelectedCategory(tab.id)}
-                    className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all ${
-                      selectedCategory === tab.id
-                        ? 'bg-mcvill-accent/15 border border-mcvill-accent/30 text-mcvill-accent'
-                        : 'text-slate-500 border border-transparent hover:text-slate-300'
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
-
-            </div>
-
-            {/* Custom Interactive SVG/CSS Bar Chart */}
-            <div className="h-52 flex items-end gap-2 px-2 relative group/chart">
-              
-              {/* Background Limit Threshold Line */}
-              <div 
-                className="absolute left-0 right-0 border-t border-dashed border-red-500/40 z-0 flex items-center justify-end pr-4 pointer-events-none"
-                style={{ bottom: `${(chartData[0]?.limitLine / maxChartValue) * 100}%` }}
-              >
-                <span className="text-[7px] font-mono font-black text-red-400 bg-slate-950 px-1 rounded border border-red-500/20 translate-y-[-50%] uppercase tracking-widest">
-                  Límite: {chartData[0]?.limitLine}
-                </span>
-              </div>
-
-              {chartData.map((d, i) => {
-                const pct = (d.value / maxChartValue) * 100;
-                const isOverLimit = selectedCategory === 'calidad' || selectedCategory === 'seguridad' || selectedCategory === 'energia'
-                  ? d.value > d.limitLine
-                  : false;
-
-                return (
-                  <div
-                    key={i}
-                    className="flex-1 flex flex-col justify-end h-full relative group/bar z-10"
-                  >
-                    {/* Glowing bar */}
-                    <div
-                      className={`w-full rounded-t-lg transition-all duration-500 cursor-pointer relative ${
-                        isOverLimit
-                          ? 'bg-gradient-to-t from-red-600/30 to-red-400/60 hover:to-red-400 shadow-[0_0_10px_rgba(239,68,68,0.2)]'
-                          : 'bg-gradient-to-t from-mcvill-accent/25 to-mcvill-accent/50 hover:to-mcvill-accent shadow-[0_0_10px_rgba(var(--mcvill-accent-rgb),0.1)]'
-                      }`}
-                      style={{ height: `${Math.max(3, pct)}%` }}
-                    >
-                      {/* Tooltip on Hover */}
-                      <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-[8px] font-black text-white px-2 py-0.5 rounded-lg opacity-0 group-hover/bar:opacity-100 transition-opacity z-30 whitespace-nowrap shadow-xl">
-                        {d.value} {selectedCategory === 'energia' ? 'KWh' : selectedCategory === 'calidad' ? 'PPM' : 'unidades'}
-                      </div>
+          {/* 5 KPI Mini Line Charts — 2 cols wide */}
+          <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {([
+              { key: 'oee',        label: 'OEE Producción', unit: '%',    color: 'var(--mcvill-accent)',  colorRgb: 'var(--mcvill-accent-rgb)', icon: '⚙️', good: (v: number) => v >= 85 },
+              { key: 'asistencia', label: 'Asistencia',     unit: ' op',  color: '#60a5fa',              colorRgb: '96,165,250',              icon: '👥', good: (v: number) => v >= metrics.empleados * 0.9 },
+              { key: 'scrap',      label: 'Scrap %',        unit: '%',    color: '#34d399',              colorRgb: '52,211,153',              icon: '✅', good: (v: number) => v <= 2 },
+              { key: 'produccion', label: 'Producción',     unit: ' ton', color: '#f59e0b',              colorRgb: '245,158,11',              icon: '🏭', good: () => true },
+              { key: 'energia',    label: 'Energía',        unit: ' KWh', color: '#f87171',              colorRgb: '248,113,113',             icon: '⚡', good: (v: number) => v <= metrics.energy },
+            ] as const).map(({ key, label, unit, color, colorRgb, icon, good }) => {
+              const vals = allCharts.map(d => d[key] as number);
+              const min = Math.min(...vals); const max = Math.max(...vals);
+              const range = max - min || 1;
+              const last = vals[vals.length - 1];
+              const isGood = good(last);
+              const pts = vals.map((v, i) => {
+                const x = (i / (vals.length - 1)) * 100;
+                const y = 100 - ((v - min) / range) * 80 - 10;
+                return `${x},${y}`;
+              }).join(' ');
+              const trend = last > vals[0] ? '▲' : last < vals[0] ? '▼' : '─';
+              const trendColor = key === 'scrap' || key === 'energia'
+                ? (last > vals[0] ? 'text-red-400' : 'text-emerald-400')
+                : (last > vals[0] ? 'text-emerald-400' : 'text-red-400');
+              return (
+                <div key={key} className="bg-slate-900/40 border border-slate-800/40 rounded-2xl p-3.5 hover:border-slate-700/60 transition-all group relative overflow-hidden">
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: `radial-gradient(circle at top right, rgba(${colorRgb},0.04), transparent 70%)` }} />
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[11px]">{icon}</span>
+                      <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">{label}</span>
                     </div>
+                    <span className={`text-[8px] font-black ${trendColor}`}>{trend} {last}{unit}</span>
                   </div>
-                );
-              })}
-            </div>
+                  <svg viewBox="0 0 100 100" className="w-full h-14" preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id={`g-${key}`} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor={color} stopOpacity="0.3" />
+                        <stop offset="100%" stopColor={color} stopOpacity="0" />
+                      </linearGradient>
+                    </defs>
+                    <polygon points={`0,100 ${pts} 100,100`} fill={`url(#g-${key})`} />
+                    <polyline points={pts} fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                    {vals.map((v, i) => {
+                      const x = (i / (vals.length - 1)) * 100;
+                      const y = 100 - ((v - min) / range) * 80 - 10;
+                      return <circle key={i} cx={x} cy={y} r="2" fill={color} opacity={i === vals.length - 1 ? 1 : 0.5} />;
+                    })}
+                  </svg>
+                  <div className="flex justify-between mt-1">
+                    {allCharts.map((d, i) => <span key={i} className="text-[7px] font-black text-slate-600 flex-1 text-center uppercase">{d.name}</span>)}
+                  </div>
+                  <div className={`absolute top-3 right-3 w-1.5 h-1.5 rounded-full ${isGood ? 'bg-emerald-400' : 'bg-red-400'} shadow-[0_0_6px_currentColor]`} />
+                </div>
+              );
+            })}
 
-            {/* X-Axis labels */}
-            <div className="flex justify-between mt-3 px-1 text-[8px] font-black text-slate-500 uppercase tracking-widest">
-              {chartData.map((d, i) => <span key={i} className="text-center flex-1">{d.name}</span>)}
-            </div>
-
+            {/* 5th chart occupies remaining space as wider panel */}
           </div>
 
           {/* AI Neural Diagnostics & Event Log: Column 3 */}
@@ -939,6 +905,119 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
 
           </div>
 
+        </div>
+
+        {/* ── ESCENARIO DE ASISTENCIA: OPERADORES POR TURNO Y PUESTO ──────────── */}
+        <div className="bg-slate-900/30 border border-slate-800/40 rounded-2xl p-4">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Users className="text-blue-400" size={15} />
+              <h3 className="text-[10px] font-black text-white uppercase tracking-widest">Escenario de Asistencia</h3>
+              <span className="text-[8px] font-black text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-lg uppercase tracking-widest">
+                {selectedTurno === 'todos' ? 'Todos los Turnos' : selectedTurno === 'matutino' ? '☀️ Matutino' : selectedTurno === 'vespertino' ? '⛅ Vespertino' : '🌙 Nocturno'}
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                <span className="text-[8px] text-slate-500 font-black uppercase">Presentes: {metrics.presentes}</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full bg-red-400" />
+                <span className="text-[8px] text-slate-500 font-black uppercase">Ausentes: {metrics.empleados - metrics.presentes}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {/* Por Turno */}
+            <div className="bg-slate-950/50 border border-slate-800/40 rounded-xl p-3">
+              <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-2.5 flex items-center gap-1.5"><Clock size={10} /> Por Turno</p>
+              <div className="space-y-2">
+                {[
+                  { label: 'Matutino 06-14h',   pct: 0.95, color: 'bg-amber-400' },
+                  { label: 'Vespertino 14-22h',  pct: 0.88, color: 'bg-blue-400' },
+                  { label: 'Nocturno 22-06h',    pct: 0.72, color: 'bg-purple-400' },
+                ].map(t => {
+                  const n = Math.round(metrics.empleados / 3);
+                  const present = Math.round(n * t.pct * (selectedTurno === 'todos' ? 1 : selectedTurno === 'matutino' && t.label.startsWith('Mat') ? 1 : selectedTurno === 'vespertino' && t.label.startsWith('Ves') ? 1 : selectedTurno === 'nocturno' && t.label.startsWith('Noc') ? 1 : 0.82));
+                  return (
+                    <div key={t.label}>
+                      <div className="flex justify-between text-[8px] font-black mb-1">
+                        <span className="text-slate-400">{t.label}</span>
+                        <span className="text-white">{present}<span className="text-slate-600">/{n}</span></span>
+                      </div>
+                      <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                        <div className={`h-full ${t.color} rounded-full transition-all duration-700`} style={{ width: `${(present/n)*100}%` }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Por Puesto */}
+            <div className="bg-slate-950/50 border border-slate-800/40 rounded-xl p-3">
+              <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-2.5 flex items-center gap-1.5"><Factory size={10} /> Por Puesto</p>
+              <div className="space-y-1.5">
+                {[
+                  { puesto: 'Operador Máquina',   total: 12, pct: 0.92 },
+                  { puesto: 'Soldador',           total: 8,  pct: 0.88 },
+                  { puesto: 'Control Calidad',    total: 5,  pct: 1.00 },
+                  { puesto: 'Mantenimiento',      total: 4,  pct: 0.75 },
+                  { puesto: 'Almacén / Logística',total: 4,  pct: 0.80 },
+                ].map(p => {
+                  const present = Math.round(p.total * p.pct);
+                  const missing = p.total - present;
+                  return (
+                    <div key={p.puesto} className="flex items-center justify-between">
+                      <span className="text-[8px] text-slate-400 font-black truncate flex-1">{p.puesto}</span>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <span className="text-[8px] font-black text-white">{present}/{p.total}</span>
+                        {missing > 0 && (
+                          <span className="text-[7px] font-black text-red-400 bg-red-500/10 px-1 rounded">-{missing}</span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Alertas de Cobertura */}
+            <div className="bg-slate-950/50 border border-slate-800/40 rounded-xl p-3">
+              <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-2.5 flex items-center gap-1.5"><AlertTriangle size={10} className="text-amber-400" /> Cobertura</p>
+              <div className="space-y-2">
+                {metrics.empleados - metrics.presentes > 0 ? (
+                  <>
+                    <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-lg px-2.5 py-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
+                      <p className="text-[8px] text-red-300 font-black">{metrics.empleados - metrics.presentes} operadores sin registrar entrada</p>
+                    </div>
+                    <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 rounded-lg px-2.5 py-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                      <p className="text-[8px] text-amber-300 font-black">Mantenimiento con cobertura del 75% — riesgo medio</p>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-2.5 py-2">
+                    <CheckCircle2 size={12} className="text-emerald-400" />
+                    <p className="text-[8px] text-emerald-300 font-black">Cobertura completa en todos los puestos</p>
+                  </div>
+                )}
+                <div className="mt-3 pt-2 border-t border-slate-800/50">
+                  <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">Cobertura global</p>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-mcvill-accent to-emerald-400 rounded-full transition-all duration-700"
+                        style={{ width: `${Math.round((metrics.presentes / metrics.empleados) * 100)}%` }} />
+                    </div>
+                    <span className="text-[9px] font-black text-white">{Math.round((metrics.presentes / metrics.empleados) * 100)}%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* ── GRID DE ACCESOS RÁPIDOS ────────────────────────────────────────── */}
