@@ -431,7 +431,7 @@ const FullscreenSimulatorWrapper = ({ cam }: { cam: SecurityCamera }) => {
 };
 
 /* ────── Main View ────── */
-const SeguridadIndustrialView: React.FC = () => {
+export const SeguridadIndustrialView: React.FC = () => {
   const [cameras, setCameras]     = useState<SecurityCamera[]>(() => {
     try { return JSON.parse(localStorage.getItem('mcvill_cameras') || 'null') ?? DEFAULT_CAMERAS; }
     catch { return DEFAULT_CAMERAS; }

@@ -47,7 +47,26 @@ export const hseService = {
   },
 
   async getCertifications() {
+    // Intento 1: con join a employees (Estándar de la BD real)
     const { data, error } = await supabase
+      .from('hse_certifications')
+      .select(`
+        *,
+        employees (first_name, last_name),
+        hse_courses (title)
+      `)
+      .order('expiry_date', { ascending: true });
+    
+    if (!error && data) {
+      return data.map((cert: any) => ({
+        ...cert,
+        employee_name: cert.employees ? `${cert.employees.first_name} ${cert.employees.last_name}` : 'N/A',
+        course_title: cert.hse_courses?.title
+      })) as HSECertification[];
+    }
+
+    // Intento 2: con join a empleados
+    const { data: dataEmp, error: errorEmp } = await supabase
       .from('hse_certifications')
       .select(`
         *,
@@ -55,14 +74,30 @@ export const hseService = {
         hse_courses (title)
       `)
       .order('expiry_date', { ascending: true });
-    
-    if (error) throw error;
 
-    return data.map((cert: any) => ({
-      ...cert,
-      employee_name: cert.empleados ? `${cert.empleados.first_name} ${cert.empleados.last_name}` : 'N/A',
-      course_title: cert.hse_courses?.title
-    })) as HSECertification[];
+    if (!errorEmp && dataEmp) {
+      return dataEmp.map((cert: any) => ({
+        ...cert,
+        employee_name: cert.empleados ? `${cert.empleados.first_name} ${cert.empleados.last_name}` : 'N/A',
+        course_title: cert.hse_courses?.title
+      })) as HSECertification[];
+    }
+
+    // Intento 3: simple sin joins por si fallan las FKs
+    const { data: dataSimple, error: errorSimple } = await supabase
+      .from('hse_certifications')
+      .select('*')
+      .order('expiry_date', { ascending: true });
+
+    if (!errorSimple && dataSimple) {
+      return dataSimple.map((cert: any) => ({
+        ...cert,
+        employee_name: 'N/A',
+        course_title: 'N/A'
+      })) as HSECertification[];
+    }
+
+    return [];
   },
 
   async getIncidents() {

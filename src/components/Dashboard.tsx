@@ -374,7 +374,7 @@ const EnlazarBancoModal: React.FC<EnlazarBancoModalProps> = ({ onClose, onNaviga
                   ))}
                 </div>
                 <button
-                  onClick={() => { onNavigateToBanco(); onClose(); }}
+                  onClick={() => { sessionStorage.setItem('mcvill_banco_tab', 'conciliacion'); onNavigateToBanco(); onClose(); }}
                   className="w-full h-11 rounded-xl bg-mcvill-accent text-[10px] font-black text-slate-950 hover:opacity-90 uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_var(--theme-glow)]">
                   <Database size={14} /> Ir a Conciliación IA
                 </button>

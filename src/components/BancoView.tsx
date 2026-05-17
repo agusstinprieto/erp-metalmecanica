@@ -63,7 +63,11 @@ const emptyTx: Omit<BankTx, 'account_id'> = {
 };
 
 export const BancoView: React.FC = () => {
-  const [tab, setTab] = useState<Tab>('cuentas');
+  const [tab, setTab] = useState<Tab>(() => {
+    const flag = sessionStorage.getItem('mcvill_banco_tab');
+    if (flag) { sessionStorage.removeItem('mcvill_banco_tab'); return flag as Tab; }
+    return 'cuentas';
+  });
   const [accounts, setAccounts] = useState<BankAccount[]>([]);
   const [txs, setTxs] = useState<BankTx[]>([]);
   const [loading, setLoading] = useState(true);
