@@ -24,6 +24,24 @@ export interface TenantConfig {
   theme_color?: string;
   theme_color_light?: string;
   theme_name?: 'blue' | 'slate' | 'emerald' | 'carbon';
+  // Fórmulas y Parámetros del Manual
+  uma_value?: number;
+  imss_iv?: number;
+  imss_cv?: number;
+  imss_em?: number;
+  oee_bono_umbral?: number;
+  oee_bono_monto?: number;
+  scrap_factor?: number;
+  margen_utilidad?: number;
+  overhead_operativo?: number;
+  // Fórmulas (Existentes)
+  salarioBaseDefault?: number;
+  productividadPctBajo?: number;
+  productividadPctAlto?: number;
+  calidadPct?: number;
+  seguridadPct?: number;
+  fiveSPct?: number;
+  industryType?: 'metal_mechanical' | 'automotive' | 'aerospace' | 'textile' | 'pharmaceutical' | 'electronic' | 'mining';
 }
 
 const CEO_ROLES = new Set(['ceo', 'admin', 'sistemas']);

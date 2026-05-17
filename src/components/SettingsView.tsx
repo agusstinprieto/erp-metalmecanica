@@ -214,6 +214,20 @@ const PoliticasTab: React.FC = () => {
   const [seguridad, setSeguridad] = useState(config.seguridadPct ?? 2);
   const [fiveS, setFiveS] = useState(config.fiveSPct ?? 1);
   const [industryType, setIndustryType] = useState<'metal_mechanical' | 'automotive' | 'aerospace' | 'textile' | 'pharmaceutical' | 'electronic' | 'mining'>(config.industryType ?? 'metal_mechanical');
+  
+  // Nuevas Fórmulas del Manual
+  const [umaValue, setUmaValue] = useState(config.uma_value ?? 108.57);
+  const [imssIv, setImssIv] = useState(config.imss_iv ?? 0.625);
+  const [imssCv, setImssCv] = useState(config.imss_cv ?? 1.125);
+  const [imssEm, setImssEm] = useState(config.imss_em ?? 0.40);
+  
+  const [oeeBonoUmbral, setOeeBonoUmbral] = useState(config.oee_bono_umbral ?? 85);
+  const [oeeBonoMonto, setOeeBonoMonto] = useState(config.oee_bono_monto ?? 5.0);
+  
+  const [scrapFactor, setScrapFactor] = useState(config.scrap_factor ?? 12.0);
+  const [margenUtilidad, setMargenUtilidad] = useState(config.margen_utilidad ?? 35.0);
+  const [overheadOperativo, setOverheadOperativo] = useState(config.overhead_operativo ?? 15.0);
+
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -227,6 +241,15 @@ const PoliticasTab: React.FC = () => {
       seguridadPct: Number(seguridad),
       fiveSPct: Number(fiveS),
       industryType: industryType,
+      uma_value: Number(umaValue),
+      imss_iv: Number(imssIv),
+      imss_cv: Number(imssCv),
+      imss_em: Number(imssEm),
+      oee_bono_umbral: Number(oeeBonoUmbral),
+      oee_bono_monto: Number(oeeBonoMonto),
+      scrap_factor: Number(scrapFactor),
+      margen_utilidad: Number(margenUtilidad),
+      overhead_operativo: Number(overheadOperativo),
     });
     setSaving(false);
     setSaved(true);
@@ -243,8 +266,8 @@ const PoliticasTab: React.FC = () => {
             <FileText size={20} className="text-mcvill-accent" />
           </div>
           <div>
-            <h3 className="text-xs font-black text-mcvill-text uppercase tracking-widest">Políticas Operativas</h3>
-            <p className="text-[9px] text-slate-500 font-black uppercase tracking-[0.2em]">Normas y Compensaciones Dinámicas</p>
+            <h3 className="text-xs font-black text-mcvill-text uppercase tracking-widest">Fórmulas y Políticas Operativas</h3>
+            <p className="text-[9px] text-slate-500 font-black uppercase tracking-[0.2em]">Cálculos, Impuestos y Compensaciones</p>
           </div>
         </div>
         <button 
@@ -384,6 +407,67 @@ const PoliticasTab: React.FC = () => {
               <span className="absolute right-3 top-2.5 text-slate-500 font-mono text-[11px]">%</span>
             </div>
             <p className="text-[8px] text-slate-600 font-medium ml-1">Incentiva mantener el área limpia, ordenada, estandarizada y segura.</p>
+          </div>
+        </div>
+
+        {/* Impuestos y Retenciones */}
+        <div className="bg-slate-900/40 border border-white/5 rounded-xl p-5 space-y-4">
+          <h4 className="text-[10px] font-black text-mcvill-accent uppercase tracking-widest border-b border-white/5 pb-2">Impuestos y Retenciones (IMSS)</h4>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Valor UMA (MXN)</label>
+              <div className="relative">
+                <span className="absolute left-3 top-2.5 text-slate-500 font-mono text-[11px]">$</span>
+                <input type="number" step="0.01" value={umaValue} onChange={e => setUmaValue(parseFloat(e.target.value) || 0)} className={clsx(inputCls, 'pl-6')} />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Invalidez y Vida (IV)</label>
+              <div className="relative"><input type="number" step="0.001" value={imssIv} onChange={e => setImssIv(parseFloat(e.target.value) || 0)} className={inputCls} /><span className="absolute right-3 top-2.5 text-slate-500 font-mono text-[11px]">%</span></div>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Cesantía y Vejez (CV)</label>
+              <div className="relative"><input type="number" step="0.001" value={imssCv} onChange={e => setImssCv(parseFloat(e.target.value) || 0)} className={inputCls} /><span className="absolute right-3 top-2.5 text-slate-500 font-mono text-[11px]">%</span></div>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Enfermedad Mat. (EM)</label>
+              <div className="relative"><input type="number" step="0.001" value={imssEm} onChange={e => setImssEm(parseFloat(e.target.value) || 0)} className={inputCls} /><span className="absolute right-3 top-2.5 text-slate-500 font-mono text-[11px]">%</span></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bonos de OEE */}
+        <div className="bg-slate-900/40 border border-white/5 rounded-xl p-5 space-y-4">
+          <h4 className="text-[10px] font-black text-mcvill-accent uppercase tracking-widest border-b border-white/5 pb-2">Bonos de OEE (Producción)</h4>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Umbral OEE Mínimo</label>
+              <div className="relative"><input type="number" value={oeeBonoUmbral} onChange={e => setOeeBonoUmbral(parseFloat(e.target.value) || 0)} className={inputCls} /><span className="absolute right-3 top-2.5 text-slate-500 font-mono text-[11px]">%</span></div>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Monto del Bono</label>
+              <div className="relative"><input type="number" value={oeeBonoMonto} onChange={e => setOeeBonoMonto(parseFloat(e.target.value) || 0)} className={inputCls} /><span className="absolute right-3 top-2.5 text-slate-500 font-mono text-[11px]">%</span></div>
+            </div>
+          </div>
+          <p className="text-[8px] text-slate-600 font-medium ml-1">Se pagará el porcentaje del monto sobre el salario si se supera el umbral del OEE en la línea.</p>
+        </div>
+
+        {/* Cotizaciones y Costos */}
+        <div className="col-span-full bg-slate-900/40 border border-white/5 rounded-xl p-5 space-y-4">
+          <h4 className="text-[10px] font-black text-mcvill-accent uppercase tracking-widest border-b border-white/5 pb-2">Cotizaciones y Márgenes (Ingeniería)</h4>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Factor de Scrap (Merma)</label>
+              <div className="relative"><input type="number" value={scrapFactor} onChange={e => setScrapFactor(parseFloat(e.target.value) || 0)} className={inputCls} /><span className="absolute right-3 top-2.5 text-slate-500 font-mono text-[11px]">%</span></div>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Overhead Operativo (Fijo)</label>
+              <div className="relative"><input type="number" value={overheadOperativo} onChange={e => setOverheadOperativo(parseFloat(e.target.value) || 0)} className={inputCls} /><span className="absolute right-3 top-2.5 text-slate-500 font-mono text-[11px]">%</span></div>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Margen de Utilidad Objetivo</label>
+              <div className="relative"><input type="number" value={margenUtilidad} onChange={e => setMargenUtilidad(parseFloat(e.target.value) || 0)} className={inputCls} /><span className="absolute right-3 top-2.5 text-slate-500 font-mono text-[11px]">%</span></div>
+            </div>
           </div>
         </div>
       </div>
