@@ -48,6 +48,7 @@ import {
   Landmark,
   Search,
   Camera,
+  Smartphone,
 } from 'lucide-react';
 import { useConfig } from '../contexts/ConfigContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -220,6 +221,7 @@ export const Sidebar = (props: {
     { id: 'costing',           label: 'Costos',           icon: BarChart3,       godmode: true },
     { id: 'costeo',            label: 'Costeo Live',      icon: Gauge,           godmode: true },
     { id: 'reports',           label: 'Reportes',         icon: FileBarChart,    godmode: true },
+    { id: 'ceo_mobile_sim',    label: 'CEO Móvil Sim',    icon: Smartphone,      godmode: true },
     { id: 'settings',          label: 'Configuración',    icon: Settings2,       godmode: true, superadmin: true },
   ];
 

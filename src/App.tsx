@@ -67,6 +67,7 @@ const BancoView               = lz(() => import('./components/BancoView'),      
 const SeguridadIndustrialView = lz(() => import('./components/SeguridadIndustrialView'), 'SeguridadIndustrialView');
 const EnergyMonitorView      = lz(() => import('./components/EnergyMonitorView'),      'EnergyMonitorView');
 const PreventiveMaintenanceIAView = lz(() => import('./components/PreventiveMaintenanceIAView'), 'PreventiveMaintenanceIAView');
+const CeoMobileSim = lz(() => import('./components/CeoMobileSim'), 'CeoMobileSim');
 
 type UserRole = 'ceo' | 'gerencia' | 'sistemas' | 'empleado' | 'rh' | 'finanzas' | 'contabilidad' | 'supervisor' | 'ingenieria' | 'calidad' | 'operaciones' | 'ventas' | 'compras' | 'almacen' | 'auditoria' | 'soporte' | 'marketing' | 'seguridad';
 
@@ -581,6 +582,7 @@ function App() {
             {activeView === 'seguridad' && <SeguridadIndustrialView />}
             {activeView === 'energy_monitor' && <EnergyMonitorView />}
             {activeView === 'preventive_maintenance_ia' && <PreventiveMaintenanceIAView />}
+            {activeView === 'ceo_mobile_sim' && <CeoMobileSim />}
           </Suspense>
           </div>
         </div>
