@@ -46,6 +46,7 @@ import {
   ScanSearch,
   Scan,
   Landmark,
+  Search,
 } from 'lucide-react';
 import { useConfig } from '../contexts/ConfigContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -157,12 +158,75 @@ export const Sidebar = (props: {
     panelType = 'chat'
   } = props;
   const [isSidebarCollapsed, setIsSidebarCollapsed] = React.useState(false);
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const searchRef = React.useRef<HTMLInputElement>(null);
   const navigate = (view: string) => { setView(view); onCloseMobile?.(); };
   const { config, isDarkMode } = useConfig();
   const { t } = useLanguage();
   const role = userRole?.toLowerCase() || 'empleado';
   const isGodmode    = role === 'ceo' || role === 'sistemas' || role === 'gerente';
-  const isSuperAdmin = role === 'ceo' || role === 'sistemas'; // acceso a Configuración
+  const isSuperAdmin = role === 'ceo' || role === 'sistemas';
+
+  const ALL_NAV_ITEMS: { id: string; label: string; icon: any; godmode?: boolean; superadmin?: boolean; special?: 'chat' | 'voice' }[] = [
+    { id: 'dashboard',         label: 'Tablero',         icon: LayoutDashboard },
+    { id: 'production',        label: 'Planta',           icon: Factory },
+    { id: 'viajeros',          label: 'Viajeros',         icon: Route },
+    { id: 'planeacion',        label: 'Planeación',       icon: CalendarDays },
+    { id: 'inventory',         label: 'Inventarios',      icon: Package },
+    { id: 'quality',           label: 'Calidad',          icon: ClipboardCheck },
+    { id: 'hse',               label: 'HSE',              icon: ShieldAlert },
+    { id: 'maintenance',       label: 'Mantenimiento',    icon: Wrench },
+    { id: 'chat_ia',           label: 'Chat IA',          icon: MessageSquare, special: 'chat' },
+    { id: 'voice_link',        label: 'Voice Link',       icon: Zap, special: 'voice' },
+    { id: 'minutas',           label: 'Minutas IA',       icon: ScrollText },
+    { id: 'spc',               label: 'SPC Alertas',      icon: LineChart,       godmode: true },
+    { id: 'visual_ia',         label: 'Inspección IA',    icon: ScanSearch,      godmode: true },
+    { id: 'trazabilidad',      label: 'Trazabilidad',     icon: GitBranch,       godmode: true },
+    { id: 'defect_library',    label: 'Bib. Defectos',    icon: Library,         godmode: true },
+    { id: 'ppap',              label: 'PPAP',             icon: FileCheck2,      godmode: true },
+    { id: 'voc',               label: 'VOC',              icon: MessageCircle,   godmode: true },
+    { id: 'shop_floor',        label: 'Shop Floor',       icon: Scan,            godmode: true },
+    { id: 'ventas',            label: 'Ventas',           icon: TrendingUp,      godmode: true },
+    { id: 'compras',           label: 'Compras',          icon: ShoppingCart,    godmode: true },
+    { id: 'agente_cot',        label: 'Agente Cotiz.',    icon: Sparkles,        godmode: true },
+    { id: 'rfq_kanban',        label: 'Kanban RFQ',       icon: KanbanSquare,    godmode: true },
+    { id: 'factibilidad',      label: 'Factibilidad',     icon: ShieldCheck,     godmode: true },
+    { id: 'factibilidad_ia',   label: 'Factibilidad IA',  icon: BrainCircuit,    godmode: true },
+    { id: 'metal_quoter',      label: 'Cotizador Metal',  icon: Calculator,      godmode: true },
+    { id: 'roi',               label: 'Cotizador ROI',    icon: TrendingUp,      godmode: true },
+    { id: 'engineering',       label: 'Ingeniería',       icon: Cpu,             godmode: true },
+    { id: 'work_instructions', label: 'Inst. Trabajo',    icon: ClipboardList,   godmode: true },
+    { id: 'layout_design',     label: 'Layout Planta',    icon: Layout,          godmode: true },
+    { id: 'process_simulator', label: 'Simulador',        icon: FlaskConical,    godmode: true },
+    { id: 'nesting',           label: 'Nesting',          icon: Layers,          godmode: true },
+    { id: 'rh',                label: 'RH',               icon: MembersIcon,     godmode: true },
+    { id: 'payroll',           label: 'Nómina',           icon: FileText,        godmode: true },
+    { id: 'attendance',        label: 'Asistencia',       icon: CalendarCheck,   godmode: true },
+    { id: 'recruitment',       label: 'Reclutamiento',    icon: UserSearch,      godmode: true },
+    { id: 'desempeno',         label: 'Desempeño',        icon: Medal,           godmode: true },
+    { id: 'finance',           label: 'Finanzas',         icon: CircleDollarSign, godmode: true },
+    { id: 'banco',             label: 'Banco',            icon: Landmark,        godmode: true },
+    { id: 'costing',           label: 'Costos',           icon: BarChart3,       godmode: true },
+    { id: 'costeo',            label: 'Costeo Live',      icon: Gauge,           godmode: true },
+    { id: 'reports',           label: 'Reportes',         icon: FileBarChart,    godmode: true },
+    { id: 'settings',          label: 'Configuración',    icon: Settings2,       godmode: true, superadmin: true },
+  ];
+
+  const q = searchQuery.trim().toLowerCase();
+  const searchResults = q
+    ? ALL_NAV_ITEMS.filter(item => {
+        if (item.godmode && !isGodmode) return false;
+        if (item.superadmin && !isSuperAdmin) return false;
+        return item.label.toLowerCase().includes(q) || item.id.toLowerCase().includes(q);
+      })
+    : [];
+
+  const handleSearchNavigate = (item: typeof ALL_NAV_ITEMS[number]) => {
+    setSearchQuery('');
+    if (item.special === 'chat') onToggleChat?.();
+    else if (item.special === 'voice') onOpenVoice?.();
+    else navigate(item.id);
+  };
 
   const hasAccess = (module: string) => {
     if (isGodmode) return true;
@@ -236,32 +300,87 @@ export const Sidebar = (props: {
         )}
       </div>
 
+      {/* Search bar */}
+      {!isSidebarCollapsed && (
+        <div className="relative mb-3 z-10">
+          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-mcvill-text-muted/50 pointer-events-none" />
+          <input
+            ref={searchRef}
+            type="text"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Escape') setSearchQuery('');
+              if (e.key === 'Enter' && searchResults.length > 0) handleSearchNavigate(searchResults[0]);
+            }}
+            placeholder="Buscar módulo..."
+            className="w-full bg-mcvill-bg/80 border border-mcvill-accent/20 rounded-xl pl-8 pr-8 py-2 text-[11px] text-mcvill-text placeholder:text-mcvill-text-muted/40 focus:outline-none focus:border-mcvill-accent/60 focus:bg-mcvill-accent/5 transition-all duration-200"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-mcvill-text-muted/40 hover:text-mcvill-text-muted transition-colors"
+            >
+              <X size={12} />
+            </button>
+          )}
+        </div>
+      )}
+
       <div className="flex-1 min-h-0 flex flex-col gap-5 overflow-y-auto pr-1 custom-scrollbar relative z-10">
-        {sidebarSections.map((section) => (
-          <div key={section.title} className="space-y-2">
-            {!isSidebarCollapsed && (
-              <p className="px-3 mb-1 text-[9px] font-black text-mcvill-text-muted/60 tracking-[0.25em] uppercase flex items-center gap-2">
-                <span className="w-1 h-1 rounded-full bg-mcvill-accent/50" />
-                {section.items[0].id === 'dashboard' ? t('section.operations', section.title) : t('section.quality', section.title)}
-              </p>
+        {/* Search results */}
+        {searchQuery.trim() && (
+          <div className="space-y-1">
+            {searchResults.length === 0 ? (
+              <p className="text-center text-mcvill-text-muted/40 text-[11px] py-10">Sin resultados</p>
+            ) : (
+              <>
+                <p className="px-3 mb-2 text-[9px] font-black text-mcvill-accent/60 tracking-[0.25em] uppercase flex items-center gap-2">
+                  <span className="w-1 h-1 rounded-full bg-mcvill-accent/50" />
+                  {searchResults.length} resultado{searchResults.length !== 1 ? 's' : ''}
+                </p>
+                {searchResults.map(item => (
+                  <SidebarItem
+                    key={item.id}
+                    icon={item.icon}
+                    label={item.label}
+                    active={activeView === item.id}
+                    onClick={() => handleSearchNavigate(item)}
+                    collapsed={false}
+                  />
+                ))}
+              </>
             )}
-            
-            {section.items.map(item => {
-              if (!hasAccess(item.id)) return null;
-              return (
-                <SidebarItem 
-                  key={item.id}
-                  icon={item.icon} 
-                  label={t(`sidebar.${item.id}`, item.label)} 
-                  active={activeView === item.id} 
-                  onClick={() => navigate(item.id)} 
-                  collapsed={isSidebarCollapsed}
-                />
-              );
-            })}
           </div>
-        ))}
-        
+        )}
+
+        {/* Normal sections (hidden while searching) */}
+        {!searchQuery.trim() && (
+          <>
+            {sidebarSections.map((section) => (
+              <div key={section.title} className="space-y-2">
+                {!isSidebarCollapsed && (
+                  <p className="px-3 mb-1 text-[9px] font-black text-mcvill-text-muted/60 tracking-[0.25em] uppercase flex items-center gap-2">
+                    <span className="w-1 h-1 rounded-full bg-mcvill-accent/50" />
+                    {section.items[0].id === 'dashboard' ? t('section.operations', section.title) : t('section.quality', section.title)}
+                  </p>
+                )}
+                {section.items.map(item => {
+                  if (!hasAccess(item.id)) return null;
+                  return (
+                    <SidebarItem
+                      key={item.id}
+                      icon={item.icon}
+                      label={t(`sidebar.${item.id}`, item.label)}
+                      active={activeView === item.id}
+                      onClick={() => navigate(item.id)}
+                      collapsed={isSidebarCollapsed}
+                    />
+                  );
+                })}
+              </div>
+            ))}
+
         <div className="pt-3 border-t border-mcvill-accent/30">
           {!isSidebarCollapsed && (
             <p className="px-3 mb-1 text-[9px] font-black text-slate-500/70 tracking-[0.25em] uppercase flex items-center gap-2">
@@ -374,6 +493,8 @@ export const Sidebar = (props: {
             <SidebarItem icon={FileBarChart} label={t('sidebar.reports', 'Reportes')} active={activeView === 'reports'} onClick={() => navigate('reports')} collapsed={isSidebarCollapsed} />
             {isSuperAdmin && <SidebarItem icon={Settings2} label={t('sidebar.settings', 'CONFIGURACION')} active={activeView === 'settings'} onClick={() => navigate('settings')} collapsed={isSidebarCollapsed} />}
           </div>
+        )}
+          </>
         )}
       </div>
 
