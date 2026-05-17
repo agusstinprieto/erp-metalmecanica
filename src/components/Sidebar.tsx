@@ -245,6 +245,10 @@ export const Sidebar = (props: {
     const industry = config.industryType || 'metal_mechanical';
     if (industry === 'aerospace' && ['metal_quoter', 'nesting', 'process_simulator'].includes(module)) return false;
     if (industry === 'automotive' && ['metal_quoter', 'nesting'].includes(module)) return false;
+    if (industry === 'textile' && ['metal_quoter', 'nesting', 'process_simulator', 'ppap'].includes(module)) return false;
+    if (industry === 'pharmaceutical' && ['metal_quoter', 'nesting', 'process_simulator'].includes(module)) return false;
+    if (industry === 'electronic' && ['metal_quoter', 'nesting'].includes(module)) return false;
+    if (industry === 'mining' && ['metal_quoter', 'nesting', 'process_simulator', 'ppap', 'layout_design'].includes(module)) return false;
 
     if (isGodmode) return true;
     if (['chat_ia', 'voice_link'].includes(module)) return true;
@@ -397,7 +401,13 @@ export const Sidebar = (props: {
                   if (!hasAccess(item.id)) return null;
                   let dynamicLabel = t(`sidebar.${item.id}`, item.label);
                   if (item.id === 'viajeros') {
-                    dynamicLabel = config.industryType === 'aerospace' ? 'Viajeros AS9100' : config.industryType === 'automotive' ? 'Hojas de Proceso' : 'Viajeros';
+                    if (config.industryType === 'aerospace') dynamicLabel = 'Viajeros AS9100';
+                    else if (config.industryType === 'automotive') dynamicLabel = 'Hojas de Proceso';
+                    else if (config.industryType === 'textile') dynamicLabel = 'Fichas Técnicas';
+                    else if (config.industryType === 'pharmaceutical') dynamicLabel = 'Batch Record (Lotes)';
+                    else if (config.industryType === 'electronic') dynamicLabel = 'Hojas de Ruta SMT';
+                    else if (config.industryType === 'mining') dynamicLabel = 'Trazabilidad de Vetas';
+                    else dynamicLabel = 'Viajeros';
                   }
                   return (
                     <SidebarItem
@@ -465,7 +475,7 @@ export const Sidebar = (props: {
                 {hasAccess('visual_ia') && <SidebarItem icon={ScanSearch} label={t('sidebar.visual_ia', 'Inspección IA')} active={activeView === 'visual_ia'} onClick={() => navigate('visual_ia')} collapsed={isSidebarCollapsed} />}
                 {hasAccess('trazabilidad') && <SidebarItem icon={GitBranch} label={t('sidebar.trazabilidad', 'Trazabilidad')} active={activeView === 'trazabilidad'} onClick={() => navigate('trazabilidad')} collapsed={isSidebarCollapsed} />}
                 {hasAccess('defect_library') && <SidebarItem icon={Library} label={t('sidebar.defect_library', 'Bib. Defectos')} active={activeView === 'defect_library'} onClick={() => navigate('defect_library')} collapsed={isSidebarCollapsed} />}
-                {hasAccess('ppap') && <SidebarItem icon={FileCheck2} label={config.industryType === 'aerospace' ? 'FAI AS9102' : config.industryType === 'automotive' ? 'PPAP (Core Tools)' : 'PPAP / FAI'} active={activeView === 'ppap'} onClick={() => navigate('ppap')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('ppap') && <SidebarItem icon={FileCheck2} label={config.industryType === 'aerospace' ? 'FAI AS9102' : config.industryType === 'automotive' ? 'PPAP (Core Tools)' : config.industryType === 'pharmaceutical' ? 'Validación FDA (21 CFR)' : config.industryType === 'electronic' ? 'PPAP Componentes' : 'PPAP / FAI'} active={activeView === 'ppap'} onClick={() => navigate('ppap')} collapsed={isSidebarCollapsed} />}
                 {hasAccess('voc') && <SidebarItem icon={MessageCircle} label={t('sidebar.voc', 'VOC')} active={activeView === 'voc'} onClick={() => navigate('voc')} collapsed={isSidebarCollapsed} />}
                 {hasAccess('shop_floor') && <SidebarItem icon={Scan} label={t('sidebar.shop_floor', 'Shop Floor')} active={activeView === 'shop_floor'} onClick={() => navigate('shop_floor')} collapsed={isSidebarCollapsed} />}
                 {hasAccess('seguridad') && <SidebarItem icon={Camera} label={t('sidebar.seguridad', 'Seguridad')} active={activeView === 'seguridad'} onClick={() => navigate('seguridad')} collapsed={isSidebarCollapsed} />}
@@ -502,7 +512,7 @@ export const Sidebar = (props: {
                   </p>
                 )}
                 {hasAccess('engineering') && <SidebarItem icon={Cpu} label={t('sidebar.engineering', 'Ingeniería')} active={activeView === 'engineering'} onClick={() => navigate('engineering')} collapsed={isSidebarCollapsed} />}
-                {hasAccess('work_instructions') && <SidebarItem icon={ClipboardList} label={config.industryType === 'aerospace' ? 'Inst. Trabajo AS9100' : 'Inst. Trabajo'} active={activeView === 'work_instructions'} onClick={() => navigate('work_instructions')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('work_instructions') && <SidebarItem icon={ClipboardList} label={config.industryType === 'aerospace' ? 'Inst. Trabajo AS9100' : config.industryType === 'textile' ? 'Instrucciones Costura' : config.industryType === 'pharmaceutical' ? 'Procedimiento PNO (SOP)' : config.industryType === 'electronic' ? 'Instrucciones ESD / SMT' : config.industryType === 'mining' ? 'Instrucciones Seguridad' : 'Inst. Trabajo'} active={activeView === 'work_instructions'} onClick={() => navigate('work_instructions')} collapsed={isSidebarCollapsed} />}
                 {hasAccess('layout_design') && <SidebarItem icon={Layout} label={t('sidebar.layout_design', 'Layout Planta')} active={activeView === 'layout_design'} onClick={() => navigate('layout_design')} collapsed={isSidebarCollapsed} />}
                 {hasAccess('process_simulator') && <SidebarItem icon={FlaskConical} label={t('sidebar.process_simulator', 'Simulador')} active={activeView === 'process_simulator'} onClick={() => navigate('process_simulator')} collapsed={isSidebarCollapsed} />}
                 {hasAccess('nesting') && <SidebarItem icon={Layers} label={t('sidebar.nesting', 'Nesting')} active={activeView === 'nesting'} onClick={() => navigate('nesting')} collapsed={isSidebarCollapsed} />}

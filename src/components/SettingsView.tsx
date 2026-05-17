@@ -213,7 +213,7 @@ const PoliticasTab: React.FC = () => {
   const [calidad, setCalidad] = useState(config.calidadPct ?? 3);
   const [seguridad, setSeguridad] = useState(config.seguridadPct ?? 2);
   const [fiveS, setFiveS] = useState(config.fiveSPct ?? 1);
-  const [industryType, setIndustryType] = useState<'metal_mechanical' | 'automotive' | 'aerospace'>(config.industryType ?? 'metal_mechanical');
+  const [industryType, setIndustryType] = useState<'metal_mechanical' | 'automotive' | 'aerospace' | 'textile' | 'pharmaceutical' | 'electronic' | 'mining'>(config.industryType ?? 'metal_mechanical');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -272,6 +272,10 @@ const PoliticasTab: React.FC = () => {
               <option value="metal_mechanical">🏭 METALMECÁNICA (Nesting, Corte, Viajeros de Acero)</option>
               <option value="automotive">🚗 AUTOMOTRIZ (Core Tools, PPAP, APQP, Kanban RFQ)</option>
               <option value="aerospace">✈️ AEROESPACIAL (AS9100 Quality, FAI AS9102, ITAR Certs)</option>
+              <option value="textile">🧵 TEXTIL (Fichas Técnicas, Patronaje, Hilatura)</option>
+              <option value="pharmaceutical">💊 FARMACÉUTICA (Batch Record FDA, PNO SOP, Cuarto Limpio)</option>
+              <option value="electronic">⚡ ELECTRÓNICA (Splicing ESD, Ruta SMT, Core Components)</option>
+              <option value="mining">⛏️ MINERA (Vetas de Ley, Concentrados, Seguridad MSHA)</option>
             </select>
             <p className="text-[8px] text-slate-600 font-medium ml-1">El ERP adaptará dinámicamente todo su menú de navegación, algoritmos de cálculo, y agentes de Inteligencia Artificial para cumplir con el giro industrial seleccionado.</p>
           </div>

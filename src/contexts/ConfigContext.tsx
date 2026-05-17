@@ -29,7 +29,7 @@ interface BrandConfig {
   calidadPct?: number;
   seguridadPct?: number;
   fiveSPct?: number;
-  industryType?: 'metal_mechanical' | 'automotive' | 'aerospace';
+  industryType?: 'metal_mechanical' | 'automotive' | 'aerospace' | 'textile' | 'pharmaceutical' | 'electronic' | 'mining';
 }
 
 interface ConfigContextType {
