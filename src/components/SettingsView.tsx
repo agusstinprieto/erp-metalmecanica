@@ -543,7 +543,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ userRole }) => {
   const [changingPassword, setChangingPassword] = useState(false);
 
   // API Config State
-  const { config, updateConfig, setSelectedApi } = useConfig();
+  const { config, updateConfig, setSelectedApi, setThemeName } = useConfig();
   const selectedApi = config.selectedApi;
 
   const fetchUsers = async () => {
@@ -944,40 +944,39 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ userRole }) => {
                 <input type="text" value={config.slogan} onChange={(e) => updateConfig({ slogan: e.target.value })} className="bg-black/40 border border-white/5 rounded-lg w-full px-3 h-9 text-[11px] text-white focus:border-mcvill-accent/50 transition-all" />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Color de Marca (Dark)</label>
-                  <div className="flex gap-2">
-                    <input 
-                      type="color" 
-                      value={config.themeColor} 
-                      onChange={(e) => updateConfig({ themeColor: e.target.value })} 
-                      className="w-9 h-9 bg-transparent border-none cursor-pointer"
-                    />
-                    <input 
-                      type="text" 
-                      value={config.themeColor} 
-                      onChange={(e) => updateConfig({ themeColor: e.target.value })} 
-                      className="bg-black/40 border border-white/5 rounded-lg flex-1 px-3 h-9 text-[11px] text-white font-mono uppercase" 
-                    />
-                  </div>
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Color de Marca (Light)</label>
-                  <div className="flex gap-2">
-                    <input 
-                      type="color" 
-                      value={config.themeColorLight} 
-                      onChange={(e) => updateConfig({ themeColorLight: e.target.value })} 
-                      className="w-9 h-9 bg-transparent border-none cursor-pointer"
-                    />
-                    <input 
-                      type="text" 
-                      value={config.themeColorLight} 
-                      onChange={(e) => updateConfig({ themeColorLight: e.target.value })} 
-                      className="bg-black/40 border border-white/5 rounded-lg flex-1 px-3 h-9 text-[11px] text-white font-mono uppercase" 
-                    />
-                  </div>
+              <div className="space-y-1.5">
+                <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Tema de Color</label>
+                <div className="grid grid-cols-3 gap-3">
+                  {([
+                    { id: 'blue',    label: 'Azul Industrial', desc: 'Corporativo · Default', dark: '#4FA5FF', light: '#1D4ED8' },
+                    { id: 'slate',   label: 'Slate Neutro',    desc: 'Minimalista · Sobrio',  dark: '#94A3B8', light: '#475569' },
+                    { id: 'emerald', label: 'Esmeralda',       desc: 'Producción · Planta',   dark: '#34D399', light: '#059669' },
+                  ] as const).map(t => {
+                    const active = (config.themeName ?? 'blue') === t.id;
+                    return (
+                      <button
+                        key={t.id}
+                        onClick={() => setThemeName(t.id)}
+                        className={`relative flex flex-col items-center gap-2 rounded-xl border p-3 transition-all ${
+                          active
+                            ? 'border-mcvill-accent bg-mcvill-accent/10 shadow-lg shadow-mcvill-accent/20'
+                            : 'border-white/5 bg-black/30 hover:border-white/20 hover:bg-black/50'
+                        }`}
+                      >
+                        {active && (
+                          <div className="absolute top-1.5 right-1.5 w-3 h-3 rounded-full bg-mcvill-accent flex items-center justify-center">
+                            <div className="w-1.5 h-1.5 rounded-full bg-slate-950" />
+                          </div>
+                        )}
+                        <div className="flex gap-1.5">
+                          <div className="w-5 h-5 rounded-full border border-white/10" style={{ backgroundColor: t.dark }} />
+                          <div className="w-5 h-5 rounded-full border border-white/10" style={{ backgroundColor: t.light }} />
+                        </div>
+                        <p className={`text-[9px] font-black uppercase tracking-wider leading-tight text-center ${active ? 'text-mcvill-accent' : 'text-slate-300'}`}>{t.label}</p>
+                        <p className="text-[7.5px] text-slate-500 text-center leading-tight">{t.desc}</p>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -1026,15 +1025,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ userRole }) => {
               
               <div className="mt-8 w-full space-y-3">
                 <button 
-                  onClick={() => handleUpdateConfig({ 
-                    brand_name: config.brandName, 
-                    system_name: config.systemName, 
+                  onClick={() => handleUpdateConfig({
+                    brand_name: config.brandName,
+                    system_name: config.systemName,
                     slogan: config.slogan,
-                    config: {
-                      ...tenantConfig.config,
-                      themeColor: config.themeColor,
-                      themeColorLight: config.themeColorLight
-                    }
+                    theme_name: config.themeName,
                   })}
                   disabled={savingKeys}
                   className="w-full h-10 rounded-lg bg-mcvill-accent text-slate-950 text-[9px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50 transition-all shadow-lg shadow-mcvill-accent/20"

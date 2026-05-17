@@ -182,19 +182,19 @@
 .light .cyber-input:focus,
 .light input[class*="bg-"]:focus,
 .light textarea[class*="bg-"]:focus {
-  border-color: #1D4ED8 !important;
-  box-shadow: 0 0 0 4px rgba(29,78,216,0.15) !important;
+  border-color: var(--theme-accent) !important;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--theme-accent), transparent 85%) !important;
 }
 .light input::placeholder,
 .light textarea::placeholder { color: #94A3B8 !important; }
 .light select option { background-color: #FFFFFF !important; color: #0F172A !important; }
 
 /* ── Tablas — filas ─────────────────────────────────────── */
-.light .hover\:bg-blue-600\/5:hover  { background-color: rgba(29,78,216,0.04) !important; }
-.light .hover\:bg-white\/5:hover     { background-color: rgba(29,78,216,0.04) !important; }
-.light .hover\:bg-white\/10:hover    { background-color: rgba(29,78,216,0.06) !important; }
-.light .bg-blue-600\/10              { background-color: rgba(29,78,216,0.08) !important; }
-.light tr:hover                      { background-color: rgba(29,78,216,0.03) !important; }
+.light .hover\:bg-blue-600\/5:hover  { background-color: color-mix(in srgb, var(--theme-accent), transparent 96%) !important; }
+.light .hover\:bg-white\/5:hover     { background-color: color-mix(in srgb, var(--theme-accent), transparent 96%) !important; }
+.light .hover\:bg-white\/10:hover    { background-color: color-mix(in srgb, var(--theme-accent), transparent 93%) !important; }
+.light .bg-blue-600\/10              { background-color: color-mix(in srgb, var(--theme-accent), transparent 92%) !important; }
+.light tr:hover                      { background-color: color-mix(in srgb, var(--theme-accent), transparent 97%) !important; }
 .light thead tr                      { background-color: #F1F5F9 !important; }
 
 /* ── Botones ─────────────────────────────────────────────── */

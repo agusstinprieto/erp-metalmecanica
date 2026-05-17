@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 
+export type ThemeName = 'blue' | 'slate' | 'emerald';
+
 interface BrandConfig {
   brandName: string;
   systemName: string;
@@ -20,6 +22,7 @@ interface BrandConfig {
   loginBackground?: string;
   themeColor?: string;
   themeColorLight?: string;
+  themeName?: ThemeName;
 }
 
 interface ConfigContextType {
@@ -30,6 +33,7 @@ interface ConfigContextType {
   updateConfig: (newConfig: Partial<BrandConfig>) => void;
   setSelectedApi: (apiId: string) => void;
   toggleTheme: () => void;
+  setThemeName: (name: ThemeName) => void;
 }
 
 const defaultConfig: BrandConfig = {
@@ -50,7 +54,26 @@ const defaultConfig: BrandConfig = {
   logoDark: '/logo-erp.png',
   loginBackground: '/login-bg.png',
   themeColor: '#3B82F6',
-  themeColorLight: '#1D4ED8'
+  themeColorLight: '#1D4ED8',
+  themeName: 'blue' as ThemeName,
+};
+
+const THEME_PALETTES: Record<ThemeName, {
+  dark:  { accent: string; border: string; glow: string; shadow: string; shadowLg: string };
+  light: { accent: string; border: string; glow: string; shadow: string; shadowLg: string };
+}> = {
+  blue: {
+    dark:  { accent: '#4FA5FF', border: 'rgba(79,165,255,0.2)',   glow: 'rgba(79,165,255,0.5)',  shadow: '0 0 20px rgba(79,165,255,0.1)',   shadowLg: '0 0 40px rgba(79,165,255,0.2)'  },
+    light: { accent: '#1D4ED8', border: '#BFDBFE',                glow: 'rgba(29,78,216,0.12)',  shadow: '0 1px 4px rgba(15,23,42,0.10), 0 4px 16px rgba(15,23,42,0.06)', shadowLg: '0 4px 16px rgba(15,23,42,0.12), 0 12px 32px rgba(15,23,42,0.08)' },
+  },
+  slate: {
+    dark:  { accent: '#94A3B8', border: 'rgba(148,163,184,0.2)',  glow: 'rgba(148,163,184,0.4)', shadow: '0 0 20px rgba(148,163,184,0.08)', shadowLg: '0 0 40px rgba(148,163,184,0.15)' },
+    light: { accent: '#475569', border: '#CBD5E1',                glow: 'rgba(71,85,105,0.12)',  shadow: '0 1px 4px rgba(15,23,42,0.10), 0 4px 16px rgba(15,23,42,0.06)', shadowLg: '0 4px 16px rgba(15,23,42,0.12), 0 12px 32px rgba(15,23,42,0.08)' },
+  },
+  emerald: {
+    dark:  { accent: '#34D399', border: 'rgba(52,211,153,0.2)',   glow: 'rgba(52,211,153,0.5)',  shadow: '0 0 20px rgba(52,211,153,0.1)',   shadowLg: '0 0 40px rgba(52,211,153,0.2)'  },
+    light: { accent: '#059669', border: '#A7F3D0',                glow: 'rgba(5,150,105,0.12)',  shadow: '0 1px 4px rgba(15,23,42,0.10), 0 4px 16px rgba(15,23,42,0.06)', shadowLg: '0 4px 16px rgba(15,23,42,0.12), 0 12px 32px rgba(15,23,42,0.08)' },
+  },
 };
 
 const ConfigContext = createContext<ConfigContextType | undefined>(undefined);
@@ -61,36 +84,25 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [isLoading, setIsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(true); // Default to dark mode for "Agus Pro" aesthetic
 
-  // Helper to convert hex to rgba
-  const hexToRgba = (hex: string, alpha: number) => {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-  };
-
   useEffect(() => {
-    // Sync theme with document class on initial load
+    const palette = THEME_PALETTES[config.themeName ?? 'blue'];
+    const mode = isDarkMode ? palette.dark : palette.light;
+
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
       document.documentElement.classList.remove('light');
-      
-      // Apply custom colors if present
-      const accent = config.themeColor || defaultConfig.themeColor;
-      document.documentElement.style.setProperty('--theme-accent', accent!);
-      document.documentElement.style.setProperty('--theme-card-border', hexToRgba(accent!, 0.6));
-      document.documentElement.style.setProperty('--theme-glow', hexToRgba(accent!, 0.5));
     } else {
       document.documentElement.classList.add('light');
       document.documentElement.classList.remove('dark');
-
-      // Apply custom colors if present
-      const accent = config.themeColorLight || defaultConfig.themeColorLight;
-      document.documentElement.style.setProperty('--theme-accent', accent!);
-      document.documentElement.style.setProperty('--theme-card-border', '#CBD5E1');
-      document.documentElement.style.setProperty('--theme-glow', hexToRgba(accent!, 0.12));
     }
-  }, [isDarkMode, config.themeColor, config.themeColorLight]);
+
+    document.documentElement.setAttribute('data-theme', config.themeName ?? 'blue');
+    document.documentElement.style.setProperty('--theme-accent', mode.accent);
+    document.documentElement.style.setProperty('--theme-card-border', mode.border);
+    document.documentElement.style.setProperty('--theme-glow', mode.glow);
+    document.documentElement.style.setProperty('--theme-shadow', mode.shadow);
+    document.documentElement.style.setProperty('--theme-shadow-lg', mode.shadowLg);
+  }, [isDarkMode, config.themeName]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
@@ -105,6 +117,11 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         const savedTheme = localStorage.getItem('mcvill-theme');
         if (savedTheme !== null) {
           setIsDarkMode(savedTheme === 'dark');
+        }
+
+        const savedThemeName = localStorage.getItem('mcvill-theme-name') as ThemeName | null;
+        if (savedThemeName && ['blue', 'slate', 'emerald'].includes(savedThemeName)) {
+          setConfig(prev => ({ ...prev, themeName: savedThemeName }));
         }
 
         // Step 2: Get authenticated user's tenant_id
@@ -142,6 +159,7 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             selectedApi: tenant.selected_api || config.selectedApi,
             themeColor: supabaseConfig.themeColor || config.themeColor,
             themeColorLight: supabaseConfig.themeColorLight || config.themeColorLight,
+            themeName: (supabaseConfig.themeName as ThemeName) || config.themeName,
             logo: supabaseConfig.logo_url || config.logo,
             logoDark: supabaseConfig.logo_url || config.logoDark,
             companyName: supabaseConfig.company_name || config.companyName,
@@ -190,6 +208,7 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               ...currentSupabaseConfig,
               themeColor: updated.themeColor,
               themeColorLight: updated.themeColorLight,
+              themeName: updated.themeName,
               ...(updated.logo ? { logo_url: updated.logo } : {}),
               company_name: updated.companyName,
               company_city: updated.companyCity,
@@ -214,6 +233,12 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     localStorage.setItem('mcvill-theme', newMode ? 'dark' : 'light');
   };
 
+  const setThemeName = (name: ThemeName) => {
+    setConfig(prev => ({ ...prev, themeName: name }));
+    localStorage.setItem('mcvill-theme-name', name);
+    updateConfig({ themeName: name });
+  };
+
   // Derived logo based on theme
   const currentConfig = {
     ...config,
@@ -221,14 +246,15 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   return (
-    <ConfigContext.Provider value={{ 
-      config: currentConfig, 
+    <ConfigContext.Provider value={{
+      config: currentConfig,
       tenantId,
-      isLoading, 
+      isLoading,
       isDarkMode,
-      updateConfig, 
+      updateConfig,
       setSelectedApi,
-      toggleTheme 
+      toggleTheme,
+      setThemeName,
     }}>
       {children}
     </ConfigContext.Provider>
