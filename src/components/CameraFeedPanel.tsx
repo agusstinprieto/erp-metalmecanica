@@ -538,7 +538,18 @@ Responde ÚNICAMENTE con JSON:
     <div className="bg-slate-900/60 border border-white/5 rounded-2xl overflow-hidden flex flex-col">
       {/* Camera feed */}
       <div className="relative aspect-video bg-black flex items-center justify-center overflow-hidden">
-        {isDemo ? (
+        {cam.streamUrl.includes('.mp4') || cam.streamUrl.startsWith('https://assets.mixkit.co') ? (
+          <video
+            src={cam.streamUrl}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover"
+            onCanPlay={() => setOnline(true)}
+            onError={() => setOnline(false)}
+          />
+        ) : isDemo ? (
           cam.id === 'cam-1' ? (
             <AssemblyLineSimulator canvasRef={canvasRef} />
           ) : (

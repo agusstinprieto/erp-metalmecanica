@@ -436,12 +436,17 @@ export const QualityView: React.FC = () => {
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'info' | 'error' } | null>(null);
   const CAM_STORAGE_KEY = 'mcvill_quality_feeds';
   const [activeFeeds, setActiveFeeds] = useState<{ id: string; url: string; label: string }[]>(() => {
+    const defaultFeeds = [
+      { id: 'cam-1', url: 'demo-assembly', label: 'LÍNEA ENSAMBLE 1' },
+      { id: 'cam-2', url: 'demo-welding', label: 'ESTACIÓN SOLDADURA 4' },
+      { id: 'cam-3', url: 'https://assets.mixkit.co/videos/preview/mixkit-robotic-arm-assembling-a-circuit-board-43187-large.mp4', label: 'ROBOT ENSAMBLE PCB' },
+    ];
     try {
       const saved = localStorage.getItem('mcvill_quality_feeds');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed.map(f => {
+          const upgraded = parsed.map(f => {
             if (f.url.includes('buffalotrace') || f.id === 'cam-1') {
               return { ...f, url: 'demo-assembly' };
             }
@@ -450,13 +455,14 @@ export const QualityView: React.FC = () => {
             }
             return f;
           });
+          if (!upgraded.some(f => f.id === 'cam-3')) {
+            upgraded.push(defaultFeeds[2]);
+          }
+          return upgraded;
         }
       }
     } catch {}
-    return [
-      { id: 'cam-1', url: 'demo-assembly', label: 'LÍNEA ENSAMBLE 1' },
-      { id: 'cam-2', url: 'demo-welding', label: 'ESTACIÓN SOLDADURA 4' },
-    ];
+    return defaultFeeds;
   });
   const [selectedFeedId, setSelectedFeedId] = useState<string | null>(null);
   
@@ -925,7 +931,9 @@ export const QualityView: React.FC = () => {
                   </div>
                   <div className="relative flex-1 bg-black aspect-video flex items-center justify-center overflow-hidden">
                     {feed.url ? (
-                      feed.id === 'cam-1' || feed.url === 'demo-assembly' ? (
+                      feed.url.includes('.mp4') || feed.url.startsWith('https://assets.mixkit.co') ? (
+                        <video src={feed.url} autoPlay loop muted playsInline className="w-full h-full object-cover" />
+                      ) : feed.id === 'cam-1' || feed.url === 'demo-assembly' ? (
                         <AssemblyLineSimulator canvasRef={canvasRef1} />
                       ) : feed.id === 'cam-2' || feed.url === 'demo-welding' ? (
                         <WeldingSimulator canvasRef={canvasRef2} />
