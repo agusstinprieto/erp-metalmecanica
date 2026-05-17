@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<!--
+  ═══════════════════════════════════════════════════════════════════
+  VIAJERO INDUSTRIAL — Template HTML Completo
+  ═══════════════════════════════════════════════════════════════════
+
+  CÓMO EDITAR ESTE ARCHIVO:
+  • Abre este archivo en tu navegador para ver una vista previa en vivo.
+  • Los textos entre {{ }} son datos reales — se reemplazan automáticamente.
+  • Puedes cambiar: colores, fuentes, orden de secciones, bordes, tamaños.
+  • Guarda el archivo → la próxima generación de PDF usa el nuevo diseño.
+  • NO necesitas recompilar el servidor C# para ver cambios de diseño.
+
+  VARIABLES DE DATOS ({{ }}) — no cambies los nombres dentro de {{ }}:
+  ┌─ job.id             → Ej: MCV-ENG-2024-001
+  ├─ job.numero_parte   → Ej: HORN-APL-047
+  ├─ job.revision       → Ej: REV-B
+  ├─ job.descripcion    → Descripción larga del producto
+  ├─ job.cliente        → Nombre del cliente
+  ├─ job.cantidad_orden → Ej: 250 PZ
+  ├─ job.fecha_orden    → Ej: 12-May-2026
+  ├─ job.fecha_entrega  → Ej: 30-May-2026
+  ├─ job.oc_cliente     → Orden de compra del cliente
+  ├─ job.linea          → Línea de producción
+  ├─ job.cotizacion     → Número de cotización
+  ├─ job.horas_est      → Ej: 48.00 HRS
+  ├─ job.ensamble_padre → Job padre en la jerarquía
+  ├─ job.ensamble_tl    → Top Level assembly
+  ├─ job.notas          → Notas especiales (sólo si job.tiene_notas)
+  ├─ job.barcode_img    → Barcode del Job ID como <img src="data:...">
+  │
+  ├─ operaciones[]  → Lista de operaciones/ruta
+  │    .orden, .ct, .clave, .nombre, .descripcion
+  │    .config, .tasa, .minutos
+  │    .barcode_img → Barcode del centro de trabajo
+  │
+  ├─ materiales[]   → Lista de materiales/recogidas
+  │    .req, .clave, .descripcion, .ubicacion, .cantidad, .unidad
+  │    .vencimiento, .lote, .tiene_lote
+  │    .barcode_req_img → Barcode del requisición
+  │    .barcode_ubi_img → Barcode de ubicación
+  │
+  └─ componentes[]  → Lista de componentes BOM (sólo si job.tiene_componentes)
+       .job_id, .parte, .revision, .descripcion, .horas_est, .cantidad
+       .inicio, .fin
+  ═══════════════════════════════════════════════════════════════════
+-->
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <title>Viajero Industrial — {{ job.id }}</title>
+  <style>
+    /* ═══════════════════════════════════════════════════
+       CONFIGURACIÓN DE PÁGINA (para impresión/PDF)
+       Cambia los márgenes aquí si quieres más o menos espacio.
+       ═══════════════════════════════════════════════════ */
+    @page {
+      size: letter;
+      margin: 22mm 18mm 18mm 18mm; /* Arriba: 22mm (espacio para header corriente) | Abajo: 18mm (footer) | Lados: 18mm */
+    }
+
+    /* ═══════════════════════════════════════════════════
+       ESTILOS BASE — cambia la fuente del reporte aquí
+       ═══════════════════════════════════════════════════ */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 8pt;
+      color: #000000;
+      background: white;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       HEADER DEL REPORTE
+       Cambia los colores del encabezado aquí.
+       ═══════════════════════════════════════════════════ */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #1e40af;
+      margin-bottom: 8px;
+    }
+    .header-logo {
+      font-size: 9pt;
+      font-weight: bold;
+      color: #000000;
+      min-width: 140px;
+    }
+    .header-center {
+      text-align: center;
+      flex: 1;
+    }
+    .header-center h1 {
+      font-size: 16pt;
+      font-weight: bold;
+      color: #000000;
+      margin-bottom: 2px;
+    }
+    .header-center h2 {
+      font-size: 10pt;
+      font-weight: bold;
+      color: #000000;
+      margin-bottom: 4px;
+    }
+    .header-center .barcode-wrap {
+      display: inline-block;
+      margin-top: 3px;
+    }
+    .header-center .barcode-wrap img { height: 30px; }
+    .header-meta {
+      text-align: right;
+      font-size: 7pt;
+      min-width: 140px;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       CAJA DE DATOS DEL JOB
+       Cambia el color de fondo (#eff6ff) y borde (#bfdbfe) aquí.
+       ═══════════════════════════════════════════════════ */
+    .job-info {
+      width: 100%;
+      border-collapse: collapse;
+      background: #eff6ff;
+      border: 0.75px solid #bfdbfe;
+      margin-bottom: 6px;
+    }
+    .job-info td {
+      padding: 4px 6px;
+    }
+    .job-info .lbl {
+      font-size: 7pt;
+      font-weight: bold;
+      color: #1e40af;     /* ← CAMBIA ESTE COLOR para las etiquetas */
+      white-space: nowrap;
+    }
+    .job-info .val {
+      font-size: 7.5pt;
+      font-weight: bold;
+      color: #0f172a;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       BLOQUE DE NOTAS
+       Cambia los colores del aviso de notas aquí.
+       ═══════════════════════════════════════════════════ */
+    .notas-box {
+      background: #fffbeb;
+      border: 0.75px solid #fde68a;
+      padding: 6px;
+      margin-bottom: 8px;
+      font-size: 7.5pt;
+    }
+    .notas-box strong { color: #d97706; }
+    .notas-box span   { color: #92400e; }
+
+    /* ═══════════════════════════════════════════════════
+       TÍTULOS DE SECCIÓN
+       Cambia el color #1e40af para cambiar el azul de todos los títulos.
+       ═══════════════════════════════════════════════════ */
+    .section-title {
+      border-top: 1.5px solid #1e40af;
+      border-bottom: 1px solid #dbeafe;
+      text-align: center;
+      padding: 3px 0;
+      margin: 12px 0 4px;
+    }
+    .section-title strong {
+      font-size: 10pt;
+      color: #1e40af;      /* ← CAMBIA ESTE COLOR para todos los títulos */
+      letter-spacing: 1px;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       TABLA DE RUTA DE PROCESO
+       Cambia background de .ruta-th para cambiar el header de la tabla.
+       ═══════════════════════════════════════════════════ */
+    .ruta-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 4px;
+    }
+    .ruta-th {
+      background: #1e40af;   /* ← CAMBIA ESTE COLOR: encabezado de columnas */
+      color: white;
+      font-size: 6.5pt;
+      font-weight: bold;
+      padding: 4px;
+    }
+    .ruta-td {
+      border-bottom: 0.5px solid #bfdbfe;
+      padding: 6px 4px;
+      font-size: 7.5pt;
+      vertical-align: top;
+    }
+    .ruta-td .ct-barcode img { height: 16px; display: block; margin: 2px auto 0; }
+
+    /* ═══════════════════════════════════════════════════
+       TABLA DE MATERIALES
+       ═══════════════════════════════════════════════════ */
+    .mat-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .mat-th {
+      border-bottom: 1.5px solid #000000;
+      font-size: 6.5pt;
+      font-weight: bold;
+      padding: 4px 2px;
+    }
+    .mat-td {
+      border-bottom: 0.5px solid #cccccc;
+      padding: 4px 2px;
+      font-size: 7.5pt;
+      vertical-align: top;
+    }
+    .mat-td .barcode-small img { height: 14px; display: block; }
+
+    /* ═══════════════════════════════════════════════════
+       TABLA DE COMPONENTES (BOM)
+       ═══════════════════════════════════════════════════ */
+    .bom-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .bom-th {
+      border-bottom: 1.5px solid #000000;
+      font-size: 6.5pt;
+      font-weight: bold;
+      padding: 4px;
+    }
+    .bom-td {
+      border-bottom: 0.5px solid #cccccc;
+      padding: 6px 4px;
+      font-size: 7pt;
+      vertical-align: top;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       HEADER CORRIENTE — aparece en TODAS las páginas (excepto la 1ra visualmente)
+       ═══════════════════════════════════════════════════ */
+    .running-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 14mm;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1.5px solid #1e40af;
+      background: white;
+      font-size: 7pt;
+      padding: 0 2px;
+    }
+    .running-header .rh-left  { font-weight: bold; color: #000; }
+    .running-header .rh-center { text-align: center; font-weight: bold; color: #1e40af; font-size: 8pt; }
+    .running-header .rh-right  { text-align: right; font-size: 6.5pt; color: #333; }
+
+    /* ═══════════════════════════════════════════════════
+       FOOTER DEL REPORTE — aparece en TODAS las páginas
+       ═══════════════════════════════════════════════════ */
+    .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      border-top: 1px solid #000000;
+      padding: 3px 2px 2px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 6pt;
+      background: white;
+      z-index: 100;
+    }
+
+    /* Espacio en body para que el contenido no quede debajo del footer fijo */
+    body { padding-bottom: 14mm; }
+
+    /* Evitar que las tablas grandes se corten feo al pasar de página */
+    tr { page-break-inside: avoid; }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════
+       HEADER CORRIENTE (fijo, sale en cada página)
+       ═══════════════════════════════════ -->
+  <div class="running-header">
+    <div class="rh-left">MCVILL SA DE CV</div>
+    <div class="rh-center">VIAJERO INDUSTRIAL — JOB: {{ job.id }}</div>
+    <div class="rh-right">{{ job.numero_parte }} Rev: {{ job.revision }}<br/>{{ job.fecha_impresion }}</div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       HEADER: Logo + Título + Barcode + Fecha
+       ═══════════════════════════════════ -->
+  <div class="header">
+
+    <!-- Izquierda: Logo o nombre de empresa -->
+    <div class="header-logo">
+      <!-- Si tienes un logo, cambia el texto por: <img src="ruta/logo.png" style="height:50px"> -->
+      MCVILL SA DE CV<br/>
+      <span style="font-size:7pt;color:#333;font-weight:normal">
+        FECHA: {{ job.fecha_impresion }}
+      </span>
+    </div>
+
+    <!-- Centro: Título + Job ID + Barcode -->
+    <div class="header-center">
+      <h1>VIAJERO INDUSTRIAL</h1>
+      <h2>JOB: {{ job.id }}</h2>
+      <div class="barcode-wrap">
+        {{ job.barcode_img }}
+      </div>
+      <div style="font-size:6.5pt;color:#333;margin-top:2px">{{ job.id }}</div>
+    </div>
+
+    <!-- Derecha: Fecha de impresión + Parte -->
+    <div class="header-meta">
+      <div><strong>FECHA IMPRESIÓN:</strong> {{ job.fecha_impresion }}</div>
+      <div><strong>{{ job.numero_parte }}</strong></div>
+      {{ if job.fecha_orden != "—" }}
+      <div>{{ job.fecha_orden }}</div>
+      {{ end }}
+    </div>
+
+  </div>
+
+
+  <!-- ═══════════════════════════════════
+       SECCIÓN 1: DATOS DEL JOB
+       Para cambiar la disposición de campos:
+       mueve las celdas <td> a donde quieras.
+       ═══════════════════════════════════ -->
+  <table class="job-info">
+    <tr>
+      <td class="lbl" style="width:10%">PARTE:</td>
+      <td class="val" style="width:18%">{{ job.numero_parte }}</td>
+      <td class="lbl" style="width:9%">REVISIÓN:</td>
+      <td class="val" style="width:8%">{{ job.revision }}</td>
+      <td class="lbl" style="width:12%">CANT. ORDEN:</td>
+      <td class="val" style="width:10%">{{ job.cantidad_orden }}</td>
+      <td class="lbl" style="width:11%">FECHA ORDEN:</td>
+      <td class="val">{{ job.fecha_orden }}</td>
+    </tr>
+    <tr>
+      <td class="lbl">CLIENTE:</td>
+      <td class="val">{{ job.cliente }}</td>
+      <td class="lbl">DIBUJO:</td>
+      <td class="val">{{ job.dibujo }}</td>
+      <td class="lbl">OC CLIENTE:</td>
+      <td class="val">{{ job.oc_cliente }}</td>
+      <td class="lbl">ENTREGA:</td>
+      <td class="val">{{ job.fecha_entrega }}</td>
+    </tr>
+    <tr>
+      <td class="lbl">E. PADRE:</td>
+      <td class="val">{{ job.ensamble_padre }}</td>
+      <td class="lbl">E. T/L:</td>
+      <td class="val">{{ job.ensamble_tl }}</td>
+      <td class="lbl">LÍNEA:</td>
+      <td class="val">{{ job.linea }}</td>
+      <td class="lbl">HORAS EST.:</td>
+      <td class="val">{{ job.horas_est }}</td>
+    </tr>
+    <tr>
+      <td class="lbl">JOB ID:</td>
+      <td class="val">{{ job.id }}</td>
+      <td class="lbl">COTIZACIÓN:</td>
+      <td class="val">{{ job.cotizacion }}</td>
+      <td class="lbl">CANT. FAB.:</td>
+      <td class="val">{{ job.cant_fabricada }}</td>
+      <td class="lbl">ESTATUS:</td>
+      <td class="val">PENDIENTE</td>
+    </tr>
+    <tr>
+      <td class="lbl">DESCRIPCIÓN:</td>
+      <td class="val" colspan="7">{{ job.descripcion }}</td>
+    </tr>
+  </table>
+
+  <!-- Notas especiales — sólo aparece si hay notas -->
+  {{ if job.tiene_notas }}
+  <div class="notas-box">
+    <strong>NOTAS: </strong><span>{{ job.notas }}</span>
+  </div>
+  {{ end }}
+
+
+  <!-- ═══════════════════════════════════
+       SECCIÓN 2: RUTA DE PROCESO
+       Para agregar una columna: añade un <th> y un <td> más.
+       ═══════════════════════════════════ -->
+  <div class="section-title"><strong>RUTA DE PROCESO</strong></div>
+
+  <table class="ruta-table">
+    <thead>
+      <tr>
+        <th class="ruta-th" style="text-align:center;width:6%">SEQ</th>
+        <th class="ruta-th" style="text-align:center;width:16%">CENTRO TRAB.</th>
+        <th class="ruta-th" style="text-align:left;width:46%">INSTRUCCIONES DETALLADAS DE OPERACIÓN</th>
+        <th class="ruta-th" style="text-align:center;width:11%">Configurar</th>
+        <th class="ruta-th" style="text-align:center;width:11%">Tasa Proceso</th>
+        <th class="ruta-th" style="text-align:center;width:10%">Min. Est.</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ for op in operaciones }}
+      <tr>
+        <td class="ruta-td" style="text-align:center">{{ op.orden }}</td>
+        <td class="ruta-td" style="text-align:center">
+          <strong>{{ op.ct }}</strong>
+          <div class="ct-barcode">{{ op.barcode_img }}</div>
+          <div style="font-size:5pt;color:#666;text-align:center">{{ op.ct }}</div>
+        </td>
+        <td class="ruta-td">
+          <strong>[{{ op.clave }}] {{ op.nombre }}</strong><br/>
+          <span style="color:#1e293b">{{ op.descripcion }}</span>
+        </td>
+        <td class="ruta-td" style="text-align:center">{{ op.config }}</td>
+        <td class="ruta-td" style="text-align:center">{{ op.tasa }}</td>
+        <td class="ruta-td" style="text-align:center;font-weight:bold">{{ op.minutos }}</td>
+      </tr>
+      {{ else }}
+      <tr>
+        <td colspan="6" style="padding:8px;text-align:center;color:#666;font-style:italic">Sin operaciones registradas</td>
+      </tr>
+      {{ end }}
+    </tbody>
+  </table>
+
+
+  <!-- ═══════════════════════════════════
+       SECCIÓN 3: MATERIALES / RECOGIDAS
+       ═══════════════════════════════════ -->
+  <div class="section-title"><strong>MATERIALES / RECOGIDAS</strong></div>
+  <p style="font-size:7pt;color:#64748b;font-style:italic;margin:0 0 4px 8px">Vencimiento · Material · Primario</p>
+
+  <table class="mat-table">
+    <thead>
+      <tr>
+        <th class="mat-th" style="text-align:left;width:22%">Vencimiento<br/>Requerimiento (REQ)</th>
+        <th class="mat-th" style="text-align:left;width:40%">Material<br/>Descripción</th>
+        <th class="mat-th" style="text-align:left;width:22%">Ubicación<br/>Inventario</th>
+        <th class="mat-th" style="text-align:right;width:16%">Cantidad</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ for mat in materiales }}
+      <tr>
+        <td class="mat-td">
+          <div>{{ mat.vencimiento }}</div>
+          <div class="barcode-small">{{ mat.barcode_req_img }}</div>
+          <strong>{{ mat.req }}</strong>
+        </td>
+        <td class="mat-td">
+          <div>{{ mat.clave }}</div>
+          <strong>{{ mat.descripcion }}</strong>
+          {{ if mat.tiene_lote }}
+          <br/><em style="color:#64748b;font-size:6.5pt">Lote: {{ mat.lote }}</em>
+          {{ end }}
+        </td>
+        <td class="mat-td">
+          <div class="barcode-small">{{ mat.barcode_ubi_img }}</div>
+          <strong>{{ mat.ubicacion }}</strong>
+        </td>
+        <td class="mat-td" style="text-align:right">
+          <div style="font-size:8pt;font-weight:bold">{{ mat.cantidad }}</div>
+          <div>{{ mat.unidad }}</div>
+        </td>
+      </tr>
+      {{ else }}
+      <tr>
+        <td colspan="4" style="padding:8px;text-align:center;color:#666;font-style:italic">Sin materiales registrados</td>
+      </tr>
+      {{ end }}
+    </tbody>
+  </table>
+
+
+  <!-- ═══════════════════════════════════
+       SECCIÓN 4: COMPONENTES (BOM)
+       Sólo aparece si el viajero tiene componentes.
+       ═══════════════════════════════════ -->
+  {{ if job.tiene_componentes }}
+  <div class="section-title"><strong>COMPONENTES (BOM)</strong></div>
+
+  <table class="bom-table">
+    <thead>
+      <tr>
+        <th class="bom-th" style="text-align:left;width:34%">OT / Sub-Orden<br/>Parte — Descripción</th>
+        <th class="bom-th" style="text-align:center;width:8%">Rev</th>
+        <th class="bom-th" style="text-align:right;width:16%">Total Hrs Est</th>
+        <th class="bom-th" style="text-align:center;width:18%">Cant. Fabricar</th>
+        <th class="bom-th" style="text-align:left;width:24%">Ini / Fin Prg</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ for comp in componentes }}
+      <tr>
+        <td class="bom-td">
+          <strong style="font-size:8pt">{{ comp.job_id }}</strong><br/>
+          <span style="font-weight:bold">Parte: {{ comp.parte }}</span><br/>
+          <span style="color:#334155">{{ comp.descripcion }}</span>
+        </td>
+        <td class="bom-td" style="text-align:center">{{ comp.revision }}</td>
+        <td class="bom-td" style="text-align:right;font-weight:bold">{{ comp.horas_est }}</td>
+        <td class="bom-td" style="text-align:center">{{ comp.cantidad }}</td>
+        <td class="bom-td" style="color:#333">
+          Ini: {{ comp.inicio }}<br/>Fin: {{ comp.fin }}
+        </td>
+      </tr>
+      {{ end }}
+    </tbody>
+  </table>
+  {{ end }}
+
+
+  <!-- ═══════════════════════════════════
+       FOOTER
+       ═══════════════════════════════════ -->
+  <div class="footer">
+    <div>Padre: {{ job.ensamble_padre }}</div>
+    <div style="text-align:center">
+      MCVILL SA DE CV — IA.AGUS<br/>
+      Job: {{ job.id }} | Parte: {{ job.numero_parte }} Rev: {{ job.revision }}
+    </div>
+    <div style="text-align:right">
+      Job: {{ job.id }}<br/>
+      Parte: {{ job.numero_parte }} Rev: {{ job.revision }}
+    </div>
+  </div>
+
+</body>
+</html>
