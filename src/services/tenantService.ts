@@ -23,7 +23,7 @@ export interface TenantConfig {
   teams_webhook_url?: string;
   theme_color?: string;
   theme_color_light?: string;
-  theme_name?: 'blue' | 'slate' | 'emerald';
+  theme_name?: 'blue' | 'slate' | 'emerald' | 'carbon';
 }
 
 const CEO_ROLES = new Set(['ceo', 'admin']);

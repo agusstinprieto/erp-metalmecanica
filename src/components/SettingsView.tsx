@@ -946,11 +946,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ userRole }) => {
 
               <div className="space-y-1.5">
                 <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Tema de Color</label>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-4 gap-3">
                   {([
                     { id: 'blue',    label: 'Azul Industrial', desc: 'Corporativo · Default', dark: '#4FA5FF', light: '#1D4ED8' },
                     { id: 'slate',   label: 'Slate Neutro',    desc: 'Minimalista · Sobrio',  dark: '#94A3B8', light: '#475569' },
                     { id: 'emerald', label: 'Esmeralda',       desc: 'Producción · Planta',   dark: '#34D399', light: '#059669' },
+                    { id: 'carbon',  label: 'Carbon',          desc: 'Negro · Naranja',        dark: '#FF6B00', light: '#C2410C' },
                   ] as const).map(t => {
                     const active = (config.themeName ?? 'blue') === t.id;
                     return (

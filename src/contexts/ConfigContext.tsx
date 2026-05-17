@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 
-export type ThemeName = 'blue' | 'slate' | 'emerald';
+export type ThemeName = 'blue' | 'slate' | 'emerald' | 'carbon';
 
 interface BrandConfig {
   brandName: string;
@@ -59,20 +59,24 @@ const defaultConfig: BrandConfig = {
 };
 
 const THEME_PALETTES: Record<ThemeName, {
-  dark:  { accent: string; border: string; glow: string; shadow: string; shadowLg: string };
-  light: { accent: string; border: string; glow: string; shadow: string; shadowLg: string };
+  dark:  { accent: string; bg: string; border: string; glow: string; shadow: string; shadowLg: string };
+  light: { accent: string; bg: string; border: string; glow: string; shadow: string; shadowLg: string };
 }> = {
   blue: {
-    dark:  { accent: '#4FA5FF', border: 'rgba(79,165,255,0.2)',   glow: 'rgba(79,165,255,0.5)',  shadow: '0 0 20px rgba(79,165,255,0.1)',   shadowLg: '0 0 40px rgba(79,165,255,0.2)'  },
-    light: { accent: '#1D4ED8', border: '#BFDBFE',                glow: 'rgba(29,78,216,0.12)',  shadow: '0 1px 4px rgba(15,23,42,0.10), 0 4px 16px rgba(15,23,42,0.06)', shadowLg: '0 4px 16px rgba(15,23,42,0.12), 0 12px 32px rgba(15,23,42,0.08)' },
+    dark:  { accent: '#4FA5FF', bg: '#020617', border: 'rgba(79,165,255,0.2)',   glow: 'rgba(79,165,255,0.5)',  shadow: '0 0 20px rgba(79,165,255,0.1)',   shadowLg: '0 0 40px rgba(79,165,255,0.2)'  },
+    light: { accent: '#1D4ED8', bg: '#F0F4F8', border: '#BFDBFE',                glow: 'rgba(29,78,216,0.12)',  shadow: '0 1px 4px rgba(15,23,42,0.10), 0 4px 16px rgba(15,23,42,0.06)', shadowLg: '0 4px 16px rgba(15,23,42,0.12), 0 12px 32px rgba(15,23,42,0.08)' },
   },
   slate: {
-    dark:  { accent: '#94A3B8', border: 'rgba(148,163,184,0.2)',  glow: 'rgba(148,163,184,0.4)', shadow: '0 0 20px rgba(148,163,184,0.08)', shadowLg: '0 0 40px rgba(148,163,184,0.15)' },
-    light: { accent: '#475569', border: '#CBD5E1',                glow: 'rgba(71,85,105,0.12)',  shadow: '0 1px 4px rgba(15,23,42,0.10), 0 4px 16px rgba(15,23,42,0.06)', shadowLg: '0 4px 16px rgba(15,23,42,0.12), 0 12px 32px rgba(15,23,42,0.08)' },
+    dark:  { accent: '#94A3B8', bg: '#0F172A', border: 'rgba(148,163,184,0.2)',  glow: 'rgba(148,163,184,0.4)', shadow: '0 0 20px rgba(148,163,184,0.08)', shadowLg: '0 0 40px rgba(148,163,184,0.15)' },
+    light: { accent: '#475569', bg: '#F8FAFC', border: '#CBD5E1',                glow: 'rgba(71,85,105,0.12)',  shadow: '0 1px 4px rgba(15,23,42,0.10), 0 4px 16px rgba(15,23,42,0.06)', shadowLg: '0 4px 16px rgba(15,23,42,0.12), 0 12px 32px rgba(15,23,42,0.08)' },
   },
   emerald: {
-    dark:  { accent: '#34D399', border: 'rgba(52,211,153,0.2)',   glow: 'rgba(52,211,153,0.5)',  shadow: '0 0 20px rgba(52,211,153,0.1)',   shadowLg: '0 0 40px rgba(52,211,153,0.2)'  },
-    light: { accent: '#059669', border: '#A7F3D0',                glow: 'rgba(5,150,105,0.12)',  shadow: '0 1px 4px rgba(15,23,42,0.10), 0 4px 16px rgba(15,23,42,0.06)', shadowLg: '0 4px 16px rgba(15,23,42,0.12), 0 12px 32px rgba(15,23,42,0.08)' },
+    dark:  { accent: '#34D399', bg: '#020617', border: 'rgba(52,211,153,0.2)',   glow: 'rgba(52,211,153,0.5)',  shadow: '0 0 20px rgba(52,211,153,0.1)',   shadowLg: '0 0 40px rgba(52,211,153,0.2)'  },
+    light: { accent: '#059669', bg: '#F0FDF9', border: '#A7F3D0',                glow: 'rgba(5,150,105,0.12)',  shadow: '0 1px 4px rgba(15,23,42,0.10), 0 4px 16px rgba(15,23,42,0.06)', shadowLg: '0 4px 16px rgba(15,23,42,0.12), 0 12px 32px rgba(15,23,42,0.08)' },
+  },
+  carbon: {
+    dark:  { accent: '#FF6B00', bg: '#0A0A0A', border: 'rgba(255,107,0,0.25)',   glow: 'rgba(255,107,0,0.5)',   shadow: '0 0 20px rgba(255,107,0,0.12)',   shadowLg: '0 0 40px rgba(255,107,0,0.22)'  },
+    light: { accent: '#C2410C', bg: '#FAFAF9', border: '#FED7AA',                glow: 'rgba(194,65,12,0.12)',  shadow: '0 1px 4px rgba(15,23,42,0.10), 0 4px 16px rgba(15,23,42,0.06)', shadowLg: '0 4px 16px rgba(15,23,42,0.12), 0 12px 32px rgba(15,23,42,0.08)' },
   },
 };
 
@@ -97,6 +101,7 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
 
     document.documentElement.setAttribute('data-theme', config.themeName ?? 'blue');
+    document.documentElement.style.setProperty('--theme-bg', mode.bg);
     document.documentElement.style.setProperty('--theme-accent', mode.accent);
     document.documentElement.style.setProperty('--theme-card-border', mode.border);
     document.documentElement.style.setProperty('--theme-glow', mode.glow);
@@ -120,7 +125,7 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         }
 
         const savedThemeName = localStorage.getItem('mcvill-theme-name') as ThemeName | null;
-        if (savedThemeName && ['blue', 'slate', 'emerald'].includes(savedThemeName)) {
+        if (savedThemeName && ['blue', 'slate', 'emerald', 'carbon'].includes(savedThemeName)) {
           setConfig(prev => ({ ...prev, themeName: savedThemeName }));
         }
 
