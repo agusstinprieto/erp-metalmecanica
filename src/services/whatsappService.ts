@@ -14,8 +14,11 @@ export const whatsappService = {
    * Envía una notificación de Stock Crítico.
    */
   notifyCriticalStock(materialName: string, sku: string, currentStock: number, unit: string) {
+    const saved = localStorage.getItem('mcvill-config');
+    const brandName = saved ? JSON.parse(saved).brandName || 'ERP' : 'ERP';
+
     const message = `🚨 *ALERTA DE STOCK CRÍTICO*\n\n` +
-      `Se ha detectado inventario bajo en el sistema McVill ERP:\n\n` +
+      `Se ha detectado inventario bajo en el sistema ${brandName} ERP:\n\n` +
       `📦 *Material:* ${materialName}\n` +
       `🆔 *SKU:* ${sku}\n` +
       `📉 *Stock Actual:* ${currentStock} ${unit}\n\n` +
