@@ -686,12 +686,12 @@ export const QualityView: React.FC = () => {
       {/* Stats */}
       <div className="px-4 py-3 grid grid-cols-2 md:grid-cols-4 gap-3 bg-slate-900/20 shrink-0">
         {[
-          { label: 'TASA ÉXITO', value: `${passRate}%`, icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-          { label: 'NCs ABIERTAS', value: String(openNCs), icon: AlertTriangle, color: 'text-rose-400', bg: 'bg-rose-500/10' },
-          { label: 'NCs CRÍTICAS', value: String(criticalNCs), icon: AlertCircle, color: 'text-amber-400', bg: 'bg-amber-500/10' },
-          { label: 'AUDITORÍAS PEND.', value: String(pendingAudits), icon: ClipboardCheck, color: 'text-mcvill-accent', bg: 'bg-mcvill-accent/10' },
+          { label: 'TASA ÉXITO', value: `${passRate}%`, icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-500/10', title: 'Tasa de Éxito: (Inspecciones Aprobadas / Total de Inspecciones) * 100' },
+          { label: 'NCs ABIERTAS', value: String(openNCs), icon: AlertTriangle, color: 'text-rose-400', bg: 'bg-rose-500/10', title: 'No Conformidades Activas sin Resolución' },
+          { label: 'NCs CRÍTICAS', value: String(criticalNCs), icon: AlertCircle, color: 'text-amber-400', bg: 'bg-amber-500/10', title: 'No Conformidades con Severidad Crítica (Riesgo Operativo Mayor)' },
+          { label: 'AUDITORÍAS PEND.', value: String(pendingAudits), icon: ClipboardCheck, color: 'text-mcvill-accent', bg: 'bg-mcvill-accent/10', title: 'Auditorías Programadas Pendientes de Ejecución' },
         ].map((stat, i) => (
-          <div key={i} className="px-4 py-3 bg-white/[0.02] border border-white/5 rounded-xl flex items-center gap-4 hover:bg-white/[0.04] transition-all">
+          <div key={i} title={stat.title} className="px-4 py-3 bg-white/[0.02] border border-white/5 rounded-xl flex items-center gap-4 hover:bg-white/[0.04] transition-all">
             <div className={clsx('w-10 h-10 rounded-lg flex items-center justify-center border border-white/10 shrink-0', stat.bg, stat.color)}>
               <stat.icon size={18} />
             </div>

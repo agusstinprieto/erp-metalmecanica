@@ -603,11 +603,11 @@ export const PayrollCalculatorModal: React.FC<PayrollCalculatorModalProps> = ({
                           )}>
                             <tr className="font-black uppercase tracking-wider text-slate-500">
                               <th className="px-4 py-3">Empleado</th>
-                              <th className="px-4 py-3 text-right">Bruto</th>
-                              <th className="px-4 py-3 text-right">IMSS</th>
-                              <th className="px-4 py-3 text-right">ISR</th>
-                              <th className="px-4 py-3 text-right">Infonavit</th>
-                              <th className="px-4 py-3 text-right">Neto</th>
+                              <th title="Sueldo Base: (Salario Diario × Días Trabajados)" className="px-4 py-3 text-right">Bruto</th>
+                              <th title="Retención IMSS: (Cuota Fija + Excedente + Enf/Mat + Inv/Vida) × (Días/365)" className="px-4 py-3 text-right">IMSS</th>
+                              <th title="Retención LISR: Calculada en base a las tablas mensuales del Art. 96 LISR vigente" className="px-4 py-3 text-right">ISR</th>
+                              <th title="Descuento INFONAVIT: (Monto Crediticio o % de Salario Tope 30%)" className="px-4 py-3 text-right">Infonavit</th>
+                              <th title="Salario Neto Final: (Percepciones Totales - Deducciones Totales)" className="px-4 py-3 text-right">Neto</th>
                               <th className="px-4 py-3 text-center">Acciones</th>
                             </tr>
                           </thead>
