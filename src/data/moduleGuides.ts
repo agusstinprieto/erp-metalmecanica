@@ -1379,6 +1379,64 @@ export const MODULE_GUIDES: Record<string, ModuleGuide> = {
     ],
   },
 
+  energy_monitor: {
+    moduleId: 'energy_monitor',
+    label: 'Monitoreo de Energía IA',
+    emoji: '⚡',
+    description: 'Gestión Inteligente de Carga Eléctrica y Eficiencia Eléctrica CFE',
+    steps: [
+      {
+        icon: 'Zap', color: 'text-mcvill-accent', bg: 'bg-mcvill-accent/10 border-mcvill-accent/30',
+        title: 'Carga Eléctrica en Vivo',
+        subtitle: 'Monitorea la carga instantánea de tus CNCs y Láseres',
+        tips: [
+          '📊 Observa la demanda total actual en tiempo real en kW.',
+          '📈 Compara tu demanda contra el pico de demanda CFE para evitar cargos extras.',
+          '🤖 Activa el Peak-Shaving para programar operaciones en periodos de tarifa base.',
+        ],
+      },
+      {
+        icon: 'Sparkles', color: 'text-yellow-400', bg: 'bg-yellow-400/10 border-yellow-400/30',
+        title: 'Optimización de Factor de Potencia',
+        subtitle: 'Evita penalizaciones y mantén tu FP > 0.90',
+        tips: [
+          '🔋 Visualiza el Factor de Potencia actual y el estado del banco de capacitores.',
+          '🤖 El cerebro IA analiza patrones de consumo y sugiere secuencias de encendido óptimas.',
+          '💰 Genera reportes de ahorro proyectado cruzando tarifas GDMTH.',
+        ],
+      },
+    ],
+  },
+
+  preventive_maintenance_ia: {
+    moduleId: 'preventive_maintenance_ia',
+    label: 'Mantenimiento Predictivo IA',
+    emoji: '🔧',
+    description: 'Análisis Vibracional y Térmico de Husillos y Rodamientos (ISO 10816)',
+    steps: [
+      {
+        icon: 'Activity', color: 'text-mcvill-accent', bg: 'bg-mcvill-accent/10 border-mcvill-accent/30',
+        title: 'Diagnóstico FFT y Vibraciones',
+        subtitle: 'Previene fallas catastróficas en husillos y baleros',
+        tips: [
+          '⚙️ Monitorea las lecturas continuas de mm/s en los rodamientos de tornos y fresas.',
+          '🚨 Recibe alertas de desgaste mecánico antes de que ocurra una parada de línea.',
+          '📈 Consulta el Health Score histórico calculado con algoritmos de IA de McVill.',
+        ],
+      },
+      {
+        icon: 'Flame', color: 'text-red-400', bg: 'bg-red-400/10 border-red-400/30',
+        title: 'Termografía Spindle',
+        subtitle: 'Detección de calor anómalo por fricción',
+        tips: [
+          '🔥 Monitorea la temperatura interna operativa en grados Celsius.',
+          '🤖 Haz clic en "Predecir Desgaste Spindle" para obtener recomendaciones automáticas de lubricación e intervención.',
+          '📅 Programa preventivos con prioridad dinámica basada en uso real y no en fechas fijas.',
+        ],
+      },
+    ],
+  },
+
 };
 
 export const DEFAULT_GUIDE: ModuleGuide = {

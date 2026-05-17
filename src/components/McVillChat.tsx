@@ -27,6 +27,8 @@ import type { ToolResult } from '../services/agentService';
 import { useConfig } from '../contexts/ConfigContext';
 import { toast, appConfirm } from '../lib/dialogs';
 import { eventBus } from '../utils/eventBus';
+import { MODULE_GUIDES } from '../data/moduleGuides';
+import { MODULE_GUIDES_EN } from '../data/moduleGuidesEn';
 
 const LiveVoiceModal = lazy(() => import('./LiveVoiceModalERP').then(m => ({ default: m.LiveVoiceModalERP })));
 
@@ -47,28 +49,24 @@ interface McVillChatProps {
   onAutoSendConsumed?: () => void;
 }
 
-// Contexto del Manual específico para el ERP Control
-function getErpManualContext(logoText: string): string { return `
-Eres el Manual Oficial e Inteligencia de Soporte de Control ERP (${logoText}).
-Aquí tienes la guía de operación actualizada del sistema:
+// Contexto del Manual específico para el ERP Control - Compilado Dinámicamente para todos los módulos
+function getErpManualContext(logoText: string): string {
+  const allModulesSummary = Object.values(MODULE_GUIDES)
+    .map((g, i) => `${i + 1}. **${g.label}** (${g.emoji}): ${g.description}. Pasos clave: ${g.steps.map(s => s.title).join(' ➔ ')}`)
+    .join('\n');
 
-1. **Dashboard**: Panel principal con KPIs (OEE, Eficiencia, ROI) y alertas predictivas de la planta.
-2. **Ventas & Cotizaciones**: Gestión de Clientes, Evaluación de Factibilidad (FT-IG-01) y Cotizador Express con análisis STEP para piezas industriales.
-3. **Producción & Viajeros**: Control de manufactura mediante Viajeros (Travelers) con rastreo por estaciones (Corte, Soldadura, etc.) y escaneo QR.
-4. **Trazabilidad & Lotes**: Monitoreo pieza por pieza y TV Mode para visualización en tiempo real en piso de planta.
-5. **Inventarios**: Gestión de materia prima, stock crítico y escaneo IA de piezas.
-6. **Finanzas & ROI**: Monitoreo de flujo de caja, rentabilidad por proyecto y costos proyectados vs reales.
-7. **Ingeniería**: Extracción de BOM mediante IA (Blueprint Analyzer) y definición de rutas de proceso.
-8. **Mantenimiento**: Control de activos, planes preventivos/correctivos e índice de salud (Health Score).
-9. **Calidad (SGC)**: Gestión de No Conformidades, Auditorías Internas e inspecciones de primer artículo.
-10. **Capital Humano & HSE**: Nóminas, Control de Asistencia sincronizado y registro de incidentes/seguridad industrial.
-11. **Reportes**: Centro de análisis con generación de PDF automáticos para producción y calidad.
+  return `
+Eres el Manual Oficial e Inteligencia de Soporte de Control ERP (${logoText}).
+Aquí tienes la guía de operación completa y actualizada de todos los módulos del sistema (Agus Pro Standard):
+
+${allModulesSummary}
 
 **Directrices de Respuesta**:
 - El sistema utiliza IA (Control Core v2.5) para automatizar el 90% de la carga operativa.
 - Si el usuario pregunta por "Agus Pro", explícale que es el estándar de excelencia en automatización, diseño premium y eficiencia del sistema.
 - Siempre sé profesional, ejecutivo y enfocado en la eficiencia industrial.
-`; }
+`;
+}
 
 export const McVillChat: React.FC<McVillChatProps> = ({
   isPanel = false,

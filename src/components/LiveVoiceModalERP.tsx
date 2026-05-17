@@ -39,6 +39,11 @@ function buildSystemInstruction(moduleId?: string, brandName?: string, language:
   const defaultG = language === 'en' ? DEFAULT_GUIDE_EN : DEFAULT_GUIDE;
   const guide = moduleId ? (guidesDict[moduleId] ?? defaultG) : defaultG;
 
+  // Dynamically compile a comprehensive dictionary of all modules in the manual
+  const allModulesSummary = Object.values(guidesDict)
+    .map((g, i) => `◆ ${g.label} (${g.emoji}): ${g.description}. Pasos clave: ${g.steps.map(s => s.title).join(' ➔ ')}`)
+    .join('\n');
+
   if (language === 'en') {
     const moduleContext = moduleId
       ? `ACTIVE MODULE: ${guide.label} ${guide.emoji}\n${guide.description}\n\nHOW TO TEACH THIS MODULE (when the user asks how to use it):\n${guide.steps.map((s, i) => `${i + 1}. ${s.title} — ${s.subtitle}:\n   ${s.tips.join('\n   ')}`).join('\n\n')}`
@@ -49,14 +54,8 @@ Your tone is professional, efficient, direct, and tech-driven (Agus Pro Standard
 
 ${moduleContext}
 
-ERP GUIDE:
-1. Sales & Feasibility: Customer management and FT-IG-01 feasibility rulings.
-2. Production: Control by Travelers, workstations, and QR scanning.
-3. Traceability: Real-time monitoring of batches and parts.
-4. Finance: ROI, cash flows, and projected vs actual costs.
-5. Engineering: Blueprint Analyzer (AI) and BOM extraction.
-6. Maintenance: Asset management and Health Score.
-7. Human Capital: Payroll and Attendance Control.
+COMPLETE SYSTEM USER MANUAL:
+${allModulesSummary}
 
 VOICE RULES:
 1. Respond concisely and fluidly (maximum 2-3 sentences per answer).
@@ -74,14 +73,8 @@ Tu tono es profesional, eficiente, directo y tecnológico (Agus Pro Standard).
 
 ${moduleContext}
 
-GUÍA DEL ERP:
-1. Ventas & Factibilidad: Gestión de clientes y dictámenes FT-IG-01.
-2. Producción: Control por Viajeros, estaciones de trabajo y escaneo QR.
-3. Trazabilidad: Monitoreo en tiempo real de lotes y piezas.
-4. Finanzas: ROI, flujo de caja y costos proyectados vs reales.
-5. Ingeniería: Blueprint Analyzer (IA) y extracción de BOM.
-6. Mantenimiento: Gestión de activos y Health Score.
-7. Capital Humano: Nóminas y Control de Asistencia.
+MANUAL COMPLETO DEL SISTEMA ERP:
+${allModulesSummary}
 
 REGLAS DE VOZ:
 1. Responde de manera concisa y fluida (máximo 2-3 oraciones por respuesta).

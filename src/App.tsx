@@ -65,6 +65,8 @@ const VisualIAInspection     = lz(() => import('./components/VisualIAInspection'
 const ShopFloorTracking      = lz(() => import('./components/ShopFloorTracking'),      'ShopFloorTracking');
 const BancoView               = lz(() => import('./components/BancoView'),               'BancoView');
 const SeguridadIndustrialView = lz(() => import('./components/SeguridadIndustrialView'), 'SeguridadIndustrialView');
+const EnergyMonitorView      = lz(() => import('./components/EnergyMonitorView'),      'EnergyMonitorView');
+const PreventiveMaintenanceIAView = lz(() => import('./components/PreventiveMaintenanceIAView'), 'PreventiveMaintenanceIAView');
 
 type UserRole = 'ceo' | 'gerente' | 'sistemas' | 'empleado' | 'rh' | 'finanzas' | 'contabilidad' | 'supervisor';
 
@@ -569,6 +571,8 @@ function App() {
             {activeView === 'shop_floor' && <ShopFloorTracking onBack={() => setActiveView('production')} />}
             {activeView === 'banco' && <BancoView />}
             {activeView === 'seguridad' && <SeguridadIndustrialView />}
+            {activeView === 'energy_monitor' && <EnergyMonitorView />}
+            {activeView === 'preventive_maintenance_ia' && <PreventiveMaintenanceIAView />}
           </Suspense>
           </div>
         </div>

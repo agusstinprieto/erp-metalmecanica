@@ -200,6 +200,8 @@ export const Sidebar = (props: {
     { id: 'layout_design',     label: 'Layout Planta',    icon: Layout,          godmode: true },
     { id: 'process_simulator', label: 'Simulador',        icon: FlaskConical,    godmode: true },
     { id: 'nesting',           label: 'Nesting',          icon: Layers,          godmode: true },
+    { id: 'energy_monitor',    label: 'Energía IA',       icon: Zap,             godmode: true },
+    { id: 'preventive_maintenance_ia', label: 'Mantto. Predictivo', icon: Wrench, godmode: true },
     { id: 'rh',                label: 'RH',               icon: MembersIcon,     godmode: true },
     { id: 'payroll',           label: 'Nómina',           icon: FileText,        godmode: true },
     { id: 'attendance',        label: 'Asistencia',       icon: CalendarCheck,   godmode: true },
@@ -462,6 +464,8 @@ export const Sidebar = (props: {
             <SidebarItem icon={Layout} label={t('sidebar.layout_design', 'Layout Planta')} active={activeView === 'layout_design'} onClick={() => navigate('layout_design')} collapsed={isSidebarCollapsed} />
             <SidebarItem icon={FlaskConical} label={t('sidebar.process_simulator', 'Simulador')} active={activeView === 'process_simulator'} onClick={() => navigate('process_simulator')} collapsed={isSidebarCollapsed} />
             <SidebarItem icon={Layers} label={t('sidebar.nesting', 'Nesting')} active={activeView === 'nesting'} onClick={() => navigate('nesting')} collapsed={isSidebarCollapsed} />
+            <SidebarItem icon={Zap} label={t('sidebar.energy_monitor', 'Energía IA')} active={activeView === 'energy_monitor'} onClick={() => navigate('energy_monitor')} collapsed={isSidebarCollapsed} />
+            <SidebarItem icon={Wrench} label={t('sidebar.preventive_maintenance_ia', 'Mantto. Predictivo')} active={activeView === 'preventive_maintenance_ia'} onClick={() => navigate('preventive_maintenance_ia')} collapsed={isSidebarCollapsed} />
 
             {!isSidebarCollapsed && (
               <p className="px-3 mt-3 mb-1 text-[9px] font-black text-mcvill-accent/70 tracking-[0.25em] uppercase flex items-center gap-2">

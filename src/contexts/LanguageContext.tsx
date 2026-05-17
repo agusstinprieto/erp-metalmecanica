@@ -36,7 +36,7 @@ const translations: Record<Language, Record<string, string>> = {
     'sidebar.inventory': 'Inventarios',
     'sidebar.quality': 'Calidad',
     'sidebar.hse': 'Seguridad',
-    'sidebar.maintenance': 'Mantto.',
+    'sidebar.maintenance': 'Mantenimiento.',
     'sidebar.spc': 'SPC Alertas',
     'sidebar.visual_ia': 'Inspección IA',
     'sidebar.trazabilidad': 'Trazabilidad',

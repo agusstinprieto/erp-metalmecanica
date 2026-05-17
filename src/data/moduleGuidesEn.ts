@@ -1247,6 +1247,64 @@ export const MODULE_GUIDES_EN: Record<string, ModuleGuide> = {
     ],
   },
 
+  energy_monitor: {
+    moduleId: 'energy_monitor',
+    label: 'AI Energy Monitor',
+    emoji: '⚡',
+    description: 'Intelligent electrical load management and CFE utility tariff optimization',
+    steps: [
+      {
+        icon: 'Zap', color: 'text-mcvill-accent', bg: 'bg-mcvill-accent/10 border-mcvill-accent/30',
+        title: 'Live Electrical Load',
+        subtitle: 'Monitor real-time active power draw of CNCs and lasers',
+        tips: [
+          '📊 Inspect total plant active load in kW updated in real time.',
+          '📈 Check current demand vs company contract peaks to avoid penalties.',
+          '🤖 Activate Peak-Shaving suggestions to defer high-draw cycles away from peak hours.',
+        ],
+      },
+      {
+        icon: 'Sparkles', color: 'text-yellow-400', bg: 'bg-yellow-400/10 border-yellow-400/30',
+        title: 'Power Factor Optimization',
+        subtitle: 'Avoid low-efficiency utility surcharges',
+        tips: [
+          '🔋 View active power factor metrics and capacitor bank levels.',
+          '🤖 AI schedules start sequences to mitigate reactive power spikes.',
+          '💰 Access detailed financial savings dashboards crossing GDMTH utility tiers.',
+        ],
+      },
+    ],
+  },
+
+  preventive_maintenance_ia: {
+    moduleId: 'preventive_maintenance_ia',
+    label: 'AI Predictive Maintenance',
+    emoji: '🔧',
+    description: 'Continuous mechanical vibration and spindle thermal telemetry diagnostics (ISO 10816)',
+    steps: [
+      {
+        icon: 'Activity', color: 'text-mcvill-accent', bg: 'bg-mcvill-accent/10 border-mcvill-accent/30',
+        title: 'Vibration & FFT Diagnostics',
+        subtitle: 'Prevent spindle and bearing catastrophic failures',
+        tips: [
+          '⚙️ Log continuous RMS vibration speeds in real-time.',
+          '🚨 Get instant anomaly alerts before spindle seizures trigger downtime.',
+          '📈 Track structural equipment health scores computed by neural models.',
+        ],
+      },
+      {
+        icon: 'Flame', color: 'text-red-400', bg: 'bg-red-400/10 border-red-400/30',
+        title: 'Spindle Thermography',
+        subtitle: 'Track hot spots on bearings due to friction',
+        tips: [
+          '🔥 View active spindle core temperature logs in Celsius.',
+          '🤖 Click "Predict Spindle Wear" to run diagnostics on mechanical degradation.',
+          '📅 Schedule maintenance dynamically based on real use data instead of fixed time periods.',
+        ],
+      },
+    ],
+  },
+
 };
 
 export const DEFAULT_GUIDE_EN: ModuleGuide = {
