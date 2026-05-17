@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
-import { Sun, Moon, LogOut, Zap, Menu, Activity, X, Users as UsersIcon } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
+import { Sun, Moon, LogOut, Zap, Menu, Activity, X, Users as UsersIcon, Settings2, Mic, Mail, Shield, ChevronDown } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import clsx from 'clsx';
 import { supabase } from './lib/supabase';
@@ -71,6 +71,10 @@ function App() {
   const [sessionChecked, setSessionChecked] = useState(false);
   const [activeView, setActiveView] = useState('dashboard');
   const [userRole, setUserRole] = useState<UserRole>('empleado');
+  const [userEmail, setUserEmail] = useState<string>('');
+  const [userDisplayName, setUserDisplayName] = useState<string>('');
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [panelType, setPanelType] = useState<'chat' | 'voice'>('chat');
   const [pendingChatPrompt, setPendingChatPrompt] = useState<string | null>(null);
@@ -94,6 +98,8 @@ function App() {
         const role = (session.user.user_metadata?.role as UserRole) || 'empleado';
         setLoggedIn(true);
         setUserRole(role);
+        setUserEmail(session.user.email || '');
+        setUserDisplayName(session.user.user_metadata?.full_name || session.user.user_metadata?.nombre || session.user.email?.split('@')[0] || '');
         setSentryUser(session.user.id, role, session.user.user_metadata?.tenant_id);
       }
       setSessionChecked(true);
@@ -104,10 +110,23 @@ function App() {
       if (event === 'SIGNED_OUT' || !session) {
         setLoggedIn(false);
         setUserRole('empleado');
+        setUserEmail('');
+        setUserDisplayName('');
       }
     });
 
     return () => subscription.unsubscribe();
+  }, []);
+
+  // Close profile dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setIsProfileOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
   }, []);
 
   // Update browser title dynamically
@@ -129,7 +148,11 @@ function App() {
     setUserRole(role as UserRole);
     setLoggedIn(true);
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) setSentryUser(user.id, role, user.user_metadata?.tenant_id);
+      if (user) {
+        setSentryUser(user.id, role, user.user_metadata?.tenant_id);
+        setUserEmail(user.email || '');
+        setUserDisplayName(user.user_metadata?.full_name || user.user_metadata?.nombre || user.email?.split('@')[0] || '');
+      }
     });
   };
 
@@ -312,44 +335,134 @@ function App() {
                   ))}
                 </div>
 
-                {/* Logout Button */}
-                <button
-                  onClick={handleLogout}
-                  className={clsx(
-                    "p-2 rounded-2xl transition-all duration-300 border",
-                    isDarkMode 
-                      ? "border-white/5 bg-slate-900/50 text-rose-500 hover:border-rose-500/30" 
-                      : "border-slate-200 bg-slate-50 text-rose-600 hover:border-rose-300"
-                  )}
-                  title="Cerrar Sesión"
-                >
-                  <LogOut size={18} />
-                </button>
+                {/* User Profile Dropdown */}
+                <div ref={profileRef} className="relative">
+                  <button
+                    onClick={() => setIsProfileOpen(v => !v)}
+                    className={clsx(
+                      "flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-2xl border transition-all duration-300",
+                      isDarkMode
+                        ? "bg-slate-900/60 border-white/10 hover:border-mcvill-accent/40"
+                        : "bg-white border-slate-200 hover:border-blue-300 shadow-sm"
+                    )}
+                  >
+                    {/* Avatar circle */}
+                    <div className="relative w-7 h-7 rounded-xl flex items-center justify-center bg-mcvill-accent/20 border border-mcvill-accent/40 shrink-0">
+                      <span className="text-[11px] font-black text-mcvill-accent uppercase">
+                        {(userDisplayName || userRole)?.charAt(0) || 'U'}
+                      </span>
+                      <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-mcvill-bg" />
+                    </div>
+                    <div className="hidden sm:flex flex-col items-start leading-none gap-0.5">
+                      <span className={clsx("text-[10px] font-black uppercase tracking-wide", isDarkMode ? "text-mcvill-text" : "text-slate-800")}>
+                        {userDisplayName || userRole}
+                      </span>
+                      <span className="text-[8px] text-mcvill-text-muted uppercase tracking-widest font-bold">{userRole}</span>
+                    </div>
+                    <ChevronDown size={12} className={clsx("text-mcvill-text-muted transition-transform duration-200", isProfileOpen && "rotate-180")} />
+                  </button>
 
-                {/* User Profile Avatar */}
-                <div className={clsx(
-                  "relative w-10 h-10 rounded-xl border flex items-center justify-center group cursor-pointer transition-all duration-500",
-                  isDarkMode 
-                    ? "bg-slate-900 border-white/10 hover:border-blue-500/50 shadow-xl" 
-                    : "bg-white border-blue-100 shadow-sm"
-                )}>
-                  <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl" />
-                  
-                  {/* Initial / Avatar Logic */}
-                  <span className={clsx(
-                    "text-xs font-black uppercase tracking-tighter relative z-10",
-                    isDarkMode ? "text-blue-400" : "text-blue-600"
-                  )}>
-                    {userRole?.charAt(0) || 'U'}
-                  </span>
+                  {/* Dropdown */}
+                  <AnimatePresence>
+                    {isProfileOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                        transition={{ duration: 0.15 }}
+                        className={clsx(
+                          "absolute top-full right-0 mt-2 w-64 rounded-2xl border shadow-2xl z-[200] overflow-hidden",
+                          isDarkMode
+                            ? "bg-slate-950 border-white/10"
+                            : "bg-white border-slate-200"
+                        )}
+                      >
+                        {/* Profile header */}
+                        <div className={clsx("px-4 py-4 border-b", isDarkMode ? "border-white/5 bg-white/[0.02]" : "border-slate-100 bg-slate-50")}>
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-2xl bg-mcvill-accent/20 border border-mcvill-accent/40 flex items-center justify-center shrink-0">
+                              <span className="text-base font-black text-mcvill-accent uppercase">
+                                {(userDisplayName || userRole)?.charAt(0) || 'U'}
+                              </span>
+                            </div>
+                            <div className="min-w-0">
+                              <p className={clsx("text-xs font-black uppercase tracking-wide truncate", isDarkMode ? "text-white" : "text-slate-900")}>
+                                {userDisplayName || userRole}
+                              </p>
+                              <p className="text-[9px] text-mcvill-text-muted truncate flex items-center gap-1 mt-0.5">
+                                <Mail size={9} />
+                                {userEmail || '—'}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="mt-3 flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.6)]" />
+                            <span className="text-[8px] font-black text-emerald-400 uppercase tracking-widest">Sesión activa</span>
+                            <span className={clsx("ml-auto px-2 py-0.5 rounded-lg text-[8px] font-black uppercase border", isDarkMode ? "border-mcvill-accent/30 bg-mcvill-accent/10 text-mcvill-accent" : "border-blue-200 bg-blue-50 text-blue-600")}>
+                              <Shield size={8} className="inline mr-1" />{userRole}
+                            </span>
+                          </div>
+                        </div>
 
-                  {/* Status Indicator */}
-                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-mcvill-bg shadow-[0_0_10px_rgba(16,185,129,0.4)] z-20" />
-                  
-                  {/* Hover info badge */}
-                  <div className="absolute top-full right-0 mt-2 py-1 px-2 bg-slate-900 border border-white/10 rounded text-[8px] font-black text-white uppercase tracking-widest opacity-0 group-hover:opacity-100 pointer-events-none transition-all translate-y-1 group-hover:translate-y-0 whitespace-nowrap z-50">
-                    Sessión: {userRole}
-                  </div>
+                        {/* Actions */}
+                        <div className="p-2 space-y-1">
+                          {(['ceo','admin','sistemas'] as string[]).includes(userRole) && (
+                            <button
+                              onClick={() => { setActiveView('settings'); setIsProfileOpen(false); }}
+                              className={clsx(
+                                "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all",
+                                isDarkMode ? "hover:bg-white/5 text-slate-300 hover:text-white" : "hover:bg-slate-100 text-slate-700"
+                              )}
+                            >
+                              <div className="w-7 h-7 rounded-xl bg-mcvill-accent/10 flex items-center justify-center shrink-0">
+                                <Settings2 size={13} className="text-mcvill-accent" />
+                              </div>
+                              <div>
+                                <p className="text-[11px] font-black uppercase tracking-wide">Configuración</p>
+                                <p className="text-[8px] text-mcvill-text-muted">Identidad, permisos, integraciones</p>
+                              </div>
+                            </button>
+                          )}
+
+                          <button
+                            onClick={() => {
+                              setIsChatOpen(true);
+                              setPanelType('voice');
+                              setIsProfileOpen(false);
+                            }}
+                            className={clsx(
+                              "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all",
+                              isDarkMode ? "hover:bg-white/5 text-slate-300 hover:text-white" : "hover:bg-slate-100 text-slate-700"
+                            )}
+                          >
+                            <div className="w-7 h-7 rounded-xl bg-violet-500/10 flex items-center justify-center shrink-0">
+                              <Mic size={13} className="text-violet-400" />
+                            </div>
+                            <div>
+                              <p className="text-[11px] font-black uppercase tracking-wide">Asistente de Voz</p>
+                              <p className="text-[8px] text-mcvill-text-muted">Voice Link — control por voz</p>
+                            </div>
+                          </button>
+                        </div>
+
+                        {/* Logout */}
+                        <div className={clsx("p-2 border-t", isDarkMode ? "border-white/5" : "border-slate-100")}>
+                          <button
+                            onClick={() => { setIsProfileOpen(false); handleLogout(); }}
+                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all hover:bg-rose-500/10 text-rose-500 hover:text-rose-400 group"
+                          >
+                            <div className="w-7 h-7 rounded-xl bg-rose-500/10 flex items-center justify-center shrink-0 group-hover:bg-rose-500/20 transition-all">
+                              <LogOut size={13} className="text-rose-500" />
+                            </div>
+                            <div>
+                              <p className="text-[11px] font-black uppercase tracking-wide">Cerrar Sesión</p>
+                              <p className="text-[8px] text-rose-500/60">Salir del sistema seguro</p>
+                            </div>
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </div>
             </div>
