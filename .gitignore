@@ -1,9 +1,45 @@
-node_modules/
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+.vercel
+scratch/
+# Documentation & SQL
+Archivos MD/
+Archivos SQL/
+
+# Temp / build output files
+build_log*.txt
+build_full.txt
+build_erp_output.log
+temp_*.js
+test_check.txt
+usestate_search.txt
+execute_sql.py
+env
 .env
 .env.local
-.vercel/
-dist/
-build_erp_output.log
-reporting-service/bin/
-reporting-service/obj/
-Acelerador de Software/
+.env.development.local
+.env.test.local
+.env.production.local
