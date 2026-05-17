@@ -1041,8 +1041,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
               </div>
               <div className="space-y-3 flex-1">
                 <div>
-                  <div className="flex justify-between text-[8px] font-black uppercase tracking-wider mb-1">
-                    <span className="text-mcvill-accent">Hombres</span>
+                  <div className="flex justify-between items-center text-[8px] font-black uppercase tracking-wider mb-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-mcvill-accent">Hombres</span>
+                      <span className="text-[7px] text-mcvill-accent bg-mcvill-accent/10 px-1.5 py-0.5 rounded-md">
+                        {Math.round(metrics.empleados * 0.68)} op
+                      </span>
+                    </div>
                     <span className="text-white">68%</span>
                   </div>
                   <div className="h-1 w-full bg-slate-800/80 rounded-full overflow-hidden">
@@ -1050,8 +1055,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
                   </div>
                 </div>
                 <div>
-                  <div className="flex justify-between text-[8px] font-black uppercase tracking-wider mb-1">
-                    <span className="text-pink-400">Mujeres</span>
+                  <div className="flex justify-between items-center text-[8px] font-black uppercase tracking-wider mb-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-pink-400">Mujeres</span>
+                      <span className="text-[7px] text-pink-400 bg-pink-400/10 px-1.5 py-0.5 rounded-md">
+                        {metrics.empleados - Math.round(metrics.empleados * 0.68)} op
+                      </span>
+                    </div>
                     <span className="text-white">32%</span>
                   </div>
                   <div className="h-1 w-full bg-slate-800/80 rounded-full overflow-hidden">
