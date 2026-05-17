@@ -9,6 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../lib/supabase';
 import { colors } from '../../lib/theme';
 import { Badge } from '../../components/Badge';
+import { syncQueue } from '../../lib/offline';
 
 interface Viajero {
   id: string;
@@ -32,6 +33,10 @@ export default function ViajerosScreen() {
   const [query,    setQuery]    = useState('');
 
   const load = useCallback(async () => {
+    try {
+      await syncQueue().catch(e => console.log('[Offline] Sync error on travelers index load:', e));
+    } catch {}
+
     const { data } = await supabase
       .from('viajeros')
       .select('id, numero_viajero, numero_parte, cliente, descripcion_ensamble, cantidad_orden, cantidad_fabricada, estatus, fecha_orden, horas_est_totales')

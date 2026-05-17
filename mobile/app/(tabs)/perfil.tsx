@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../lib/supabase';
 import { colors } from '../../lib/theme';
 import type { User } from '@supabase/supabase-js';
+import { checkConnectivity, getSyncQueue, syncQueue } from '../../lib/offline';
 
 interface Stats {
   viajeros_activos: number;
@@ -17,9 +18,33 @@ interface Stats {
 }
 
 export default function PerfilScreen() {
-  const [user,    setUser]    = useState<User | null>(null);
-  const [stats,   setStats]   = useState<Stats | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user,        setUser]        = useState<User | null>(null);
+  const [stats,       setStats]       = useState<Stats | null>(null);
+  const [loading,     setLoading]     = useState(true);
+  
+  // Offline sync panel state
+  const [queueCount,  setQueueCount]  = useState<number>(0);
+  const [queueItems,  setQueueItems]  = useState<any[]>([]);
+  const [online,      setOnline]      = useState<boolean>(true);
+  const [syncing,     setSyncing]     = useState<boolean>(false);
+
+  const loadQueue = async () => {
+    try {
+      const q = await getSyncQueue();
+      setQueueCount(q.length);
+      setQueueItems(q);
+      const isOnline = await checkConnectivity();
+      setOnline(isOnline);
+    } catch (e) {
+      console.log('[Offline Panel] Error loading queue state:', e);
+    }
+  };
+
+  useEffect(() => {
+    loadQueue();
+    const t = setInterval(loadQueue, 3500);
+    return () => clearInterval(t);
+  }, []);
 
   useEffect(() => {
     const load = async () => {
@@ -80,6 +105,81 @@ export default function PerfilScreen() {
           <View style={s.roleBadge}>
             <Ionicons name="shield-checkmark-outline" size={12} color={colors.accent} />
             <Text style={s.roleText}>{role}</Text>
+          </View>
+        </View>
+
+        {/* Panel de Sincronización Offline */}
+        <View style={s.syncCard}>
+          <View style={s.syncHeader}>
+            <Text style={s.syncTitle}>PANEL DE COLA OFFLINE</Text>
+            <View style={[s.statusIndicator, { backgroundColor: online ? colors.accent + '20' : colors.warning + '20', borderColor: online ? colors.accent + '40' : colors.warning + '40' }]}>
+              <View style={[s.statusDot, { backgroundColor: online ? colors.accent : colors.warning }]} />
+              <Text style={[s.statusText, { color: online ? colors.accent : colors.warning }]}>
+                {online ? 'ONLINE' : 'OFFLINE'}
+              </Text>
+            </View>
+          </View>
+
+          <View style={s.syncBody}>
+            <View style={s.syncStatRow}>
+              <Ionicons name="cloud-upload-outline" size={24} color={queueCount > 0 ? colors.warning : colors.muted} />
+              <View style={{ flex: 1, marginLeft: 12 }}>
+                <Text style={s.syncStatVal}>{queueCount} pendientes</Text>
+                <Text style={s.syncStatSub}>
+                  {queueCount > 0 ? 'Datos retenidos listos para sincronizar' : 'Todos los datos están al día'}
+                </Text>
+              </View>
+            </View>
+
+            {queueCount > 0 ? (
+              <View style={s.miniList}>
+                {queueItems.slice(0, 3).map((item, idx) => (
+                  <View key={item.id || idx} style={s.miniItem}>
+                    <Ionicons 
+                      name={item.action === 'insert' ? 'add-circle-outline' : 'git-compare-outline'} 
+                      size={14} 
+                      color={colors.muted} 
+                    />
+                    <Text style={s.miniItemText} numberOfLines={1}>
+                      {item.action === 'insert' ? 'Alta' : 'Modificación'} en {item.table}
+                    </Text>
+                  </View>
+                ))}
+                {queueCount > 3 ? (
+                  <Text style={s.moreText}>+ {queueCount - 3} elementos más en cola...</Text>
+                ) : null}
+              </View>
+            ) : null}
+
+            <TouchableOpacity 
+              style={[s.syncBtn, syncing && s.syncBtnDisabled, queueCount === 0 && s.syncBtnInactive]} 
+              disabled={syncing || queueCount === 0} 
+              onPress={async () => {
+                setSyncing(true);
+                try {
+                  const res = await syncQueue();
+                  Alert.alert(
+                    'Sincronización', 
+                    `Proceso completado. Éxitos: ${res.successCount}. Errores: ${res.failedCount}.`
+                  );
+                  await loadQueue();
+                } catch (e: any) {
+                  Alert.alert('Error', e.message || 'Error al intentar sincronizar');
+                } finally {
+                  setSyncing(false);
+                }
+              }}
+              activeOpacity={0.8}
+            >
+              {syncing ? (
+                <ActivityIndicator color="#fff" size="small" />
+              ) : (
+                <>
+                  <Ionicons name="sync-outline" size={18} color="#fff" />
+                  <Text style={s.syncBtnText}>SINCRONIZAR COLA</Text>
+                </>
+              )}
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -151,6 +251,24 @@ const s = StyleSheet.create({
   email:      { fontSize: 13, color: colors.muted },
   roleBadge:  { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: colors.accentDim, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 4, borderWidth: 1, borderColor: colors.accent + '30' },
   roleText:   { color: colors.accent, fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5 },
+  syncCard: { backgroundColor: colors.card, borderRadius: 20, padding: 16, borderWidth: 1, borderColor: colors.border },
+  syncHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+  syncTitle: { fontSize: 9, fontWeight: '900', color: colors.muted, letterSpacing: 2 },
+  statusIndicator: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, borderWidth: 1 },
+  statusDot: { width: 8, height: 8, borderRadius: 4 },
+  statusText: { fontSize: 10, fontWeight: '900', letterSpacing: 0.5 },
+  syncBody: { gap: 12 },
+  syncStatRow: { flexDirection: 'row', alignItems: 'center' },
+  syncStatVal: { color: colors.text, fontSize: 16, fontWeight: '800' },
+  syncStatSub: { color: colors.muted, fontSize: 11, marginTop: 1 },
+  miniList: { backgroundColor: colors.bg, borderRadius: 12, padding: 12, gap: 6, borderWidth: 1, borderColor: colors.border },
+  miniItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  miniItemText: { color: colors.sub, fontSize: 11 },
+  moreText: { color: colors.muted, fontSize: 10, fontStyle: 'italic', marginTop: 2 },
+  syncBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: colors.accent, borderRadius: 16, height: 48, marginTop: 4 },
+  syncBtnDisabled: { opacity: 0.6 },
+  syncBtnInactive: { backgroundColor: colors.muted + '40', opacity: 0.8 },
+  syncBtnText: { color: '#fff', fontSize: 12, fontWeight: '800', letterSpacing: 1 },
   statsCard:  { backgroundColor: colors.card, borderRadius: 20, padding: 16, borderWidth: 1, borderColor: colors.border },
   statsTitle: { fontSize: 9, fontWeight: '900', color: colors.muted, letterSpacing: 2, marginBottom: 12, textAlign: 'center' },
   statsGrid:  { flexDirection: 'row', flexWrap: 'wrap' },

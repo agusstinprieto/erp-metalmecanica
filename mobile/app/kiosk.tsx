@@ -1,10 +1,11 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Vibration } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../lib/supabase';
 import { colors } from '../lib/theme';
+import { checkConnectivity, enqueueAction, getCachedEmployee, getTodayLocalPunches, syncQueue, cacheEmployees } from '../lib/offline';
 
 type ResultState = {
   type: 'checkin' | 'checkout' | 'complete';
@@ -26,6 +27,15 @@ export default function KioskScreen() {
   const [error,      setError]      = useState('');
   const [result,     setResult]     = useState<ResultState>(null);
 
+  // Intentar descargar caché de empleados y sincronizar al iniciar Kiosco
+  useEffect(() => {
+    const init = async () => {
+      await syncQueue().catch(() => {});
+      await cacheEmployees().catch(() => {});
+    };
+    init();
+  }, []);
+
   const reset = useCallback(() => {
     setScanned(false);
     setResolving(false);
@@ -41,23 +51,94 @@ export default function KioskScreen() {
     Vibration.vibrate(80);
 
     try {
+      const isOnline = await checkConnectivity();
+      const empNum = data.trim();
+      let fullName = '';
+      const dateStr  = todayDate();
+      const now      = nowISO();
+
+      if (!isOnline) {
+        // MODO OFFLINE
+        const emp = await getCachedEmployee(empNum);
+        if (!emp) {
+          setError(`Empleado no encontrado offline: "${empNum}"`);
+          setResolving(false);
+          setTimeout(reset, 3500);
+          return;
+        }
+
+        fullName = `${emp.first_name} ${emp.last_name}`;
+        
+        // Consultar checadas locales del día en la cola
+        const localRecord = await getTodayLocalPunches(empNum);
+
+        if (!localRecord.check_in) {
+          // Primera checada del día offline -> Entrada
+          const isLate = new Date().getHours() > 8 || (new Date().getHours() === 8 && new Date().getMinutes() > 10);
+          await enqueueAction({
+            table: 'time_attendance',
+            action: 'insert',
+            payload: {
+              employee_id:   emp.employee_number,
+              employee_name: fullName,
+              date:          dateStr,
+              check_in:      now,
+              method:        'qr_kiosk',
+              status:        isLate ? 'late' : 'present',
+              location:      'planta',
+              created_by:    'kiosk',
+            }
+          });
+          setResult({ type: 'checkin', employeeName: fullName, time: fmtTime(now) });
+
+        } else if (localRecord.check_in && !localRecord.check_out) {
+          // Ya tiene entrada local pero no salida local -> Salida offline
+          const checkIn     = new Date(localRecord.check_in);
+          const nowDate     = new Date(now);
+          const diffMin     = Math.round((nowDate.getTime() - checkIn.getTime()) / 60000);
+          const regularMin  = Math.min(diffMin, 8 * 60);
+          const overtimeMin = Math.max(0, diffMin - 8 * 60);
+
+          await enqueueAction({
+            table: 'time_attendance',
+            action: 'update',
+            payload: {
+              check_out:       now,
+              minutes_worked:  regularMin,
+              overtime_minutes: overtimeMin,
+            },
+            filterField: 'id',
+            filterValue: localRecord.id! // El tempId de la entrada local
+          });
+
+          setResult({ type: 'checkout', employeeName: fullName, time: fmtTime(now) });
+
+        } else {
+          // Ya tiene ambas checadas locales
+          setResult({ type: 'complete', employeeName: fullName, time: fmtTime(localRecord.check_out!) });
+        }
+
+        setResolving(false);
+        setTimeout(reset, 3000);
+        return;
+      }
+
+      // MODO ONLINE
       // Buscar empleado por employee_number (lo que va codificado en el QR del gafete)
       const { data: emp } = await supabase
         .from('employees')
         .select('id, employee_number, first_name, last_name')
-        .eq('employee_number', data.trim())
+        .eq('employee_number', empNum)
         .maybeSingle();
 
       if (!emp) {
-        setError(`Empleado no encontrado: "${data}"`);
+        setError(`Empleado no encontrado: "${empNum}"`);
         setResolving(false);
         setTimeout(reset, 3500);
         return;
       }
 
-      const fullName = `${emp.first_name} ${emp.last_name}`;
-      const dateStr  = todayDate();
-      const now      = nowISO();
+      fullName = `${emp.first_name} ${emp.last_name}`;
 
       // Verificar si ya tiene checada hoy
       const { data: existing } = await supabase

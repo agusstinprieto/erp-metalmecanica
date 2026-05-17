@@ -10,6 +10,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { supabase } from '../../lib/supabase';
 import { colors } from '../../lib/theme';
 import { Badge } from '../../components/Badge';
+import { checkConnectivity, enqueueAction, syncQueue } from '../../lib/offline';
 
 interface Operacion {
   id: string;
@@ -53,6 +54,10 @@ export default function ViajeroDetailScreen() {
   const [saving,     setSaving]     = useState(false);
 
   const load = useCallback(async () => {
+    try {
+      await syncQueue().catch(e => console.log('[Offline] Sync error on traveler load:', e));
+    } catch {}
+
     const [{ data: v }, { data: o }] = await Promise.all([
       supabase.from('viajeros').select('*').eq('id', id).single(),
       supabase.from('viajero_operaciones').select('*').eq('viajero_id', id).order('orden'),
@@ -66,7 +71,7 @@ export default function ViajeroDetailScreen() {
 
   const selectPhoto = async () => {
     const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ['images'],
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 0.7,
       base64: false,
     });
@@ -88,7 +93,51 @@ export default function ViajeroDetailScreen() {
 
   const completarOp = async (op: Operacion) => {
     setSaving(true);
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser().catch(() => ({ data: { user: null } }));
+    const nowStr = new Date().toISOString();
+    const isOnline = await checkConnectivity();
+
+    if (!isOnline) {
+      // Guardar firma local offline
+      await enqueueAction({
+        table: 'viajero_operaciones',
+        action: 'update',
+        payload: {
+          estatus: 'completado',
+          notas_campo: notaInput.trim() || null,
+          completado_por: user?.email ?? 'desconocido',
+          completado_en: nowStr,
+        },
+        filterField: 'id',
+        filterValue: op.id,
+        photoUri: photo || undefined,
+        photoField: 'foto_url',
+        photoBucket: 'mcvill-fotos',
+        photoFolder: `viajeros/${id}`
+      });
+
+      setOps(prev => prev.map(o => o.id === op.id
+        ? { ...o, estatus: 'completado', notas_campo: notaInput.trim(), foto_url: photo ?? undefined, completado_por: user?.email ?? 'desconocido' }
+        : o
+      ));
+
+      const allDone = ops.every(o => o.id === op.id || o.estatus === 'completado');
+      if (allDone) {
+        await enqueueAction({
+          table: 'viajeros',
+          action: 'update',
+          payload: { estatus: 'completado' },
+          filterField: 'id',
+          filterValue: id
+        });
+        setViajero(v => v ? { ...v, estatus: 'completado' } : v);
+      }
+
+      setActiveOp(null); setNotaInput(''); setPhoto(null); setSaving(false);
+      Alert.alert('Modo Offline', 'Firma de operación guardada localmente. Se sincronizará al recuperar internet.');
+      return;
+    }
+
     let fotoUrl: string | null = null;
     if (photo) fotoUrl = await uploadPhoto(photo, op.id);
 
@@ -97,7 +146,7 @@ export default function ViajeroDetailScreen() {
       notas_campo: notaInput.trim() || null,
       foto_url: fotoUrl,
       completado_por: user?.email ?? 'desconocido',
-      completado_en: new Date().toISOString(),
+      completado_en: nowStr,
     }).eq('id', op.id);
 
     setOps(prev => prev.map(o => o.id === op.id

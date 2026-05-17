@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { supabase } from '../../lib/supabase';
 import { colors } from '../../lib/theme';
+import { checkConnectivity, enqueueAction, syncQueue, generateTempId } from '../../lib/offline';
 
 interface AttendanceRecord {
   id: string;
@@ -30,12 +31,12 @@ interface Employee {
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: string }> = {
-  present:    { label: 'Presente',    color: colors.accent,   icon: 'checkmark-circle' },
-  late:       { label: 'Retardo',     color: colors.warning,  icon: 'time' },
-  absent:     { label: 'Ausente',     color: colors.danger,   icon: 'close-circle' },
-  incomplete: { label: 'Incompleto',  color: colors.warning,  icon: 'alert-circle' },
-  holiday:    { label: 'Festivo',     color: colors.muted,    icon: 'calendar' },
-  vacation:   { label: 'Vacaciones',  color: '#3b82f6',       icon: 'airplane' },
+  present: { label: 'Presente', color: colors.accent, icon: 'checkmark-circle' },
+  late: { label: 'Retardo', color: colors.warning, icon: 'time' },
+  absent: { label: 'Ausente', color: colors.danger, icon: 'close-circle' },
+  incomplete: { label: 'Incompleto', color: colors.warning, icon: 'alert-circle' },
+  holiday: { label: 'Festivo', color: colors.muted, icon: 'calendar' },
+  vacation: { label: 'Vacaciones', color: '#3b82f6', icon: 'airplane' },
 };
 
 function fmtTime(iso: string | null): string {
@@ -59,13 +60,13 @@ function todayISO(): string {
 
 export default function AsistenciaScreen() {
   const router = useRouter();
-  const [employee, setEmployee]     = useState<Employee | null>(null);
-  const [today, setToday]           = useState<AttendanceRecord | null>(null);
-  const [history, setHistory]       = useState<AttendanceRecord[]>([]);
-  const [loading, setLoading]       = useState(true);
-  const [saving, setSaving]         = useState(false);
-  const [refresh, setRefresh]       = useState(false);
-  const [clock, setClock]           = useState(new Date());
+  const [employee, setEmployee] = useState<Employee | null>(null);
+  const [today, setToday] = useState<AttendanceRecord | null>(null);
+  const [history, setHistory] = useState<AttendanceRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [refresh, setRefresh] = useState(false);
+  const [clock, setClock] = useState(new Date());
 
   // Reloj en tiempo real
   useEffect(() => {
@@ -75,6 +76,9 @@ export default function AsistenciaScreen() {
 
   const loadData = useCallback(async () => {
     try {
+      // Intentar sincronizar cola local antes de leer
+      await syncQueue().catch(e => console.log('[Offline] Sync error on load:', e));
+
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
@@ -126,6 +130,39 @@ export default function AsistenciaScreen() {
       const dateStr = todayISO();
       const isLate = new Date().getHours() > 8 || (new Date().getHours() === 8 && new Date().getMinutes() > 10);
 
+      const isOnline = await checkConnectivity();
+      if (!isOnline) {
+        // Guardado local offline
+        const tempId = generateTempId();
+        const payload = {
+          employee_id: employee.employee_number,
+          employee_name: `${employee.first_name} ${employee.last_name}`,
+          date: dateStr,
+          check_in: now,
+          method: 'mobile_gps',
+          status: isLate ? 'late' : 'present',
+          location: 'planta',
+          created_by: employee.employee_number,
+        };
+
+        await enqueueAction({
+          table: 'time_attendance',
+          action: 'insert',
+          payload
+        });
+
+        const localRow = {
+          id: tempId,
+          ...payload,
+          check_out: null,
+          minutes_worked: null,
+          overtime_minutes: 0,
+        };
+        setToday(localRow as any);
+        Alert.alert('Modo Offline', 'Fichada de ENTRADA guardada localmente. Se sincronizará al recuperar internet.');
+        return;
+      }
+
       const { data, error } = await supabase
         .from('time_attendance')
         .insert({
@@ -160,6 +197,32 @@ export default function AsistenciaScreen() {
       const regularMin = Math.min(diffMin, 8 * 60); // máx 8h regulares
       const overtimeMin = Math.max(0, diffMin - 8 * 60);
 
+      const isOnline = await checkConnectivity();
+      if (!isOnline) {
+        // Guardado local offline
+        const payload = {
+          check_out: now.toISOString(),
+          minutes_worked: regularMin,
+          overtime_minutes: overtimeMin,
+        };
+
+        await enqueueAction({
+          table: 'time_attendance',
+          action: 'update',
+          payload,
+          filterField: 'id',
+          filterValue: today.id // temp_id o UUID
+        });
+
+        const updatedRow = {
+          ...today,
+          ...payload,
+        };
+        setToday(updatedRow as any);
+        Alert.alert('Modo Offline', 'Fichada de SALIDA guardada localmente. Se sincronizará al recuperar internet.');
+        return;
+      }
+
       const { data, error } = await supabase
         .from('time_attendance')
         .update({
@@ -181,13 +244,13 @@ export default function AsistenciaScreen() {
   };
 
   // ─── Determinar estado del botón principal ────────────────────────────────
-  const hasCheckIn  = !!today?.check_in;
+  const hasCheckIn = !!today?.check_in;
   const hasCheckOut = !!today?.check_out;
-  const isComplete  = hasCheckIn && hasCheckOut;
+  const isComplete = hasCheckIn && hasCheckOut;
 
-  const btnLabel  = !hasCheckIn ? 'REGISTRAR ENTRADA' : !hasCheckOut ? 'REGISTRAR SALIDA' : 'JORNADA COMPLETA';
-  const btnColor  = !hasCheckIn ? colors.accent : !hasCheckOut ? colors.warning : colors.muted;
-  const btnIcon   = !hasCheckIn ? 'log-in' : !hasCheckOut ? 'log-out' : 'checkmark-done';
+  const btnLabel = !hasCheckIn ? 'REGISTRAR ENTRADA' : !hasCheckOut ? 'REGISTRAR SALIDA' : 'JORNADA COMPLETA';
+  const btnColor = !hasCheckIn ? colors.accent : !hasCheckOut ? colors.warning : colors.muted;
+  const btnIcon = !hasCheckIn ? 'log-in' : !hasCheckOut ? 'log-out' : 'checkmark-done';
   const btnAction = !hasCheckIn ? handleCheckin : !hasCheckOut ? handleCheckout : undefined;
 
   if (loading) {
@@ -286,9 +349,9 @@ export default function AsistenciaScreen() {
           {saving
             ? <ActivityIndicator color={btnColor} />
             : <>
-                <Ionicons name={btnIcon as any} size={28} color={btnColor} />
-                <Text style={[s.mainBtnText, { color: btnColor }]}>{btnLabel}</Text>
-              </>
+              <Ionicons name={btnIcon as any} size={28} color={btnColor} />
+              <Text style={[s.mainBtnText, { color: btnColor }]}>{btnLabel}</Text>
+            </>
           }
         </TouchableOpacity>
 
@@ -324,45 +387,45 @@ export default function AsistenciaScreen() {
 }
 
 const s = StyleSheet.create({
-  safe:         { flex: 1, backgroundColor: colors.bg },
-  scroll:       { padding: 16, paddingBottom: 32 },
+  safe: { flex: 1, backgroundColor: colors.bg },
+  scroll: { padding: 16, paddingBottom: 32 },
 
-  header:       { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
-  headerName:   { color: colors.text, fontSize: 18, fontWeight: '700' },
-  headerSub:    { color: colors.sub,  fontSize: 12, marginTop: 2 },
-  kioskBtn:     { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: colors.accentDim, borderRadius: 10, borderWidth: 1, borderColor: colors.accent + '30' },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
+  headerName: { color: colors.text, fontSize: 18, fontWeight: '700' },
+  headerSub: { color: colors.sub, fontSize: 12, marginTop: 2 },
+  kioskBtn: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: colors.accentDim, borderRadius: 10, borderWidth: 1, borderColor: colors.accent + '30' },
   kioskBtnText: { color: colors.accent, fontSize: 10, fontWeight: '800', letterSpacing: 1 },
 
-  clockCard:    { backgroundColor: colors.card, borderRadius: 16, padding: 24, alignItems: 'center', marginBottom: 12, borderWidth: 1, borderColor: colors.border },
-  clockTime:    { color: colors.text, fontSize: 42, fontWeight: '200', letterSpacing: 2 },
-  clockDate:    { color: colors.sub,  fontSize: 13, marginTop: 4, textTransform: 'capitalize' },
+  clockCard: { backgroundColor: colors.card, borderRadius: 16, padding: 24, alignItems: 'center', marginBottom: 12, borderWidth: 1, borderColor: colors.border },
+  clockTime: { color: colors.text, fontSize: 42, fontWeight: '200', letterSpacing: 2 },
+  clockDate: { color: colors.sub, fontSize: 13, marginTop: 4, textTransform: 'capitalize' },
 
-  todayCard:    { backgroundColor: colors.card, borderRadius: 16, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: colors.border },
+  todayCard: { backgroundColor: colors.card, borderRadius: 16, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: colors.border },
   sectionTitle: { color: colors.muted, fontSize: 11, fontWeight: '700', letterSpacing: 1.5, marginBottom: 12 },
-  checksRow:    { flexDirection: 'row', justifyContent: 'space-between' },
-  checkItem:    { flex: 1, alignItems: 'center', gap: 4 },
-  divider:      { width: 1, backgroundColor: colors.border },
-  checkLabel:   { color: colors.muted, fontSize: 11 },
-  checkTime:    { fontSize: 18, fontWeight: '600' },
+  checksRow: { flexDirection: 'row', justifyContent: 'space-between' },
+  checkItem: { flex: 1, alignItems: 'center', gap: 4 },
+  divider: { width: 1, backgroundColor: colors.border },
+  checkLabel: { color: colors.muted, fontSize: 11 },
+  checkTime: { fontSize: 18, fontWeight: '600' },
 
   overtimeBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 12, backgroundColor: colors.warning + '18', borderRadius: 8, padding: 8 },
-  overtimeText:  { color: colors.warning, fontSize: 12, fontWeight: '600' },
+  overtimeText: { color: colors.warning, fontSize: 12, fontWeight: '600' },
 
-  mainBtn:      { borderRadius: 16, borderWidth: 1.5, padding: 20, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 12, marginBottom: 24 },
+  mainBtn: { borderRadius: 16, borderWidth: 1.5, padding: 20, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 12, marginBottom: 24 },
   mainBtnDisabled: { opacity: 0.5 },
-  mainBtnText:  { fontSize: 17, fontWeight: '800', letterSpacing: 1 },
+  mainBtnText: { fontSize: 17, fontWeight: '800', letterSpacing: 1 },
 
   historySection: { gap: 8 },
-  histRow:      { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.card, borderRadius: 12, padding: 12, gap: 12, borderWidth: 1, borderColor: colors.border },
-  histStatus:   { width: 32, height: 32, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
-  histInfo:     { flex: 1, gap: 2 },
-  histDate:     { color: colors.text, fontSize: 13, fontWeight: '600', textTransform: 'capitalize' },
-  histTimes:    { color: colors.sub,  fontSize: 11 },
-  histRight:    { alignItems: 'flex-end', gap: 2 },
-  histHours:    { color: colors.text, fontSize: 13, fontWeight: '700' },
-  histLabel:    { fontSize: 10, fontWeight: '600' },
+  histRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.card, borderRadius: 12, padding: 12, gap: 12, borderWidth: 1, borderColor: colors.border },
+  histStatus: { width: 32, height: 32, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
+  histInfo: { flex: 1, gap: 2 },
+  histDate: { color: colors.text, fontSize: 13, fontWeight: '600', textTransform: 'capitalize' },
+  histTimes: { color: colors.sub, fontSize: 11 },
+  histRight: { alignItems: 'flex-end', gap: 2 },
+  histHours: { color: colors.text, fontSize: 13, fontWeight: '700' },
+  histLabel: { fontSize: 10, fontWeight: '600' },
 
-  emptyWrap:    { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8, padding: 40 },
-  emptyTitle:   { color: colors.text, fontSize: 16, fontWeight: '700' },
-  emptySub:     { color: colors.muted, fontSize: 13, textAlign: 'center' },
+  emptyWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8, padding: 40 },
+  emptyTitle: { color: colors.text, fontSize: 16, fontWeight: '700' },
+  emptySub: { color: colors.muted, fontSize: 13, textAlign: 'center' },
 });

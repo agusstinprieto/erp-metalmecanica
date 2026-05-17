@@ -8,6 +8,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../lib/supabase';
 import { colors } from '../../lib/theme';
+import { checkConnectivity, enqueueAction, syncQueue } from '../../lib/offline';
 
 interface PendingOp {
   id: string;
@@ -32,6 +33,10 @@ export default function AprobacionesScreen() {
   const [acting,   setActing]   = useState<string | null>(null);
 
   const load = useCallback(async () => {
+    try {
+      await syncQueue().catch(e => console.log('[Offline] Sync error on approvals load:', e));
+    } catch {}
+
     // Buscar operaciones completadas que aún no tienen aprobacion_supervisor
     const { data } = await supabase
       .from('viajero_operaciones')
@@ -59,14 +64,33 @@ export default function AprobacionesScreen() {
 
   const act = async (op: PendingOp, approved: boolean) => {
     setActing(op.id);
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser().catch(() => ({ data: { user: null } }));
     const now = new Date().toISOString();
-    await supabase.from('viajero_operaciones').update({
+    const isOnline = await checkConnectivity();
+
+    const payload = {
       aprobado_por:    user?.email ?? 'supervisor',
       aprobado_en:     now,
       estatus:         approved ? 'aprobado' : 'rechazado',
       notas_supervisor: comment[op.id]?.trim() || null,
-    }).eq('id', op.id);
+    };
+
+    if (!isOnline) {
+      await enqueueAction({
+        table: 'viajero_operaciones',
+        action: 'update',
+        payload,
+        filterField: 'id',
+        filterValue: op.id
+      });
+
+      setOps(prev => prev.filter(o => o.id !== op.id));
+      setActing(null);
+      Alert.alert('Modo Offline', 'Aprobación encolada localmente. Se sincronizará al recuperar internet.');
+      return;
+    }
+
+    await supabase.from('viajero_operaciones').update(payload).eq('id', op.id);
     setOps(prev => prev.filter(o => o.id !== op.id));
     setActing(null);
   };

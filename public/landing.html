@@ -1,0 +1,2645 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>McVill ERP | Portal Ejecutivo y Manuales de Configuración</title>
+  <link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml">
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons via CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* VARIABLES & BRAND SYSTEM (AGUS PRO) */
+    :root {
+      --bg-base: #060913;
+      --bg-card: rgba(16, 23, 42, 0.8);
+      --bg-card-hover: rgba(22, 32, 58, 0.95);
+      --border-color: rgba(79, 165, 255, 0.15);
+      --border-glow: rgba(79, 165, 255, 0.4);
+      --color-primary: #4fa5ff; /* Azul Industrial */
+      --color-accent: #00f0ff; /* Neon Cyan */
+      --color-orange: #ff6b00; /* Glow Fuego TIG */
+      --color-success: #10b981; /* Emerald */
+      --color-error: #ef4444; /* Ruby Red */
+      --color-text: #e2e8f0;
+      --color-text-muted: #94a3b8;
+      --font-display: 'Outfit', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --transition-speed: 0.3s;
+    }
+
+    /* BASE STYLES */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      scrollbar-width: thin;
+      scrollbar-color: var(--color-primary) var(--bg-base);
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--color-text);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* SCROLLBAR CUSTOM */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-base);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--color-primary);
+    }
+
+    /* GRAPHIC BACKGROUND ELEMENTS */
+    .architect-grid {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: 40px 40px;
+      background-image: linear-gradient(to right, rgba(79, 165, 255, 0.02) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(79, 165, 255, 0.02) 1px, transparent 1px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .radial-glow {
+      position: fixed;
+      top: -10%;
+      right: -10%;
+      width: 60vw;
+      height: 60vw;
+      background: radial-gradient(circle, rgba(79, 165, 255, 0.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .radial-glow-left {
+      position: fixed;
+      bottom: -10%;
+      left: -10%;
+      width: 50vw;
+      height: 50vw;
+      background: radial-gradient(circle, rgba(255, 107, 0, 0.03) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .scanline {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+      background-size: 100% 4px, 6px 100%;
+      z-index: 999;
+      pointer-events: none;
+      opacity: 0.2;
+    }
+
+    /* GATEWAY SECURITY ACCESS (LOCKSCREEN) */
+    #security-gateway {
+      position: fixed;
+      inset: 0;
+      background-color: var(--bg-base);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: transform 0.6s cubic-bezier(0.85, 0, 0.15, 1), opacity 0.5s ease;
+      padding: 20px;
+    }
+
+    #security-gateway.unlocked {
+      transform: translateY(-100%);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .gateway-card {
+      background: rgba(10, 16, 30, 0.85);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 40px;
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 0 50px rgba(79, 165, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gateway-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, var(--color-primary), var(--color-accent), var(--color-orange));
+    }
+
+    .gateway-logo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+
+    .gateway-logo img {
+      height: 45px;
+    }
+
+    .gateway-logo h1 {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #fff 30%, var(--color-primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .gateway-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: var(--color-error);
+      padding: 6px 14px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 24px;
+    }
+
+    .gateway-badge.valid {
+      background: rgba(16, 119, 81, 0.1);
+      border: 1px solid rgba(16, 119, 81, 0.3);
+      color: var(--color-success);
+    }
+
+    .gateway-terminal {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--color-text-muted);
+      background: rgba(0, 0, 0, 0.4);
+      padding: 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      text-align: left;
+      margin-bottom: 30px;
+      height: 100px;
+      overflow-y: auto;
+      line-height: 1.5;
+    }
+
+    .gateway-input-group {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .gateway-input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 16px 20px;
+      padding-left: 50px;
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 16px;
+      letter-spacing: 4px;
+      text-align: center;
+      transition: all var(--transition-speed);
+    }
+
+    .gateway-input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      background: rgba(79, 165, 255, 0.05);
+      box-shadow: 0 0 15px rgba(79, 165, 255, 0.15);
+    }
+
+    .gateway-icon {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--color-text-muted);
+      pointer-events: none;
+    }
+
+    .gateway-btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+      border: none;
+      border-radius: 16px;
+      padding: 16px;
+      color: #060913;
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: all var(--transition-speed);
+      box-shadow: 0 4px 20px rgba(0, 240, 255, 0.2);
+    }
+
+    .gateway-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0, 240, 255, 0.4);
+      filter: brightness(1.1);
+    }
+
+    .gateway-hint {
+      margin-top: 20px;
+      font-size: 11px;
+      color: var(--color-text-muted);
+    }
+    .gateway-hint span {
+      color: var(--color-accent);
+      font-family: var(--font-mono);
+      font-weight: bold;
+    }
+
+    /* MAIN APP WORKSPACE */
+    #portal-content {
+      position: relative;
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+
+    #portal-content.active {
+      opacity: 1;
+    }
+
+    /* TOP HEADER NAV */
+    header {
+      border-b: 1px solid var(--border-color);
+      background: rgba(6, 9, 19, 0.8);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .nav-logo img {
+      height: 38px;
+    }
+
+    .nav-logo h1 {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #fff 50%, var(--color-primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-status {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 6px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: var(--color-success);
+      box-shadow: 0 0 8px var(--color-success);
+      animation: pulse-glow 1.5s infinite;
+    }
+
+    @keyframes pulse-glow {
+      0% { box-shadow: 0 0 2px var(--color-success); }
+      50% { box-shadow: 0 0 8px var(--color-success); }
+      100% { box-shadow: 0 0 2px var(--color-success); }
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 10px 18px;
+      color: var(--color-text);
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all var(--transition-speed);
+    }
+
+    .nav-btn:hover {
+      background: rgba(79, 165, 255, 0.1);
+      border-color: var(--color-primary);
+      box-shadow: 0 0 10px rgba(79, 165, 255, 0.1);
+    }
+
+    .nav-btn-primary {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+      border: none;
+      color: #060913;
+    }
+
+    .nav-btn-primary:hover {
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+      filter: brightness(1.1);
+    }
+
+    /* HERO PORTADA EXECUTIVE */
+    .hero-section {
+      max-width: 1400px;
+      margin: 40px auto 60px;
+      padding: 0 30px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    @media (max-width: 1024px) {
+      .hero-section {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+    }
+
+    .hero-content h2 {
+      font-family: var(--font-display);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: var(--color-orange);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    @media (max-width: 1024px) {
+      .hero-content h2 {
+        justify-content: center;
+      }
+    }
+
+    .hero-content h1 {
+      font-family: var(--font-display);
+      font-size: 52px;
+      font-weight: 900;
+      line-height: 1.1;
+      text-transform: uppercase;
+      letter-spacing: -1px;
+      margin-bottom: 24px;
+      background: linear-gradient(to right, #fff 40%, var(--color-primary) 70%, var(--color-accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    @media (max-width: 768px) {
+      .hero-content h1 {
+        font-size: 38px;
+      }
+    }
+
+    .hero-content p {
+      font-size: 15px;
+      color: var(--color-text-muted);
+      margin-bottom: 35px;
+      max-width: 600px;
+    }
+
+    @media (max-width: 1024px) {
+      .hero-content p {
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+
+    .hero-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 40px;
+    }
+
+    @media (max-width: 1024px) {
+      .hero-buttons {
+        justify-content: center;
+      }
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 30px;
+    }
+
+    .stat-card {
+      text-align: left;
+    }
+
+    @media (max-width: 1024px) {
+      .stat-card {
+        text-align: center;
+      }
+    }
+
+    .stat-num {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 900;
+      color: #fff;
+    }
+
+    .stat-num span {
+      color: var(--color-accent);
+    }
+
+    .stat-lbl {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 4px;
+    }
+
+    .hero-visual {
+      position: relative;
+      border-radius: 24px;
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+      aspect-ratio: 16/10;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(79, 165, 255, 0.15);
+    }
+
+    .hero-visual img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* HUD OVERLAYS */
+    .hud-overlay {
+      position: absolute;
+      background: rgba(10, 16, 30, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 240, 255, 0.2);
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      pointer-events: none;
+    }
+
+    .hud-1 {
+      top: 20px;
+      left: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--color-accent);
+    }
+
+    .hud-2 {
+      bottom: 20px;
+      right: 20px;
+      color: var(--color-orange);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      text-align: right;
+    }
+
+    .hud-pulse {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: var(--color-accent);
+      box-shadow: 0 0 8px var(--color-accent);
+      animation: pulse-glow-cyan 1.5s infinite;
+    }
+
+    @keyframes pulse-glow-cyan {
+      0% { box-shadow: 0 0 2px var(--color-accent); }
+      50% { box-shadow: 0 0 8px var(--color-accent); }
+      100% { box-shadow: 0 0 2px var(--color-accent); }
+    }
+
+    /* SECTIONS LAYOUT */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 30px;
+      margin-bottom: 80px;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 26px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 35px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-left: 4px solid var(--color-primary);
+      padding-left: 14px;
+    }
+
+    /* INTERACTIVE SIMULATORS GRID */
+    .interactive-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    @media (max-width: 1024px) {
+      .interactive-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 30px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      transition: border-color var(--transition-speed);
+      position: relative;
+    }
+
+    .card:hover {
+      border-color: var(--color-primary);
+    }
+
+    .card-header-sim {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 15px;
+    }
+
+    .card-title-sim {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-title-sim i {
+      color: var(--color-accent);
+    }
+
+    .card-badge-sim {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: bold;
+      background: rgba(0, 240, 255, 0.1);
+      border: 1px solid rgba(0, 240, 255, 0.2);
+      color: var(--color-accent);
+      padding: 4px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+
+    /* 1. NEURAL QUALITY INSPECTION ENGINE SIMULATOR */
+    .qa-sim-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .qa-sim-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .qa-sim-screen {
+      position: relative;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      aspect-ratio: 16/11;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .qa-sim-screen img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.85;
+      transition: all 0.5s ease;
+    }
+
+    .qa-scan-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(180deg, transparent, var(--color-accent));
+      box-shadow: 0 0 15px var(--color-accent);
+      z-index: 10;
+      display: none;
+    }
+
+    @keyframes scan-animation {
+      0% { top: 0%; }
+      50% { top: 100%; }
+      100% { top: 0%; }
+    }
+
+    .qa-box {
+      position: absolute;
+      border: 2px solid transparent;
+      box-shadow: 0 0 15px transparent;
+      border-radius: 6px;
+      display: none;
+      z-index: 5;
+    }
+
+    .qa-box-perfect {
+      top: 15%;
+      left: 10%;
+      width: 80%;
+      height: 70%;
+      border-color: var(--color-success);
+      background: rgba(16, 185, 129, 0.08);
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+    }
+
+    .qa-box-defect {
+      top: 35%;
+      left: 42%;
+      width: 25%;
+      height: 25%;
+      border-color: var(--color-error);
+      background: rgba(239, 68, 68, 0.1);
+      box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+    }
+
+    .qa-box-label {
+      position: absolute;
+      bottom: 100%;
+      left: 0;
+      background: inherit;
+      border: 1px solid;
+      border-color: inherit;
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 8px;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 4px 4px 0 0;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .qa-controls {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .qa-options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .qa-option-btn {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 12px 18px;
+      color: var(--color-text);
+      font-family: var(--font-display);
+      font-size: 12px;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all var(--transition-speed);
+    }
+
+    .qa-option-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--color-primary);
+    }
+
+    .qa-option-btn.active {
+      border-color: var(--color-accent);
+      background: rgba(0, 240, 255, 0.05);
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.05);
+    }
+
+    .qa-report {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      min-height: 120px;
+    }
+
+    .qa-report-title {
+      font-weight: 800;
+      color: var(--color-accent);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      font-size: 10px;
+      letter-spacing: 1px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 4px;
+    }
+
+    .qa-report-text {
+      color: var(--color-text-muted);
+      line-height: 1.5;
+    }
+
+    /* 2. OMNICHANNEL ALERTS PHONE SIMULATOR */
+    .alerts-container {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .alerts-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .alerts-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .alert-trigger-btn {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 14px;
+      color: var(--color-text);
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all var(--transition-speed);
+    }
+
+    .alert-trigger-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--color-primary);
+    }
+
+    .alert-trigger-btn.active {
+      background: rgba(79, 165, 255, 0.08);
+      border-color: var(--color-primary);
+    }
+
+    .phone-mockup {
+      background: #090e1a;
+      border: 10px solid #1e293b;
+      border-radius: 32px;
+      aspect-ratio: 9/16;
+      max-width: 250px;
+      margin: 0 auto;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .phone-header {
+      height: 24px;
+      background: #1e293b;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .phone-notch {
+      width: 80px;
+      height: 12px;
+      background: #000;
+      border-radius: 0 0 10px 10px;
+      position: absolute;
+      top: 0;
+    }
+
+    .phone-screen {
+      flex: 1;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 12px;
+      background: radial-gradient(circle at top, #141b2d 0%, #060913 100%);
+      font-family: var(--font-body);
+      overflow-y: auto;
+    }
+
+    /* MOCK NOTIFICATION STYLES */
+    .mock-notif {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      animation: slide-in-top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes slide-in-top {
+      0% { transform: translateY(-20px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    .mock-notif-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 8px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--color-text-muted);
+    }
+
+    .mock-notif-header img {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+    }
+
+    .mock-notif-title {
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .mock-notif-body {
+      font-size: 9px;
+      color: var(--color-text-muted);
+      line-height: 1.3;
+    }
+
+    .mock-notif-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .mock-notif-btn {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 5px;
+      font-size: 8px;
+      font-weight: bold;
+      color: #fff;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .mock-notif-btn-accent {
+      background: var(--color-primary);
+      color: #060913;
+      border: none;
+    }
+
+    /* MOCK WHATSAPP PREVIEW */
+    .wa-preview {
+      background: #0b141a;
+      border-radius: 16px;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      font-family: Helvetica, Arial, sans-serif;
+      animation: slide-in-top 0.4s ease;
+    }
+
+    .wa-header {
+      background: #1f2c34;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .wa-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .wa-username {
+      font-size: 10px;
+      font-weight: bold;
+      color: #e9edef;
+    }
+
+    .wa-chat {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+      background-size: cover;
+      min-height: 150px;
+    }
+
+    .wa-bubble {
+      background: #005c4b;
+      align-self: flex-end;
+      border-radius: 8px 0 8px 8px;
+      padding: 8px;
+      color: #e9edef;
+      font-size: 9px;
+      line-height: 1.3;
+      max-width: 85%;
+      box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
+      position: relative;
+    }
+
+    .wa-bubble-logo {
+      font-size: 8px;
+      font-weight: bold;
+      color: var(--color-accent);
+      margin-bottom: 2px;
+      text-transform: uppercase;
+    }
+
+    /* MOCK TEAMS PREVIEW */
+    .teams-preview {
+      background: #1f1f1f;
+      border-left: 4px solid var(--color-error);
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-family: sans-serif;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      animation: slide-in-top 0.4s ease;
+    }
+
+    .teams-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 8px;
+      font-weight: bold;
+      color: #9f9f9f;
+    }
+
+    .teams-header i {
+      color: #ef4444;
+    }
+
+    .teams-title {
+      font-size: 11px;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .teams-field {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      font-size: 9px;
+      border-top: 1px solid #2f2f2f;
+      padding: 4px 0;
+    }
+
+    .teams-label {
+      color: #a0a0a0;
+      font-weight: bold;
+    }
+
+    .teams-value {
+      color: #dfdfdf;
+    }
+
+    /* 3. DYNAMIC ROI CALCULATOR */
+    .roi-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 40px;
+      margin-bottom: 80px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .roi-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 50px;
+      align-items: center;
+    }
+
+    @media (max-width: 1024px) {
+      .roi-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .roi-sliders {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .slider-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .slider-title {
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .slider-value {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--color-accent);
+      background: rgba(0, 240, 255, 0.05);
+      border: 1px solid rgba(0, 240, 255, 0.1);
+      padding: 4px 12px;
+      border-radius: 8px;
+    }
+
+    .slider-input {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+      accent-color: var(--color-primary);
+    }
+
+    .slider-input::-webkit-slider-runnable-track {
+      background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+      height: 6px;
+      border-radius: 3px;
+    }
+
+    .slider-input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      border: 3px solid var(--color-primary);
+      cursor: pointer;
+      margin-top: -6px;
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+      transition: transform 0.1s;
+    }
+
+    .slider-input::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    .roi-outputs {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      border-radius: 20px;
+      padding: 30px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      position: relative;
+    }
+
+    .roi-outputs::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      width: 40px;
+      height: 40px;
+      border-top: 2px solid var(--color-accent);
+      border-right: 2px solid var(--color-accent);
+      pointer-events: none;
+    }
+
+    .roi-outputs::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: -10px;
+      width: 40px;
+      height: 40px;
+      border-bottom: 2px solid var(--color-accent);
+      border-left: 2px solid var(--color-accent);
+      pointer-events: none;
+    }
+
+    .roi-card-out {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      background: rgba(255, 255, 255, 0.01);
+      padding: 20px 10px;
+      border-radius: 14px;
+    }
+
+    .roi-card-out-full {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, rgba(79, 165, 255, 0.05), rgba(0, 240, 255, 0.05));
+      border: 1px solid rgba(79, 165, 255, 0.15);
+    }
+
+    .roi-num-out {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 900;
+      color: #fff;
+    }
+
+    .roi-num-out span {
+      color: var(--color-accent);
+    }
+
+    .roi-num-out-green {
+      color: var(--color-success) !important;
+      text-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+    }
+
+    .roi-lbl-out {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 4px;
+    }
+
+    /* COMPARATIVE TABLE */
+    .comparison-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      border-radius: 20px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-family: var(--font-body);
+      font-size: 13px;
+      background: var(--bg-card);
+      min-width: 800px;
+    }
+
+    th, td {
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    th {
+      font-family: var(--font-display);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background: rgba(10, 16, 30, 0.9);
+      color: #fff;
+      font-size: 11px;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    .check-yes {
+      color: var(--color-success);
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .check-no {
+      color: var(--color-error);
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .highlight-cell {
+      background: rgba(79, 165, 255, 0.03);
+      font-weight: 600;
+      color: #fff;
+      border-left: 1px solid rgba(79, 165, 255, 0.1);
+      border-right: 1px solid rgba(79, 165, 255, 0.1);
+    }
+
+    th.highlight-cell {
+      background: rgba(79, 165, 255, 0.1);
+    }
+
+    /* DOCUMENTATION HUB (STRICTLY AGUS PRO) */
+    .docs-section {
+      max-width: 1400px;
+      margin: 0 auto 80px;
+      padding: 0 30px;
+    }
+
+    .docs-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      height: 75vh;
+      min-height: 550px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    @media (max-width: 900px) {
+      .docs-container {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+    }
+
+    /* DOCS SIDEBAR */
+    .docs-sidebar {
+      background: rgba(10, 16, 30, 0.9);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .docs-selector-tabs {
+      display: flex;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .docs-tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 15px 10px;
+      font-family: var(--font-display);
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all var(--transition-speed);
+    }
+
+    .docs-tab-btn:hover {
+      color: #fff;
+    }
+
+    .docs-tab-btn.active {
+      color: var(--color-primary);
+      border-bottom-color: var(--color-primary);
+      background: rgba(79, 165, 255, 0.03);
+    }
+
+    .docs-index-list {
+      flex: 1;
+      padding: 20px 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .index-group-title {
+      font-family: var(--font-display);
+      font-size: 9px;
+      font-weight: 800;
+      color: var(--color-orange);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin: 14px 0 6px 6px;
+    }
+
+    .index-item-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      color: var(--color-text-muted);
+      text-decoration: none;
+      transition: all var(--transition-speed);
+      border-left: 2px solid transparent;
+    }
+
+    .index-item-link:hover {
+      background: rgba(255, 255, 255, 0.02);
+      color: #fff;
+    }
+
+    .index-item-link.active {
+      color: var(--color-accent);
+      background: rgba(0, 240, 255, 0.03);
+      border-left-color: var(--color-accent);
+      font-weight: 600;
+    }
+
+    /* DOCS VIEWER CONTENT */
+    .docs-viewer {
+      padding: 40px;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      background: radial-gradient(circle at bottom right, rgba(79,165,255,0.01) 0%, transparent 60%);
+    }
+
+    @media (max-width: 768px) {
+      .docs-viewer {
+        padding: 24px;
+      }
+    }
+
+    .docs-loading {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      gap: 12px;
+      color: var(--color-text-muted);
+    }
+
+    .docs-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid rgba(79, 165, 255, 0.1);
+      border-top-color: var(--color-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    /* MARKDOWN RENDER STYLING */
+    .md-render {
+      font-family: var(--font-body);
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--color-text);
+    }
+
+    .md-render h1 {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 12px;
+      color: #fff;
+    }
+
+    .md-render h2 {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 800;
+      margin-top: 35px;
+      margin-bottom: 16px;
+      color: var(--color-primary);
+      border-left: 3px solid var(--color-primary);
+      padding-left: 10px;
+    }
+
+    .md-render h3 {
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 700;
+      margin-top: 24px;
+      margin-bottom: 12px;
+      color: var(--color-accent);
+    }
+
+    .md-render p {
+      margin-bottom: 16px;
+      color: var(--color-text-muted);
+    }
+
+    .md-render ul, .md-render ol {
+      margin-bottom: 20px;
+      padding-left: 20px;
+    }
+
+    .md-render li {
+      margin-bottom: 6px;
+      color: var(--color-text-muted);
+    }
+
+    .md-render table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 12px;
+      min-width: auto;
+    }
+
+    .md-render th, .md-render td {
+      padding: 10px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .md-render th {
+      background: rgba(255, 255, 255, 0.02);
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .md-render code {
+      font-family: var(--font-mono);
+      background: rgba(255, 255, 255, 0.04);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--color-accent);
+      font-size: 12px;
+    }
+
+    .md-render pre {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 18px;
+      overflow-x: auto;
+      margin-bottom: 20px;
+    }
+
+    .md-render pre code {
+      background: transparent;
+      padding: 0;
+      border-radius: 0;
+      color: #dfdfdf;
+      font-size: 11px;
+    }
+
+    .md-render blockquote {
+      border-left: 4px solid var(--color-orange);
+      background: rgba(255, 107, 0, 0.03);
+      padding: 14px 20px;
+      border-radius: 0 12px 12px 0;
+      margin-bottom: 20px;
+    }
+
+    .md-render blockquote p {
+      margin-bottom: 0;
+      color: var(--color-text);
+      font-style: italic;
+    }
+
+    .md-render hr {
+      border: none;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      margin: 30px 0;
+    }
+
+    /* FOOTER TALLER ESTILO TERMINAL */
+    footer {
+      border-top: 1px solid var(--border-color);
+      background: #03060c;
+      padding: 30px 0;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .footer-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .footer-right {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .footer-link {
+      color: var(--color-primary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color var(--transition-speed);
+    }
+
+    .footer-link:hover {
+      color: var(--color-accent);
+    }
+
+    /* UTILITIES */
+    .flex-center {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .text-glow-primary {
+      text-shadow: 0 0 10px rgba(79, 165, 255, 0.3);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="scanline"></div>
+  <div class="architect-grid"></div>
+  <div class="radial-glow"></div>
+  <div class="radial-glow-left"></div>
+
+  <!-- 1. GATEWAY DE SEGURIDAD (PASSKEY ENTER SCREEN) -->
+  <div id="security-gateway">
+    <div class="gateway-card">
+      <div class="gateway-logo">
+        <span style="font-size: 30px;">⚙️</span>
+        <h1>McVill ERP</h1>
+      </div>
+      <div class="gateway-badge" id="gateway-status-badge">
+        <i data-lucide="shield-alert" style="width: 14px; height: 14px;"></i> Acceso Restringido
+      </div>
+      
+      <div class="gateway-terminal" id="gateway-log">
+        [AUTH SYSTEM] PORTAL DE ACCESO EJECUTIVO v2.6<br>
+        [NET CONECT] CONEXIÓN SEGURA SUPABASE COMPACTA...<br>
+        [API CORE] INFERENCIA NEURAL GEMINI LISTA...<br>
+        [AWAITING] POR FAVOR INTRODUZCA SU CLAVE DE ACCESO...
+      </div>
+
+      <div class="gateway-input-group">
+        <i data-lucide="key-round" class="gateway-icon"></i>
+        <input type="text" class="gateway-input" id="passkey-input" placeholder="PASSKEY" autocomplete="off" max="25">
+      </div>
+
+      <button class="gateway-btn" onclick="validatePasskey()">Verificar Credencial</button>
+
+      <div class="gateway-hint">
+        Demostración para McVill. Clave de acceso: <span>MCVILL-2026-IA</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. PORTAL CENTRAL (MAIN APP CONTAINER) -->
+  <div id="portal-content">
+    
+    <!-- HEADER NAV BAR -->
+    <header>
+      <div class="nav-container">
+        <a href="#" class="nav-logo">
+          <span style="font-size: 24px;">⚙️</span>
+          <h1>McVill ERP</h1>
+        </a>
+
+        <div class="nav-status">
+          <div class="status-item">
+            <div class="status-dot"></div>
+            Base de Datos: Supabase
+          </div>
+          <div class="status-item" style="color: var(--color-accent);">
+            Gemini Core 2.5: Activo
+          </div>
+        </div>
+
+        <div class="nav-actions">
+          <button class="nav-btn" onclick="scrollToDocs('manual_ejecutivo')">
+            <i data-lucide="book-open" style="width: 14px; height: 14px;"></i> Manual de Usuario
+          </button>
+          <button class="nav-btn" onclick="scrollToDocs('manual_configuracion')">
+            <i data-lucide="settings" style="width: 14px; height: 14px;"></i> Configuración
+          </button>
+          <a href="/" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+            <button class="nav-btn nav-btn-primary">
+              <i data-lucide="zap" style="width: 14px; height: 14px;"></i> Iniciar ERP
+            </button>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- PORTADA HERO SECTOR -->
+    <section class="hero-section">
+      <div class="hero-content">
+        <h2>⚡ SISTEMA NEURAL DE CONTROL INDUSTRIAL</h2>
+        <h1>Revolucionando la Metalmecánica con IA</h1>
+        <p>McVill ERP es la primera plataforma SaaS de alta ingeniería diseñada para talleres metalmecánicos medianos en México. Automatiza la planta mediante viajeros con código QR, análisis multimodal de planos, inspección visual de soldadura por visión artificial y generación inteligente de cotizaciones. Una solución Premium que transforma el caos operativo en eficiencias medibles.</p>
+        
+        <div class="hero-buttons">
+          <button class="nav-btn nav-btn-primary" style="padding: 14px 28px; font-size: 12px;" onclick="scrollToSection('simuladores-area')">
+            <i data-lucide="terminal" style="width: 16px; height: 16px;"></i> Probar Simuladores
+          </button>
+          <button class="nav-btn" style="padding: 14px 28px; font-size: 12px;" onclick="scrollToSection('roi-calc-area')">
+            <i data-lucide="calculator" style="width: 16px; height: 16px;"></i> Calcular Retorno de Inversión (ROI)
+          </button>
+        </div>
+
+        <div class="hero-stats">
+          <div class="stat-card">
+            <div class="stat-num">-80%</div>
+            <div class="stat-lbl">Errores de Inventario</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">15<span>min</span></div>
+            <div class="stat-lbl">Tiempo de Cotización</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">91.4%</div>
+            <div class="stat-lbl">OEE Promedio Logrado</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <img src="/mcvill_hero_metalwork.png" alt="Planta Industrial Robotizada McVill">
+        <div class="hud-overlay hud-1">
+          <div class="hud-pulse"></div>
+          Visión Neural ACTIVA
+        </div>
+        <div class="hud-overlay hud-2">
+          <span>MONITOR DE PLANTA v2.6</span>
+          <span style="color: var(--color-accent); font-weight: bold;">[ORDEN ACTIVA: #4012]</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- INTERACTIVE AREA: SIMULATORS & DEMOS -->
+    <section class="container" id="simuladores-area">
+      <h3 class="section-title">⚡ Laboratorio de Simulación Interactiva</h3>
+      
+      <div class="interactive-grid">
+        
+        <!-- 1. NEURAL QA WELDING SIMULATOR -->
+        <div class="card">
+          <div class="card-header-sim">
+            <h4 class="card-title-sim">
+              <i data-lucide="eye"></i> Neural QA Weld Inspector (IA Visual)
+            </h4>
+            <span class="card-badge-sim">Visión Artificial v2.5</span>
+          </div>
+
+          <p style="font-size: 13px; color: var(--color-text-muted); margin-bottom: 20px;">
+            Simule el funcionamiento del <strong>Neural Inspection Engine</strong>. La IA visual del ERP analiza fotos tomadas desde cualquier celular o tablet en taller para detectar defectos de soldadura y ensamble en tiempo real.
+          </p>
+
+          <div class="qa-sim-container">
+            <div class="qa-sim-screen">
+              <div class="qa-scan-line" id="qa-scanner"></div>
+              <!-- Image element with fallback -->
+              <img id="qa-target-img" src="/demo-soldadura-inspeccion.jpg" alt="Inspección de Soldadura">
+              
+              <!-- Perfect Bounding Box -->
+              <div class="qa-box qa-box-perfect" id="box-perfect">
+                <div class="qa-box-label">Cordón Uniforme [PASS 98.4%]</div>
+              </div>
+
+              <!-- Defective Bounding Box -->
+              <div class="qa-box qa-box-defect" id="box-defect">
+                <div class="qa-box-label">Porosidad Detectada [FAIL 87.2%]</div>
+              </div>
+            </div>
+
+            <div class="qa-controls">
+              <div class="qa-options-list">
+                <button class="qa-option-btn active" onclick="simulateQA('perfect')">
+                  <span style="color: var(--color-success);">🟢</span>
+                  <div>
+                    <p style="font-weight: bold;">Soldadura TIG Correcta</p>
+                    <p style="font-size: 10px; color: var(--color-text-muted);">Verificar cordón con estándar ISO 9001</p>
+                  </div>
+                </button>
+                <button class="qa-option-btn" onclick="simulateQA('defective')">
+                  <span style="color: var(--color-error);">🔴</span>
+                  <div>
+                    <p style="font-weight: bold;">Soldadura con Porosidades</p>
+                    <p style="font-size: 10px; color: var(--color-text-muted);">Detectar poros, sopladuras e inclusiones</p>
+                  </div>
+                </button>
+              </div>
+
+              <div class="qa-report">
+                <div class="qa-report-title">Reporte Neural IA</div>
+                <div class="qa-report-text" id="qa-report-text">
+                  [INICIO] Seleccione una junta de soldadura para iniciar el análisis neural en piso...
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. OMNICHANNEL ALERTS SIMULATOR -->
+        <div class="card">
+          <div class="card-header-sim">
+            <h4 class="card-title-sim">
+              <i data-lucide="smartphone"></i> Simulador de Alertas y Omnicanalidad
+            </h4>
+            <span class="card-badge-sim">Integración APIs</span>
+          </div>
+
+          <p style="font-size: 13px; color: var(--color-text-muted); margin-bottom: 20px;">
+            Haga clic en los disparadores para ver cómo el ERP notifica en tiempo real a clientes y operadores mediante WhatsApp, Teams y correo.
+          </p>
+
+          <div class="alerts-container">
+            <div class="alerts-sidebar">
+              <button class="alert-trigger-btn active" id="trigger-wa" onclick="simulateAlert('wa')">
+                <i data-lucide="message-square-more" style="color: var(--color-success);"></i> WhatsApp Cliente
+              </button>
+              <button class="alert-trigger-btn" id="trigger-teams" onclick="simulateAlert('teams')">
+                <i data-lucide="bell" style="color: var(--color-error);"></i> Alerta Teams (HSE)
+              </button>
+              <button class="alert-trigger-btn" id="trigger-email" onclick="simulateAlert('email')">
+                <i data-lucide="mail" style="color: var(--color-primary);"></i> Cotización IA (Email)
+              </button>
+            </div>
+
+            <div class="phone-mockup">
+              <div class="phone-header">
+                <div class="phone-notch"></div>
+              </div>
+              <div class="phone-screen" id="phone-screen-area">
+                <!-- Notifications load here dynamically -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 3. ROI INTERACTIVE CALCULATOR -->
+    <section class="container" id="roi-calc-area">
+      <div class="roi-section">
+        <h3 class="section-title" style="border-left-color: var(--color-accent); margin-bottom: 20px;">
+          📈 Calculadora de ROI e Impacto Financiero
+        </h3>
+        <p style="font-size: 14px; color: var(--color-text-muted); margin-bottom: 40px; max-width: 900px;">
+          Ajuste los sliders con los datos operativos de su planta metalmecánica y descubra el impacto económico directo, los ahorros anuales en OpEx y el tiempo de recuperación de inversión al implementar McVill ERP.
+        </p>
+
+        <div class="roi-grid">
+          <div class="roi-sliders">
+            <!-- Slider 1 -->
+            <div class="slider-group">
+              <div class="slider-header">
+                <span class="slider-title">OpEx Mensual de Planta (MXN)</span>
+                <span class="slider-value" id="val-opex">$800,000</span>
+              </div>
+              <input type="range" class="slider-input" id="slide-opex" min="300000" max="5000000" step="50000" value="800000" oninput="calculateROI()">
+            </div>
+
+            <!-- Slider 2 -->
+            <div class="slider-group">
+              <div class="slider-header">
+                <span class="slider-title">Horas dedicadas a Cotizar RFQ (Por Proyecto)</span>
+                <span class="slider-value" id="val-hours">6 hrs</span>
+              </div>
+              <input type="range" class="slider-input" id="slide-hours" min="1" max="24" step="1" value="6" oninput="calculateROI()">
+            </div>
+
+            <!-- Slider 3 -->
+            <div class="slider-group">
+              <div class="slider-header">
+                <span class="slider-title">Tasa de Desperdicio / Scrap y Rechazos (%)</span>
+                <span class="slider-value" id="val-scrap">8.0%</span>
+              </div>
+              <input type="range" class="slider-input" id="slide-scrap" min="1" max="20" step="0.5" value="8.0" oninput="calculateROI()">
+            </div>
+          </div>
+
+          <div class="roi-outputs">
+            <div class="roi-card-out">
+              <div class="roi-num-out" id="out-savings">$52,400<span>/mes</span></div>
+              <div class="roi-lbl-out">Ahorro Mensual Estimado</div>
+            </div>
+
+            <div class="roi-card-out">
+              <div class="roi-num-out" id="out-hours-saved">42<span>hrs</span></div>
+              <div class="roi-lbl-out">Horas de Ingeniería Ahorradas</div>
+            </div>
+
+            <div class="roi-card-out">
+              <div class="roi-num-out" id="out-payback">2.4<span>meses</span></div>
+              <div class="roi-lbl-out">Retorno de Inversión</div>
+            </div>
+
+            <div class="roi-card-out">
+              <div class="roi-num-out roi-num-out-green" id="out-roi">+480%</div>
+              <div class="roi-lbl-out">ROI en el Primer Año</div>
+            </div>
+
+            <div class="roi-card-out roi-card-out-full">
+              <div class="roi-num-out" style="font-size: 38px; color: var(--color-accent);" id="out-annual">$628,800<span>/año</span></div>
+              <div class="roi-lbl-out" style="color: #fff; font-weight: 900; letter-spacing: 2px;">Ahorro Neto Anualizado en OpEx</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. COMPARATIVA CON OTROS ERPs -->
+    <section class="container">
+      <h3 class="section-title" style="border-left-color: var(--color-orange);">⚖️ Comparativa Estratégica de Mercado</h3>
+      
+      <div class="comparison-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Criterio Técnico / Comercial</th>
+              <th class="highlight-cell">McVill ERP v2.6</th>
+              <th>SAP S/4HANA</th>
+              <th>JobBOSS / ERP Tradicional</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Costo de Implementación (Est.)</strong></td>
+              <td class="highlight-cell" style="color: var(--color-success); font-weight: bold;">$150,000 - $250,000 MXN</td>
+              <td>$2,000,000 - $8,000,000 MXN</td>
+              <td>$500,000 - $1,500,000 MXN</td>
+            </tr>
+            <tr>
+              <td><strong>Tiempo de Despliegue en Planta</strong></td>
+              <td class="highlight-cell" style="color: var(--color-success); font-weight: bold;">2 a 4 Semanas (SaaS Ágil)</td>
+              <td>6 a 18 Meses</td>
+              <td>3 a 8 Meses</td>
+            </tr>
+            <tr>
+              <td><strong>Especialización Metalmecánica</strong></td>
+              <td class="highlight-cell"><span class="check-yes"><i data-lucide="check-circle-2" style="width: 16px;"></i> Nativo</span></td>
+              <td><span class="check-no"><i data-lucide="x-circle" style="width: 16px;"></i> Requiere Customización</span></td>
+              <td><span class="check-yes"><i data-lucide="check-circle-2" style="width: 16px;"></i> Modular Rígido</span></td>
+            </tr>
+            <tr>
+              <td><strong>Inteligencia Artificial Integrada</strong></td>
+              <td class="highlight-cell"><span class="check-yes"><i data-lucide="check-circle-2" style="width: 16px;"></i> Sí (Gemini 2.5 flash-lite)</span></td>
+              <td><span class="check-no"><i data-lucide="x-circle" style="width: 16px;"></i> No (Add-on muy costoso)</span></td>
+              <td><span class="check-no"><i data-lucide="x-circle" style="width: 16px;"></i> No</span></td>
+            </tr>
+            <tr>
+              <td><strong>Control de Soldadura (IA Visual)</strong></td>
+              <td class="highlight-cell"><span class="check-yes"><i data-lucide="check-circle-2" style="width: 16px;"></i> Nativo (Neural Inspection)</span></td>
+              <td><span class="check-no"><i data-lucide="x-circle" style="width: 16px;"></i> No</span></td>
+              <td><span class="check-no"><i data-lucide="x-circle" style="width: 16px;"></i> No</span></td>
+            </tr>
+            <tr>
+              <td><strong>Viajeros de Taller con QR</strong></td>
+              <td class="highlight-cell"><span class="check-yes"><i data-lucide="check-circle-2" style="width: 16px;"></i> Sí (Nativo y PWA Móvil)</span></td>
+              <td><span class="check-no"><i data-lucide="x-circle" style="width: 16px;"></i> Requiere Integrador</span></td>
+              <td><span class="check-yes"><i data-lucide="check-circle-2" style="width: 16px;"></i> Escáner Fijo USB</span></td>
+            </tr>
+            <tr>
+              <td><strong>Selector de APIs (DeepSeek / Gemini)</strong></td>
+              <td class="highlight-cell"><span class="check-yes"><i data-lucide="check-circle-2" style="width: 16px;"></i> Sí (Cifrado RLS Supabase)</span></td>
+              <td><span class="check-no"><i data-lucide="x-circle" style="width: 16px;"></i> No</span></td>
+              <td><span class="check-no"><i data-lucide="x-circle" style="width: 16px;"></i> No</span></td>
+            </tr>
+            <tr>
+              <td><strong>Curva de Aprendizaje de Operadores</strong></td>
+              <td class="highlight-cell" style="color: var(--color-success);">Baja (Soporte de Voz Directo)</td>
+              <td>Extremadamente Alta</td>
+              <td>Media-Alta</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 5. DOCUMENTATION HUB (STRICTLY AGUS PRO) -->
+    <section class="docs-section" id="documentos-hub-area">
+      <h3 class="section-title">📖 Repositorio de Manuales Corporativos</h3>
+      
+      <div class="docs-container">
+        
+        <!-- SIDEBAR DE MANUALES -->
+        <div class="docs-sidebar">
+          <div class="docs-selector-tabs">
+            <button class="docs-tab-btn active" id="tab-btn-ejecutivo" onclick="loadManual('manual_ejecutivo')">Manual de Usuario</button>
+            <button class="docs-tab-btn" id="tab-btn-configuracion" onclick="loadManual('manual_configuracion')">Configuración</button>
+          </div>
+
+          <div class="docs-index-list" id="docs-toc-list">
+            <!-- Dynamic Index Links populate here -->
+          </div>
+        </div>
+
+        <!-- VISOR DE CONTENIDO RENDERIZADO -->
+        <div class="docs-viewer" id="docs-viewport">
+          <div class="docs-loading">
+            <div class="docs-spinner"></div>
+            <p style="font-family: var(--font-mono); font-size: 11px; uppercase; letter-spacing: 1px;">Compilando archivo markdown...</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- FUTURISTIC TERMINAL FOOTER -->
+    <footer>
+      <div class="footer-container">
+        <div class="footer-left">
+          <span style="font-size: 18px; filter: grayscale(1);">⚙️</span>
+          <span>© 2026 McVill Metalmecánica. Todos los derechos reservados.</span>
+        </div>
+        <div class="footer-right">
+          <span>Infraestructura Segura Supabase</span>
+          <a href="https://ia-agus.com" target="_blank" class="footer-link">
+            <i data-lucide="zap" style="width: 12px; height: 12px; fill: var(--color-primary);"></i> Desarrollado por IA.AGUS
+          </a>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    // INITIALIZE LUCIDE ICONS
+    lucide.createIcons();
+
+    // 1. GATEWAY VALIDATION SECURITY
+    const ACCESS_PASSKEY = "MCVILL-2026-IA";
+    const passkeyInput = document.getElementById("passkey-input");
+    const gatewayLog = document.getElementById("gateway-log");
+    const gatewayBadge = document.getElementById("gateway-status-badge");
+
+    // Allow enter key to submit passcode
+    passkeyInput.addEventListener("keypress", function(e) {
+      if (e.key === "Enter") {
+        validatePasskey();
+      }
+    });
+
+    function addLogLine(text) {
+      gatewayLog.innerHTML += `<br>${text}`;
+      gatewayLog.scrollTop = gatewayLog.scrollHeight;
+    }
+
+    function validatePasskey() {
+      const code = passkeyInput.value.trim().toUpperCase();
+      
+      if (code === ACCESS_PASSKEY) {
+        addLogLine("<span style='color: var(--color-success);'>[SUCCESS] CREDENCIAL COMPATIBLE CON McVILL CORE.</span>");
+        addLogLine("<span style='color: var(--color-accent);'>[DECRYPT] ACCESO CONCEDIDO. INICIANDO PORTAL...</span>");
+        
+        gatewayBadge.className = "gateway-badge valid";
+        gatewayBadge.innerHTML = `<i class="gateway-icon" data-lucide="shield-check" style="position:static; margin-right:6px; width:14px; height:14px; display:inline;"></i> Acceso Autorizado`;
+        lucide.createIcons();
+
+        setTimeout(() => {
+          document.getElementById("security-gateway").classList.add("unlocked");
+          const portal = document.getElementById("portal-content");
+          portal.classList.add("active");
+          
+          // Preload default manual
+          loadManual("manual_ejecutivo");
+        }, 1200);
+      } else {
+        addLogLine("<span style='color: var(--color-error);'>[DENIED] ERROR 403: LLAVE CRIPTOGRÁFICA RECHAZADA.</span>");
+        passkeyInput.value = "";
+        passkeyInput.focus();
+        
+        // Shake screen
+        const card = document.querySelector(".gateway-card");
+        card.style.animation = "shake 0.4s ease";
+        setTimeout(() => card.style.animation = "", 400);
+      }
+    }
+
+    // CSS SHAKE ANIMATION DYNAMIC ADD
+    const style = document.createElement('style');
+    style.innerHTML = `
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20%, 60% { transform: translateX(-8px); }
+        40%, 80% { transform: translateX(8px); }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // 2. SCROLL UTILITIES
+    function scrollToSection(id) {
+      document.getElementById(id).scrollIntoView({ behavior: "smooth" });
+    }
+
+    function scrollToDocs(manualType) {
+      document.getElementById("documentos-hub-area").scrollIntoView({ behavior: "smooth" });
+      loadManual(manualType);
+    }
+
+    // 3. NEURAL QA WELDING SIMULATOR ACTIONS
+    function simulateQA(mode) {
+      const scanner = document.getElementById("qa-scanner");
+      const targetImg = document.getElementById("qa-target-img");
+      const boxPerfect = document.getElementById("box-perfect");
+      const boxDefect = document.getElementById("box-defect");
+      const reportText = document.getElementById("qa-report-text");
+
+      // Set active buttons
+      const buttons = document.querySelectorAll(".qa-option-btn");
+      buttons.forEach(btn => btn.classList.remove("active"));
+      if (mode === "perfect") buttons[0].classList.add("active");
+      else buttons[1].classList.add("active");
+
+      // Reset visibilities
+      boxPerfect.style.display = "none";
+      boxDefect.style.display = "none";
+      scanner.style.display = "block";
+      scanner.style.animation = "scan-animation 1.5s infinite linear";
+      reportText.innerHTML = `[SCANNING] Escaneando junta metálica en estación...<br>[ANALYSIS] Extrayendo patrones termográficos y de cordón...`;
+
+      setTimeout(() => {
+        // Stop scan
+        scanner.style.display = "none";
+        
+        if (mode === "perfect") {
+          boxPerfect.style.display = "block";
+          reportText.innerHTML = `
+            <span style="color: var(--color-success); font-weight:bold;">[PASS] ANÁLISIS COMPLETADO EXITOSAMENTE</span><br>
+            <strong>Diagnóstico:</strong> Cordón uniforme con penetración ideal. Sin porosidades ni socavaciones.<br>
+            <strong>Confianza IA:</strong> 98.4%<br>
+            <strong>Acción:</strong> Viajero de Producción firmado electrónicamente. Avanza a etapa de Pintura.
+          `;
+        } else {
+          boxDefect.style.display = "block";
+          reportText.innerHTML = `
+            <span style="color: var(--color-error); font-weight:bold;">[FAIL] DEFECTO DETECTADO POR CEREBRO NEURAL</span><br>
+            <strong>Diagnóstico:</strong> Socavación lateral y porosidades agrupadas en zona de enfriamiento.<br>
+            <strong>Confianza IA:</strong> 87.2%<br>
+            <strong>Acción Crítica:</strong> <span style="color: var(--color-error);">NO CONFORMIDAD NC-2026-904 CREADA</span>. Bloqueando código de barras del viajero en Supabase y alertando a Supervisor vía WhatsApp.
+          `;
+          
+          // Trigger automatic mock alert to Teams
+          setTimeout(() => {
+            simulateAlert("teams", "🚨 PARO DE CALIDAD AUTOMÁTICO: Soldadura defectuosa en OT-4012 (Porosidades).");
+          }, 1000);
+        }
+      }, 1500);
+    }
+
+    // 4. ALERTS AND COMMUNICATIONS SIMULATOR
+    function simulateAlert(type, customText = "") {
+      const screen = document.getElementById("phone-screen-area");
+      
+      // Update buttons
+      document.querySelectorAll(".alert-trigger-btn").forEach(btn => btn.classList.remove("active"));
+      
+      let triggerBtn;
+      if (type === 'wa') triggerBtn = document.getElementById("trigger-wa");
+      else if (type === 'teams') triggerBtn = document.getElementById("trigger-teams");
+      else if (type === 'email') triggerBtn = document.getElementById("trigger-email");
+      
+      if (triggerBtn) triggerBtn.classList.add("active");
+
+      screen.innerHTML = ""; // Clear screen
+
+      if (type === "wa") {
+        screen.innerHTML = `
+          <div class="wa-preview">
+            <div class="wa-header">
+              <div class="wa-avatar">MV</div>
+              <div class="wa-username">McVill Alertas ERP</div>
+            </div>
+            <div class="wa-chat">
+              <div class="wa-bubble">
+                <div class="wa-bubble-logo">McVill Neural Alert ⚙️</div>
+                Estimado Director, su orden de trabajo <strong>OT-4012 (Estructuras Mineras John Deere)</strong> ha completado la etapa de <strong>Corte Láser</strong> con OEE de 94.2%.<br><br>
+                Siguiente etapa: <strong>Doblez CNC</strong>.<br>
+                Operador: Ing. R. Garza.<br><br>
+                Ver en vivo: <span style="text-decoration:underline; color:#00a3ff; cursor:pointer;">mcvill-erp.mx/v/4012</span>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (type === "teams") {
+        screen.innerHTML = `
+          <div class="teams-preview">
+            <div class="teams-header">
+              <i data-lucide="shield-alert" style="width:12px; height:12px;"></i> ALERTA CRÍTICA TEAMS Webhook
+            </div>
+            <div class="teams-title">
+              ${customText || "🚨 PARO DE LÍNEA: Soldadura Defectuosa en Estación TIG-03"}
+            </div>
+            <div class="teams-field">
+              <div class="teams-label">OT Afectada:</div>
+              <div class="teams-value">OT-4012 (Soportes Estructurales)</div>
+            </div>
+            <div class="teams-field">
+              <div class="teams-label">Defecto:</div>
+              <div class="teams-value">Porosidad e Inclusión de Escoria (>60% confianza)</div>
+            </div>
+            <div class="teams-field">
+              <div class="teams-label">Acción:</div>
+              <div class="teams-value">Viajero QR de pieza bloqueado en base de datos. Se requiere revisión CAPA de Ing. de Calidad.</div>
+            </div>
+          </div>
+        `;
+        lucide.createIcons();
+      } else if (type === "email") {
+        screen.innerHTML = `
+          <div class="mock-notif" style="background: rgba(15,23,42,0.95); border-color: var(--color-primary);">
+            <div class="mock-notif-header">
+              <i data-lucide="mail" style="width:10px; height:10px;"></i> Correo SMTP Empleado
+            </div>
+            <div class="mock-notif-title" style="font-size: 10px;">
+              Cotización Aprobada: Estructuras Metalmecánicas
+            </div>
+            <div class="mock-notif-body" style="font-size:8px;">
+              Estimado Cliente,<br><br>
+              Adjuntamos la cotización <strong>COT-2026-092</strong> generada por el Agente de Inteligencia Artificial de McVill ERP.<br><br>
+              <strong>Monto Total:</strong> $124,500.00 MXN<br>
+              <strong>Tiempo de entrega:</strong> 12 días hábiles.<br><br>
+              El análisis de factibilidad técnica FT-IG-01 concluyó con <strong>94% de viabilidad</strong>.<br><br>
+              Atentamente,<br>
+              Ing. A. Prieto — Ventas McVill
+            </div>
+            <div class="mock-notif-actions">
+              <div class="mock-notif-btn mock-notif-btn-accent">Ver PDF</div>
+              <div class="mock-notif-btn">Descargar BOM</div>
+            </div>
+          </div>
+        `;
+        lucide.createIcons();
+      }
+    }
+
+    // Set default alert simulated
+    setTimeout(() => {
+      simulateAlert('wa');
+    }, 500);
+
+    // 5. DYNAMIC ROI CALCULATOR LOGIC
+    function calculateROI() {
+      // Get values
+      const opex = parseFloat(document.getElementById("slide-opex").value);
+      const hours = parseFloat(document.getElementById("slide-hours").value);
+      const scrap = parseFloat(document.getElementById("slide-scrap").value);
+
+      // Display inputs
+      document.getElementById("val-opex").innerHTML = "$" + opex.toLocaleString();
+      document.getElementById("val-hours").innerHTML = hours + " hrs";
+      document.getElementById("val-scrap").innerHTML = scrap.toFixed(1) + "%";
+
+      // CALCULATE SAVINGS
+      // 1. Engineering RFQ time saved (Before: hours, After: 15 mins (0.25 hrs))
+      // Assuming 15 RFQs per month
+      const hoursSaved = Math.max(0, (hours - 0.25) * 15);
+      // Engineering cost per hour is ~$200 MXN
+      const engineeringSavings = hoursSaved * 200;
+
+      // 2. Scrap reduction. McVill ERP reduces scrap rate by ~35% average due to smart travelers & visual QA
+      // Scrap costs are usually ~5% of OpEx. Reduction is 35% of that.
+      const scrapBaseCost = opex * 0.05 * (scrap / 10);
+      const scrapSavings = scrapBaseCost * 0.35;
+
+      // 3. Efficiency in administrative closes (Payroll, KPIs, Inventory)
+      const administrativeSavings = opex * 0.02;
+
+      // Total monthly savings
+      const monthlySavings = engineeringSavings + scrapSavings + administrativeSavings;
+      const annualSavings = monthlySavings * 12;
+
+      // Payback period in months. Investment is $180,000 MXN average.
+      const investment = 180000;
+      const payback = Math.max(0.8, investment / monthlySavings);
+      
+      // ROI Percentage
+      const roi = (monthlySavings * 12 / investment) * 100;
+
+      // Update outputs
+      document.getElementById("out-savings").innerHTML = "$" + Math.round(monthlySavings).toLocaleString() + "<span>/mes</span>";
+      document.getElementById("out-hours-saved").innerHTML = Math.round(hoursSaved) + "<span>hrs</span>";
+      document.getElementById("out-payback").innerHTML = payback.toFixed(1) + "<span>meses</span>";
+      document.getElementById("out-roi").innerHTML = "+" + Math.round(roi) + "%";
+      document.getElementById("out-annual").innerHTML = "$" + Math.round(annualSavings).toLocaleString() + "<span>/año</span>";
+    }
+
+    // Run first calculation
+    calculateROI();
+
+    // 6. CLIENT-SIDE MARKDOWN FETCH AND PARSER (STRIKE-LIKE PORTAL)
+    let currentManualLoaded = "";
+    
+    async function loadManual(manualType) {
+      currentManualLoaded = manualType;
+      
+      // Update Tab styling
+      const btnEjecutivo = document.getElementById("tab-btn-ejecutivo");
+      const btnConfig = document.getElementById("tab-btn-configuracion");
+      
+      if (manualType === "manual_ejecutivo") {
+        btnEjecutivo.classList.add("active");
+        btnConfig.classList.remove("active");
+      } else {
+        btnEjecutivo.classList.remove("active");
+        btnConfig.classList.add("active");
+      }
+
+      const viewport = document.getElementById("docs-viewport");
+      const tocList = document.getElementById("docs-toc-list");
+      
+      // Set Loading
+      viewport.innerHTML = `
+        <div class="docs-loading">
+          <div class="docs-spinner"></div>
+          <p style="font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">Sincronizando manual en tiempo de ejecución...</p>
+        </div>
+      `;
+      tocList.innerHTML = "";
+
+      try {
+        const filePath = manualType === "manual_ejecutivo" ? "/manual_ejecutivo.md" : "/manual_configuracion.md";
+        const response = await fetch(filePath);
+        
+        if (!response.ok) {
+          throw new Error("No se pudo obtener el archivo del servidor.");
+        }
+        
+        const markdown = await response.text();
+        
+        // Render Markdown to HTML
+        const { html, toc } = parseMarkdown(markdown);
+        
+        // Populate viewport
+        viewport.innerHTML = `<div class="md-render">${html}</div>`;
+        
+        // Populate TOC
+        let tocHtml = "";
+        let currentGroup = "GENERAL";
+        
+        toc.forEach(item => {
+          // If it is H2, it represents a main category group
+          if (item.level === 2) {
+            tocHtml += `<div class="index-group-title">${item.text}</div>`;
+          } else if (item.level === 3 || item.level === 1) {
+            tocHtml += `
+              <a href="#${item.id}" class="index-item-link" onclick="highlightActiveIndex(this)">
+                <i data-lucide="chevron-right" style="width: 12px; height: 12px; color: var(--color-accent);"></i>
+                ${item.text}
+              </a>
+            `;
+          }
+        });
+        
+        tocList.innerHTML = tocHtml;
+        lucide.createIcons();
+
+      } catch (err) {
+        viewport.innerHTML = `
+          <div class="docs-loading" style="color: var(--color-error);">
+            <i data-lucide="alert-triangle" style="width: 48px; height: 48px; margin-bottom: 12px;"></i>
+            <p style="font-family: var(--font-mono); font-size: 12px; font-weight: bold;">[ERROR DE CARGA] ARCHIVO NO ENCONTRADO</p>
+            <p style="font-size: 11px; color: var(--color-text-muted); max-width: 400px; text-align: center; margin-top: 6px;">
+              Verifique que los archivos manuales existan en la carpeta /public/ del servidor de Vite. Detalles: ${err.message}
+            </p>
+          </div>
+        `;
+        lucide.createIcons();
+      }
+    }
+
+    function highlightActiveIndex(element) {
+      document.querySelectorAll(".index-item-link").forEach(link => link.classList.remove("active"));
+      element.classList.add("active");
+    }
+
+    // 7. ELITE LIGHTWEIGHT MARKDOWN TO HTML COMPILER
+    function parseMarkdown(md) {
+      const toc = [];
+      let html = "";
+      const lines = md.split("\n");
+      
+      let inList = false;
+      let inTable = false;
+      let inCodeBlock = false;
+      let codeBlockContent = [];
+      let tableRows = [];
+
+      for (let i = 0; i < lines.length; i++) {
+        let line = lines[i];
+
+        // 1. Handle Code Block ```
+        if (line.trim().startsWith("```")) {
+          if (inCodeBlock) {
+            // End code block
+            inCodeBlock = false;
+            html += `<pre><code>${escapeHtml(codeBlockContent.join("\n"))}</code></pre>`;
+            codeBlockContent = [];
+          } else {
+            // Start code block
+            inCodeBlock = true;
+          }
+          continue;
+        }
+
+        if (inCodeBlock) {
+          codeBlockContent.push(line);
+          continue;
+        }
+
+        // 2. Handle Tables
+        if (line.trim().startsWith("|") && line.trim().endsWith("|")) {
+          // Verify if it's separator
+          if (line.includes("---") || line.includes("---|")) {
+            continue; // Skip separator line
+          }
+          inTable = true;
+          tableRows.push(line);
+          continue;
+        } else {
+          if (inTable) {
+            // End Table & compile it
+            inTable = false;
+            html += compileTable(tableRows);
+            tableRows = [];
+          }
+        }
+
+        // 3. Handle Lists
+        if (line.trim().startsWith("- ") || line.trim().startsWith("* ") || /^\d+\.\s/.test(line.trim())) {
+          if (!inList) {
+            inList = true;
+            html += line.trim().startsWith("- ") || line.trim().startsWith("* ") ? "<ul>" : "<ol>";
+          }
+          let cleanItem = line.trim().replace(/^[-*]\s+/, "").replace(/^\d+\.\s+/, "");
+          html += `<li>${parseInlineStyles(cleanItem)}</li>`;
+          continue;
+        } else {
+          if (inList) {
+            inList = false;
+            html += html.endsWith("</li></ul>") || html.includes("<ul>") ? "</ul>" : "</ol>";
+          }
+        }
+
+        // 4. Handle Headers
+        if (line.startsWith("# ")) {
+          const text = line.replace("# ", "").trim();
+          const id = slugify(text);
+          toc.push({ level: 1, text, id });
+          html += `<h1 id="${id}">${text}</h1>`;
+          continue;
+        }
+        if (line.startsWith("## ")) {
+          const text = line.replace("## ", "").trim();
+          const id = slugify(text);
+          toc.push({ level: 2, text, id });
+          html += `<h2 id="${id}">${text}</h2>`;
+          continue;
+        }
+        if (line.startsWith("### ")) {
+          const text = line.replace("### ", "").trim();
+          const id = slugify(text);
+          toc.push({ level: 3, text, id });
+          html += `<h3 id="${id}">${text}</h3>`;
+          continue;
+        }
+
+        // 5. Handle Blockquotes (Alerts)
+        if (line.trim().startsWith(">")) {
+          let quoteText = line.trim().replace(/^>\s*/, "");
+          // Check for GitHub Alerts like [!IMPORTANT]
+          quoteText = quoteText.replace(/\[!(NOTE|IMPORTANT|TIP|WARNING|CAUTION)\]/, "<strong>$1:</strong>");
+          html += `<blockquote><p>${parseInlineStyles(quoteText)}</p></blockquote>`;
+          continue;
+        }
+
+        // 6. Handle Dividers
+        if (line.trim() === "---") {
+          html += `<hr>`;
+          continue;
+        }
+
+        // 7. Standard Paragraphs
+        if (line.trim() !== "") {
+          html += `<p>${parseInlineStyles(line)}</p>`;
+        }
+      }
+
+      // Close open items
+      if (inTable) html += compileTable(tableRows);
+      if (inList) html += "</ul>";
+
+      return { html, toc };
+    }
+
+    // Helper functions for parser
+    function slugify(text) {
+      return text.toLowerCase()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/--+/g, '-')
+        .trim();
+    }
+
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function parseInlineStyles(text) {
+      // Bold **text**
+      text = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+      // Code `code`
+      text = text.replace(/`(.*?)`/g, "<code>$1</code>");
+      // Links [text](url)
+      text = text.replace(/\[(.*?)\]\((.*?)\)/g, "<a href='$2' style='color:var(--color-primary); text-decoration:none;'>$1</a>");
+      return text;
+    }
+
+    function compileTable(rows) {
+      let html = "<table><thead>";
+      
+      // Compile headers
+      const headers = rows[0].split("|").map(h => h.trim()).filter(h => h !== "");
+      html += "<tr>";
+      headers.forEach(header => {
+        html += `<th>${parseInlineStyles(header)}</th>`;
+      });
+      html += "</tr></thead><tbody>";
+
+      // Compile rows
+      for (let i = 1; i < rows.length; i++) {
+        const cols = rows[i].split("|").map(c => c.trim()).filter(c => c !== "");
+        if (cols.length === 0) continue;
+        html += "<tr>";
+        cols.forEach(col => {
+          // Check for Yes/No visual indicator in comparative tables
+          if (col === "✅ Nativo" || col === "✅ Sí" || col.includes("PASS")) {
+            html += `<td style="color:var(--color-success); font-weight:bold;">${parseInlineStyles(col)}</td>`;
+          } else if (col.includes("❌") || col.includes("FAIL")) {
+            html += `<td style="color:var(--color-error); font-weight:bold;">${parseInlineStyles(col)}</td>`;
+          } else {
+            html += `<td>${parseInlineStyles(col)}</td>`;
+          }
+        });
+        html += "</tr>";
+      }
+
+      html += "</tbody></table>";
+      return html;
+    }
+  </script>
+</body>
+</html>

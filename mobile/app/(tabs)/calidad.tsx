@@ -9,6 +9,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { supabase } from '../../lib/supabase';
 import { colors } from '../../lib/theme';
 import { Badge } from '../../components/Badge';
+import { checkConnectivity, enqueueAction, syncQueue } from '../../lib/offline';
 
 const DEFECT_OPTS = ['Dimensional', 'Soldadura', 'Acabado', 'Material', 'Mecanizado', 'Pintura', 'Otro'];
 
@@ -47,6 +48,10 @@ export default function CalidadScreen() {
   const [photo,     setPhoto]     = useState<string | null>(null);
 
   const load = useCallback(async () => {
+    try {
+      await syncQueue().catch(e => console.log('[Offline] Sync error on quality load:', e));
+    } catch {}
+
     const { data } = await supabase
       .from('quality_inspections')
       .select('*')
@@ -63,7 +68,7 @@ export default function CalidadScreen() {
     setDefects(prev => prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d]);
 
   const selectPhoto = async () => {
-    const r = await ImagePicker.launchCameraAsync({ mediaTypes: ['images'], quality: 0.7 });
+    const r = await ImagePicker.launchCameraAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, quality: 0.7 });
     if (!r.canceled) setPhoto(r.assets[0].uri);
   };
 
@@ -88,13 +93,15 @@ export default function CalidadScreen() {
 
     setSaving(true);
     const { data: { user } } = await supabase.auth.getUser().catch(() => ({ data: { user: null } }));
+    const nowStr = new Date().toISOString();
+    const isOnline = await checkConnectivity();
 
-    const { data: ins, error } = await supabase.from('quality_inspections').insert({
+    const payload = {
       product_code:       partCode.trim().toUpperCase(),
       product_name:       partName.trim() || partCode.trim(),
       batch_number:       batch.trim() || null,
-      inspector_id:       user?.id,
-      inspection_date:    new Date().toISOString(),
+      inspector_id:       user?.id || null,
+      inspection_date:    nowStr,
       quantity_inspected: qi,
       quantity_passed:    qp,
       quantity_failed:    qf,
@@ -102,7 +109,29 @@ export default function CalidadScreen() {
       defect_notes:       notes.trim() || null,
       status:             qf === 0 ? 'passed' : qf < qi ? 'partial' : 'failed',
       tenant_id:          'mcvill',
-    }).select().single();
+    };
+
+    if (!isOnline) {
+      // Guardado local offline
+      await enqueueAction({
+        table: 'quality_inspections',
+        action: 'insert',
+        payload,
+        photoUri: photo || undefined,
+        photoField: 'foto_url',
+        photoBucket: 'mcvill-fotos',
+        photoFolder: 'calidad'
+      });
+
+      Alert.alert('Modo Offline', 'Reporte de calidad guardado localmente. Se sincronizará al recuperar internet.');
+      setMode('list');
+      setPartCode(''); setPartName(''); setBatch(''); setInspected(''); setPassed(''); setFailed('');
+      setDefects([]); setNotes(''); setPhoto(null);
+      setSaving(false);
+      return;
+    }
+
+    const { data: ins, error } = await supabase.from('quality_inspections').insert(payload).select().single();
 
     if (error) { Alert.alert('Error', error.message); setSaving(false); return; }
 
