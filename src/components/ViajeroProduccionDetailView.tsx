@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  ArrowLeft, Printer, Hammer, Box, Activity, 
+import {
+  ArrowLeft, Printer, Hammer, Box, Activity,
   Calendar, User, Clock, FileText, Image as ImageIcon,
-  CheckCircle2, AlertTriangle, Play, Shield, Sparkles
+  CheckCircle2, AlertTriangle, Play, Shield, Sparkles, GitBranch, X
 } from 'lucide-react';
 import { eventBus } from '../utils/eventBus';
 import { supabase } from '../lib/supabase';
 import { useConfig } from '../contexts/ConfigContext';
 import clsx from 'clsx';
+import { TraceTimeline } from './TraceTimeline';
 
 interface Props {
   viajeroId: string;
@@ -21,6 +22,7 @@ export const ViajeroProduccionDetailView: React.FC<Props> = ({ viajeroId, onBack
   const [mats, setMats] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [showTimeline, setShowTimeline] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -127,7 +129,13 @@ Dame recomendaciones de optimización, posibles riesgos de calidad y sugerencias
               </div>
             </div>
           </div>
-          <button 
+          <button
+            onClick={() => setShowTimeline(true)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-mcvill-accent/10 hover:bg-mcvill-accent/20 border border-mcvill-accent/30 text-mcvill-accent rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95"
+          >
+            <GitBranch size={14} /> Trazabilidad
+          </button>
+          <button
             onClick={handleConsultarIA}
             className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-indigo-600/20 active:scale-95"
           >
@@ -360,6 +368,26 @@ Dame recomendaciones de optimización, posibles riesgos de calidad y sugerencias
         </div>
         <div>Creado: {new Date(data.created_at).toLocaleString()}</div>
       </div>
+
+      {/* Timeline modal */}
+      {showTimeline && (
+        <div className="fixed inset-0 top-16 left-0 md:left-64 z-[200] flex flex-col bg-slate-950/95 backdrop-blur-xl">
+          <div className="px-5 py-3 border-b border-white/5 bg-slate-900/60 flex items-center justify-between shrink-0">
+            <div className="flex items-center gap-3">
+              <GitBranch size={15} className="text-mcvill-accent" />
+              <span className="text-[11px] font-black text-white uppercase tracking-widest">
+                Trazabilidad — <span className="text-mcvill-accent">{data.numero_parte}</span>
+              </span>
+            </div>
+            <button onClick={() => setShowTimeline(false)} className="w-8 h-8 flex items-center justify-center rounded-xl bg-white/5 text-slate-500 hover:text-white transition-all">
+              <X size={16} />
+            </button>
+          </div>
+          <div className="flex-1 overflow-hidden">
+            <TraceTimeline initialViajeroId={viajeroId} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

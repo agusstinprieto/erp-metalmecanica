@@ -4,14 +4,15 @@ import clsx from 'clsx';
 import {
   GitBranch, Search, Plus, X, Loader2, Settings, Trash2,
   Package, ArrowRight, ClipboardList, History, ShieldCheck,
-  AlertTriangle, CheckCircle2, FileText, Link2
+  AlertTriangle, CheckCircle2, FileText, Link2, Activity
 } from 'lucide-react';
 import { engineeringService } from '../services/engineeringService';
 import { useSearch } from '../contexts/SearchContext';
 import { appConfirm } from '../lib/dialogs';
 import { Toast } from './common/Toast';
+import { TraceTimeline } from './TraceTimeline';
 
-type Tab = 'lotes' | 'uso' | 'revisiones';
+type Tab = 'lotes' | 'uso' | 'revisiones' | 'timeline';
 
 const emptyLoteForm = {
   numero_lote: '', material_id: '', descripcion: '', proveedor: '',
@@ -232,9 +233,10 @@ export const TrazabilidadView: React.FC = () => {
   const totalRevs    = revisiones.length;
 
   const tabs = [
-    { id: 'lotes',     label: 'Lotes Recibidos', icon: Package },
-    { id: 'uso',       label: 'Uso de Lotes', icon: Link2 },
-    { id: 'revisiones',label: 'Historial Revisiones', icon: History },
+    { id: 'lotes',     label: 'Lotes Recibidos',    icon: Package },
+    { id: 'uso',       label: 'Uso de Lotes',        icon: Link2 },
+    { id: 'revisiones',label: 'Historial Revisiones',icon: History },
+    { id: 'timeline',  label: 'Trazar Pieza',        icon: Activity },
   ] as const;
 
   return (
@@ -314,7 +316,7 @@ export const TrazabilidadView: React.FC = () => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar bg-slate-950/40">
+      <div className={clsx('flex-1 bg-slate-950/40', activeTab === 'timeline' ? 'overflow-hidden' : 'overflow-y-auto custom-scrollbar')}>
 
         {/* ── Tab: Lotes ── */}
         {activeTab === 'lotes' && (
@@ -509,6 +511,9 @@ export const TrazabilidadView: React.FC = () => {
           </table>
         )}
       </div>
+
+        {/* ── Tab: Trazar Pieza ── */}
+        {activeTab === 'timeline' && <TraceTimeline />}
 
       {/* ── Modal: Lote ── */}
       {showLoteModal && (
