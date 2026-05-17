@@ -25,8 +25,7 @@ dist-ssr
 
 .vercel
 scratch/
-# Documentation & SQL
-Archivos MD/
+# SQL seed scripts (no necesitan estar en el repo)
 Archivos SQL/
 
 # Temp / build output files
