@@ -439,7 +439,7 @@ export const QualityView: React.FC = () => {
     const defaultFeeds = [
       { id: 'cam-1', url: 'demo-assembly', label: 'LÍNEA ENSAMBLE 1' },
       { id: 'cam-2', url: 'demo-welding', label: 'ESTACIÓN SOLDADURA 4' },
-      { id: 'cam-3', url: 'https://assets.mixkit.co/videos/preview/mixkit-robotic-arm-assembling-a-circuit-board-43187-large.mp4', label: 'ROBOT ENSAMBLE PCB' },
+      { id: 'cam-3', url: 'https://raw.githubusercontent.com/intel-iot-devkit/sample-videos/master/bottles-detection.mp4', label: 'LÍNEA EMBOTELLADO (REAL)' },
     ];
     try {
       const saved = localStorage.getItem('mcvill_quality_feeds');
@@ -452,6 +452,9 @@ export const QualityView: React.FC = () => {
             }
             if (f.url.includes('pendelcam') || f.url.includes('uni-heidelberg') || f.id === 'cam-2') {
               return { ...f, url: 'demo-welding' };
+            }
+            if (f.id === 'cam-3') {
+              return { ...f, url: 'https://raw.githubusercontent.com/intel-iot-devkit/sample-videos/master/bottles-detection.mp4', label: 'LÍNEA EMBOTELLADO (REAL)' };
             }
             return f;
           });
@@ -931,8 +934,8 @@ export const QualityView: React.FC = () => {
                   </div>
                   <div className="relative flex-1 bg-black aspect-video flex items-center justify-center overflow-hidden">
                     {feed.url ? (
-                      feed.url.includes('.mp4') || feed.url.startsWith('https://assets.mixkit.co') ? (
-                        <video src={feed.url} autoPlay loop muted playsInline className="w-full h-full object-cover" />
+                      feed.url.includes('.mp4') || feed.url.includes('raw.githubusercontent') || feed.url.startsWith('https://assets.mixkit.co') ? (
+                        <video src={feed.url} autoPlay loop muted playsInline crossOrigin="anonymous" className="w-full h-full object-cover" />
                       ) : feed.id === 'cam-1' || feed.url === 'demo-assembly' ? (
                         <AssemblyLineSimulator canvasRef={canvasRef1} />
                       ) : feed.id === 'cam-2' || feed.url === 'demo-welding' ? (
