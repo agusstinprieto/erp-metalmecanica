@@ -241,6 +241,11 @@ export const Sidebar = (props: {
   };
 
   const hasAccess = (module: string) => {
+    // Dynamic industry vertical module exclusions
+    const industry = config.industryType || 'metal_mechanical';
+    if (industry === 'aerospace' && ['metal_quoter', 'nesting', 'process_simulator'].includes(module)) return false;
+    if (industry === 'automotive' && ['metal_quoter', 'nesting'].includes(module)) return false;
+
     if (isGodmode) return true;
     if (['chat_ia', 'voice_link'].includes(module)) return true;
     const permissions: Record<string, string[]> = {
@@ -390,11 +395,15 @@ export const Sidebar = (props: {
                 )}
                 {section.items.map(item => {
                   if (!hasAccess(item.id)) return null;
+                  let dynamicLabel = t(`sidebar.${item.id}`, item.label);
+                  if (item.id === 'viajeros') {
+                    dynamicLabel = config.industryType === 'aerospace' ? 'Viajeros AS9100' : config.industryType === 'automotive' ? 'Hojas de Proceso' : 'Viajeros';
+                  }
                   return (
                     <SidebarItem
                       key={item.id}
                       icon={item.icon}
-                      label={t(`sidebar.${item.id}`, item.label)}
+                      label={dynamicLabel}
                       active={activeView === item.id}
                       onClick={() => navigate(item.id)}
                       collapsed={isSidebarCollapsed}
@@ -456,7 +465,7 @@ export const Sidebar = (props: {
                 {hasAccess('visual_ia') && <SidebarItem icon={ScanSearch} label={t('sidebar.visual_ia', 'Inspección IA')} active={activeView === 'visual_ia'} onClick={() => navigate('visual_ia')} collapsed={isSidebarCollapsed} />}
                 {hasAccess('trazabilidad') && <SidebarItem icon={GitBranch} label={t('sidebar.trazabilidad', 'Trazabilidad')} active={activeView === 'trazabilidad'} onClick={() => navigate('trazabilidad')} collapsed={isSidebarCollapsed} />}
                 {hasAccess('defect_library') && <SidebarItem icon={Library} label={t('sidebar.defect_library', 'Bib. Defectos')} active={activeView === 'defect_library'} onClick={() => navigate('defect_library')} collapsed={isSidebarCollapsed} />}
-                {hasAccess('ppap') && <SidebarItem icon={FileCheck2} label={t('sidebar.ppap', 'PPAP')} active={activeView === 'ppap'} onClick={() => navigate('ppap')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('ppap') && <SidebarItem icon={FileCheck2} label={config.industryType === 'aerospace' ? 'FAI AS9102' : config.industryType === 'automotive' ? 'PPAP (Core Tools)' : 'PPAP / FAI'} active={activeView === 'ppap'} onClick={() => navigate('ppap')} collapsed={isSidebarCollapsed} />}
                 {hasAccess('voc') && <SidebarItem icon={MessageCircle} label={t('sidebar.voc', 'VOC')} active={activeView === 'voc'} onClick={() => navigate('voc')} collapsed={isSidebarCollapsed} />}
                 {hasAccess('shop_floor') && <SidebarItem icon={Scan} label={t('sidebar.shop_floor', 'Shop Floor')} active={activeView === 'shop_floor'} onClick={() => navigate('shop_floor')} collapsed={isSidebarCollapsed} />}
                 {hasAccess('seguridad') && <SidebarItem icon={Camera} label={t('sidebar.seguridad', 'Seguridad')} active={activeView === 'seguridad'} onClick={() => navigate('seguridad')} collapsed={isSidebarCollapsed} />}
@@ -493,7 +502,7 @@ export const Sidebar = (props: {
                   </p>
                 )}
                 {hasAccess('engineering') && <SidebarItem icon={Cpu} label={t('sidebar.engineering', 'Ingeniería')} active={activeView === 'engineering'} onClick={() => navigate('engineering')} collapsed={isSidebarCollapsed} />}
-                {hasAccess('work_instructions') && <SidebarItem icon={ClipboardList} label={t('sidebar.work_instructions', 'Inst. Trabajo')} active={activeView === 'work_instructions'} onClick={() => navigate('work_instructions')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('work_instructions') && <SidebarItem icon={ClipboardList} label={config.industryType === 'aerospace' ? 'Inst. Trabajo AS9100' : 'Inst. Trabajo'} active={activeView === 'work_instructions'} onClick={() => navigate('work_instructions')} collapsed={isSidebarCollapsed} />}
                 {hasAccess('layout_design') && <SidebarItem icon={Layout} label={t('sidebar.layout_design', 'Layout Planta')} active={activeView === 'layout_design'} onClick={() => navigate('layout_design')} collapsed={isSidebarCollapsed} />}
                 {hasAccess('process_simulator') && <SidebarItem icon={FlaskConical} label={t('sidebar.process_simulator', 'Simulador')} active={activeView === 'process_simulator'} onClick={() => navigate('process_simulator')} collapsed={isSidebarCollapsed} />}
                 {hasAccess('nesting') && <SidebarItem icon={Layers} label={t('sidebar.nesting', 'Nesting')} active={activeView === 'nesting'} onClick={() => navigate('nesting')} collapsed={isSidebarCollapsed} />}

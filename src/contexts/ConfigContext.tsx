@@ -29,6 +29,7 @@ interface BrandConfig {
   calidadPct?: number;
   seguridadPct?: number;
   fiveSPct?: number;
+  industryType?: 'metal_mechanical' | 'automotive' | 'aerospace';
 }
 
 interface ConfigContextType {
@@ -68,6 +69,7 @@ const defaultConfig: BrandConfig = {
   calidadPct: 3,
   seguridadPct: 2,
   fiveSPct: 1,
+  industryType: 'metal_mechanical',
 };
 
 const THEME_PALETTES: Record<ThemeName, {
@@ -191,6 +193,7 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               calidadPct: supabaseConfig.calidadPct !== undefined ? supabaseConfig.calidadPct : prev.calidadPct,
               seguridadPct: supabaseConfig.seguridadPct !== undefined ? supabaseConfig.seguridadPct : prev.seguridadPct,
               fiveSPct: supabaseConfig.fiveSPct !== undefined ? supabaseConfig.fiveSPct : prev.fiveSPct,
+              industryType: supabaseConfig.industryType !== undefined ? supabaseConfig.industryType : prev.industryType,
             };
             localStorage.setItem('mcvill-config', JSON.stringify(merged));
             return merged;
@@ -245,6 +248,7 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               calidadPct: updated.calidadPct,
               seguridadPct: updated.seguridadPct,
               fiveSPct: updated.fiveSPct,
+              industryType: updated.industryType,
             }
           })
           .eq('id', tenant.id);
