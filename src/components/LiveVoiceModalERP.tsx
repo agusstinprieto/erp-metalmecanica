@@ -34,14 +34,23 @@ interface LiveVoiceModalERPProps {
 
 const APP_VERSION = '2.5.0-ERP';
 
-function buildSystemInstruction(moduleId?: string, brandName?: string, language: 'es' | 'en' = 'es'): string {
+function buildSystemInstruction(
+  moduleId?: string,
+  brandName?: string,
+  language: 'es' | 'en' = 'es',
+  companyName?: string,
+  assistantName?: string,
+): string {
   const guidesDict = language === 'en' ? MODULE_GUIDES_EN : MODULE_GUIDES;
   const defaultG = language === 'en' ? DEFAULT_GUIDE_EN : DEFAULT_GUIDE;
   const guide = moduleId ? (guidesDict[moduleId] ?? defaultG) : defaultG;
+  const name   = assistantName || 'ARIA';
+  const brand  = brandName    || 'McVill';
+  const company = companyName || brand;
 
   // Dynamically compile a comprehensive dictionary of all modules in the manual
   const allModulesSummary = Object.values(guidesDict)
-    .map((g, i) => `◆ ${g.label} (${g.emoji}): ${g.description}. Pasos clave: ${g.steps.map(s => s.title).join(' ➔ ')}`)
+    .map((g) => `◆ ${g.label} (${g.emoji}): ${g.description}. Pasos clave: ${g.steps.map(s => s.title).join(' ➔ ')}`)
     .join('\n');
 
   if (language === 'en') {
@@ -49,38 +58,58 @@ function buildSystemInstruction(moduleId?: string, brandName?: string, language:
       ? `ACTIVE MODULE: ${guide.label} ${guide.emoji}\n${guide.description}\n\nHOW TO TEACH THIS MODULE (when the user asks how to use it):\n${guide.steps.map((s, i) => `${i + 1}. ${s.title} — ${s.subtitle}:\n   ${s.tips.join('\n   ')}`).join('\n\n')}`
       : 'The user is not in any specific module.';
 
-    return `You are the Neural Control Brain of ${brandName || 'McVill'} ERP (IA PRO). An elite voice assistant specialized in industrial operations.
-Your tone is professional, efficient, direct, and tech-driven (Agus Pro Standard).
+    return `## IDENTITY
+You are ${name}, the Neural AI Assistant of ${brand} — the Industrial ERP Operating System of ${company}.
+You were created by IA.AGUS to maximize operational efficiency, automate industrial decisions, and serve as the intelligent backbone of the entire ${company} ecosystem.
+
+## PRESENTATION (say EXACTLY this when the conversation starts or when someone greets you):
+"Hello! I'm ${name}, your AI assistant for the ${brand} ERP at ${company}. I have real-time access to your operations — production, inventory, quality, finance and more. How can I help you today?"
+
+## PERSONALITY
+- Tone: Professional, direct, executive, tech-driven — Agus Pro Standard.
+- Never refer to yourself as a generic AI. You are ${name}, the Neural Core of ${company}.
+- Be confident, brief and impactful. Maximum 2-3 sentences per response.
+- Show intelligence: reference real ERP context when available.
 
 ${moduleContext}
 
 COMPLETE SYSTEM USER MANUAL:
 ${allModulesSummary}
 
-VOICE RULES:
-1. Respond concisely and fluidly (maximum 2-3 sentences per answer).
-2. If the user asks how to use the current module, teach them step-by-step.
-3. Speak in a natural, executive, and helpful English.
-4. If the user asks about "Agus Pro", explain that it is the standard of excellence in automation and design of the ERP.
+RULES:
+1. Always introduce yourself as ${name} when greeted.
+2. Respond concisely and fluidly.
+3. If the user asks how to use the current module, teach them step-by-step.
+4. Speak in natural, executive English.
 `;
   } else {
     const moduleContext = moduleId
       ? `MÓDULO ACTIVO: ${guide.label} ${guide.emoji}\n${guide.description}\n\nCÓMO ENSEÑAR ESTE MÓDULO (cuando el usuario pregunte cómo usarlo):\n${guide.steps.map((s, i) => `${i + 1}. ${s.title} — ${s.subtitle}:\n   ${s.tips.join('\n   ')}`).join('\n\n')}`
       : 'El usuario no está en ningún módulo específico.';
 
-    return `Eres el Cerebro Neural de Control ERP ${brandName || 'McVill'} (IA PRO). Un asistente de voz de élite especializado en operaciones industriales.
-Tu tono es profesional, eficiente, directo y tecnológico (Agus Pro Standard).
+    return `## IDENTIDAD
+Eres ${name}, el Asistente Neural de Inteligencia Artificial de ${brand} — el Sistema Operativo ERP Industrial de ${company}.
+Fuiste creado por IA.AGUS para maximizar la eficiencia operativa, automatizar decisiones industriales y ser la columna vertebral inteligente del ecosistema completo de ${company}.
+
+## PRESENTACIÓN (di EXACTAMENTE esto cuando empiece la conversación o te saluden):
+"¡Hola! Soy ${name}, tu asistente de IA del ERP ${brand} en ${company}. Tengo acceso en tiempo real a sus operaciones — producción, inventario, calidad, finanzas y más. ¿En qué les puedo ayudar hoy?"
+
+## PERSONALIDAD
+- Tono: Profesional, directo, ejecutivo, tecnológico — Agus Pro Standard.
+- Nunca te refieras a ti mismo como una IA genérica. Eres ${name}, el Núcleo Neural de ${company}.
+- Sé seguro, breve e impactante. Máximo 2-3 oraciones por respuesta.
+- Demuestra inteligencia: referencia el contexto real del ERP cuando esté disponible.
 
 ${moduleContext}
 
 MANUAL COMPLETO DEL SISTEMA ERP:
 ${allModulesSummary}
 
-REGLAS DE VOZ:
-1. Responde de manera concisa y fluida (máximo 2-3 oraciones por respuesta).
-2. Si el usuario pregunta cómo usar el módulo actual, enséñaselo paso a paso.
-3. Usa un español de México natural, ejecutivo y servicial.
-4. Si el usuario pregunta por "Agus Pro", explícale que es el estándar de excelencia en automatización y diseño del ERP.
+REGLAS:
+1. Siempre preséntate como ${name} cuando te saluden.
+2. Responde de manera concisa y fluida.
+3. Si el usuario pregunta cómo usar el módulo actual, enséñaselo paso a paso.
+4. Usa un español de México natural, ejecutivo y servicial.
 `;
   }
 }
@@ -102,7 +131,6 @@ export const LiveVoiceModalERP: React.FC<LiveVoiceModalERPProps> = ({
 }) => {
   const { isDarkMode, config } = useConfig();
   const { language } = useLanguage();
-  // ... (rest of state)
   const [isActive, setIsActive] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isModelSpeaking, setIsModelSpeaking] = useState(false);
@@ -110,6 +138,7 @@ export const LiveVoiceModalERP: React.FC<LiveVoiceModalERPProps> = ({
   const [transcription, setTranscription] = useState<{ user: string; model: string }>({ user: '', model: '' });
   const [duration, setDuration] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [assistantName, setAssistantName] = useState<string>('ARIA');
   const [selectedVoice, setSelectedVoice] = useState(() => {
     return localStorage.getItem('erp_selected_voice') || 'Aoede';
   });
@@ -230,19 +259,24 @@ export const LiveVoiceModalERP: React.FC<LiveVoiceModalERPProps> = ({
       isConnectingRef.current = true;
       setIsConnecting(true);
 
-      const config = await tenantService.getConfig();
-      const apiKey = config.gemini_api_key?.trim();
+      const tenantCfg = await tenantService.getConfig();
+      const apiKey = tenantCfg.gemini_api_key?.trim();
 
       if (!apiKey) {
         throw new Error("API Key no detectada en Supabase. Configúrala en el panel de Administración.");
       }
-      
-      console.log(`🤖 [VoiceLink-ERP] Iniciando con API Key (${apiKey.length} chars)...`);
+
+      // ── Resolución dinámica del nombre del asistente (Zero Hardcoding) ────
+      const resolvedAssistant: string = (tenantCfg as any).ai_assistant_name?.trim()
+        || config.brandName
+        || 'ARIA';
+      setAssistantName(resolvedAssistant);
 
       // Re-check after async gap — a parallel call may have already taken over
       if (!isConnectingRef.current) return;
 
       const ai = new GoogleGenAI({ apiKey, apiVersion: 'v1beta' } as any);
+      const companyName: string = (tenantCfg as any).company_name || config.companyName || config.brandName || 'McVill';
 
       // Lightweight cleanup of stale audio resources only — never reset isConnectingRef here
       if (sessionRef.current) { try { sessionRef.current.close(); } catch (e) {} sessionRef.current = null; }
@@ -323,7 +357,7 @@ export const LiveVoiceModalERP: React.FC<LiveVoiceModalERPProps> = ({
           speechConfig: {
             voiceConfig: { prebuiltVoiceConfig: { voiceName: selectedVoice } },
           },
-          systemInstruction: { parts: [{ text: `${buildSystemInstruction(currentModule, config.brandName, language)}\n\n${systemSnapshot}` }] },
+          systemInstruction: { parts: [{ text: `${buildSystemInstruction(currentModule, config.brandName, language, companyName, resolvedAssistant)}\n\n${systemSnapshot}` }] },
           inputAudioTranscription: {},
           outputAudioTranscription: {},
         },
@@ -527,7 +561,7 @@ export const LiveVoiceModalERP: React.FC<LiveVoiceModalERPProps> = ({
             )}
             {transcription.model && (
               <div className="text-left">
-                <span className="text-[7px] text-mcvill-accent uppercase tracking-widest block mb-0.5">Cerebro ERP</span>
+                <span className="text-[7px] text-mcvill-accent uppercase tracking-widest block mb-0.5">{assistantName}</span>
                 <p className={`text-[11px] leading-snug ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{transcription.model}</p>
               </div>
             )}
