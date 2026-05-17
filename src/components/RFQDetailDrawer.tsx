@@ -91,6 +91,10 @@ const TabInfo: React.FC<{ rfq: RFQCotizacion }> = ({ rfq }) => {
         <Row label="EAU"              value={rfq.eau} />
         <Row label="Fecha Recepción"  value={rfq.fecha_recepcion} />
         <Row label="Fecha Compromiso" value={rfq.fecha_compromiso} />
+        <Row label="Revisión NP"      value={rfq.revision_np} />
+        <Row label="Prototipos / PPAP" value={rfq.cant_prototipos} />
+        <Row label="Empaque"          value={rfq.metodo_empaque} />
+        <Row label="Forecast"         value={rfq.aceros_forecast ? 'SÍ (Aceros en Forecast)' : 'NO'} />
       </div>
 
       {rfq.descripcion && (

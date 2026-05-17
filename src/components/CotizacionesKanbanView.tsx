@@ -196,6 +196,7 @@ const EMPTY_FORM: NewRFQInput = {
   cant_np: 1, eau: '', cant_aceros: 0, cant_procesos: 0, cant_subensambles: 0, cant_hardwares: 0,
   alcance_general: '', tiene_solido_3d: false, tiene_planos_2d: true, tiene_bom: false,
   fecha_recepcion: new Date().toISOString().split('T')[0], comentario_pm: '',
+  revision_np: 'NA', cant_prototipos: 'NA', metodo_empaque: 'CLIENTE', aceros_forecast: false,
 };
 
 const F001Modal = ({
@@ -300,6 +301,52 @@ const F001Modal = ({
                 <label className="text-[9px] text-slate-500 font-bold uppercase tracking-wider block mb-1">EAU</label>
                 <input value={form.eau || ''} onChange={e => set('eau', e.target.value)} placeholder="ej. 500"
                   className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white font-mono placeholder-slate-600 focus:outline-none focus:border-cyan-500/50" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="text-[9px] text-slate-500 font-bold uppercase tracking-wider block mb-1">Revisión NP</label>
+                <input
+                  value={form.revision_np || ''}
+                  onChange={e => set('revision_np', e.target.value)}
+                  placeholder="ej. NA, A, B…"
+                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-cyan-500/50"
+                />
+              </div>
+              <div>
+                <label className="text-[9px] text-slate-500 font-bold uppercase tracking-wider block mb-1">Prototipos / PPAP</label>
+                <input
+                  value={form.cant_prototipos || ''}
+                  onChange={e => set('cant_prototipos', e.target.value)}
+                  placeholder="ej. NA, 5 pcs…"
+                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-cyan-500/50"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="text-[9px] text-slate-500 font-bold uppercase tracking-wider block mb-1">Método de Empaque</label>
+                <input
+                  value={form.metodo_empaque || ''}
+                  onChange={e => set('metodo_empaque', e.target.value)}
+                  placeholder="ej. CLIENTE, CAJA…"
+                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-cyan-500/50"
+                />
+              </div>
+              <div className="flex items-center pt-4">
+                <label className="flex items-center gap-1.5 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={form.aceros_forecast || false}
+                    onChange={e => set('aceros_forecast', e.target.checked)}
+                    className="w-3.5 h-3.5 accent-cyan-400"
+                  />
+                  <span className="text-[9px] text-slate-400 group-hover:text-white transition-colors uppercase tracking-wider font-bold">
+                    Aceros en Forecast
+                  </span>
+                </label>
               </div>
             </div>
 

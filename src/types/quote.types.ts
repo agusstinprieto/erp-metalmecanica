@@ -44,6 +44,13 @@ export interface RFQCotizacion {
   motivo_declinacion?: string;
   comentario_pm?: string;
   monto_estimado?: number;
+  
+  // Industrial Formato PM_F001
+  revision_np?: string;
+  cant_prototipos?: string;
+  metodo_empaque?: string;
+  aceros_forecast?: boolean;
+
   created_at: string;
   updated_at?: string;
 }
@@ -66,4 +73,10 @@ export type NewRFQInput = {
   fecha_recepcion?: string;
   comentario_pm?: string;
   monto_estimado?: number;
+
+  // Industrial Formato PM_F001
+  revision_np?: string;
+  cant_prototipos?: string;
+  metodo_empaque?: string;
+  aceros_forecast?: boolean;
 };
