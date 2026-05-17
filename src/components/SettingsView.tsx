@@ -132,7 +132,7 @@ const TarifasTab: React.FC = () => {
     return new Date(iso).toLocaleDateString('es-MX', { day: '2-digit', month: 'short' });
   };
 
-  const inputCls = 'w-24 bg-mcvill-bg/40 border border-mcvill-card-border rounded-md py-1 px-2 text-[11px] text-mcvill-text text-right focus:border-mcvill-accent/50 transition-all';
+  const inputCls = 'w-16 md:w-24 bg-mcvill-bg/40 border border-mcvill-card-border rounded-md py-1 px-1 md:px-2 text-[11px] text-mcvill-text text-right focus:border-mcvill-accent/50 transition-all';
 
   return (
     <div className="h-full flex flex-col bg-mcvill-bg/20 p-6 space-y-6">
@@ -150,11 +150,11 @@ const TarifasTab: React.FC = () => {
         <div className="flex justify-center py-12"><Loader2 size={24} className="animate-spin text-blue-500" /></div>
       ) : (
         <div className="flex-1 overflow-y-auto custom-scrollbar">
-          <div className="grid grid-cols-[1fr_70px_110px_90px_50px] gap-2 px-4 pb-2 border-b border-white/5 mb-2">
+          <div className="grid grid-cols-[1fr_40px_80px_30px] md:grid-cols-[1fr_70px_110px_90px_50px] gap-2 px-2 md:px-4 pb-2 border-b border-white/5 mb-2">
             <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest">Concepto</span>
             <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest text-center">Unidad</span>
             <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest text-right">Precio</span>
-            <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest text-center">Update</span>
+            <span className="hidden md:block text-[8px] font-black text-slate-600 uppercase tracking-widest text-center">Update</span>
             <span></span>
           </div>
 
@@ -165,8 +165,8 @@ const TarifasTab: React.FC = () => {
               const isSaved = saved === t.id;
 
               return (
-                <div key={t.id} className="grid grid-cols-[1fr_70px_110px_90px_50px] gap-2 items-center px-4 py-1.5 rounded bg-black/20 border border-white/5 hover:border-white/10 transition-all group">
-                  <span className="text-[10px] font-bold text-slate-300 uppercase truncate">{t.etiqueta}</span>
+                <div key={t.id} className="grid grid-cols-[1fr_40px_80px_30px] md:grid-cols-[1fr_70px_110px_90px_50px] gap-2 items-center px-2 md:px-4 py-1.5 rounded bg-black/20 border border-white/5 hover:border-white/10 transition-all group">
+                  <span className="text-[10px] font-bold text-slate-300 uppercase truncate" title={t.etiqueta}>{t.etiqueta}</span>
                   <span className="text-[9px] text-center text-slate-500 font-black bg-white/5 rounded px-1.5 py-0.5">{t.unidad}</span>
                   <div className="flex items-center gap-1 justify-end">
                     <span className="text-slate-600 text-[10px]">$</span>
@@ -180,7 +180,7 @@ const TarifasTab: React.FC = () => {
                       className={clsx(inputCls, dirty && 'border-orange-500/50')}
                     />
                   </div>
-                  <div className="text-center">
+                  <div className="hidden md:block text-center">
                     <span className="text-[9px] text-slate-600 font-mono">{fmtFecha(t.updated_at)}</span>
                   </div>
                   <div className="flex justify-center">
