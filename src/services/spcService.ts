@@ -138,8 +138,12 @@ export function calcularEstadisticas(carac: SPCCaracteristica, mediciones: SPCMe
   // Group by subgrupo_id
   const groups = new Map<number, number[]>();
   for (const m of mediciones) {
-    if (!groups.has(m.subgrupo_id)) groups.set(m.subgrupo_id, []);
-    groups.get(m.subgrupo_id)!.push(m.valor);
+    const bucket = groups.get(m.subgrupo_id);
+    if (bucket) {
+      bucket.push(m.valor);
+    } else {
+      groups.set(m.subgrupo_id, [m.valor]);
+    }
   }
 
   const subgrupos: SubgrupoStats[] = [];

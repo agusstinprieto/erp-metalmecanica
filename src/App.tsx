@@ -58,7 +58,7 @@ const PPAPView               = lz(() => import('./components/PPAPView'),        
 const VOCDashboardView       = lz(() => import('./components/VOCDashboardView'),       'VOCDashboardView');
 const LayoutDesignView       = lz(() => import('./components/LayoutDesignView'),       'LayoutDesignView');
 const ProcessSimulatorView   = lz(() => import('./components/ProcessSimulatorView'),   'ProcessSimulatorView');
-const NestingView            = lazy(() => import('./components/NestingView'));
+const NestingView            = lz(() => import('./components/NestingView'),            'NestingView');
 const MetalQuoterView        = lz(() => import('./components/MetalQuoterView'),        'MetalQuoterView');
 const RecruitmentView        = lz(() => import('./components/RecruitmentView'),        'RecruitmentView');
 const VisualIAInspection     = lz(() => import('./components/VisualIAInspection'),     'VisualIAInspection');

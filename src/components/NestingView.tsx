@@ -301,4 +301,5 @@ const NestingView: React.FC = () => {
     );
 };
 
+export { NestingView };
 export default NestingView;

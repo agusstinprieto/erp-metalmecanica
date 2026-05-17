@@ -184,7 +184,10 @@ export async function fetchOperadores(celula?: string): Promise<Operador[]> {
   let q = supabase.from('operadores').select('*').eq('tenant_id', tenant).eq('activo', true).order('nombre');
   if (celula) q = q.eq('celula', celula);
   const { data, error } = await q;
-  if (error || !data?.length) return celula ? DEMO_OPERADORES.filter(o => o.celula === celula) : DEMO_OPERADORES;
+  if (error || !data?.length) {
+    console.warn('[Desempeño] Tabla operadores no disponible — mostrando datos de demostración', error?.message);
+    return celula ? DEMO_OPERADORES.filter(o => o.celula === celula) : DEMO_OPERADORES;
+  }
   return data as Operador[];
 }
 
@@ -192,7 +195,10 @@ export async function fetchKPIs(periodo: string, tipoPeriodo: TipoPeriodo = 'sem
   const tenant = await getTenant();
   const { data, error } = await supabase.from('desempeno_kpis').select('*')
     .eq('tenant_id', tenant).eq('periodo', periodo).eq('tipo_periodo', tipoPeriodo);
-  if (error || !data?.length) return DEMO_KPIS;
+  if (error || !data?.length) {
+    console.warn('[Desempeño] Tabla desempeno_kpis no disponible — mostrando datos de demostración', error?.message);
+    return DEMO_KPIS;
+  }
   return data as DesempenoKPI[];
 }
 

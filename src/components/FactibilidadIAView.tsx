@@ -379,7 +379,7 @@ export function FactibilidadIAView() {
     try {
       await saveAnalisis(selected, analisis, tenantId);
       setSaved(true);
-      getHistorial(tenantId).then(setHistorial).catch(() => {});
+      getHistorial(tenantId).then(setHistorial).catch((e) => console.warn('[Factibilidad] Error al recargar historial tras guardar:', e));
     } catch (e) {
       setError('Error al guardar el análisis. Intenta de nuevo.');
     }
@@ -391,7 +391,7 @@ export function FactibilidadIAView() {
     } catch {
       setError('No se pudo eliminar el análisis. Intenta de nuevo.');
     }
-    getHistorial(tenantId).then(setHistorial).catch(() => {});
+    getHistorial(tenantId).then(setHistorial).catch((e) => console.warn('[Factibilidad] Error al recargar historial tras eliminar:', e));
   }, [tenantId]);
 
   const handleReload = useCallback((record: AnalisisRecord) => {
