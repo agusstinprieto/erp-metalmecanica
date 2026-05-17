@@ -925,10 +925,46 @@ El agente calcula automáticamente:
 <p>Los retazos aprovechables se reingresan al inventario con clave especial. El sistema los sugiere automáticamente antes de abrir una lámina nueva.</p>
 </section>
 
-<!-- ═══════════════════════════════════════════════════ -->
 <section id="layout">
-<h2>Diseño de Layout</h2>
-<p>Editor visual de planta. Arrastra estaciones, dibuja flujos de material con flechas. El análisis de distancias identifica movimientos innecesarios (mudas de transporte). La IA sugiere reordenamientos para minimizar WIP y distancias recorridas.</p>
+<h2>Diseño de Layout e Ingeniería de Planta</h2>
+<p>El editor visual de planta permite modelar estaciones de trabajo de forma interactiva sobre una cuadrícula digital de 8×10. A medida que pintas o arrastras estaciones en el plano, el sistema simula y calcula de manera totalmente dinámica e interactiva las métricas operacionales clave de eficiencia y flujo:</p>
+
+<h3>1. Distancia del Flujo Principal</h3>
+<p>Calcula la trayectoria lineal que sigue el material a lo largo de las etapas estándar de manufactura metalmecánica. Mide la distancia de Manhattan entre los centroides de cada tipo de estación activa siguiendo el orden lógico del proceso:</p>
+<div class="formula">
+  <span class="eq">Trayecto Lógico</span> = Almacén ➔ CNC ➔ Láser ➔ Soldadura ➔ Ensamble ➔ Calidad ➔ Almacén<br>
+  <span class="eq">Distancia Manhattan</span> = |x₂ - x₁| + |y₂ - y₁|  &nbsp;<span class="comment">← Entre centroides de estaciones consecutivas</span><br>
+  <span class="eq">Distancia Escalada</span> = Distancia Total × 5.5 metros  &nbsp;<span class="comment">← Cada celda equivale a ~5.5m reales</span>
+</div>
+<p>El porcentaje de tendencia compara el resultado de tu diseño contra el layout base de 48 metros. Si consigues una distribución compacta y coherente, el indicador mostrará un cambio favorable en verde.</p>
+
+<h3>2. Cuellos de Botella Operativos</h3>
+<p>Evalúa el balance y redundancia de celdas de procesamiento crítico en planta. Para garantizar un flujo continuo y evitar tiempos muertos, el algoritmo espera una redundancia mínima de al menos <strong>2 unidades activas</strong> para estaciones de corte y soldadura:</p>
+<div class="formula">
+  Si <span class="eq">Celdas CNC</span> &lt; 2 → <span style="color:#f87171">+1 Cuello de Botella</span><br>
+  Si <span class="eq">Celdas Láser</span> &lt; 2 → <span style="color:#f87171">+1 Cuello de Botella</span><br>
+  Si <span class="eq">Celdas Soldadura</span> &lt; 2 → <span style="color:#f87171">+1 Cuello de Botella</span>
+</div>
+<p>Un mayor número de cuellos de botella indica que tu distribución es susceptible a paros por saturación en estaciones de una sola línea.</p>
+
+<h3>3. Operadores Requeridos</h3>
+<p>Suma la dotación de personal técnico necesario para operar las estaciones asignadas en la cuadrícula de diseño, utilizando coeficientes estándar de carga de trabajo por máquina:</p>
+<div class="table-wrap"><table>
+  <tr><th>Tipo de Estación</th><th>Coeficiente de Carga</th><th>Descripción Operacional</th></tr>
+  <tr><td>CNC / Láser / Soldadura / Ensamble / Calidad</td><td><span class="pill pill-blue">1.0</span> operador</td><td>Dedicación de tiempo completo por turno</td></tr>
+  <tr><td>Almacén / Materia Prima</td><td><span class="pill pill-amber">0.5</span> operador</td><td>Dedicación parcial o compartida</td></tr>
+  <tr><td>Pasillos / Vacíos</td><td><span class="pill pill-gray">0.0</span> operador</td><td>Áreas libres de tránsito o estructurales</td></tr>
+</table></div>
+
+<h3>4. OEE Estimado de la Planta</h3>
+<p>Estima la Efectividad Global del Equipo (OEE) teórica que alcanzará la planta bajo la distribución física propuesta. Parte de un OEE base (72%) y aplica modificadores paramétricos de eficiencia espacial:</p>
+<div class="formula">
+  <span class="eq">OEE Inicial</span> = 72%<br>
+  <span class="eq">Bono de Tránsito</span> = +0.5% por cada celda de Pasillo  &nbsp;<span class="comment">← Máximo bono de +5% (flujo libre)</span><br>
+  <span class="eq">Bono de Capacidad</span> = +3.0% por cada unidad mínima balanceada  &nbsp;<span class="comment">← Máximo bono de +10% (min de cnc, laser, solda)</span><br>
+  <span class="eq">Ajuste de Distancia</span> = Distancia &lt; 35m ➔ <span style="color:#34d399">+5% (Baja muda)</span> | Distancia &gt; 50m ➔ <span style="color:#f87171">-5% (Alta muda de transporte)</span>
+</div>
+<p>El OEE resultante se limita dinámicamente a un rango realista de entre <strong>55% y 95%</strong>.</p>
 </section>
 
 <!-- ═══════════════════════════════════════════════════ -->

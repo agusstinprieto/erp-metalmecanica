@@ -808,10 +808,46 @@ Gross Salary             $11,575.25   Total Deductions  $539.93
 </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════════ -->
 <section id="layout">
-<h2>Plant Layout Design</h2>
-<p>A drag-and-drop spatial editor for the factory floor. Model machine placements and trace transport paths to identify material handling bottlenecks. The AI tool reviews floor plans to recommend optimal layouts that minimize work-in-progress (WIP) transport paths.</p>
+<h2>Plant Layout Design &amp; Flow Engineering</h2>
+<p>The interactive Plant Layout Editor allows you to model workstations on a digital 8×10 grid. As you drag, drop, or paint stations on the plant floor, the system runs a real-time, dynamic simulation to calculate crucial operational flow metrics:</p>
+
+<h3>1. Main Flow Distance</h3>
+<p>Calculates the total linear trajectory that materials travel through standard metalworking processing steps. It computes the Manhattan distance between active station centroids in the logical manufacturing sequence:</p>
+<div class="formula">
+  <span class="eq">Logical Sequence</span> = Store ➔ CNC ➔ Laser ➔ Weld ➔ Assembly ➔ Quality ➔ Store<br>
+  <span class="eq">Manhattan Distance</span> = |x₂ - x₁| + |y₂ - y₁|  &nbsp;<span class="comment">← Between centroids of consecutive stages</span><br>
+  <span class="eq">Scaled Distance</span> = Total Units × 5.5 meters  &nbsp;<span class="comment">← Each grid cell equals ~5.5m in the real world</span>
+</div>
+<p>The trend indicator compares your layout’s distance against a baseline standard of 48 meters. Designing a compact, high-efficiency sequence will show a favorable green improvement mark.</p>
+
+<h3>2. Operational Bottlenecks</h3>
+<p>Evaluates station balances and capacity redundancy. To ensure uninterrupted flow and prevent idle times, the system expects a minimum of <strong>2 active cells</strong> for critical processing centers:</p>
+<div class="formula">
+  If <span class="eq">CNC Cells</span> &lt; 2 → <span style="color:#f87171">+1 Bottleneck Alert</span><br>
+  If <span class="eq">Laser Cells</span> &lt; 2 → <span style="color:#f87171">+1 Bottleneck Alert</span><br>
+  If <span class="eq">Welding Cells</span> &lt; 2 → <span style="color:#f87171">+1 Bottleneck Alert</span>
+</div>
+<p>A higher bottleneck count warns you that a single machine failure or peak volume will stall your entire production pipeline.</p>
+
+<h3>3. Required Operators</h3>
+<p>Tallies the exact workforce headcount needed to staff your proposed layout based on machine type and standard load coefficients:</p>
+<div class="table-wrap"><table>
+  <tr><th>Station Type</th><th>Workload Coefficient</th><th>Operational Description</th></tr>
+  <tr><td>CNC / Laser / Weld / Assembly / Quality</td><td><span class="pill pill-blue">1.0</span> operator</td><td>Dedicated full-time operator per shift</td></tr>
+  <tr><td>Store / Raw Material</td><td><span class="pill pill-amber">0.5</span> operator</td><td>Shared or part-time logistics coverage</td></tr>
+  <tr><td>Hallways / Empty Cells</td><td><span class="pill pill-gray">0.0</span> operator</td><td>Transit and structural buffer zones</td></tr>
+</table></div>
+
+<h3>4. Estimated Plant OEE</h3>
+<p>Forecasts the overall theoretical OEE of the plant based on spatial design. Starting from a baseline (72%), it applies spatial efficiency modifiers:</p>
+<div class="formula">
+  <span class="eq">Baseline OEE</span> = 72%<br>
+  <span class="eq">Transit Flow Bonus</span> = +0.5% per active Hallway cell  &nbsp;<span class="comment">← Max bonus capped at +5.0%</span><br>
+  <span class="eq">Balance Bonus</span> = +3.0% per balanced active workstation  &nbsp;<span class="comment">← Max +10.0% (min of CNC, Laser, Weld)</span><br>
+  <span class="eq">Distance Adjust</span> = Distance &lt; 35m ➔ <span style="color:#34d399">+5.0% (Low waste)</span> | Distance &gt; 50m ➔ <span style="color:#f87171">-5.0% (High transit waste)</span>
+</div>
+<p>The calculated value is dynamically constrained to a realistic manufacturing range between <strong>55% and 95%</strong>.</p>
 </section>
 
 <!-- ═══════════════════════════════════════════════════ -->

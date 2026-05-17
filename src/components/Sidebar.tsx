@@ -373,18 +373,6 @@ export const Sidebar = (props: {
             )}
             <SidebarItem icon={FileBarChart} label={t('sidebar.reports', 'Reportes')} active={activeView === 'reports'} onClick={() => navigate('reports')} collapsed={isSidebarCollapsed} />
             {isSuperAdmin && <SidebarItem icon={Settings2} label={t('sidebar.settings', 'CONFIGURACION')} active={activeView === 'settings'} onClick={() => navigate('settings')} collapsed={isSidebarCollapsed} />}
-            <div
-              onClick={() => window.open(config.software_accelerator_url, '_blank')}
-              className={clsx(
-                "flex items-center gap-2.5 px-2 py-2 rounded-2xl cursor-pointer transition-all duration-300 group text-mcvill-text-muted hover:text-mcvill-text hover:bg-mcvill-accent/5 border border-transparent hover:border-mcvill-accent/20",
-                isSidebarCollapsed && "justify-center"
-              )}
-            >
-              <div className="w-7 h-7 rounded-2xl flex items-center justify-center bg-slate-900/50 group-hover:bg-slate-800/80 transition-all">
-                <Zap size={14} className="text-mcvill-accent group-hover:text-white" />
-              </div>
-              {!isSidebarCollapsed && <span className="text-[11px] font-bold tracking-wider uppercase">{t('sidebar.accelerator', 'Acelerador')}</span>}
-            </div>
           </div>
         )}
       </div>

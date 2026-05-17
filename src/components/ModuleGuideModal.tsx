@@ -10,6 +10,8 @@ import {
 } from 'lucide-react';
 import type { ModuleGuide } from '../data/moduleGuides';
 import { useConfig } from '../contexts/ConfigContext';
+import { useLanguage } from '../contexts/LanguageContext';
+import { MODULE_GUIDES_EN, DEFAULT_GUIDE_EN } from '../data/moduleGuidesEn';
 
 const ICON_MAP: Record<string, React.FC<{ size?: number; className?: string }>> = {
   LayoutDashboard, Bell, Zap, Package, AlertTriangle, TrendingUp,
@@ -28,6 +30,7 @@ interface ModuleGuideModalProps {
 export const ModuleGuideModal: React.FC<ModuleGuideModalProps> = ({ isOpen, onClose, guide }) => {
   const [step, setStep] = useState(0);
   const { isDarkMode } = useConfig();
+  const { language } = useLanguage();
 
   useEffect(() => {
     if (isOpen) setStep(0);
@@ -35,9 +38,14 @@ export const ModuleGuideModal: React.FC<ModuleGuideModalProps> = ({ isOpen, onCl
 
   if (!isOpen || !guide) return null;
 
-  const current = guide.steps[step] || guide.steps[0];
+  // Resolve localized guide
+  const activeGuide = language === 'en'
+    ? (MODULE_GUIDES_EN[guide.moduleId] ?? DEFAULT_GUIDE_EN)
+    : guide;
+
+  const current = activeGuide.steps[step] || activeGuide.steps[0];
   const IconComponent = ICON_MAP[current?.icon] ?? Zap;
-  const isLast = step === guide.steps.length - 1;
+  const isLast = step === activeGuide.steps.length - 1;
 
   return (
     <AnimatePresence>
@@ -63,11 +71,13 @@ export const ModuleGuideModal: React.FC<ModuleGuideModalProps> = ({ isOpen, onCl
           {/* Header */}
           <div className={`flex items-center justify-between px-6 py-4 border-b ${isDarkMode ? 'border-white/8' : 'border-slate-100'}`}>
             <div className="flex items-center gap-3">
-              <span className="text-2xl leading-none">{guide.emoji}</span>
+              <span className="text-2xl leading-none">{activeGuide.emoji}</span>
               <div>
-                <p className="text-[8px] font-black uppercase tracking-[0.3em] text-mcvill-accent mb-0.5">Guía del Módulo</p>
+                <p className="text-[8px] font-black uppercase tracking-[0.3em] text-mcvill-accent mb-0.5">
+                  {language === 'en' ? 'Module Guide' : 'Guía del Módulo'}
+                </p>
                 <h2 className={`text-[15px] font-black leading-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
-                  {guide.label}
+                  {activeGuide.label}
                 </h2>
               </div>
             </div>
@@ -81,7 +91,7 @@ export const ModuleGuideModal: React.FC<ModuleGuideModalProps> = ({ isOpen, onCl
 
           {/* Description */}
           <div className="px-6 pt-4">
-            <p className={`text-[11px] ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>{guide.description}</p>
+            <p className={`text-[11px] ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>{activeGuide.description}</p>
           </div>
 
           {/* Step content */}
@@ -119,9 +129,9 @@ export const ModuleGuideModal: React.FC<ModuleGuideModalProps> = ({ isOpen, onCl
             </AnimatePresence>
 
             {/* Step dots */}
-            {guide.steps.length > 1 && (
+            {activeGuide.steps.length > 1 && (
               <div className="flex items-center justify-center gap-1.5 mb-5">
-                {guide.steps.map((_, i) => (
+                {activeGuide.steps.map((_, i) => (
                   <button
                     key={i}
                     onClick={() => setStep(i)}
@@ -145,11 +155,11 @@ export const ModuleGuideModal: React.FC<ModuleGuideModalProps> = ({ isOpen, onCl
                 }`}
               >
                 <ChevronLeft size={13} />
-                Anterior
+                {language === 'en' ? 'Previous' : 'Anterior'}
               </button>
 
               <span className={`text-[9px] font-black uppercase tracking-widest ${isDarkMode ? 'text-slate-600' : 'text-slate-400'}`}>
-                {step + 1} / {guide.steps.length}
+                {step + 1} / {activeGuide.steps.length}
               </span>
 
               {!isLast ? (
@@ -157,7 +167,7 @@ export const ModuleGuideModal: React.FC<ModuleGuideModalProps> = ({ isOpen, onCl
                   onClick={() => setStep(step + 1)}
                   className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-mcvill-accent text-white text-[10px] font-black uppercase tracking-widest hover:bg-blue-500 transition-all"
                 >
-                  Siguiente
+                  {language === 'en' ? 'Next' : 'Siguiente'}
                   <ChevronRight size={13} />
                 </button>
               ) : (
@@ -165,7 +175,7 @@ export const ModuleGuideModal: React.FC<ModuleGuideModalProps> = ({ isOpen, onCl
                   onClick={onClose}
                   className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500 transition-all"
                 >
-                  ¡Entendido!
+                  {language === 'en' ? 'Got it!' : '¡Entendido!'}
                   <CheckCircle2 size={13} />
                 </button>
               )}

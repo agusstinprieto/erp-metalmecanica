@@ -37,6 +37,7 @@ import {
 } from 'lucide-react';
 import { RecruitmentView } from './RecruitmentView';
 import { useConfig } from '../contexts/ConfigContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { useSearch } from '../contexts/SearchContext';
 import { toast, appConfirm } from '../lib/dialogs';
 import { employeeService } from '../services/employeeService';
@@ -69,12 +70,13 @@ interface Employee {
 }
 
 const StatusBadge: React.FC<{ status: Employee['status'] }> = ({ status }) => {
+  const { language } = useLanguage();
   const configs: Record<Employee['status'], { label: string; color: string; icon: any }> = {
-    active: { label: 'ACTIVO', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20', icon: CheckCircle2 },
-    inactive: { label: 'INACTIVO', color: 'bg-rose-500/10 text-rose-500 border-rose-500/20', icon: ShieldAlert },
-    vacation: { label: 'VACACIONES', color: 'bg-blue-500/10 text-blue-400 border-blue-500/20', icon: Calendar },
-    medical_leave: { label: 'INCAPACIDAD', color: 'bg-amber-500/10 text-amber-500 border-amber-500/20', icon: Clock },
-    on_leave: { label: 'LICENCIA', color: 'bg-slate-500/10 text-slate-400 border-slate-500/20', icon: UserCheck }
+    active: { label: language === 'en' ? 'ACTIVE' : 'ACTIVO', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20', icon: CheckCircle2 },
+    inactive: { label: language === 'en' ? 'INACTIVE' : 'INACTIVO', color: 'bg-rose-500/10 text-rose-500 border-rose-500/20', icon: ShieldAlert },
+    vacation: { label: language === 'en' ? 'VACATION' : 'VACACIONES', color: 'bg-blue-500/10 text-blue-400 border-blue-500/20', icon: Calendar },
+    medical_leave: { label: language === 'en' ? 'MEDICAL LEAVE' : 'INCAPACIDAD', color: 'bg-amber-500/10 text-amber-500 border-amber-500/20', icon: Clock },
+    on_leave: { label: language === 'en' ? 'ON LEAVE' : 'LICENCIA', color: 'bg-slate-500/10 text-slate-400 border-slate-500/20', icon: UserCheck }
   };
 
   const config = configs[status] || configs.active;
@@ -92,6 +94,7 @@ export const RHView: React.FC = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const { isDarkMode } = useConfig();
+  const { language } = useLanguage();
   const { searchTerm, setSearchTerm } = useSearch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
@@ -169,12 +172,12 @@ export const RHView: React.FC = () => {
           <div className="flex items-center gap-2">
             <MembersIcon size={16} className="text-blue-500" />
             <h2 className="text-base font-black text-white tracking-tight uppercase">
-              CAPITAL <span className="text-blue-500">HUMANO</span>
+              {language === 'en' ? 'HUMAN' : 'CAPITAL'} <span className="text-blue-500">{language === 'en' ? 'CAPITAL' : 'HUMANO'}</span>
             </h2>
           </div>
           <div className="h-4 w-px bg-white/10" />
           <p className="text-[9px] text-slate-500 font-black uppercase tracking-widest hidden md:block">
-            Censo de Personal · Reclutamiento · Desarrollo de Talento
+            {language === 'en' ? 'Personnel Census · Recruitment · Talent Development' : 'Censo de Personal · Reclutamiento · Desarrollo de Talento'}
           </p>
         </div>
         
@@ -186,7 +189,7 @@ export const RHView: React.FC = () => {
               viewMode === 'census' ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "text-slate-500 hover:text-white"
             )}
           >
-            Censo
+            {language === 'en' ? 'Census' : 'Censo'}
           </button>
           <button 
             onClick={() => setViewMode('recruitment')}
@@ -195,11 +198,11 @@ export const RHView: React.FC = () => {
               viewMode === 'recruitment' ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "text-slate-500 hover:text-white"
             )}
           >
-            Reclutamiento
+            {language === 'en' ? 'Recruitment' : 'Reclutamiento'}
           </button>
           <div className="w-px h-6 bg-white/10 mx-1" />
           <button onClick={() => setIsModalOpen(true)} className="mcvill-btn-create flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all shadow-lg shadow-emerald-600/20">
-            <UserPlus size={12} /> CONTRATAR
+            <UserPlus size={12} /> {language === 'en' ? 'HIRE' : 'CONTRATAR'}
           </button>
         </div>
       </div>
@@ -209,10 +212,10 @@ export const RHView: React.FC = () => {
             {/* KPI Matrix — Compact */}
             <div className="px-4 py-3 grid grid-cols-2 md:grid-cols-4 gap-3 bg-slate-900/20">
               {[
-                { label: 'PLANTILLA TOTAL', value: employees.length, icon: MembersIcon, color: 'text-blue-500' },
-                { label: 'DEPARTAMENTOS', value: new Set(employees.map(e => e.department)).size, icon: Briefcase, color: 'text-indigo-500' },
-                { label: 'EN VACACIONES', value: employees.filter(e => e.status === 'vacation').length, icon: Calendar, color: 'text-amber-500' },
-                { label: 'INCAPACIDADES', value: employees.filter(e => e.status === 'medical_leave').length, icon: ShieldAlert, color: 'text-rose-500' }
+                { label: language === 'en' ? 'TOTAL STAFF' : 'PLANTILLA TOTAL', value: employees.length, icon: MembersIcon, color: 'text-blue-500' },
+                { label: language === 'en' ? 'DEPARTMENTS' : 'DEPARTAMENTOS', value: new Set(employees.map(e => e.department)).size, icon: Briefcase, color: 'text-indigo-500' },
+                { label: language === 'en' ? 'ON VACATION' : 'EN VACACIONES', value: employees.filter(e => e.status === 'vacation').length, icon: Calendar, color: 'text-amber-500' },
+                { label: language === 'en' ? 'MEDICAL LEAVE' : 'INCAPACIDADES', value: employees.filter(e => e.status === 'medical_leave').length, icon: ShieldAlert, color: 'text-rose-500' }
               ].map((k, i) => (
                 <div key={i} className="px-4 py-2 bg-white/[0.02] border border-white/5 rounded-xl flex items-center gap-4 group hover:bg-white/[0.04] transition-all">
                   <div className={clsx("w-10 h-10 rounded-lg flex items-center justify-center border border-white/10 shrink-0 bg-slate-900", k.color)}>
@@ -233,14 +236,14 @@ export const RHView: React.FC = () => {
               <div className="relative flex-1 max-w-md group">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-blue-500 transition-colors" size={12} />
                 <input 
-                  type="text" placeholder="RASTREAR COLABORADORES..." 
+                  type="text" placeholder={language === 'en' ? 'TRACK EMPLOYEES...' : 'RASTREAR COLABORADORES...'} 
                   value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
                   className="w-full bg-black/40 border border-white/10 rounded-lg py-1.5 pl-9 pr-4 text-[10px] font-bold text-white outline-none focus:border-blue-500/50 transition-all placeholder:text-slate-700" 
                 />
               </div>
               <div className="flex items-center gap-2 ml-auto">
                 <button onClick={handleDownloadReport} className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-white/10 text-slate-400 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all">
-                  <Download size={12} /> REPORTE
+                  <Download size={12} /> {language === 'en' ? 'REPORT' : 'REPORTE'}
                 </button>
                 <button onClick={fetchEmployees} className="p-2 bg-white/5 border border-white/10 rounded-lg text-slate-400 hover:text-white transition-all">
                   <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
@@ -251,10 +254,10 @@ export const RHView: React.FC = () => {
                 <table className="w-full text-left">
                   <thead>
                     <tr className="bg-slate-950/30 text-[8px] font-black text-slate-500 uppercase tracking-widest border-b border-white/5">
-                      <th className="px-4 py-3">Colaborador / ID</th>
-                      <th className="px-4 py-3">Cargo</th>
-                      <th className="px-4 py-3 text-center">Estado</th>
-                      <th className="px-4 py-3 text-right">Acciones</th>
+                      <th className="px-4 py-3">{language === 'en' ? 'Employee / ID' : 'Colaborador / ID'}</th>
+                      <th className="px-4 py-3">{language === 'en' ? 'Job Title' : 'Cargo'}</th>
+                      <th className="px-4 py-3 text-center">{language === 'en' ? 'Status' : 'Estado'}</th>
+                      <th className="px-4 py-3 text-right">{language === 'en' ? 'Actions' : 'Acciones'}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">

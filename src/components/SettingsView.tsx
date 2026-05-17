@@ -44,6 +44,7 @@ import type { AuditLog } from '../services/auditService';
 import { supabase } from '../lib/supabase';
 import { format } from 'date-fns';
 import { useConfig } from '../contexts/ConfigContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { tenantService } from '../services/tenantService';
 import { appConfirm } from '../lib/dialogs';
 import type { TenantConfig } from '../services/tenantService';
@@ -465,6 +466,7 @@ const ShiftsTab: React.FC = () => {
 // ─── Settings View ────────────────────────────────────────────────────────────
 
 export const SettingsView: React.FC<SettingsViewProps> = ({ userRole }) => {
+  const { language, t } = useLanguage();
   const isPrivileged = userRole === 'ceo' || userRole === 'sistemas';
   const [activeTab, setActiveTab] = useState<'users' | 'audit' | 'api' | 'tarifas' | 'brand' | 'security' | 'knowledge' | 'shifts'>(isPrivileged ? 'users' : 'security');
   const [searchTerm, setSearchTerm] = useState('');
@@ -692,25 +694,25 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ userRole }) => {
           <div className="flex items-center gap-2">
             <Shield className="text-mcvill-accent" size={16} />
             <h2 className="text-base font-black text-mcvill-text tracking-tight uppercase">
-              CENTRAL DE <span className="text-mcvill-accent">CONFIGURACIÓN</span>
+              {language === 'en' ? 'CONFIGURATION' : 'CENTRAL DE'} <span className="text-mcvill-accent">{language === 'en' ? 'CENTRAL' : 'CONFIGURACIÓN'}</span>
             </h2>
           </div>
           <div className="h-4 w-px bg-white/10 hidden md:block" />
           <p className="text-[10px] text-slate-500 font-medium hidden md:block uppercase tracking-widest">
-            Gestión técnica de protocolos y seguridad
+            {language === 'en' ? 'Technical protocol and security management' : 'Gestión técnica de protocolos y seguridad'}
           </p>
         </div>
         
         <div className="flex items-center gap-1.5 bg-black/40 p-1 rounded-lg border border-white/5">
           {[
-            isPrivileged && { id: 'users', label: 'Usuarios', icon: Users },
-            isPrivileged && { id: 'audit', label: 'Auditoría', icon: History },
-            isPrivileged && { id: 'api', label: 'Motores IA', icon: Cpu },
-            isPrivileged && { id: 'tarifas', label: 'Tarifas', icon: Zap },
-            isPrivileged && { id: 'shifts', label: 'Turnos', icon: Clock },
-            isPrivileged && { id: 'knowledge', label: 'Base IA', icon: BookOpen },
-            isPrivileged && { id: 'brand', label: 'Identidad', icon: Globe },
-            { id: 'security', label: 'Seguridad', icon: Key },
+            isPrivileged && { id: 'users', label: language === 'en' ? 'Users' : 'Usuarios', icon: Users },
+            isPrivileged && { id: 'audit', label: language === 'en' ? 'Auditing' : 'Auditoría', icon: History },
+            isPrivileged && { id: 'api', label: language === 'en' ? 'AI Engines' : 'Motores IA', icon: Cpu },
+            isPrivileged && { id: 'tarifas', label: language === 'en' ? 'Rates' : 'Tarifas', icon: Zap },
+            isPrivileged && { id: 'shifts', label: language === 'en' ? 'Shifts' : 'Turnos', icon: Clock },
+            isPrivileged && { id: 'knowledge', label: language === 'en' ? 'AI Base' : 'Base IA', icon: BookOpen },
+            isPrivileged && { id: 'brand', label: language === 'en' ? 'Identity' : 'Identidad', icon: Globe },
+            { id: 'security', label: language === 'en' ? 'Security' : 'Seguridad', icon: Key },
           ].filter(Boolean).map((tab: any) => (
             <button 
               key={tab.id}
@@ -749,7 +751,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ userRole }) => {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-mcvill-accent transition-colors" size={14} />
                 <input 
                   type="text" 
-                  placeholder="FILTRO USUARIOS..."
+                  placeholder={language === 'en' ? 'FILTER USERS...' : 'FILTRO USUARIOS...'}
                   className="bg-mcvill-bg/40 border border-mcvill-card-border rounded-lg w-full pl-10 pr-4 h-8 text-[10px] font-black uppercase tracking-widest text-mcvill-text focus:outline-none focus:border-mcvill-accent/50 transition-all"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -763,7 +765,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ userRole }) => {
                 className="flex items-center gap-2 h-8 px-4 rounded-lg bg-mcvill-accent text-slate-950 text-[9px] font-black uppercase tracking-widest hover:opacity-90 transition-all ml-4"
               >
                 <UserPlus size={14} />
-                NUEVO USUARIO
+                {language === 'en' ? 'NEW USER' : 'NUEVO USUARIO'}
               </button>
             </div>
 
@@ -771,11 +773,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ userRole }) => {
               <table className="w-full text-left border-collapse">
                 <thead className="bg-black/60 sticky top-0 z-10 backdrop-blur-md">
                   <tr className="text-[9px] font-black text-slate-500 uppercase tracking-widest border-b border-white/5">
-                    <th className="px-6 py-2.5">Usuario</th>
-                    <th className="px-6 py-2.5 text-center">Protocolo de Rol</th>
-                    <th className="px-6 py-2.5 text-center">Estado</th>
-                    <th className="px-6 py-2.5 text-center">Último Acceso</th>
-                    <th className="px-6 py-2.5 text-right">ACC</th>
+                    <th className="px-6 py-2.5">{language === 'en' ? 'User' : 'Usuario'}</th>
+                    <th className="px-6 py-2.5 text-center">{language === 'en' ? 'Role Protocol' : 'Protocolo de Rol'}</th>
+                    <th className="px-6 py-2.5 text-center">{language === 'en' ? 'Status' : 'Estado'}</th>
+                    <th className="px-6 py-2.5 text-center">{language === 'en' ? 'Last Access' : 'Último Acceso'}</th>
+                    <th className="px-6 py-2.5 text-right">{language === 'en' ? 'ACT' : 'ACC'}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
@@ -783,13 +785,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ userRole }) => {
                     <tr>
                       <td colSpan={5} className="px-6 py-12 text-center">
                         <Loader2 className="w-8 h-8 text-mcvill-accent animate-spin mx-auto mb-3" />
-                        <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Sincronizando Usuarios...</p>
+                        <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">{language === 'en' ? 'Syncing Users...' : 'Sincronizando Usuarios...'}</p>
                       </td>
                     </tr>
                   ) : users.length === 0 ? (
                     <tr>
                       <td colSpan={5} className="px-6 py-12 text-center text-slate-600 italic text-[10px]">
-                        Sin resultados en la base de datos.
+                        {language === 'en' ? 'No results found in the database.' : 'Sin resultados en la base de datos.'}
                       </td>
                     </tr>
                   ) : (

@@ -18,6 +18,8 @@ import { supabase } from '../lib/supabase';
 import { tenantService } from '../services/tenantService';
 import { useConfig } from '../contexts/ConfigContext';
 import { MODULE_GUIDES, DEFAULT_GUIDE } from '../data/moduleGuides';
+import { MODULE_GUIDES_EN, DEFAULT_GUIDE_EN } from '../data/moduleGuidesEn';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const Modality = { AUDIO: 'audio' as any };
 type LiveServerMessage = any;
@@ -32,13 +34,42 @@ interface LiveVoiceModalERPProps {
 
 const APP_VERSION = '2.5.0-ERP';
 
-function buildSystemInstruction(moduleId?: string, brandName?: string): string {
-  const guide = moduleId ? (MODULE_GUIDES[moduleId] ?? DEFAULT_GUIDE) : DEFAULT_GUIDE;
-  const moduleContext = moduleId
-    ? `MÓDULO ACTIVO: ${guide.label} ${guide.emoji}\n${guide.description}\n\nCÓMO ENSEÑAR ESTE MÓDULO (cuando el usuario pregunte cómo usarlo):\n${guide.steps.map((s, i) => `${i + 1}. ${s.title} — ${s.subtitle}:\n   ${s.tips.join('\n   ')}`).join('\n\n')}`
-    : 'El usuario no está en ningún módulo específico.';
+function buildSystemInstruction(moduleId?: string, brandName?: string, language: 'es' | 'en' = 'es'): string {
+  const guidesDict = language === 'en' ? MODULE_GUIDES_EN : MODULE_GUIDES;
+  const defaultG = language === 'en' ? DEFAULT_GUIDE_EN : DEFAULT_GUIDE;
+  const guide = moduleId ? (guidesDict[moduleId] ?? defaultG) : defaultG;
 
-  return `Eres el Cerebro Neural de Control ERP ${brandName || 'McVill'} (IA PRO). Un asistente de voz de élite especializado en operaciones industriales.
+  if (language === 'en') {
+    const moduleContext = moduleId
+      ? `ACTIVE MODULE: ${guide.label} ${guide.emoji}\n${guide.description}\n\nHOW TO TEACH THIS MODULE (when the user asks how to use it):\n${guide.steps.map((s, i) => `${i + 1}. ${s.title} — ${s.subtitle}:\n   ${s.tips.join('\n   ')}`).join('\n\n')}`
+      : 'The user is not in any specific module.';
+
+    return `You are the Neural Control Brain of ${brandName || 'McVill'} ERP (IA PRO). An elite voice assistant specialized in industrial operations.
+Your tone is professional, efficient, direct, and tech-driven (Agus Pro Standard).
+
+${moduleContext}
+
+ERP GUIDE:
+1. Sales & Feasibility: Customer management and FT-IG-01 feasibility rulings.
+2. Production: Control by Travelers, workstations, and QR scanning.
+3. Traceability: Real-time monitoring of batches and parts.
+4. Finance: ROI, cash flows, and projected vs actual costs.
+5. Engineering: Blueprint Analyzer (AI) and BOM extraction.
+6. Maintenance: Asset management and Health Score.
+7. Human Capital: Payroll and Attendance Control.
+
+VOICE RULES:
+1. Respond concisely and fluidly (maximum 2-3 sentences per answer).
+2. If the user asks how to use the current module, teach them step-by-step.
+3. Speak in a natural, executive, and helpful English.
+4. If the user asks about "Agus Pro", explain that it is the standard of excellence in automation and design of the ERP.
+`;
+  } else {
+    const moduleContext = moduleId
+      ? `MÓDULO ACTIVO: ${guide.label} ${guide.emoji}\n${guide.description}\n\nCÓMO ENSEÑAR ESTE MÓDULO (cuando el usuario pregunte cómo usarlo):\n${guide.steps.map((s, i) => `${i + 1}. ${s.title} — ${s.subtitle}:\n   ${s.tips.join('\n   ')}`).join('\n\n')}`
+      : 'El usuario no está en ningún módulo específico.';
+
+    return `Eres el Cerebro Neural de Control ERP ${brandName || 'McVill'} (IA PRO). Un asistente de voz de élite especializado en operaciones industriales.
 Tu tono es profesional, eficiente, directo y tecnológico (Agus Pro Standard).
 
 ${moduleContext}
@@ -58,6 +89,7 @@ REGLAS DE VOZ:
 3. Usa un español de México natural, ejecutivo y servicial.
 4. Si el usuario pregunta por "Agus Pro", explícale que es el estándar de excelencia en automatización y diseño del ERP.
 `;
+  }
 }
 
 const GEMINI_VOICES = [
@@ -76,6 +108,7 @@ export const LiveVoiceModalERP: React.FC<LiveVoiceModalERPProps> = ({
   currentModule,
 }) => {
   const { isDarkMode, config } = useConfig();
+  const { language } = useLanguage();
   // ... (rest of state)
   const [isActive, setIsActive] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
@@ -297,7 +330,7 @@ export const LiveVoiceModalERP: React.FC<LiveVoiceModalERPProps> = ({
           speechConfig: {
             voiceConfig: { prebuiltVoiceConfig: { voiceName: selectedVoice } },
           },
-          systemInstruction: { parts: [{ text: `${buildSystemInstruction(currentModule, config.brandName)}\n\n${systemSnapshot}` }] },
+          systemInstruction: { parts: [{ text: `${buildSystemInstruction(currentModule, config.brandName, language)}\n\n${systemSnapshot}` }] },
           inputAudioTranscription: {},
           outputAudioTranscription: {},
         },

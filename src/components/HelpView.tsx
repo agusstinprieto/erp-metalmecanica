@@ -2,13 +2,18 @@ import React, { useState, useMemo } from 'react';
 import { Search, BookOpen, Mail, Globe, Database, Upload, ExternalLink, ChevronRight } from 'lucide-react';
 import { useConfig } from '../contexts/ConfigContext';
 import { MODULE_GUIDES } from '../data/moduleGuides';
+import { MODULE_GUIDES_EN } from '../data/moduleGuidesEn';
+import { useLanguage } from '../contexts/LanguageContext';
 import clsx from 'clsx';
 
 export const HelpView = () => {
   const { isDarkMode, config } = useConfig();
+  const { language, t } = useLanguage();
   const [search, setSearch] = useState('');
 
-  const allModules = useMemo(() => Object.values(MODULE_GUIDES), []);
+  const allModules = useMemo(() => {
+    return Object.values(language === 'en' ? MODULE_GUIDES_EN : MODULE_GUIDES);
+  }, [language]);
 
   const filteredModules = useMemo(() => {
     const q = search.toLowerCase().trim();
@@ -38,19 +43,22 @@ export const HelpView = () => {
           </div>
           <div>
             <p className="text-[9px] font-black uppercase tracking-[0.3em] text-mcvill-accent mb-1">
-              Centro de Ayuda
+              {language === 'en' ? 'Help Center' : 'Centro de Ayuda'}
             </p>
             <h1 className={clsx(
               'text-2xl font-black uppercase tracking-tight leading-none mb-1',
               isDarkMode ? 'text-white' : 'text-slate-900'
             )}>
-              Manual y Soporte <span className="text-mcvill-accent">{config.logoText}</span>
+              {language === 'en' ? 'Manual & Support' : 'Manual y Soporte'}{' '}
+              <span className="text-mcvill-accent">{config.logoText}</span>
             </h1>
             <p className={clsx(
               'text-sm font-medium',
               isDarkMode ? 'text-slate-400' : 'text-slate-500'
             )}>
-              Explora guías por módulo, contacta soporte o aprende a usar la memoria corporativa IA.
+              {language === 'en'
+                ? 'Explore guides by module, contact support, or learn to use the AI corporate memory.'
+                : 'Explora guías por módulo, contacta soporte o aprende a usar la memoria corporativa IA.'}
             </p>
           </div>
         </div>
@@ -67,7 +75,11 @@ export const HelpView = () => {
         />
         <input
           type="text"
-          placeholder="Buscar módulo... (Inventario, Calidad, Nómina...)"
+          placeholder={
+            language === 'en'
+              ? 'Search module... (Inventory, Quality, Payroll...)'
+              : 'Buscar módulo... (Inventario, Calidad, Nómina...)'
+          }
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className={clsx(
@@ -88,7 +100,10 @@ export const HelpView = () => {
             'text-[9px] font-black uppercase tracking-[0.3em]',
             isDarkMode ? 'text-slate-600' : 'text-slate-400'
           )}>
-            {filteredModules.length} módulo{filteredModules.length !== 1 ? 's' : ''} disponibles
+            {filteredModules.length}{' '}
+            {language === 'en'
+              ? `available module${filteredModules.length !== 1 ? 's' : ''}`
+              : `módulo${filteredModules.length !== 1 ? 's' : ''} disponible${filteredModules.length !== 1 ? 's' : ''}`}
           </p>
           <div className="h-px flex-1 bg-white/5" />
         </div>
@@ -103,7 +118,9 @@ export const HelpView = () => {
               'text-sm font-black uppercase tracking-widest',
               isDarkMode ? 'text-slate-600' : 'text-slate-400'
             )}>
-              No se encontraron módulos para "{search}"
+              {language === 'en'
+                ? `No modules found for "${search}"`
+                : `No se encontraron módulos para "${search}"`}
             </p>
           </div>
         ) : (
@@ -147,7 +164,10 @@ export const HelpView = () => {
                   'text-[9px] font-black uppercase tracking-widest',
                   isDarkMode ? 'text-slate-700' : 'text-slate-400'
                 )}>
-                  {mod.steps.length} sección{mod.steps.length !== 1 ? 'es' : ''} de guia
+                  {mod.steps.length}{' '}
+                  {language === 'en'
+                    ? `guide section${mod.steps.length !== 1 ? 's' : ''}`
+                    : `sección${mod.steps.length !== 1 ? 'es' : ''} de guía`}
                 </p>
 
                 {/* Ver Guia button */}
@@ -165,7 +185,7 @@ export const HelpView = () => {
                       : 'border-blue-200 text-blue-600 bg-blue-50 hover:bg-blue-100'
                   )}
                 >
-                  <span>Ver Guia</span>
+                  <span>{language === 'en' ? 'View Guide' : 'Ver Guía'}</span>
                   <ChevronRight size={12} className="transition-transform group-hover:translate-x-0.5" />
                 </a>
               </div>
@@ -191,13 +211,13 @@ export const HelpView = () => {
               'text-[10px] font-black uppercase tracking-[0.25em]',
               isDarkMode ? 'text-purple-400' : 'text-purple-600'
             )}>
-              Memoria Corporativa IA
+              {language === 'en' ? 'AI Corporate Memory' : 'Memoria Corporativa IA'}
             </p>
             <h2 className={clsx(
               'text-sm font-black uppercase tracking-tight',
               isDarkMode ? 'text-white' : 'text-slate-900'
             )}>
-              Documentos RAG
+              {language === 'en' ? 'RAG Documents' : 'Documentos RAG'}
             </h2>
           </div>
         </div>
@@ -206,34 +226,37 @@ export const HelpView = () => {
           'text-[11px] leading-relaxed',
           isDarkMode ? 'text-slate-500' : 'text-slate-500'
         )}>
-          {`El sistema de IA de ${config.logoText} utiliza`}{' '}
-          <span className={isDarkMode ? 'text-white font-bold' : 'text-slate-800 font-bold'}>
-            Retrieval-Augmented Generation (RAG)
-          </span>{' '}
-          para acceder a documentos internos de la empresa en tiempo real. Al subir documentos a la memoria corporativa,
-          {`el asistente IA puede responder preguntas basadas en el contenido real de ${config.brandName}.`}
+          {language === 'en'
+            ? `The AI system of ${config.logoText} utilizes Retrieval-Augmented Generation (RAG) to access internal company documents in real time. By uploading documents to the corporate memory, the AI assistant can answer questions based on the real content of ${config.brandName}.`
+            : `El sistema de IA de ${config.logoText} utiliza Retrieval-Augmented Generation (RAG) para acceder a documentos internos de la empresa en tiempo real. Al subir documentos a la memoria corporativa, el asistente IA puede responder preguntas basadas en el contenido real de ${config.brandName}.`}
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {[
             {
               icon: Upload,
-              title: 'Subir Documentos',
-              desc: 'PDF, Word o texto plano con procedimientos, normas o manuales internos.',
+              title: language === 'en' ? 'Upload Documents' : 'Subir Documentos',
+              desc: language === 'en'
+                ? 'PDF, Word, or plain text containing procedures, compliance standards, or internal manuals.'
+                : 'PDF, Word o texto plano con procedimientos, normas o manuales internos.',
               color: isDarkMode ? 'text-purple-400' : 'text-purple-600',
               bg: isDarkMode ? 'bg-purple-500/5 border-purple-500/20' : 'bg-purple-50 border-purple-200',
             },
             {
               icon: Database,
-              title: 'Indexación Automática',
-              desc: 'El sistema convierte los documentos en vectores semánticos para búsqueda inteligente.',
+              title: language === 'en' ? 'Automatic Indexing' : 'Indexación Automática',
+              desc: language === 'en'
+                ? 'The system converts documents into semantic vectors for intelligent real-time searching.'
+                : 'El sistema convierte los documentos en vectores semánticos para búsqueda inteligente.',
               color: isDarkMode ? 'text-blue-400' : 'text-blue-600',
               bg: isDarkMode ? 'bg-blue-500/5 border-blue-500/20' : 'bg-blue-50 border-blue-200',
             },
             {
               icon: BookOpen,
-              title: 'Consulta en Chat IA',
-              desc: 'Pregunta al asistente y obtendrá respuestas contextuales basadas en tus documentos.',
+              title: language === 'en' ? 'Query in AI Chat' : 'Consulta en Chat IA',
+              desc: language === 'en'
+                ? 'Ask the assistant and it will fetch contextual answers based on your loaded documents.'
+                : 'Pregunta al asistente y obtendrá respuestas contextuales basadas en tus documentos.',
               color: isDarkMode ? 'text-emerald-400' : 'text-emerald-600',
               bg: isDarkMode ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-emerald-50 border-emerald-200',
             },
@@ -252,7 +275,9 @@ export const HelpView = () => {
           'text-[10px] italic',
           isDarkMode ? 'text-slate-700' : 'text-slate-400'
         )}>
-          Para gestionar documentos RAG, accede a Configuracion &gt; Memoria Corporativa o contacta al administrador del sistema.
+          {language === 'en'
+            ? 'To manage RAG documents, navigate to Settings > Corporate Memory or contact your system administrator.'
+            : 'Para gestionar documentos RAG, accede a Configuración > Memoria Corporativa o contacta al administrador del sistema.'}
         </p>
       </section>
 
@@ -270,13 +295,13 @@ export const HelpView = () => {
           </div>
           <div>
             <p className="text-[10px] font-black uppercase tracking-[0.25em] text-mcvill-accent">
-              Soporte Tecnico
+              {language === 'en' ? 'Technical Support' : 'Soporte Técnico'}
             </p>
             <h2 className={clsx(
               'text-sm font-black uppercase tracking-tight',
               isDarkMode ? 'text-white' : 'text-slate-900'
             )}>
-              Contacto
+              {language === 'en' ? 'Contact Us' : 'Contacto'}
             </h2>
           </div>
         </div>
@@ -298,7 +323,7 @@ export const HelpView = () => {
                 'text-[9px] font-black uppercase tracking-widest',
                 isDarkMode ? 'text-slate-600' : 'text-slate-400'
               )}>
-                Email Soporte
+                {language === 'en' ? 'Support Email' : 'Email Soporte'}
               </p>
               <p className={clsx(
                 'text-[11px] font-bold',
@@ -328,7 +353,7 @@ export const HelpView = () => {
                 'text-[9px] font-black uppercase tracking-widest',
                 isDarkMode ? 'text-slate-600' : 'text-slate-400'
               )}>
-                Sitio Web
+                {language === 'en' ? 'Website' : 'Sitio Web'}
               </p>
               <p className={clsx(
                 'text-[11px] font-bold',
@@ -345,7 +370,9 @@ export const HelpView = () => {
           'text-[9px] mt-4 font-medium',
           isDarkMode ? 'text-slate-700' : 'text-slate-400'
         )}>
-          Tiempo de respuesta tipico: menos de 24 horas en dias habiles. Para urgencias criticas menciona "URGENTE" en el asunto.
+          {language === 'en'
+            ? 'Typical response time: under 24 hours on business days. For critical emergencies mention "URGENT" in the subject line.'
+            : 'Tiempo de respuesta típico: menos de 24 horas en días hábiles. Para urgencias críticas menciona "URGENTE" en el asunto.'}
         </p>
       </section>
 

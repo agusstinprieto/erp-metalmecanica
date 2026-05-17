@@ -10,6 +10,7 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { supabase } from '../lib/supabase';
 import { useConfig } from '../contexts/ConfigContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { OCManagerModal } from './OCManagerModal';
 import { FactibilidadGatekeeper } from './FactibilidadGatekeeper';
 
@@ -1521,6 +1522,7 @@ const TarifasTab: React.FC = () => {
 // ─── Main ────────────────────────────────────────────────────────────────────
 
 export const VentasPanel: React.FC<{ initialTab?: TabId }> = ({ initialTab }) => {
+  const { language } = useLanguage();
   const [tab, setTab] = useState<TabId>(initialTab || 'clientes');
   const [isOCModalOpen, setIsOCModalOpen] = useState(false);
 
@@ -1528,6 +1530,14 @@ export const VentasPanel: React.FC<{ initialTab?: TabId }> = ({ initialTab }) =>
     if (initialTab) setTab(initialTab);
   }, [initialTab]);
   const isFactibilidad = tab === 'factibilidad';
+
+  const tabLabels: Record<TabId, string> = {
+    clientes: language === 'en' ? 'Clients' : 'Clientes',
+    factibilidad: language === 'en' ? 'Feasibility' : 'Factibilidad',
+    cotizaciones: language === 'en' ? 'Quotes' : 'Cotizaciones',
+    ordenes_compra: language === 'en' ? 'Purchase Orders' : 'Órdenes de Compra',
+    tarifas: language === 'en' ? 'Rates' : 'Tarifas',
+  };
 
   return (
     <div className="h-full flex flex-col bg-slate-950 overflow-hidden -m-8">
@@ -1544,13 +1554,18 @@ export const VentasPanel: React.FC<{ initialTab?: TabId }> = ({ initialTab }) =>
           <div>
             <h1 className="text-base font-black text-white tracking-tighter uppercase">
               {isFactibilidad ? (
-                <>DICTAMEN DE <span className="text-blue-500">FACTIBILIDAD</span></>
+                language === 'en' ? <>FEASIBILITY <span className="text-blue-500">REPORT</span></> : <>DICTAMEN DE <span className="text-blue-500">FACTIBILIDAD</span></>
               ) : (
-                <>CONTROL DE <span className="text-blue-500">VENTAS & CRM</span></>
+                language === 'en' ? <>SALES & CRM <span className="text-blue-500">MANAGEMENT</span></> : <>CONTROL DE <span className="text-blue-500">VENTAS & CRM</span></>
               )}
             </h1>
             <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest flex items-center gap-2">
-              {isFactibilidad ? 'Análisis de Riesgos' : 'Pipeline Comercial'} <span className="hidden sm:inline px-1.5 py-0.5 rounded-lg bg-mcvill-accent/10 border border-mcvill-accent/30 text-[8px]">{isFactibilidad ? 'RISK-PRO' : 'SALES-PRO'}</span>
+              {isFactibilidad 
+                ? (language === 'en' ? 'Risk Analysis' : 'Análisis de Riesgos') 
+                : (language === 'en' ? 'Commercial Pipeline' : 'Pipeline Comercial')}{' '}
+              <span className="hidden sm:inline px-1.5 py-0.5 rounded-lg bg-mcvill-accent/10 border border-mcvill-accent/30 text-[8px]">
+                {isFactibilidad ? 'RISK-PRO' : 'SALES-PRO'}
+              </span>
             </p>
           </div>
         </div>
@@ -1572,7 +1587,7 @@ export const VentasPanel: React.FC<{ initialTab?: TabId }> = ({ initialTab }) =>
               className={`flex items-center gap-2 px-4 py-1.5 rounded-t-xl border-x border-t text-[10px] font-black uppercase tracking-widest transition-all ${
                 isActive ? 'bg-slate-900 border-white/10 text-blue-400 border-b-slate-900 shadow-[0_-4px_12px_rgba(59,130,246,0.05)]' : 'bg-transparent border-transparent text-slate-500 hover:text-slate-300'
               }`}>
-              <Icon size={12} />{t.label}
+              <Icon size={12} />{tabLabels[t.id]}
             </button>
           );
         })}
