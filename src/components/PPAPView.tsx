@@ -76,7 +76,10 @@ export const PPAPView: React.FC = () => {
   const loadRecords = useCallback(async () => {
     setLoading(true);
     const { data } = await supabase.from('ppap_records').select('*').order('created_at', { ascending: false });
-    const rows = (data ?? []) as PPAPRecord[];
+    const rows = (data ?? []).map(r => ({
+      ...r,
+      items: Array.isArray(r.items) ? r.items : makeItems(),
+    })) as PPAPRecord[];
     setRecords(rows);
     if (rows.length > 0 && !selected) setSelected(rows[0]);
     setLoading(false);
@@ -88,10 +91,10 @@ export const PPAPView: React.FC = () => {
     await supabase.from('ppap_records').update({ items: updated.items as unknown as object }).eq('id', updated.id);
   };
 
-  const completados    = selected.items.filter(i => i.completado).length;
-  const requeridos     = selected.items.filter(i => i.requerido).length;
-  const requeridosOk   = selected.items.filter(i => i.requerido && i.completado).length;
-  const pct            = Math.round((completados / selected.items.length) * 100);
+  const completados  = selected?.items?.filter(i => i.completado).length ?? 0;
+  const requeridos   = selected?.items?.filter(i => i.requerido).length ?? 0;
+  const requeridosOk = selected?.items?.filter(i => i.requerido && i.completado).length ?? 0;
+  const pct          = selected?.items?.length ? Math.round((completados / selected.items.length) * 100) : 0;
 
   const toggleItem = (num: number) => {
     if (!selected) return;
@@ -173,13 +176,14 @@ export const PPAPView: React.FC = () => {
         <div className="w-60 shrink-0 border-r border-white/5 flex flex-col gap-2 overflow-y-auto custom-scrollbar p-3">
           <p className="text-[8px] font-black text-slate-600 uppercase tracking-widest px-1 mb-1">Expedientes ({records.length})</p>
           {records.map((r, i) => {
-            const ok = r.items.filter(it => it.completado).length;
-            const total = r.items.length;
+            const safeItems = Array.isArray(r.items) ? r.items : [];
+            const ok = safeItems.filter(it => it.completado).length;
+            const total = safeItems.length || 1;
             return (
               <motion.button key={r.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
                 onClick={() => setSelected(r)}
                 className={clsx('w-full text-left p-3 rounded-xl border transition-all',
-                  selected.id === r.id ? 'border-sky-500/50 bg-sky-500/10' : 'border-white/5 bg-slate-900/40 hover:border-white/10')}>
+                  selected?.id === r.id ? 'border-sky-500/50 bg-sky-500/10' : 'border-white/5 bg-slate-900/40 hover:border-white/10')}>
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-[11px] font-black text-white">{r.parte}</span>
                   <span className={clsx('text-[7px] font-black px-1.5 py-0.5 rounded-full border', statusColor[r.estatus])}>{r.estatus}</span>
@@ -196,67 +200,75 @@ export const PPAPView: React.FC = () => {
 
         {/* Detail */}
         <div className="flex-1 flex flex-col overflow-y-auto custom-scrollbar p-4 gap-4">
-          {/* Summary */}
-          <div className="flex items-start justify-between">
-            <div>
-              <h2 className="text-base font-black text-white uppercase">PPAP — {selected.parte}</h2>
-              <p className="text-[10px] text-slate-400">{selected.cliente} · Nivel {selected.nivel}: {NIVEL_DESC[selected.nivel]}</p>
-            </div>
-            <span className={clsx('text-[9px] font-black px-2 py-1 rounded-lg border', statusColor[selected.estatus])}>{selected.estatus}</span>
-          </div>
-
-          {/* Progress KPIs */}
-          <div className="grid grid-cols-3 gap-3">
-            {[
-              { label: 'Completitud',       value: `${pct}%`,                   color: 'text-sky-400',     bar: pct },
-              { label: 'Requeridos OK',     value: `${requeridosOk}/${requeridos}`, color: 'text-emerald-400', bar: null },
-              { label: 'Faltantes críticos',value: String(requeridos - requeridosOk), color: requeridos - requeridosOk > 0 ? 'text-rose-400' : 'text-emerald-400', bar: null },
-            ].map((k, i) => (
-              <div key={i} className="bg-slate-900/40 border border-white/5 rounded-xl p-4">
-                <p className="text-[9px] text-slate-500 uppercase tracking-widest mb-1">{k.label}</p>
-                <p className={clsx('text-2xl font-black', k.color)}>{k.value}</p>
-                {k.bar !== null && (
-                  <div className="mt-2 h-1 bg-slate-800 rounded-full">
-                    <div className="h-full rounded-full bg-sky-500 transition-all" style={{ width: `${k.bar}%` }} />
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* Checklist */}
-          <div>
-            <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-3">Elementos PPAP — AIAG 4ª Edición</p>
-            <div className="space-y-1.5">
-              {selected.items.map(item => (
-                <div key={item.numero}>
-                  <div
-                    onClick={() => setExpanded(expandedItem === item.numero ? null : item.numero)}
-                    className={clsx('flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all',
-                      item.completado ? 'border-emerald-500/20 bg-emerald-500/5' : item.requerido ? 'border-rose-500/10 bg-rose-500/5' : 'border-white/5 bg-slate-900/30')}>
-                    <button onClick={e => { e.stopPropagation(); toggleItem(item.numero); }} className="shrink-0">
-                      {item.completado
-                        ? <CheckCircle size={15} className="text-emerald-400" />
-                        : item.requerido
-                        ? <AlertCircle size={15} className="text-rose-400/60" />
-                        : <Circle size={15} className="text-slate-600" />}
-                    </button>
-                    <span className="text-[9px] font-black text-slate-500 shrink-0 w-5">{item.numero}.</span>
-                    <p className="text-[11px] text-white flex-1 font-bold">{item.elemento}</p>
-                    {item.requerido && <span className="text-[7px] text-rose-400 bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/20 font-black">REQ</span>}
-                    <ChevronDown size={12} className={clsx('text-slate-500 transition-transform', expandedItem === item.numero && 'rotate-180')} />
-                  </div>
-                  <AnimatePresence>
-                    {expandedItem === item.numero && (
-                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                        <p className="text-[10px] text-slate-400 px-4 py-2 pb-3 leading-relaxed">{item.descripcion}</p>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+          {selected ? (
+            <>
+              {/* Summary */}
+              <div className="flex items-start justify-between">
+                <div>
+                  <h2 className="text-base font-black text-white uppercase">PPAP — {selected.parte}</h2>
+                  <p className="text-[10px] text-slate-400">{selected.cliente} · Nivel {selected.nivel}: {NIVEL_DESC[selected.nivel]}</p>
                 </div>
-              ))}
+                <span className={clsx('text-[9px] font-black px-2 py-1 rounded-lg border', statusColor[selected.estatus])}>{selected.estatus}</span>
+              </div>
+
+              {/* Progress KPIs */}
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { label: 'Completitud',       value: `${pct}%`,                   color: 'text-sky-400',     bar: pct },
+                  { label: 'Requeridos OK',     value: `${requeridosOk}/${requeridos}`, color: 'text-emerald-400', bar: null },
+                  { label: 'Faltantes críticos',value: String(requeridos - requeridosOk), color: requeridos - requeridosOk > 0 ? 'text-rose-400' : 'text-emerald-400', bar: null },
+                ].map((k, i) => (
+                  <div key={i} className="bg-slate-900/40 border border-white/5 rounded-xl p-4">
+                    <p className="text-[9px] text-slate-500 uppercase tracking-widest mb-1">{k.label}</p>
+                    <p className={clsx('text-2xl font-black', k.color)}>{k.value}</p>
+                    {k.bar !== null && (
+                      <div className="mt-2 h-1 bg-slate-800 rounded-full">
+                        <div className="h-full rounded-full bg-sky-500 transition-all" style={{ width: `${k.bar}%` }} />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Checklist */}
+              <div>
+                <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-3">Elementos PPAP — AIAG 4ª Edición</p>
+                <div className="space-y-1.5">
+                  {(selected.items ?? []).map(item => (
+                    <div key={item.numero}>
+                      <div
+                        onClick={() => setExpanded(expandedItem === item.numero ? null : item.numero)}
+                        className={clsx('flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all',
+                          item.completado ? 'border-emerald-500/20 bg-emerald-500/5' : item.requerido ? 'border-rose-500/10 bg-rose-500/5' : 'border-white/5 bg-slate-900/30')}>
+                        <button onClick={e => { e.stopPropagation(); toggleItem(item.numero); }} className="shrink-0">
+                          {item.completado
+                            ? <CheckCircle size={15} className="text-emerald-400" />
+                            : item.requerido
+                            ? <AlertCircle size={15} className="text-rose-400/60" />
+                            : <Circle size={15} className="text-slate-600" />}
+                        </button>
+                        <span className="text-[9px] font-black text-slate-500 shrink-0 w-5">{item.numero}.</span>
+                        <p className="text-[11px] text-white flex-1 font-bold">{item.elemento}</p>
+                        {item.requerido && <span className="text-[7px] text-rose-400 bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/20 font-black">REQ</span>}
+                        <ChevronDown size={12} className={clsx('text-slate-500 transition-transform', expandedItem === item.numero && 'rotate-180')} />
+                      </div>
+                      <AnimatePresence>
+                        {expandedItem === item.numero && (
+                          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                            <p className="text-[10px] text-slate-400 px-4 py-2 pb-3 leading-relaxed">{item.descripcion}</p>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center text-center gap-3 opacity-40">
+              <p className="text-[11px] text-slate-500 font-bold uppercase tracking-widest">Selecciona o crea un PPAP</p>
             </div>
-          </div>
+          )}
         </div>
       </div>
 

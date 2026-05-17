@@ -65,11 +65,14 @@ export const QualityView: React.FC = () => {
   const [activeFeeds, setActiveFeeds] = useState<{ id: string; url: string; label: string }[]>(() => {
     try {
       const saved = localStorage.getItem('mcvill_quality_feeds');
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
     } catch {}
     return [
-      { id: 'cam-1', url: '', label: 'LÍNEA ENSAMBLE 1' },
-      { id: 'cam-2', url: '', label: 'ESTACIÓN SOLDADURA 4' },
+      { id: 'cam-1', url: 'http://camera.buffalotrace.com/mjpg/video.mjpg', label: 'LÍNEA ENSAMBLE 1' },
+      { id: 'cam-2', url: 'http://pendelcam.kip.uni-heidelberg.de/mjpg/video.mjpg', label: 'ESTACIÓN SOLDADURA 4' },
     ];
   });
   const [selectedFeedId, setSelectedFeedId] = useState<string | null>(null);

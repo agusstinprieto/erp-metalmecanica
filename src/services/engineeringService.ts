@@ -84,6 +84,21 @@ export interface RevisionHistorial {
   product?: { sku: string; name: string };
 }
 
+async function enrichUsoWithLotes(rows: any[], fullDetails = false): Promise<UsoLote[]> {
+  if (!rows.length) return [];
+  const loteIds = [...new Set(rows.map((r: any) => r.lote_id).filter(Boolean))] as string[];
+  if (!loteIds.length) return rows as UsoLote[];
+  const fields = fullDetails
+    ? 'id, numero_lote, descripcion, proveedor, numero_colada'
+    : 'id, numero_lote, descripcion';
+  const { data: lotes } = await supabase
+    .from('lotes_materiales')
+    .select(fields)
+    .in('id', loteIds);
+  const loteMap = new Map((lotes || []).map((l: any) => [l.id, l]));
+  return rows.map((r: any) => ({ ...r, lote: loteMap.get(r.lote_id) ?? undefined })) as UsoLote[];
+}
+
 export const engineeringService = {
   async getProjects() {
     const { data, error } = await supabase
@@ -237,30 +252,30 @@ export const engineeringService = {
   async getUsoLotes() {
     const { data, error } = await supabase
       .from('trazabilidad_uso_lote')
-      .select('*, lote:lotes_materiales(numero_lote, descripcion)')
+      .select('*')
       .order('created_at', { ascending: false });
     if (error) return [] as UsoLote[];
-    return (data || []) as UsoLote[];
+    return enrichUsoWithLotes(data || []);
   },
 
   async getUsoByLote(loteId: string) {
     const { data, error } = await supabase
       .from('trazabilidad_uso_lote')
-      .select('*, lote:lotes_materiales(numero_lote, descripcion)')
+      .select('*')
       .eq('lote_id', loteId)
       .order('created_at', { ascending: false });
     if (error) return [] as UsoLote[];
-    return (data || []) as UsoLote[];
+    return enrichUsoWithLotes(data || []);
   },
 
   async getUsoByViajero(viajeroId: string) {
     const { data, error } = await supabase
       .from('trazabilidad_uso_lote')
-      .select('*, lote:lotes_materiales(numero_lote, descripcion, proveedor, numero_colada)')
+      .select('*')
       .eq('viajero_id', viajeroId)
       .order('created_at', { ascending: false });
     if (error) return [] as UsoLote[];
-    return (data || []) as UsoLote[];
+    return enrichUsoWithLotes(data || [], true);
   },
 
   async createUsoLote(uso: Partial<UsoLote>, tenantId: string) {
