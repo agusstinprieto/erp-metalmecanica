@@ -1,4 +1,4 @@
-# McVill Control ERP
+# ERP Metalmecánica
 ### Operational Intelligence & Industrial Control System
 > *La evolución del control industrial impulsada por Inteligencia Artificial.*
 
@@ -6,7 +6,7 @@
 
 ## Visión General
 
-**McVill Control ERP** es un ecosistema de gestión de recursos empresariales de última generación diseñado para industria metalmecánica y manufactura. Fusiona una estética **Cyber-Industrial** inmersiva con IA avanzada para centralizar, automatizar y optimizar cada proceso de una organización industrial.
+**ERP Metalmecánica** es un ecosistema de gestión de recursos empresariales de última generación diseñado para industria metalmecánica y manufactura. Fusiona una estética **Cyber-Industrial** inmersiva con IA avanzada para centralizar, automatizar y optimizar cada proceso de una organización industrial.
 
 Arquitectura **multi-tenant 100% white-label** sobre Supabase (PostgreSQL + Auth + RLS), frontend React/TypeScript con Tailwind CSS v4, y servicio de reportes C# con MigraDoc. Desplegado en Vercel.
 
@@ -123,7 +123,7 @@ Cada tenant configura desde el panel de Configuración:
 - Mensajes de WhatsApp con nombre de empresa
 - Prompts de IA con contexto de la empresa
 
-El prefijo `mcvill-` en clases CSS es solo el namespace interno del design system — ningún tenant lo ve.
+El prefijo interno de clases CSS es solo el namespace del design system — ningún tenant lo ve.
 
 ---
 
@@ -219,14 +219,14 @@ Todos los documentos están en la carpeta [`Archivos MD/`](./Archivos%20MD/):
 
 | Documento | Descripción |
 |---|---|
-| `MANUAL_EJECUTIVO_MCVILL_ERP.md` | Manual completo para el usuario final |
+| `MANUAL_EJECUTIVO_ERP.md` | Manual completo para el usuario final |
 | `VIAJEROS_INTELIGENTES.md` | Guía del módulo de Viajeros industriales |
 | `GUIA-ENTREGA-MODULOS-ERP.md` | Guía de entrega y activación de módulos |
 | `MODELO-NEGOCIO-SAAS.md` | Análisis de modelo de negocio y pricing SaaS |
 | `COMPARATIVA_SQL_SERVER_SUPABASE.md` | Comparativa de bases de datos |
 | `PLAN_ADAPTACION_JOHN_DEERE.md` | Plan de adaptación para vertical automotriz |
 | `REPORTES_SISTEMA.md` | Documentación del servicio de reportes C# |
-| `DEMO-MCVILL-ERP-30MIN.md` | Script de demo de 30 minutos |
+| `DEMO-ERP-30MIN.md` | Script de demo de 30 minutos |
 
 ---
 
