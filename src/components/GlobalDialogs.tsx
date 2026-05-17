@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AlertTriangle, X, ShieldCheck, Zap } from 'lucide-react';
+import clsx from 'clsx';
 import { eventBus } from '../utils/eventBus';
 
 interface ConfirmPayload {

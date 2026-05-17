@@ -123,7 +123,8 @@ export const BancoView: React.FC = () => {
 
   const deleteAccount = async (id: string) => {
     if (!await appConfirm('¿Eliminar esta cuenta bancaria? Se perderán sus movimientos.')) return;
-    await supabase.from('bank_accounts').delete().eq('id', id);
+    const { error: e } = await supabase.from('bank_accounts').delete().eq('id', id);
+    if (e) { setError(e.message); return; }
     await load();
   };
 
@@ -154,12 +155,14 @@ export const BancoView: React.FC = () => {
 
   const deleteTx = async (tx: BankTx) => {
     if (!await appConfirm('¿Eliminar este movimiento?')) return;
-    await supabase.from('bank_transactions').delete().eq('id', tx.id!);
+    const { error: eDel } = await supabase.from('bank_transactions').delete().eq('id', tx.id!);
+    if (eDel) { setError(eDel.message); return; }
     // Revert saldo
     const acc = accounts.find(a => a.id === tx.account_id);
     if (acc && acc.id) {
       const delta = tx.tipo === 'ingreso' ? -tx.monto : tx.monto;
-      await supabase.from('bank_accounts').update({ saldo_actual: (acc.saldo_actual || 0) + delta }).eq('id', acc.id);
+      const { error: eUpd } = await supabase.from('bank_accounts').update({ saldo_actual: (acc.saldo_actual || 0) + delta }).eq('id', acc.id);
+      if (eUpd) { setError(eUpd.message); }
     }
     await load();
   };
@@ -367,7 +370,7 @@ export const BancoView: React.FC = () => {
                               </span>
                             </td>
                             <td className={`px-3 py-2 text-[11px] font-black ${tx.tipo === 'ingreso' ? 'text-emerald-400' : 'text-rose-400'}`}>
-                              {tx.tipo === 'ingreso' ? '+' : '-'}{fmt(tx.monto, acc?.moneda)}
+                              {tx.tipo === 'ingreso' ? '+' : '-'}{fmt(tx.monto, acc?.moneda ?? 'MXN')}
                             </td>
                             <td className="px-3 py-2 text-[9px] text-mcvill-text-muted font-mono">{tx.referencia || '—'}</td>
                             <td className="px-3 py-2">

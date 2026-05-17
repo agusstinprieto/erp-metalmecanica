@@ -110,13 +110,21 @@ function App() {
       setSessionChecked(true);
     });
 
-    // Handle session expiry or external sign-out
+    // Handle session changes (sign-in via magic link / OAuth, sign-out, token refresh)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT' || !session) {
+      if (event === 'SIGNED_IN' && session?.user) {
+        const role = (session.user.user_metadata?.role as UserRole) || 'empleado';
+        setLoggedIn(true);
+        setUserRole(role);
+        setUserEmail(session.user.email || '');
+        setUserDisplayName(session.user.user_metadata?.full_name || session.user.user_metadata?.nombre || session.user.email?.split('@')[0] || '');
+        setSentryUser(session.user.id, role, session.user.user_metadata?.tenant_id);
+      } else if (event === 'SIGNED_OUT' || !session) {
         setLoggedIn(false);
         setUserRole('empleado');
         setUserEmail('');
         setUserDisplayName('');
+        clearSentryUser();
       }
     });
 

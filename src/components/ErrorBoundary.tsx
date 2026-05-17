@@ -25,9 +25,14 @@ export class ErrorBoundary extends React.Component<{ children: React.ReactNode }
       error.message.includes('MIME type of "text/html"')
     );
     if (isChunkError) {
-      console.warn('[ErrorBoundary] Chunk load failed. Force reloading for new assets...');
-      window.location.reload();
-      return;
+      if (!sessionStorage.getItem('erp_chunk_reload')) {
+        sessionStorage.setItem('erp_chunk_reload', '1');
+        console.warn('[ErrorBoundary] Chunk load failed. Force reloading for new assets...');
+        window.location.reload();
+        return;
+      }
+      // Second consecutive chunk error — don't loop, fall through to error UI
+      sessionStorage.removeItem('erp_chunk_reload');
     }
     
     Sentry.captureException(error, { contexts: { react: { componentStack: info.componentStack } } });

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Plus, X, Loader2, CheckCircle2, Link2, Upload, Key, BookOpen,
   Clock, Zap, Factory, Users, Wrench, Cpu, AlertTriangle,
@@ -35,6 +35,9 @@ const LanzarOrdenModal: React.FC<LanzarOrdenModalProps> = ({ onClose, onCreated 
   const [isSaving, setIsSaving] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => () => clearTimeout(timerRef.current), []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,7 +53,7 @@ const LanzarOrdenModal: React.FC<LanzarOrdenModalProps> = ({ onClose, onCreated 
           metadata: { descripcion },
         });
       } else {
-        await supabase.from('ordenes_mantenimiento').insert({
+        const { error: e } = await supabase.from('ordenes_mantenimiento').insert({
           descripcion,
           prioridad,
           fecha_programada: fechaEstimada || null,
@@ -58,9 +61,10 @@ const LanzarOrdenModal: React.FC<LanzarOrdenModalProps> = ({ onClose, onCreated 
           estado: 'pendiente',
           tipo: 'correctivo',
         });
+        if (e) throw e;
       }
       setDone(true);
-      setTimeout(() => { onCreated(); onClose(); }, 1400);
+      timerRef.current = setTimeout(() => { onCreated(); onClose(); }, 1400);
     } catch (err: any) {
       setError(err?.message ?? 'Error al crear la orden');
     } finally {

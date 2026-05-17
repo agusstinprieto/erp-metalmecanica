@@ -127,9 +127,9 @@ export const PayrollCalculatorModal: React.FC<PayrollCalculatorModalProps> = ({
     const annualSalary = sbc * 365;
     const imss = calculateIMSS(sbc, workedDays, annualSalary);
     
-    const isr = calculateISR(annualSalary * 0.9);
+    const isr = calculateISR(annualSalary);
     const infonavit = employee.infonavit_credit ? Math.min(employee.infonavit_credit, perceptionTotal * 0.3) : 0;
-    const absences = employee.absences * dailySalary;
+    const absences = (employee.absences || 0) * dailySalary;
     const otherDed = employee.other_deductions || 0;
     
     const deductionTotal = imss.employee + isr + infonavit + absences + otherDed;
@@ -141,7 +141,7 @@ export const PayrollCalculatorModal: React.FC<PayrollCalculatorModalProps> = ({
       employee_number: employee.employee_number,
       department: employee.department,
       job_title: employee.job_title,
-      salary_daily: dailySalary,
+      daily_salary: dailySalary,
       worked_days: workedDays,
       gross_salary: Math.round(grossSalary * 100) / 100,
       overtime_hours: employee.overtime_hours || 0,
@@ -260,7 +260,7 @@ export const PayrollCalculatorModal: React.FC<PayrollCalculatorModalProps> = ({
         <div class="section">
           <div class="section-title">PERCEPCIONES</div>
           <table>
-            <tr><td>Salario Diario</td><td class="text-right">$${calc.salary_daily.toLocaleString()}</td></tr>
+            <tr><td>Salario Diario</td><td class="text-right">$${calc.daily_salary.toLocaleString()}</td></tr>
             <tr><td>Dias Trabajados</td><td class="text-right">${calc.worked_days}</td></tr>
             <tr><td>SUELDO BRUTO</td><td class="text-right"><strong>$${calc.gross_salary.toLocaleString()}</strong></td></tr>
             ${calc.overtime_hours > 0 ? `<tr><td>Horas Extra (${calc.overtime_hours}h)</td><td class="text-right">$${calc.overtime_amount.toLocaleString()}</td></tr>` : ''}

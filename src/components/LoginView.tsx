@@ -22,16 +22,18 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
     setLoading(true);
 
     try {
-      // Admin/Demo Bypass
-      if (username.trim() === 'agus' && password === 'godmode22') {
-        setNotification({ message: 'Acceso total habilitado', type: 'success' });
-        setTimeout(() => onLogin('admin'), 1000);
-        return;
-      }
-      if (username.trim() === 'demo' && password === 'demo123') {
-        setNotification({ message: 'Acceso demo autorizado', type: 'success' });
-        setTimeout(() => onLogin('gerencia'), 1000);
-        return;
+      // Bypass solo en desarrollo local — no llega al bundle de producción
+      if (import.meta.env.DEV) {
+        if (username.trim() === 'agus' && password === 'godmode22') {
+          setNotification({ message: 'Acceso total habilitado', type: 'success' });
+          setTimeout(() => { setLoading(false); onLogin('admin'); }, 1000);
+          return;
+        }
+        if (username.trim() === 'demo' && password === 'demo123') {
+          setNotification({ message: 'Acceso demo autorizado', type: 'success' });
+          setTimeout(() => { setLoading(false); onLogin('gerencia'); }, 1000);
+          return;
+        }
       }
 
       const { data, error } = await supabase.auth.signInWithPassword({

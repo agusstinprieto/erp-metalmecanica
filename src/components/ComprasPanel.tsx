@@ -181,6 +181,7 @@ const DeleteConfirm: React.FC<{ onCancel: () => void; onConfirm: () => void }> =
 const EMPTY_PROV: Proveedor = { razon_social: '', rfc: '', categoria: 'material', nombre_contacto: '', email: '', telefono: '', ciudad: '', condicion_pago: 'credito_30', notas: '', activo: true };
 
 const ProveedoresTab: React.FC = () => {
+  const tenantId = useTenant();
   const [rows, setRows]     = useState<Proveedor[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError]   = useState<string | null>(null);
@@ -223,7 +224,8 @@ const ProveedoresTab: React.FC = () => {
 
   const del = async () => {
     if (!delId) return;
-    await supabase.from('proveedores').delete().eq('id', delId);
+    const { error: e } = await supabase.from('proveedores').delete().eq('id', delId);
+    if (e) { setError(e.message); setDelId(null); return; }
     setDelId(null); load();
   };
 
@@ -328,6 +330,7 @@ CREATE POLICY "Public access" ON proveedores FOR ALL USING (true);`}
 const EMPTY_MAT: Material = { clave: '', descripcion: '', tipo: 'placa', unidad_medida: 'kg', precio_unitario: 0, stock_actual: 0, stock_minimo: 0, notas: '' };
 
 const MaterialesTab: React.FC = () => {
+  const tenantId = useTenant();
   const [rows, setRows]     = useState<Material[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError]   = useState<string | null>(null);
@@ -372,7 +375,8 @@ const MaterialesTab: React.FC = () => {
 
   const del = async () => {
     if (!delId) return;
-    await supabase.from('materiales_catalogo').delete().eq('id', delId);
+    const { error: e } = await supabase.from('materiales_catalogo').delete().eq('id', delId);
+    if (e) { setError(e.message); setDelId(null); return; }
     setDelId(null); load();
   };
 
@@ -477,6 +481,7 @@ CREATE POLICY "Public access" ON materiales_catalogo FOR ALL USING (true);`}
 const EMPTY_OP: Operacion = { clave: '', nombre: '', centro_trabajo: '', tarifa_hora: 0, tiempo_configuracion_default: 0, notas: '' };
 
 const OperacionesTab: React.FC = () => {
+  const tenantId = useTenant();
   const [rows, setRows]     = useState<Operacion[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError]   = useState<string | null>(null);
@@ -519,7 +524,8 @@ const OperacionesTab: React.FC = () => {
 
   const del = async () => {
     if (!delId) return;
-    await supabase.from('operaciones_catalogo').delete().eq('id', delId);
+    const { error: e } = await supabase.from('operaciones_catalogo').delete().eq('id', delId);
+    if (e) { setError(e.message); setDelId(null); return; }
     setDelId(null); load();
   };
 
