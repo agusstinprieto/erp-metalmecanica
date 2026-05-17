@@ -16,6 +16,8 @@ import {
   CELULAS, SALARIO_BASE_DEFAULT,
 } from '../services/desempenoService';
 
+import { useConfig } from '../contexts/ConfigContext';
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function getThisWeek(): string {
   const d = new Date();
@@ -72,7 +74,7 @@ const OperadorCard: React.FC<{
           <p className="text-[10px] text-mcvill-text-muted mt-0.5">{operador.numero_empleado} · {operador.celula}</p>
         </div>
         {totalBono > 0 && (
-          <span className="shrink-0 px-2 py-0.5 bg-amber-500/20 border border-amber-500/30 rounded-full text-[10px] font-black text-amber-400">
+          <span className="shrink-0 shrink-0 px-2 py-0.5 bg-amber-500/20 border border-amber-500/30 rounded-full text-[10px] font-black text-amber-400">
             ${totalBono.toLocaleString('es-MX')}
           </span>
         )}
@@ -232,6 +234,7 @@ const IncentivoBadge: React.FC<{ tipo: TipoIncentivo }> = ({ tipo }) => {
 
 // ── Main View ─────────────────────────────────────────────────────────────────
 export const DesempenoView: React.FC = () => {
+  const { config } = useConfig();
   const [operadores, setOperadores] = useState<Operador[]>([]);
   const [kpis, setKpis] = useState<DesempenoKPI[]>([]);
   const [incentivos, setIncentivos] = useState<Incentivo[]>([]);
@@ -274,7 +277,7 @@ export const DesempenoView: React.FC = () => {
       return [...prev, newKPI];
     });
     if (selectedOp && newKPI.operador_id === selectedOp.id) {
-      const suggested = calcularIncentivo(newKPI, SALARIO_BASE_DEFAULT);
+      const suggested = calcularIncentivo(newKPI, config.salarioBaseDefault ?? SALARIO_BASE_DEFAULT, config);
       if (suggested.length > 0) {
         setIncentivos(prev => [...prev.filter(i => i.operador_id !== selectedOp.id), ...suggested]);
       }

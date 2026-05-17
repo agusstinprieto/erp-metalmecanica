@@ -23,6 +23,12 @@ interface BrandConfig {
   themeColor?: string;
   themeColorLight?: string;
   themeName?: ThemeName;
+  salarioBaseDefault?: number;
+  productividadPctAlto?: number;
+  productividadPctBajo?: number;
+  calidadPct?: number;
+  seguridadPct?: number;
+  fiveSPct?: number;
 }
 
 interface ConfigContextType {
@@ -56,6 +62,12 @@ const defaultConfig: BrandConfig = {
   themeColor: '#3B82F6',
   themeColorLight: '#1D4ED8',
   themeName: 'blue' as ThemeName,
+  salarioBaseDefault: 4500,
+  productividadPctAlto: 10,
+  productividadPctBajo: 5,
+  calidadPct: 3,
+  seguridadPct: 2,
+  fiveSPct: 1,
 };
 
 const THEME_PALETTES: Record<ThemeName, {
@@ -173,6 +185,12 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               companyCity: supabaseConfig.company_city || prev.companyCity,
               developerName: supabaseConfig.developer_name || prev.developerName,
               developerUrl: supabaseConfig.developer_url || prev.developerUrl,
+              salarioBaseDefault: supabaseConfig.salarioBaseDefault !== undefined ? supabaseConfig.salarioBaseDefault : prev.salarioBaseDefault,
+              productividadPctAlto: supabaseConfig.productividadPctAlto !== undefined ? supabaseConfig.productividadPctAlto : prev.productividadPctAlto,
+              productividadPctBajo: supabaseConfig.productividadPctBajo !== undefined ? supabaseConfig.productividadPctBajo : prev.productividadPctBajo,
+              calidadPct: supabaseConfig.calidadPct !== undefined ? supabaseConfig.calidadPct : prev.calidadPct,
+              seguridadPct: supabaseConfig.seguridadPct !== undefined ? supabaseConfig.seguridadPct : prev.seguridadPct,
+              fiveSPct: supabaseConfig.fiveSPct !== undefined ? supabaseConfig.fiveSPct : prev.fiveSPct,
             };
             localStorage.setItem('mcvill-config', JSON.stringify(merged));
             return merged;
@@ -221,6 +239,12 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               company_city: updated.companyCity,
               developer_name: updated.developerName,
               developer_url: updated.developerUrl,
+              salarioBaseDefault: updated.salarioBaseDefault,
+              productividadPctAlto: updated.productividadPctAlto,
+              productividadPctBajo: updated.productividadPctBajo,
+              calidadPct: updated.calidadPct,
+              seguridadPct: updated.seguridadPct,
+              fiveSPct: updated.fiveSPct,
             }
           })
           .eq('id', tenant.id);

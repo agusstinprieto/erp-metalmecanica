@@ -34,6 +34,7 @@ import {
   FileText,
   Edit3,
   X,
+  Factory,
 } from 'lucide-react';
 import clsx from 'clsx';
 import { UserFormModal } from './UserFormModal';
@@ -50,6 +51,8 @@ import { appConfirm } from '../lib/dialogs';
 import type { TenantConfig } from '../services/tenantService';
 import { shiftService, type WorkShift } from '../services/shiftService';
 import { ShiftFormModal } from './ShiftFormModal';
+import { plantService, type Planta } from '../services/plantService';
+import { PlantFormModal } from './PlantFormModal';
 
 interface UserConfig {
   id: string;
@@ -196,6 +199,169 @@ const TarifasTab: React.FC = () => {
           </div>
         </div>
       )}
+    </div>
+  );
+};
+
+// ── Politicas Tab ────────────────────────────────────────────────────────────
+
+const PoliticasTab: React.FC = () => {
+  const { config, updateConfig } = useConfig();
+  const [salario, setSalario] = useState(config.salarioBaseDefault ?? 4500);
+  const [prodBajo, setProdBajo] = useState(config.productividadPctBajo ?? 5);
+  const [prodAlto, setProdAlto] = useState(config.productividadPctAlto ?? 10);
+  const [calidad, setCalidad] = useState(config.calidadPct ?? 3);
+  const [seguridad, setSeguridad] = useState(config.seguridadPct ?? 2);
+  const [fiveS, setFiveS] = useState(config.fiveSPct ?? 1);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  const handleSave = async () => {
+    setSaving(true);
+    await updateConfig({
+      salarioBaseDefault: Number(salario),
+      productividadPctBajo: Number(prodBajo),
+      productividadPctAlto: Number(prodAlto),
+      calidadPct: Number(calidad),
+      seguridadPct: Number(seguridad),
+      fiveSPct: Number(fiveS),
+    });
+    setSaving(false);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
+  const inputCls = 'bg-black/60 border border-white/5 rounded-lg w-full px-3 h-10 font-mono text-[11px] text-white focus:border-mcvill-accent/50 transition-all';
+
+  return (
+    <div className="h-full flex flex-col bg-mcvill-bg/20 p-6 space-y-6">
+      <div className="flex items-center justify-between border-b border-white/5 pb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-mcvill-accent/10 rounded-lg flex items-center justify-center border border-mcvill-accent/20">
+            <FileText size={20} className="text-mcvill-accent" />
+          </div>
+          <div>
+            <h3 className="text-xs font-black text-mcvill-text uppercase tracking-widest">Políticas Operativas</h3>
+            <p className="text-[9px] text-slate-500 font-black uppercase tracking-[0.2em]">Normas y Compensaciones Dinámicas</p>
+          </div>
+        </div>
+        <button 
+          onClick={handleSave} 
+          disabled={saving}
+          className="h-9 px-6 rounded-lg bg-mcvill-accent text-slate-950 text-[9px] font-black uppercase tracking-widest hover:opacity-90 transition-all flex items-center gap-2 shadow-lg shadow-mcvill-accent/20"
+        >
+          {saving ? <Loader2 size={14} className="animate-spin" /> : saved ? <CheckCircle2 size={14} className="text-slate-950" /> : <Save size={14} />}
+          {saved ? 'Guardado' : 'Guardar Políticas'}
+        </button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto custom-scrollbar grid grid-cols-1 md:grid-cols-2 gap-6 pb-6">
+        {/* Salarios */}
+        <div className="bg-slate-900/40 border border-white/5 rounded-xl p-5 space-y-4">
+          <h4 className="text-[10px] font-black text-mcvill-accent uppercase tracking-widest border-b border-white/5 pb-2">Salarios y Referencias</h4>
+          
+          <div className="space-y-1.5">
+            <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Salario Base Semanal de Referencia (MXN)</label>
+            <div className="relative">
+              <span className="absolute left-3 top-2.5 text-slate-500 font-mono text-[11px]">$</span>
+              <input 
+                type="number" 
+                value={salario} 
+                onChange={(e) => setSalario(parseFloat(e.target.value) || 0)} 
+                className={clsx(inputCls, 'pl-6')} 
+              />
+            </div>
+            <p className="text-[8px] text-slate-600 font-medium ml-1">Baseline para calcular el porcentaje de los bonos cuando no hay salario individual específico.</p>
+          </div>
+        </div>
+
+        {/* Políticas de Productividad */}
+        <div className="bg-slate-900/40 border border-white/5 rounded-xl p-5 space-y-4">
+          <h4 className="text-[10px] font-black text-mcvill-accent uppercase tracking-widest border-b border-white/5 pb-2">Incentivos de Productividad</h4>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Bono Eficiencia ≥ 100%</label>
+              <div className="relative">
+                <input 
+                  type="number" 
+                  value={prodBajo} 
+                  onChange={(e) => setProdBajo(parseFloat(e.target.value) || 0)} 
+                  className={inputCls} 
+                />
+                <span className="absolute right-3 top-2.5 text-slate-500 font-mono text-[11px]">%</span>
+              </div>
+            </div>
+            
+            <div className="space-y-1.5">
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Bono Eficiencia ≥ 110%</label>
+              <div className="relative">
+                <input 
+                  type="number" 
+                  value={prodAlto} 
+                  onChange={(e) => setProdAlto(parseFloat(e.target.value) || 0)} 
+                  className={inputCls} 
+                />
+                <span className="absolute right-3 top-2.5 text-slate-500 font-mono text-[11px]">%</span>
+              </div>
+            </div>
+          </div>
+          <p className="text-[8px] text-slate-600 font-medium ml-1">Porcentaje de bono sobre salario semanal según la eficiencia registrada en las células.</p>
+        </div>
+
+        {/* Calidad e Incidentes */}
+        <div className="bg-slate-900/40 border border-white/5 rounded-xl p-5 space-y-4">
+          <h4 className="text-[10px] font-black text-mcvill-accent uppercase tracking-widest border-b border-white/5 pb-2">Calidad y Seguridad</h4>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Bono Calidad ≥ 98%</label>
+              <div className="relative">
+                <input 
+                  type="number" 
+                  value={calidad} 
+                  onChange={(e) => setCalidad(parseFloat(e.target.value) || 0)} 
+                  className={inputCls} 
+                />
+                <span className="absolute right-3 top-2.5 text-slate-500 font-mono text-[11px]">%</span>
+              </div>
+            </div>
+            
+            <div className="space-y-1.5">
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Bono Cero Incidentes</label>
+              <div className="relative">
+                <input 
+                  type="number" 
+                  value={seguridad} 
+                  onChange={(e) => setSeguridad(parseFloat(e.target.value) || 0)} 
+                  className={inputCls} 
+                />
+                <span className="absolute right-3 top-2.5 text-slate-500 font-mono text-[11px]">%</span>
+              </div>
+            </div>
+          </div>
+          <p className="text-[8px] text-slate-600 font-medium ml-1">Recompensa al cumplimiento riguroso de no-rechazos y prevención de riesgos de trabajo.</p>
+        </div>
+
+        {/* Políticas de Orden 5S */}
+        <div className="bg-slate-900/40 border border-white/5 rounded-xl p-5 space-y-4">
+          <h4 className="text-[10px] font-black text-mcvill-accent uppercase tracking-widest border-b border-white/5 pb-2">Auditoría 5S</h4>
+          
+          <div className="space-y-1.5">
+            <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Bono Score 5S ≥ 90%</label>
+            <div className="relative">
+              <input 
+                type="number" 
+                value={fiveS} 
+                onChange={(e) => setFiveS(parseFloat(e.target.value) || 0)} 
+                className={inputCls} 
+              />
+              <span className="absolute right-3 top-2.5 text-slate-500 font-mono text-[11px]">%</span>
+            </div>
+            <p className="text-[8px] text-slate-600 font-medium ml-1">Incentiva mantener el área limpia, ordenada, estandarizada y segura.</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
@@ -366,6 +532,130 @@ const KnowledgeBaseTab: React.FC<{ tenantId: string }> = ({ tenantId }) => {
   );
 };
 
+// ─── Plantas Tab ────────────────────────────────────────────────────────────
+
+const PlantasTab: React.FC<{ tenantId: string }> = ({ tenantId }) => {
+  const [plants, setPlants] = useState<Planta[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPlant, setSelectedPlant] = useState<Planta | null>(null);
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const data = await plantService.listPlants();
+      setPlants(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const handleEdit = (plant: Planta) => {
+    setSelectedPlant(plant);
+    setIsModalOpen(true);
+  };
+
+  const handleToggleStatus = async (plant: Planta) => {
+    const nextStatus = !plant.activa;
+    if (!await appConfirm(`¿Seguro que deseas ${nextStatus ? 'activar' : 'desactivar'} esta planta?`)) return;
+    try {
+      await plantService.updatePlant(plant.id, { activa: nextStatus });
+      load();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  return (
+    <div className="h-full flex flex-col bg-slate-950/20 p-6 space-y-6">
+      <div className="flex items-center justify-between border-b border-white/5 pb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-mcvill-accent/10 rounded-lg flex items-center justify-center border border-mcvill-accent/20">
+            <Factory size={20} className="text-mcvill-accent" />
+          </div>
+          <div>
+            <h3 className="text-xs font-black text-mcvill-text uppercase tracking-widest">Gestión de Plantas</h3>
+            <p className="text-[9px] text-slate-500 font-black uppercase tracking-[0.2em]">Centros Operativos del Grupo</p>
+          </div>
+        </div>
+        <button 
+          onClick={() => { setSelectedPlant(null); setIsModalOpen(true); }}
+          className="mcvill-btn-create h-8 px-4 rounded-lg text-[9px] font-black uppercase flex items-center gap-2"
+        >
+          <Plus size={13} /> Agregar Planta
+        </button>
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center py-12"><Loader2 size={24} className="animate-spin text-mcvill-accent" /></div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 overflow-y-auto custom-scrollbar">
+          {plants.map(plant => (
+            <div key={plant.id} className={`bg-slate-900/40 border rounded-xl p-4 hover:border-white/10 transition-all group ${plant.activa ? 'border-white/5' : 'border-red-500/20 opacity-60'}`}>
+              <div className="flex justify-between items-start mb-3">
+                <div className="p-2 rounded-lg bg-black/40 border border-white/5">
+                  <Factory size={16} className={plant.activa ? 'text-mcvill-accent' : 'text-slate-500'} />
+                </div>
+                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button onClick={() => handleEdit(plant)} className="p-1.5 hover:text-mcvill-accent transition-colors" title="Editar"><Edit3 size={12} /></button>
+                  <button onClick={() => handleToggleStatus(plant)} className={`p-1.5 transition-colors ${plant.activa ? 'hover:text-red-400' : 'hover:text-emerald-400'}`} title={plant.activa ? 'Desactivar' : 'Activar'}>
+                    <Shield size={12} />
+                  </button>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-[9px] font-mono font-black px-1.5 py-0.5 rounded bg-black/50 border border-white/5 text-mcvill-accent">{plant.codigo}</span>
+                <h4 className="text-[11px] font-black text-white uppercase tracking-tight truncate">{plant.nombre}</h4>
+              </div>
+              
+              <div className="space-y-2 mt-3 text-[10px]">
+                <div className="flex items-center gap-1.5 text-slate-400">
+                  <span className="text-[8px] font-black text-slate-500 uppercase w-14 shrink-0">Ubicación:</span>
+                  <span className="truncate">{plant.ciudad}, {plant.pais}</span>
+                </div>
+                {plant.direccion && (
+                  <div className="flex items-center gap-1.5 text-slate-400">
+                    <span className="text-[8px] font-black text-slate-500 uppercase w-14 shrink-0">Dirección:</span>
+                    <span className="truncate" title={plant.direccion}>{plant.direccion}</span>
+                  </div>
+                )}
+                {plant.responsable && (
+                  <div className="flex items-start gap-1.5 text-slate-400">
+                    <span className="text-[8px] font-black text-slate-500 uppercase w-14 shrink-0 mt-0.5">Operación:</span>
+                    <span className="leading-snug text-slate-300 font-mono text-[9px] whitespace-pre-line">{plant.responsable}</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-1.5 pt-1 border-t border-white/5 mt-2 justify-between">
+                  <span className="text-[8px] font-black text-slate-500 uppercase">Estatus:</span>
+                  <span className={`text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded border ${plant.activa ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' : 'text-rose-400 bg-rose-500/10 border-rose-500/20'}`}>
+                    {plant.activa ? 'Operativa' : 'Inactiva'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+          {plants.length === 0 && (
+            <div className="col-span-full py-12 text-center opacity-50">
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">No hay plantas configuradas</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      <PlantFormModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={load}
+        initialData={selectedPlant}
+      />
+    </div>
+  );
+};
+
 // ─── Shifts Tab ─────────────────────────────────────────────────────────────
 
 const ShiftsTab: React.FC = () => {
@@ -478,7 +768,7 @@ const ShiftsTab: React.FC = () => {
 export const SettingsView: React.FC<SettingsViewProps> = ({ userRole }) => {
   const { language, t } = useLanguage();
   const isPrivileged = userRole === 'ceo' || userRole === 'sistemas';
-  const [activeTab, setActiveTab] = useState<'users' | 'audit' | 'api' | 'tarifas' | 'brand' | 'security' | 'knowledge' | 'shifts'>(isPrivileged ? 'users' : 'security');
+  const [activeTab, setActiveTab] = useState<'users' | 'audit' | 'api' | 'tarifas' | 'brand' | 'security' | 'knowledge' | 'shifts' | 'plantas' | 'politicas'>(isPrivileged ? 'users' : 'security');
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [users, setUsers] = useState<UserConfig[]>([]);
@@ -719,6 +1009,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ userRole }) => {
             isPrivileged && { id: 'audit', label: language === 'en' ? 'Auditing' : 'Auditoría', icon: History },
             isPrivileged && { id: 'api', label: language === 'en' ? 'AI Engines' : 'Motores IA', icon: Cpu },
             isPrivileged && { id: 'tarifas', label: language === 'en' ? 'Rates' : 'Tarifas', icon: Zap },
+            isPrivileged && { id: 'plantas', label: language === 'en' ? 'Plants' : 'Plantas', icon: Factory },
+            isPrivileged && { id: 'politicas', label: language === 'en' ? 'Policies' : 'Políticas', icon: FileText },
             isPrivileged && { id: 'shifts', label: language === 'en' ? 'Shifts' : 'Turnos', icon: Clock },
             isPrivileged && { id: 'knowledge', label: language === 'en' ? 'AI Base' : 'Base IA', icon: BookOpen },
             isPrivileged && { id: 'brand', label: language === 'en' ? 'Identity' : 'Identidad', icon: Globe },
@@ -1138,6 +1430,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ userRole }) => {
         )}
 
         {activeTab === 'tarifas' && <TarifasTab />}
+
+        {activeTab === 'plantas' && <PlantasTab tenantId={tenantId || ''} />}
+
+        {activeTab === 'politicas' && <PoliticasTab />}
 
         {activeTab === 'shifts' && <ShiftsTab />}
 

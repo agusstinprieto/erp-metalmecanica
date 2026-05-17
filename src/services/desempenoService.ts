@@ -86,49 +86,65 @@ export function calcularKPIs(kpi: Partial<DesempenoKPI>): Partial<DesempenoKPI> 
   return { ...kpi, eficiencia, tasa_calidad, oee };
 }
 
-export function calcularIncentivo(kpi: DesempenoKPI, salarioBase: number): Incentivo[] {
+export interface PolicyConfig {
+  salarioBaseDefault?: number;
+  productividadPctAlto?: number;
+  productividadPctBajo?: number;
+  calidadPct?: number;
+  seguridadPct?: number;
+  fiveSPct?: number;
+}
+
+export function calcularIncentivo(kpi: DesempenoKPI, salarioBase: number, policies?: PolicyConfig): Incentivo[] {
   const incentivos: Incentivo[] = [];
   const now = new Date().toISOString();
 
+  // Map configured dynamic percentages or fall back to default specs
+  const prodPctAlto = (policies?.productividadPctAlto ?? 10) / 100;
+  const prodPctBajo = (policies?.productividadPctBajo ?? 5) / 100;
+  const calPct = (policies?.calidadPct ?? 3) / 100;
+  const segPct = (policies?.seguridadPct ?? 2) / 100;
+  const f5sPct = (policies?.fiveSPct ?? 1) / 100;
+
   if ((kpi.eficiencia ?? 0) >= 100) {
-    const pct = kpi.eficiencia! >= 110 ? 0.10 : 0.05;
+    const pct = kpi.eficiencia! >= 110 ? prodPctAlto : prodPctBajo;
     incentivos.push({
       id: `inc-local-${Date.now()}-p`, operador_id: kpi.operador_id, periodo: kpi.periodo,
       tipo_incentivo: 'productividad',
-      descripcion: `Eficiencia ${kpi.eficiencia?.toFixed(1)}% — bono ${pct * 100}% salario`,
+      descripcion: `Eficiencia ${kpi.eficiencia?.toFixed(1)}% — bono ${(pct * 100).toFixed(0)}% salario`,
       monto: parseFloat((salarioBase * pct).toFixed(2)),
       porcentaje_base: pct * 100,
-      aprobado: false, tenant_id: TENANT, created_at: now,
+      aprobado: false, tenant_id: kpi.tenant_id || TENANT, created_at: now,
     });
   }
   if ((kpi.tasa_calidad ?? 0) >= 98) {
     incentivos.push({
       id: `inc-local-${Date.now()}-q`, operador_id: kpi.operador_id, periodo: kpi.periodo,
       tipo_incentivo: 'calidad',
-      descripcion: `Calidad ${kpi.tasa_calidad?.toFixed(1)}% — bono 3% salario`,
-      monto: parseFloat((salarioBase * 0.03).toFixed(2)),
-      porcentaje_base: 3,
-      aprobado: false, tenant_id: TENANT, created_at: now,
+      descripcion: `Calidad ${kpi.tasa_calidad?.toFixed(1)}% — bono ${(calPct * 100).toFixed(0)}% salario`,
+      monto: parseFloat((salarioBase * calPct).toFixed(2)),
+      porcentaje_base: calPct * 100,
+      aprobado: false, tenant_id: kpi.tenant_id || TENANT, created_at: now,
     });
   }
   if (kpi.incidentes === 0) {
     incentivos.push({
       id: `inc-local-${Date.now()}-s`, operador_id: kpi.operador_id, periodo: kpi.periodo,
       tipo_incentivo: 'seguridad',
-      descripcion: 'Cero incidentes en el período',
-      monto: parseFloat((salarioBase * 0.02).toFixed(2)),
-      porcentaje_base: 2,
-      aprobado: false, tenant_id: TENANT, created_at: now,
+      descripcion: `Cero incidentes en el período — bono ${(segPct * 100).toFixed(0)}% salario`,
+      monto: parseFloat((salarioBase * segPct).toFixed(2)),
+      porcentaje_base: segPct * 100,
+      aprobado: false, tenant_id: kpi.tenant_id || TENANT, created_at: now,
     });
   }
   if ((kpi.score_5s ?? 0) >= 90) {
     incentivos.push({
       id: `inc-local-${Date.now()}-5s`, operador_id: kpi.operador_id, periodo: kpi.periodo,
       tipo_incentivo: '5s',
-      descripcion: `5S score ${kpi.score_5s}% — bono 1% salario`,
-      monto: parseFloat((salarioBase * 0.01).toFixed(2)),
-      porcentaje_base: 1,
-      aprobado: false, tenant_id: TENANT, created_at: now,
+      descripcion: `5S score ${kpi.score_5s}% — bono ${(f5sPct * 100).toFixed(0)}% salario`,
+      monto: parseFloat((salarioBase * f5sPct).toFixed(2)),
+      porcentaje_base: f5sPct * 100,
+      aprobado: false, tenant_id: kpi.tenant_id || TENANT, created_at: now,
     });
   }
   return incentivos;
