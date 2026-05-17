@@ -206,6 +206,7 @@ export const MantenimientoPanel: React.FC = () => {
 const EMPTY_MAQ: Maquina = { codigo: '', nombre: '', modelo: '', fabricante: '', numero_serie: '', ubicacion: '', area: '', horas_uso: 0, frecuencia_mant_dias: 90, estado: 'operativa', notas: '', activo: true };
 
 const MaquinasTab: React.FC = () => {
+  const tenantId = useTenant();
   const [rows, setRows]           = useState<Maquina[]>([]);
   const [loading, setLoading]     = useState(false);
   const [error, setError]         = useState<string | null>(null);
@@ -348,6 +349,7 @@ const MaquinasTab: React.FC = () => {
 const EMPTY_EDI: Edificio = { nombre: '', tipo: 'civil', ubicacion: '', area_m2: undefined, responsable: '', frecuencia_mant_dias: 180, estado: 'bueno', notas: '', activo: true };
 
 const EdificioTab: React.FC = () => {
+  const tenantId = useTenant();
   const [rows, setRows]           = useState<Edificio[]>([]);
   const [loading, setLoading]     = useState(false);
   const [error, setError]         = useState<string | null>(null);
@@ -664,6 +666,7 @@ const NuevaOrdenModal: React.FC<{ onClose: () => void; onSaved: () => void }> = 
 const EMPTY_OT: OrdenMant = { tipo_activo: 'maquina', activo_nombre: '', tipo_mantenimiento: 'preventivo', prioridad: 'media', descripcion: '', tecnico_asignado: '', estado: 'pendiente', costo_estimado: 0 };
 
 const OrdenesTab: React.FC = () => {
+  const tenantId = useTenant();
   const [rows, setRows]       = useState<OrdenMant[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState<string | null>(null);

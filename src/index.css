@@ -119,7 +119,20 @@
 .border-purple-500\/30 { border-color: color-mix(in srgb, var(--theme-accent), transparent 68%) !important; }
 .hover\:bg-purple-500\/5:hover { background-color: color-mix(in srgb, var(--theme-accent), transparent 95%) !important; }
 
-/* Global Border Overrides to prevent white borders */
+/* ── Remap emerald SÓLIDO (botones de acción) → acento del tema
+   emerald con opacidad (/10 /20) y text-emerald-400 = estado semántico, se deja igual */
+.bg-emerald-600 { background-color: var(--theme-accent) !important; }
+.bg-emerald-500 { background-color: color-mix(in srgb, var(--theme-accent), white 12%) !important; }
+.hover\:bg-emerald-600:hover { background-color: var(--theme-accent) !important; }
+.hover\:bg-emerald-500:hover { background-color: color-mix(in srgb, var(--theme-accent), white 12%) !important; }
+.focus\:ring-emerald-500\/30:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-accent), transparent 70%) !important; }
+.shadow-emerald-600\/20 { box-shadow: 0 0 20px color-mix(in srgb, var(--theme-accent), transparent 80%) !important; }
+.shadow-emerald-500\/30 { box-shadow: 0 0 20px color-mix(in srgb, var(--theme-accent), transparent 70%) !important; }
+/* Borders sólidos de emerald en botones */
+.border-emerald-400\/50 { border-color: color-mix(in srgb, var(--theme-accent), transparent 50%) !important; }
+.border-emerald-500\/50 { border-color: color-mix(in srgb, var(--theme-accent), transparent 50%) !important; }
+
+/* ── Global Border Overrides to prevent white borders */
 .dark .border-white\/5,
 .dark .border-white\/10,
 .dark .border-white\/20,
@@ -403,7 +416,12 @@ select option {
 }
 
 @utility mcvill-btn-create {
-  @apply bg-emerald-600 text-white shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_35px_rgba(16,185,129,0.5)] border border-emerald-400/50 hover:bg-emerald-500 transition-all duration-300;
+  @apply bg-mcvill-accent text-white border border-white/15 transition-all duration-300;
+  box-shadow: 0 0 20px var(--theme-glow);
+  &:hover {
+    background-color: color-mix(in srgb, var(--theme-accent), white 12%);
+    box-shadow: 0 0 35px var(--theme-glow);
+  }
 }
 
 @utility mcvill-btn-planning {
