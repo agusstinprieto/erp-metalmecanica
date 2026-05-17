@@ -260,7 +260,7 @@ export const MaintenanceView = () => {
                   </div>
                   <div className="p-4 bg-[var(--mcvill-bg)]/40 rounded-2xl border border-mcvill-card-border group-hover:bg-[var(--mcvill-bg)] transition-colors">
                     <p className="text-[9px] font-black text-mcvill-text-muted uppercase tracking-[0.3em] mb-2">Próximo Protocolo</p>
-                    <p className="text-lg font-black text-mcvill-accent tracking-tighter uppercase">{new Date(machine.next_maintenance).toLocaleDateString('es-ES', {month:'short', day:'numeric'})}</p>
+                    <p className="text-lg font-black text-mcvill-accent tracking-tighter uppercase">{machine.next_maintenance ? new Date(machine.next_maintenance).toLocaleDateString('es-ES', {month:'short', day:'numeric'}) : '—'}</p>
                   </div>
                 </div>
               </div>

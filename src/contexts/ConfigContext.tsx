@@ -156,25 +156,27 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         
         if (tenant) {
           const supabaseConfig = tenant.config || {};
-          const remoteConfig = {
-            ...config,
-            brandName: tenant.brand_name || config.brandName,
-            systemName: tenant.system_name || config.systemName,
-            slogan: tenant.slogan || config.slogan,
-            selectedApi: tenant.selected_api || config.selectedApi,
-            themeColor: supabaseConfig.themeColor || config.themeColor,
-            themeColorLight: supabaseConfig.themeColorLight || config.themeColorLight,
-            themeName: (supabaseConfig.themeName as ThemeName) || config.themeName,
-            logo: supabaseConfig.logo_url || config.logo,
-            logoDark: supabaseConfig.logo_url || config.logoDark,
-            companyName: supabaseConfig.company_name || config.companyName,
-            companyCity: supabaseConfig.company_city || config.companyCity,
-            developerName: supabaseConfig.developer_name || config.developerName,
-            developerUrl: supabaseConfig.developer_url || config.developerUrl,
-          };
-          
-          setConfig(remoteConfig);
-          localStorage.setItem('mcvill-config', JSON.stringify(remoteConfig));
+          // Merge on top of whatever localStorage already restored (prev), not the stale closure value
+          setConfig(prev => {
+            const merged = {
+              ...prev,
+              brandName: tenant.brand_name || prev.brandName,
+              systemName: tenant.system_name || prev.systemName,
+              slogan: tenant.slogan || prev.slogan,
+              selectedApi: tenant.selected_api || prev.selectedApi,
+              themeColor: supabaseConfig.themeColor || prev.themeColor,
+              themeColorLight: supabaseConfig.themeColorLight || prev.themeColorLight,
+              themeName: (supabaseConfig.themeName as ThemeName) || prev.themeName,
+              logo: supabaseConfig.logo_url || prev.logo,
+              logoDark: supabaseConfig.logo_url || prev.logoDark,
+              companyName: supabaseConfig.company_name || prev.companyName,
+              companyCity: supabaseConfig.company_city || prev.companyCity,
+              developerName: supabaseConfig.developer_name || prev.developerName,
+              developerUrl: supabaseConfig.developer_url || prev.developerUrl,
+            };
+            localStorage.setItem('mcvill-config', JSON.stringify(merged));
+            return merged;
+          });
         } else if (error) {
           console.warn('Supabase config fetch failed, using local/defaults:', error.message);
         }
@@ -202,9 +204,9 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const { data: tenant } = await supabase.from('tenants').select('id, config').eq('id', tenantId ?? 'mcvill').maybeSingle();
       if (tenant) {
         const currentSupabaseConfig = tenant.config || {};
-        await supabase
+        const { error: updateErr } = await supabase
           .from('tenants')
-          .update({ 
+          .update({
             brand_name: updated.brandName,
             system_name: updated.systemName,
             slogan: updated.slogan,
@@ -222,6 +224,7 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             }
           })
           .eq('id', tenant.id);
+        if (updateErr) console.error('Error persisting config update:', updateErr.message);
       }
     } catch (error) {
       console.error('Error persisting config to Supabase:', error);
@@ -239,7 +242,6 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const setThemeName = (name: ThemeName) => {
-    setConfig(prev => ({ ...prev, themeName: name }));
     localStorage.setItem('mcvill-theme-name', name);
     updateConfig({ themeName: name });
   };

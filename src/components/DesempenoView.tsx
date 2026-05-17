@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { supabase } from '../lib/supabase';
 import clsx from 'clsx';
 import {
   Users, TrendingUp, Award, AlertTriangle, CheckCircle,
@@ -256,7 +257,8 @@ export const DesempenoView: React.FC = () => {
       setIncentivos(inc);
       setCelulas(cels);
       if (ops.length > 0 && !selectedOp) setSelectedOp(ops[0]);
-    }).catch(() => {
+    }).catch((err) => {
+      console.error('[DesempenoView] load error:', err);
       setErrorMsg('No se pudieron cargar los datos de desempeño. Verifica tu conexión.');
     }).finally(() => setLoading(false));
   }, [periodo]);
@@ -280,8 +282,15 @@ export const DesempenoView: React.FC = () => {
   };
 
   const handleAprobar = async (id: string) => {
-    await aprobarIncentivo(id, 'Arianna Carrillo');
-    setIncentivos(prev => prev.map(i => i.id === id ? { ...i, aprobado: true, aprobado_por: 'Arianna Carrillo' } : i));
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const approver = user?.user_metadata?.full_name || user?.user_metadata?.nombre || user?.email?.split('@')[0] || 'Sistema';
+      await aprobarIncentivo(id, approver);
+      setIncentivos(prev => prev.map(i => i.id === id ? { ...i, aprobado: true, aprobado_por: approver } : i));
+    } catch (err) {
+      console.error('[DesempenoView] handleAprobar error:', err);
+      setErrorMsg('No se pudo aprobar el incentivo. Intenta de nuevo.');
+    }
   };
 
   const totalBonosSemana = incentivos.filter(i => i.aprobado).reduce((s, i) => s + i.monto, 0);
@@ -322,8 +331,8 @@ export const DesempenoView: React.FC = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { icon: Users, label: 'Operadores Activos', val: operadores.length.toString(), sub: `${kpis.length} con KPIs`, color: 'text-blue-400' },
-          { icon: TrendingUp, label: 'Eficiencia Promedio', val: `${kpis.length ? (kpis.reduce((s, k) => s + (k.eficiencia ?? 0), 0) / kpis.length).toFixed(1) : '—'}%`, sub: 'Meta: 100%', color: kpiColor(kpis.length ? kpis.reduce((s, k) => s + (k.eficiencia ?? 0), 0) / kpis.length : 0, 100, 85) },
-          { icon: CheckCircle, label: 'Calidad Promedio', val: `${kpis.length ? (kpis.reduce((s, k) => s + (k.tasa_calidad ?? 0), 0) / kpis.length).toFixed(1) : '—'}%`, sub: 'Meta: 98%', color: kpiColor(kpis.length ? kpis.reduce((s, k) => s + (k.tasa_calidad ?? 0), 0) / kpis.length : 0, 98, 90) },
+          { icon: TrendingUp, label: 'Eficiencia Promedio', val: (() => { const r = kpis.filter(k => k.eficiencia != null); return r.length ? `${(r.reduce((s, k) => s + k.eficiencia!, 0) / r.length).toFixed(1)}%` : '—'; })(), sub: 'Meta: 100%', color: kpiColor(kpis.filter(k => k.eficiencia != null).length ? kpis.filter(k => k.eficiencia != null).reduce((s, k) => s + k.eficiencia!, 0) / kpis.filter(k => k.eficiencia != null).length : 0, 100, 85) },
+          { icon: CheckCircle, label: 'Calidad Promedio', val: (() => { const r = kpis.filter(k => k.tasa_calidad != null); return r.length ? `${(r.reduce((s, k) => s + k.tasa_calidad!, 0) / r.length).toFixed(1)}%` : '—'; })(), sub: 'Meta: 98%', color: kpiColor(kpis.filter(k => k.tasa_calidad != null).length ? kpis.filter(k => k.tasa_calidad != null).reduce((s, k) => s + k.tasa_calidad!, 0) / kpis.filter(k => k.tasa_calidad != null).length : 0, 98, 90) },
           { icon: DollarSign, label: 'Bonos Aprobados', val: `$${totalBonosSemana.toLocaleString('es-MX')}`, sub: `${pendientesAprobacion} pendientes`, color: 'text-amber-400' },
         ].map(k => (
           <div key={k.label} className="bg-mcvill-card border border-mcvill-accent/10 rounded-2xl p-4">

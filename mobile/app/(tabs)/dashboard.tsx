@@ -28,7 +28,7 @@ interface ViajeroRow {
 }
 
 function todayISO() { return new Date().toISOString().split('T')[0]; }
-function todayStart() { const d = new Date(); d.setHours(0,0,0,0); return d.toISOString(); }
+function todayStart() { const d = new Date(); d.setUTCHours(0,0,0,0); return d.toISOString(); }
 
 function greeting() {
   const h = new Date().getHours();

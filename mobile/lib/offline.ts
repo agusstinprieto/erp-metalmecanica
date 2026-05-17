@@ -1,7 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from './supabase';
 
-const QUEUE_STORAGE_KEY = '@mcvill_sync_queue';
+const QUEUE_STORAGE_KEY   = '@mcvill_sync_queue';
+const ID_MAP_STORAGE_KEY  = '@mcvill_id_translation_map';
 
 export interface QueueItem {
   id: string; // local temporary uuid or id
@@ -125,8 +126,13 @@ export async function syncQueue(): Promise<{ successCount: number; failedCount: 
   
   // Tabla de traducción de IDs temporales a reales
   // (Resuelve la relación offline Check-In -> Check-Out)
-  const idTranslationTable: Record<string, string> = {};
-  
+  // Load persisted ID map so cross-session checkout→check-in links still resolve
+  let idTranslationTable: Record<string, string> = {};
+  try {
+    const raw = await AsyncStorage.getItem(ID_MAP_STORAGE_KEY);
+    if (raw) idTranslationTable = JSON.parse(raw);
+  } catch {}
+
   const activeQueue = [...queue];
   const remainingQueue: QueueItem[] = [];
 
@@ -135,10 +141,10 @@ export async function syncQueue(): Promise<{ successCount: number; failedCount: 
       // 1. Traducir valores relacionales de IDs temporales a reales si existen
       let resolvedPayload = { ...item.payload };
       
-      // Si el payload contiene un filtro o campo que apunta a un ID temporal previo
-      if (item.filterValue && idTranslationTable[item.filterValue]) {
-        item.filterValue = idTranslationTable[item.filterValue];
-      }
+      // Resolver filterValue sin mutar el item original de la cola
+      const resolvedFilterValue = item.filterValue && idTranslationTable[item.filterValue]
+        ? idTranslationTable[item.filterValue]
+        : item.filterValue;
       
       for (const key of Object.keys(resolvedPayload)) {
         const val = resolvedPayload[key];
@@ -179,7 +185,7 @@ export async function syncQueue(): Promise<{ successCount: number; failedCount: 
         
       } else if (item.action === 'update') {
         const filterField = item.filterField || 'id';
-        const filterVal = item.filterValue || resolvedPayload.id;
+        const filterVal = resolvedFilterValue || resolvedPayload.id;
 
         const { error } = await supabase
           .from(item.table)
@@ -201,6 +207,10 @@ export async function syncQueue(): Promise<{ successCount: number; failedCount: 
 
   // Guardar elementos fallidos para reintentar después
   await saveSyncQueue(remainingQueue);
+  // Persist ID map so future sessions can resolve temp→real IDs for pending checkouts
+  try {
+    await AsyncStorage.setItem(ID_MAP_STORAGE_KEY, JSON.stringify(idTranslationTable));
+  } catch {}
   console.log(`[Offline] Sync finished. Successes: ${successCount}, Retained in queue: ${failedCount}`);
   
   return { successCount, failedCount };

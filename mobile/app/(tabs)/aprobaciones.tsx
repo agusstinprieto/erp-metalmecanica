@@ -90,7 +90,12 @@ export default function AprobacionesScreen() {
       return;
     }
 
-    await supabase.from('viajero_operaciones').update(payload).eq('id', op.id);
+    const { error } = await supabase.from('viajero_operaciones').update(payload).eq('id', op.id);
+    if (error) {
+      Alert.alert('Error', error.message);
+      setActing(null);
+      return;
+    }
     setOps(prev => prev.filter(o => o.id !== op.id));
     setActing(null);
   };

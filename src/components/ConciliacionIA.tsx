@@ -153,6 +153,7 @@ function runLocalMatch(bankLines: BankLine[], erpTxs: BankTx[]): {
       usedErp.add(best.id!);
       results.push({ id: `m-${bank.id}`, bankLine: bank, erpTx: best, confidence: bestScore, razon: 'Monto exacto + fecha coincide', status: 'auto' });
     } else if (best && bestScore >= 55) {
+      usedErp.add(best.id!);
       results.push({ id: `m-${bank.id}`, bankLine: bank, erpTx: best, confidence: bestScore, razon: 'Match parcial — requiere revisión', status: 'sugerido' });
     } else {
       unmatchedBank.push(bank);

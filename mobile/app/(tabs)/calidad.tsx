@@ -92,55 +92,56 @@ export default function CalidadScreen() {
     if (qp + qf > qi) { Alert.alert('Error', 'Aprobadas + rechazadas no puede exceder la cantidad inspeccionada'); return; }
 
     setSaving(true);
-    const { data: { user } } = await supabase.auth.getUser().catch(() => ({ data: { user: null } }));
-    const nowStr = new Date().toISOString();
-    const isOnline = await checkConnectivity();
+    try {
+      const { data: { user } } = await supabase.auth.getUser().catch(() => ({ data: { user: null } }));
+      const nowStr = new Date().toISOString();
+      const isOnline = await checkConnectivity();
 
-    const payload = {
-      product_code:       partCode.trim().toUpperCase(),
-      product_name:       partName.trim() || partCode.trim(),
-      batch_number:       batch.trim() || null,
-      inspector_id:       user?.id || null,
-      inspection_date:    nowStr,
-      quantity_inspected: qi,
-      quantity_passed:    qp,
-      quantity_failed:    qf,
-      defect_types:       defects.length ? defects : null,
-      defect_notes:       notes.trim() || null,
-      status:             qf === 0 ? 'passed' : qf < qi ? 'partial' : 'failed',
-      tenant_id:          'mcvill',
-    };
+      const payload = {
+        product_code:       partCode.trim().toUpperCase(),
+        product_name:       partName.trim() || partCode.trim(),
+        batch_number:       batch.trim() || null,
+        inspector_id:       user?.id || null,
+        inspection_date:    nowStr,
+        quantity_inspected: qi,
+        quantity_passed:    qp,
+        quantity_failed:    qf,
+        defect_types:       defects.length ? defects : null,
+        defect_notes:       notes.trim() || null,
+        status:             qf === 0 ? 'passed' : qf < qi ? 'partial' : 'failed',
+        tenant_id:          'mcvill',
+      };
 
-    if (!isOnline) {
-      // Guardado local offline
-      await enqueueAction({
-        table: 'quality_inspections',
-        action: 'insert',
-        payload,
-        photoUri: photo || undefined,
-        photoField: 'foto_url',
-        photoBucket: 'mcvill-fotos',
-        photoFolder: 'calidad'
-      });
+      if (!isOnline) {
+        await enqueueAction({
+          table: 'quality_inspections',
+          action: 'insert',
+          payload,
+          photoUri: photo || undefined,
+          photoField: 'foto_url',
+          photoBucket: 'mcvill-fotos',
+          photoFolder: 'calidad'
+        });
+        Alert.alert('Modo Offline', 'Reporte de calidad guardado localmente. Se sincronizará al recuperar internet.');
+        setMode('list');
+        setPartCode(''); setPartName(''); setBatch(''); setInspected(''); setPassed(''); setFailed('');
+        setDefects([]); setNotes(''); setPhoto(null);
+        return;
+      }
 
-      Alert.alert('Modo Offline', 'Reporte de calidad guardado localmente. Se sincronizará al recuperar internet.');
-      setMode('list');
+      const { data: ins, error } = await supabase.from('quality_inspections').insert(payload).select().single();
+      if (error) { Alert.alert('Error', error.message); return; }
+
+      if (photo && ins) await uploadPhoto(photo, ins.id);
+
+      setMode('list'); load();
       setPartCode(''); setPartName(''); setBatch(''); setInspected(''); setPassed(''); setFailed('');
       setDefects([]); setNotes(''); setPhoto(null);
+    } catch (e: any) {
+      Alert.alert('Error', e?.message ?? 'No se pudo guardar la inspección');
+    } finally {
       setSaving(false);
-      return;
     }
-
-    const { data: ins, error } = await supabase.from('quality_inspections').insert(payload).select().single();
-
-    if (error) { Alert.alert('Error', error.message); setSaving(false); return; }
-
-    if (photo && ins) await uploadPhoto(photo, ins.id);
-
-    setMode('list'); load();
-    setPartCode(''); setPartName(''); setBatch(''); setInspected(''); setPassed(''); setFailed('');
-    setDefects([]); setNotes(''); setPhoto(null);
-    setSaving(false);
   };
 
   const passPct = (i: Inspection) =>

@@ -38,8 +38,9 @@ export const CostingView: React.FC = () => {
     const subtotal = matCost + labCost;
     const overheadAmt = subtotal * (overhead / 100);
     const totalCost = subtotal + overheadAmt;
-    const denominator = 1 - (margin / 100);
-    const suggestedPrice = denominator > 0 ? totalCost / denominator : totalCost * 2;
+    const clampedMargin = Math.min(Math.max(margin, 0), 99);
+    const denominator = 1 - (clampedMargin / 100);
+    const suggestedPrice = totalCost / denominator;
     return { totalCost, suggestedPrice, profit: suggestedPrice - totalCost };
   };
 
@@ -60,6 +61,7 @@ export const CostingView: React.FC = () => {
 
   const handleSave = async () => {
     if (!projectName) return toast('Ingresa un nombre de proyecto', 'error');
+    if (margin >= 100) return toast('El margen debe ser menor a 100%', 'error');
     try {
       const payload = {
         project_name: projectName,
@@ -370,7 +372,7 @@ export const CostingView: React.FC = () => {
                   <p className="text-[9px] font-black text-slate-500 uppercase mb-1">Costo Total Estimado</p>
                   <p className="text-2xl font-black text-blue-400">${laborCostData.total_labor_cost?.toLocaleString()}</p>
                   <button 
-                    onClick={() => { setLabCost(laborCostData.total_labor_cost); setShowLaborModal(false); }}
+                    onClick={() => { setLabCost(laborCostData.total_labor_cost ?? 0); setShowLaborModal(false); }}
                     className="mt-3 px-4 py-1.5 bg-blue-600 text-white text-[9px] font-black uppercase rounded-lg"
                   >
                     Importar al Costeo

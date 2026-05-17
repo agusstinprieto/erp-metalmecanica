@@ -8,7 +8,7 @@ import { ScannerStation } from './ScannerStation';
 import clsx from 'clsx';
 import { supabase } from '../lib/supabase';
 import { useConfig } from '../contexts/ConfigContext';
-import { format, subDays } from 'date-fns';
+import { format, subDays, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import geminiService from '../services/geminiService';
 import { reportUtils } from '../utils/reportUtils';
@@ -114,11 +114,13 @@ export const AttendanceView: React.FC = () => {
 
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
-    attendanceService.getCurrentEmployee().then(emp => {
-      if (!emp) return;
-      setEmployee(emp as { id: string; full_name: string; tenant_id?: string });
-      attendanceService.getTodayRecord(emp.id).then(setTodayRecord);
-    });
+    attendanceService.getCurrentEmployee()
+      .then(emp => {
+        if (!emp) return;
+        setEmployee(emp as { id: string; full_name: string; tenant_id?: string });
+        return attendanceService.getTodayRecord(emp.id).then(setTodayRecord);
+      })
+      .catch(e => console.error('[AttendanceView] employee init error:', e));
   }, []);
 
   const handleCheckIn = async () => {
@@ -127,6 +129,9 @@ export const AttendanceView: React.FC = () => {
     try {
       const rec = await attendanceService.checkIn(employee.id, employee.full_name, employee.tenant_id);
       setTodayRecord(rec);
+    } catch (e) {
+      console.error('[AttendanceView] checkIn error:', e);
+      alert('Error al registrar entrada. Verifica tu conexión.');
     } finally {
       setPunchLoading(false);
     }
@@ -139,6 +144,9 @@ export const AttendanceView: React.FC = () => {
       const rec = await attendanceService.checkOut(todayRecord.id, todayRecord.check_in);
       setTodayRecord(rec);
       fetchRecords();
+    } catch (e) {
+      console.error('[AttendanceView] checkOut error:', e);
+      alert('Error al registrar salida. Verifica tu conexión.');
     } finally {
       setPunchLoading(false);
     }
@@ -538,7 +546,7 @@ export const AttendanceView: React.FC = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-1.5 text-center text-[10px] text-slate-400 font-bold">{format(new Date(rec.date + 'T00:00:00'), 'EEE dd MMM', { locale: es })}</td>
+                    <td className="px-4 py-1.5 text-center text-[10px] text-slate-400 font-bold">{format(parseISO(rec.date), 'EEE dd MMM', { locale: es })}</td>
                     <td className="px-4 py-1.5 text-center text-[11px] font-mono font-black">{fmtTime(rec.check_in)}</td>
                     <td className="px-4 py-1.5 text-center text-[11px] font-mono font-black">{fmtTime(rec.check_out)}</td>
                     <td className="px-4 py-1.5 text-center font-mono font-black text-[11px] text-emerald-500">{rec.overtime_minutes > 0 ? `+${fmtMin(rec.overtime_minutes)}` : '—'}</td>

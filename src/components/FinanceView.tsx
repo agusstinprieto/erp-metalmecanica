@@ -23,7 +23,8 @@ const fmt = (n: number) => `$${n.toLocaleString('es-MX', { minimumFractionDigits
 const fmtK = (n: number) => n >= 1000 ? `$${(n / 1000).toFixed(1)}k` : fmt(n);
 
 const diasRestantes = (fecha: string) => {
-  const diff = Math.ceil((new Date(fecha).getTime() - Date.now()) / 86400000);
+  // Noon parse avoids timezone-based off-by-one on YYYY-MM-DD strings
+  const diff = Math.ceil((new Date(fecha + 'T12:00:00').getTime() - Date.now()) / 86400000);
   return diff;
 };
 
@@ -111,7 +112,7 @@ export const FinanceView: React.FC = () => {
   };
   const handleDeleteCxC = async (id: string) => {
     if (!await appConfirm('¿ELIMINAR ESTA CUENTA POR COBRAR?')) return;
-    await financeService.deleteCxC(id); loadAll(); notify('CxC eliminada', 'error');
+    await financeService.deleteCxC(id); await loadAll(); notify('CxC eliminada', 'error');
   };
 
   // ── CxP handlers ─────────────────────────────────────────────────────────────
@@ -132,7 +133,7 @@ export const FinanceView: React.FC = () => {
   };
   const handleDeleteCxP = async (id: string) => {
     if (!await appConfirm('¿ELIMINAR ESTA CUENTA POR PAGAR?')) return;
-    await financeService.deleteCxP(id); loadAll(); notify('CxP eliminada', 'error');
+    await financeService.deleteCxP(id); await loadAll(); notify('CxP eliminada', 'error');
   };
 
   // ── Computed ──────────────────────────────────────────────────────────────────
@@ -148,6 +149,14 @@ export const FinanceView: React.FC = () => {
     pendiente:  'text-amber-400 bg-amber-500/10 border-amber-500/20',
     parcial:    'text-blue-400 bg-blue-500/10 border-blue-500/20',
     cobrada:    'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+    vencida:    'text-rose-400 bg-rose-500/10 border-rose-500/20',
+    cancelada:  'text-slate-500 bg-slate-500/10 border-slate-500/20',
+  }[s] || 'text-slate-400 bg-slate-500/10 border-slate-500/20');
+
+  const getStatusCxP = (s: string) => ({
+    pendiente:  'text-amber-400 bg-amber-500/10 border-amber-500/20',
+    parcial:    'text-blue-400 bg-blue-500/10 border-blue-500/20',
+    pagada:     'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
     vencida:    'text-rose-400 bg-rose-500/10 border-rose-500/20',
     cancelada:  'text-slate-500 bg-slate-500/10 border-slate-500/20',
   }[s] || 'text-slate-400 bg-slate-500/10 border-slate-500/20');
@@ -492,7 +501,7 @@ export const FinanceView: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-4 py-2 text-center">
-                      <span className={clsx('inline-flex items-center px-2 py-0.5 rounded-full border text-[8px] font-black tracking-widest uppercase', getStatusCxC(cxp.status))}>
+                      <span className={clsx('inline-flex items-center px-2 py-0.5 rounded-full border text-[8px] font-black tracking-widest uppercase', getStatusCxP(cxp.status))}>
                         {cxp.status}
                       </span>
                     </td>

@@ -947,7 +947,7 @@ const ForecastTab: React.FC = () => {
         real: 0,
         forecast: Math.max(0, Math.round(avg + trend * i)),
       }));
-      setWeeklyData(prev => [...prev, ...projected]);
+      setWeeklyData(prev => [...prev.filter(w => w.real > 0), ...projected]);
     } catch {
       setForecastText('Error al generar forecast.');
     } finally {
@@ -1082,7 +1082,7 @@ const SOPTab: React.FC = () => {
 
   if (loading) return <LoadingCard label="Cargando S&OP..." />;
 
-  const pipelineValue = pipeline.reduce((s, q) => s + Number(q.total ?? 0), 0);
+  const pipelineValue = pipeline.reduce((s, q) => s + Number(q.precio_total ?? 0), 0);
 
   return (
     <div className="space-y-4">
@@ -1134,19 +1134,19 @@ const SOPTab: React.FC = () => {
           pipeline.map((q, i) => (
             <div key={i} className="flex items-center justify-between p-3 border-b border-mcvill-card-border/20 last:border-0 hover:bg-white/[0.02]">
               <div>
-                <p className="text-xs font-black text-white">{q.folio ?? q.id?.slice(0, 8)}</p>
-                <p className="text-[9px] text-slate-500">{q.cliente ?? '—'}</p>
+                <p className="text-xs font-black text-white">{q.numero_cotizacion ?? q.id?.slice(0, 8)}</p>
+                <p className="text-[9px] text-slate-500">{q.cliente_nombre ?? '—'}</p>
               </div>
               <div className="flex items-center gap-3">
                 <span className="text-xs font-black text-mcvill-accent">
-                  {q.total ? `$${Number(q.total).toLocaleString()}` : '—'}
+                  {q.precio_total ? `$${Number(q.precio_total).toLocaleString()}` : '—'}
                 </span>
                 <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase ${
-                  q.status === 'aprobada' ? 'bg-green-500/20 text-green-400' :
-                  q.status === 'enviada'  ? 'bg-blue-500/20 text-blue-400' :
+                  q.estado === 'aprobada' ? 'bg-green-500/20 text-green-400' :
+                  q.estado === 'enviada'  ? 'bg-blue-500/20 text-blue-400' :
                   'bg-slate-500/20 text-slate-400'
                 }`}>
-                  {q.status ?? '—'}
+                  {q.estado ?? '—'}
                 </span>
                 <ArrowRight size={10} className="text-slate-600" />
               </div>

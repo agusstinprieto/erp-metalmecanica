@@ -37,6 +37,7 @@ export const HSEView = () => {
   const [isIncidentModalOpen, setIsIncidentModalOpen] = useState(false);
   const [isHSEModalOpen, setIsHSEModalOpen] = useState(false);
   const [editingIncident, setEditingIncident] = useState<HSEIncident | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
@@ -81,7 +82,7 @@ export const HSEView = () => {
     reportUtils.exportToPDF(title, data, `reporte_hse_${activeTab}_Control`, "HSE");
   };
   
-  const handleAction = (action: string) => {
+  const handleAction = (_action: string) => {
     if (activeTab === 'incidents') {
       setEditingIncident(null);
       setIsIncidentModalOpen(true);
@@ -112,7 +113,7 @@ export const HSEView = () => {
       case 'active': return 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20';
       case 'expired': return 'text-rose-600 dark:text-rose-400 bg-rose-500/10 border-rose-500/20';
       case 'pending': return 'text-mcvill-accent bg-mcvill-accent/10 border-mcvill-accent/20';
-      default: return isDarkMode ? "bg-slate-950/20 border-mcvill-card-border" : "bg-white border-mcvill-card-border shadow-xl";
+      default: return 'text-slate-400 bg-slate-500/10 border-slate-500/20';
     }
   };
 
@@ -215,8 +216,10 @@ export const HSEView = () => {
 
         <div className="relative flex-1 max-w-md ml-4 group">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-blue-500 transition-colors" size={12} />
-          <input 
-            type="text" 
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Buscar por colaborador, norma o incidente..."
             className="w-full bg-black/40 border border-white/10 rounded-lg py-1.5 pl-9 pr-4 focus:border-mcvill-accent/50 transition-all outline-none text-white font-bold text-[10px] placeholder:text-slate-700"
           />
@@ -231,7 +234,10 @@ export const HSEView = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
-            {activeTab === 'certs' && certs.map((cert) => (
+            {activeTab === 'certs' && certs.filter(c => {
+              const q = searchTerm.toLowerCase();
+              return !q || c.course_title.toLowerCase().includes(q) || c.employee_name.toLowerCase().includes(q);
+            }).map((cert) => (
               <div key={cert.id} className="group relative bg-slate-900/40 border border-white/5 rounded-xl p-3 hover:border-rose-500/30 transition-all flex items-center justify-between overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-rose-500/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="flex items-center gap-3 relative z-10">
@@ -259,7 +265,10 @@ export const HSEView = () => {
               </div>
             ))}
 
-            {activeTab === 'incidents' && incidents.map((incident) => (
+            {activeTab === 'incidents' && incidents.filter(i => {
+              const q = searchTerm.toLowerCase();
+              return !q || i.title.toLowerCase().includes(q) || i.location.toLowerCase().includes(q) || i.description.toLowerCase().includes(q);
+            }).map((incident) => (
               <div key={incident.id} className="group relative bg-slate-900/40 border border-white/5 rounded-xl p-3 hover:border-rose-500/30 transition-all overflow-hidden xl:col-span-2">
                 <div className="absolute inset-0 bg-gradient-to-r from-rose-500/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="flex items-center justify-between gap-4 relative z-10">
@@ -296,7 +305,10 @@ export const HSEView = () => {
               </div>
             ))}
 
-            {activeTab === 'courses' && courses.map((course) => (
+            {activeTab === 'courses' && courses.filter(c => {
+              const q = searchTerm.toLowerCase();
+              return !q || c.title.toLowerCase().includes(q) || c.category.toLowerCase().includes(q);
+            }).map((course) => (
               <div key={course.id} className="group relative bg-slate-900/40 border border-white/5 rounded-xl p-3 hover:border-rose-500/30 transition-all flex items-center justify-between overflow-hidden">
                 <div className="flex items-center gap-4 relative z-10">
                   <div className="w-10 h-10 rounded-lg bg-black/40 flex items-center justify-center border border-white/5 group-hover:border-rose-500/50 transition-colors">
