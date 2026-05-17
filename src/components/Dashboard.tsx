@@ -1025,6 +1025,72 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
           </div>
         </div>
 
+        {/* ── DEMOGRAFÍA OPERATIVA ─────────────────────────────────────────── */}
+        <div className="bg-slate-900/30 border border-slate-800/40 rounded-2xl p-4">
+          <div className="flex items-center gap-2 mb-4">
+            <Users className="text-pink-400" size={15} />
+            <h3 className="text-[10px] font-black text-white uppercase tracking-widest">Demografía Operativa</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Distribución por Género (Pie Chart) */}
+            <div className="bg-slate-950/50 border border-slate-800/40 p-4 rounded-xl flex items-center gap-6">
+              <div className="w-20 h-20 shrink-0 rounded-full relative" style={{ background: 'conic-gradient(var(--mcvill-accent) 0% 68%, #f472b6 68% 100%)' }}>
+                <div className="absolute inset-2 bg-slate-950/80 rounded-full flex flex-col items-center justify-center">
+                  <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Total</span>
+                  <span className="text-[10px] font-black text-white">{metrics.empleados}</span>
+                </div>
+              </div>
+              <div className="space-y-3 flex-1">
+                <div>
+                  <div className="flex justify-between text-[8px] font-black uppercase tracking-wider mb-1">
+                    <span className="text-mcvill-accent">Hombres</span>
+                    <span className="text-white">68%</span>
+                  </div>
+                  <div className="h-1.5 w-full bg-slate-800/50 rounded-full overflow-hidden">
+                    <div className="h-full bg-mcvill-accent w-[68%]" />
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between text-[8px] font-black uppercase tracking-wider mb-1">
+                    <span className="text-pink-400">Mujeres</span>
+                    <span className="text-white">32%</span>
+                  </div>
+                  <div className="h-1.5 w-full bg-slate-800/50 rounded-full overflow-hidden">
+                    <div className="h-full bg-pink-400 w-[32%]" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Distribución por Edades (Bar Chart) */}
+            <div className="bg-slate-950/50 border border-slate-800/40 p-4 rounded-xl flex flex-col">
+              <div className="flex justify-between text-[8px] font-black uppercase tracking-widest mb-3">
+                <span className="text-slate-400">Pirámide Poblacional</span>
+                <span className="text-amber-400">Sucesión: 8% (55+)</span>
+              </div>
+              <div className="flex items-end gap-2 flex-1 pt-2">
+                {[
+                  { range: '18-25', pct: 15, color: 'bg-emerald-400' },
+                  { range: '26-35', pct: 40, color: 'bg-mcvill-accent' },
+                  { range: '36-45', pct: 25, color: 'bg-blue-400' },
+                  { range: '46-55', pct: 12, color: 'bg-amber-400' },
+                  { range: '55+',   pct: 8,  color: 'bg-red-400' }
+                ].map(b => (
+                  <div key={b.range} className="flex-1 flex flex-col items-center gap-1.5 group h-full">
+                    <div className="w-full flex flex-col justify-end h-full bg-slate-800/30 rounded-t border-b border-slate-700/50 relative">
+                      <div className={`w-full ${b.color} transition-all opacity-70 group-hover:opacity-100 rounded-t`} style={{ height: `${b.pct}%` }} />
+                      <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[7px] font-black text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                        {b.pct}%
+                      </span>
+                    </div>
+                    <span className="text-[7px] font-mono text-slate-500 whitespace-nowrap">{b.range}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* ── GRID DE ACCESOS RÁPIDOS ────────────────────────────────────────── */}
         <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
           {[
