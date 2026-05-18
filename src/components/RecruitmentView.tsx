@@ -24,8 +24,10 @@ import { aiService } from '../services/aiService';
 import type { Vacancy, Candidate } from '../types/index';
 import { reportUtils } from '../utils/reportUtils';
 import clsx from 'clsx';
+import { useConfig } from '../contexts/ConfigContext';
 
 export const RecruitmentView: React.FC = () => {
+  const { showAlert } = useConfig();
   const [vacancies, setVacancies] = useState<Vacancy[]>([]);
   const [candidates, setCandidates] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,23 +52,23 @@ export const RecruitmentView: React.FC = () => {
   const VACANCY_TEMPLATES = [
     {
       title: 'Operador de CNC',
-      description: 'Responsable de la operación y configuración de centros de maquinado CNC. Lectura de planos y uso de instrumentos de medición.',
-      requirements: 'Experiencia previa en CNC\nInterpretación de planos técnicos\nConocimiento de herramientas de medición (Vernier, Micrómetro)\nDisponibilidad de turno'
+      description: 'Responsable de la operaciÃ³n y configuraciÃ³n de centros de maquinado CNC. Lectura de planos y uso de instrumentos de mediciÃ³n.',
+      requirements: 'Experiencia previa en CNC\nInterpretaciÃ³n de planos tÃ©cnicos\nConocimiento de herramientas de mediciÃ³n (Vernier, MicrÃ³metro)\nDisponibilidad de turno'
     },
     {
       title: 'Ingeniero de Calidad',
-      description: 'Asegurar el cumplimiento de los estándares ISO 9001:2015. Gestión de No Conformidades, APQP, PPAP y SPC.',
-      requirements: 'Ingeniería Industrial o afín\nConocimiento en Core Tools (APQP, PPAP, FMEA)\nExperiencia en auditorías internas\nInglés técnico intermedio'
+      description: 'Asegurar el cumplimiento de los estÃ¡ndares ISO 9001:2015. GestiÃ³n de No Conformidades, APQP, PPAP y SPC.',
+      requirements: 'IngenierÃ­a Industrial o afÃ­n\nConocimiento en Core Tools (APQP, PPAP, FMEA)\nExperiencia en auditorÃ­as internas\nInglÃ©s tÃ©cnico intermedio'
     },
     {
       title: 'Soldador Certificado',
-      description: 'Ejecución de procesos de soldadura TIG/MIG siguiendo especificaciones técnicas de McVill y normas internacionales.',
-      requirements: 'Certificación vigente AWS\nExperiencia en soldadura industrial (acero/aluminio)\nUso de equipo de seguridad EPP\nLectura de simbología de soldadura'
+      description: 'EjecuciÃ³n de procesos de soldadura TIG/MIG siguiendo especificaciones tÃ©cnicas de McVill y normas internacionales.',
+      requirements: 'CertificaciÃ³n vigente AWS\nExperiencia en soldadura industrial (acero/aluminio)\nUso de equipo de seguridad EPP\nLectura de simbologÃ­a de soldadura'
     },
     {
-      title: 'Supervisor de Producción',
-      description: 'Liderar células de producción para cumplir con el programa diario. Monitoreo de OEE, calidad y seguridad industrial.',
-      requirements: 'Liderazgo de equipos (min 10 personas)\nEnfoque en mejora continua (Lean Manufacturing)\nControl de mermas y tiempos de ciclo\nExperiencia en ambiente industrial metalmecánico'
+      title: 'Supervisor de ProducciÃ³n',
+      description: 'Liderar cÃ©lulas de producciÃ³n para cumplir con el programa diario. Monitoreo de OEE, calidad y seguridad industrial.',
+      requirements: 'Liderazgo de equipos (min 10 personas)\nEnfoque en mejora continua (Lean Manufacturing)\nControl de mermas y tiempos de ciclo\nExperiencia en ambiente industrial metalmecÃ¡nico'
     }
   ];
 
@@ -90,17 +92,17 @@ export const RecruitmentView: React.FC = () => {
     const rows = [
       { Campo: 'Candidato', Valor: candidate.name },
       { Campo: 'Email', Valor: candidate.email },
-      { Campo: 'Teléfono', Valor: candidate.phone || '—' },
+      { Campo: 'TelÃ©fono', Valor: candidate.phone || 'â€”' },
       { Campo: 'Vacante', Valor: vacancy?.title ?? 'Talent Pool' },
       { Campo: 'Score IA', Valor: `${candidate.ai_score ?? 0}%` },
       { Campo: 'Estatus', Valor: candidate.status },
-      { Campo: 'Veredicto IA', Valor: candidate.ai_analysis?.recommendation ?? '—' },
-      { Campo: 'Justificación', Valor: candidate.ai_analysis?.justification ?? '—' },
+      { Campo: 'Veredicto IA', Valor: candidate.ai_analysis?.recommendation ?? 'â€”' },
+      { Campo: 'JustificaciÃ³n', Valor: candidate.ai_analysis?.justification ?? 'â€”' },
       ...strengths.map((s, i) => ({ Campo: `Fortaleza ${i + 1}`, Valor: s })),
-      ...weaknesses.map((w, i) => ({ Campo: `Área oportunidad ${i + 1}`, Valor: w })),
+      ...weaknesses.map((w, i) => ({ Campo: `Ãrea oportunidad ${i + 1}`, Valor: w })),
     ];
     reportUtils.exportToPDF(
-      `Análisis Candidato — ${candidate.name}`,
+      `AnÃ¡lisis Candidato â€” ${candidate.name}`,
       rows,
       `candidato_${candidate.name.toLowerCase().replace(/\s+/g, '_')}`,
       'RECLUTAMIENTO'
@@ -135,7 +137,7 @@ export const RecruitmentView: React.FC = () => {
       setIsAddingVacancy(false);
       setFormValues({ title: '', description: '', requirements: '' });
       fetchInitialData();
-      toast('Vacante publicada con éxito', 'success');
+      showAlert('Ã‰xito', 'Vacante publicada con Ã©xito', 'success');
     } catch (err) {
       console.error('Error creating vacancy:', err);
     }
@@ -161,10 +163,10 @@ export const RecruitmentView: React.FC = () => {
       setIsAddingCandidate(false);
       setCandidateForm({ name: '', email: '', phone: '', resume_text: '' });
       fetchInitialData();
-      toast('Candidato registrado', 'success');
+      showAlert('Ã‰xito', 'Candidato registrado', 'success');
     } catch (err) {
       console.error('Error adding candidate:', err);
-      toast('Error al registrar candidato', 'error');
+      showAlert('Error', 'Error al registrar candidato', 'error');
     } finally {
       setAnalyzingCV(false);
     }
@@ -197,15 +199,15 @@ export const RecruitmentView: React.FC = () => {
 
       if (selectedVacancy) {
         await recruitmentService.analyzeCandidate(candidate, selectedVacancy);
-        toast('Análisis de IA completado', 'success');
+        showAlert('Ã‰xito', 'AnÃ¡lisis de IA completado', 'success');
       } else {
-        toast('Candidato guardado en bolsa', 'success');
+        showAlert('Éxito', 'Candidato guardado en bolsa', 'success');
       }
 
       fetchInitialData();
     } catch (err) {
       console.error('Error analyzing CV:', err);
-      toast('Error al procesar CV', 'error');
+      showAlert('Error', 'Error al procesar CV', 'error');
     } finally {
       setAnalyzingCV(false);
     }
@@ -384,7 +386,7 @@ export const RecruitmentView: React.FC = () => {
                     {c.vacancy_id ? 'Vinculado' : 'Disponible'}
                   </span>
                   <button className="text-mcvill-accent text-[9px] font-black uppercase tracking-widest flex items-center gap-1 hover:gap-2 transition-all">
-                    Ver Análisis <ChevronRight size={12} />
+                    Ver AnÃ¡lisis <ChevronRight size={12} />
                   </button>
                 </div>
               </div>
@@ -476,11 +478,11 @@ export const RecruitmentView: React.FC = () => {
                         <p className="text-white text-sm font-bold uppercase">{selectedVacancy.status}</p>
                       </div>
                       <div>
-                        <p className="text-[9px] font-black text-mcvill-accent uppercase mb-1">Descripción</p>
+                        <p className="text-[9px] font-black text-mcvill-accent uppercase mb-1">DescripciÃ³n</p>
                         <p className="text-slate-400 text-xs leading-relaxed">{selectedVacancy.description}</p>
                       </div>
                       <div>
-                        <p className="text-[9px] font-black text-mcvill-accent uppercase mb-1">Requisitos Críticos</p>
+                        <p className="text-[9px] font-black text-mcvill-accent uppercase mb-1">Requisitos CrÃ­ticos</p>
                         <ul className="space-y-2 mt-2">
                           {selectedVacancy.requirements?.map((req, i) => (
                             <li key={i} className="text-xs text-slate-400 flex items-start gap-2">
@@ -507,7 +509,7 @@ export const RecruitmentView: React.FC = () => {
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h3 className="text-2xl font-black text-white uppercase tracking-tight">Nueva Vacante</h3>
-                <p className="text-[10px] text-mcvill-accent font-black uppercase tracking-widest mt-1">Configuración de Requerimiento de Talento</p>
+                <p className="text-[10px] text-mcvill-accent font-black uppercase tracking-widest mt-1">ConfiguraciÃ³n de Requerimiento de Talento</p>
               </div>
               <button onClick={() => setIsAddingVacancy(false)} className="text-slate-500 hover:text-white">
                 <XCircle size={24} />
@@ -518,7 +520,7 @@ export const RecruitmentView: React.FC = () => {
               <div className="space-y-6">
                 <div className="flex items-center gap-2 mb-4">
                   <Award size={16} className="text-mcvill-accent" />
-                  <h4 className="text-[11px] font-black text-white uppercase tracking-widest">Guía de Perfiles Rápidos</h4>
+                  <h4 className="text-[11px] font-black text-white uppercase tracking-widest">GuÃ­a de Perfiles RÃ¡pidos</h4>
                 </div>
                 <div className="grid grid-cols-1 gap-3">
                   {VACANCY_TEMPLATES.map((template, idx) => (
@@ -549,7 +551,7 @@ export const RecruitmentView: React.FC = () => {
                 <form onSubmit={handleCreateVacancy} className="space-y-6">
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                      <Briefcase size={12} /> Título del Puesto
+                      <Briefcase size={12} /> TÃ­tulo del Puesto
                     </label>
                     <input
                       value={formValues.title}
@@ -561,7 +563,7 @@ export const RecruitmentView: React.FC = () => {
                   
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                      <FileSearch size={12} /> Descripción Técnica
+                      <FileSearch size={12} /> DescripciÃ³n TÃ©cnica
                     </label>
                     <textarea
                       value={formValues.description}
@@ -574,7 +576,7 @@ export const RecruitmentView: React.FC = () => {
 
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                      <ShieldCheck size={12} /> Requisitos Críticos (uno por línea)
+                      <ShieldCheck size={12} /> Requisitos CrÃ­ticos (uno por lÃ­nea)
                     </label>
                     <textarea
                       value={formValues.requirements}
@@ -641,7 +643,7 @@ export const RecruitmentView: React.FC = () => {
                   onChange={(e) => setCandidateForm({ ...candidateForm, resume_text: e.target.value })}
                   rows={6}
                   className="w-full bg-slate-950 border border-white/10 rounded-xl px-5 py-4 text-xs text-white focus:border-mcvill-accent outline-none transition-all resize-none font-mono"
-                  placeholder="Pega aquí el texto del CV..."
+                  placeholder="Pega aquÃ­ el texto del CV..."
                 />
               </div>
 
@@ -656,7 +658,7 @@ export const RecruitmentView: React.FC = () => {
         </div>
       )}
 
-      {/* Modal Análisis de Candidato */}
+      {/* Modal AnÃ¡lisis de Candidato */}
       {showAnalysis && selectedCandidate && (
         <div className="fixed inset-0 lg:left-64 z-[250] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-950/95 backdrop-blur-xl" onClick={() => setShowAnalysis(false)} />
@@ -669,7 +671,7 @@ export const RecruitmentView: React.FC = () => {
                 <div>
                   <h3 className="text-3xl font-black text-white uppercase tracking-tight">{selectedCandidate.name}</h3>
                   <div className="flex items-center gap-3 mt-1">
-                    <p className="text-[11px] font-black text-mcvill-accent uppercase tracking-widest">Análisis Neural Gemini 2.5</p>
+                    <p className="text-[11px] font-black text-mcvill-accent uppercase tracking-widest">AnÃ¡lisis Neural Gemini 2.5</p>
                     <span className="w-1 h-1 rounded-full bg-slate-700" />
                     <p className="text-[11px] font-black text-slate-500 uppercase tracking-widest">
                       {vacancies.find(v => v.id === selectedCandidate.vacancy_id)?.title || 'Talent Pool'}
@@ -702,7 +704,7 @@ export const RecruitmentView: React.FC = () => {
                 </div>
                 <div>
                   <h4 className="text-[10px] font-black text-amber-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                    <AlertCircle size={14} /> Áreas de Oportunidad
+                    <AlertCircle size={14} /> Ãreas de Oportunidad
                   </h4>
                   <div className="space-y-2">
                     {(selectedCandidate.ai_analysis?.weaknesses || []).map((w: string, i: number) => (
@@ -719,7 +721,7 @@ export const RecruitmentView: React.FC = () => {
                   <h4 className="text-[10px] font-black text-mcvill-accent uppercase tracking-widest mb-3">Veredicto IA</h4>
                   <p className="text-sm text-white font-bold mb-2 uppercase">{selectedCandidate.ai_analysis?.recommendation || 'Evaluando...'}</p>
                   <p className="text-xs text-slate-400 leading-relaxed italic">
-                    "{selectedCandidate.ai_analysis?.justification || 'Análisis en proceso para determinar viabilidad técnica y operativa en McVill Industrial.'}"
+                    "{selectedCandidate.ai_analysis?.justification || 'AnÃ¡lisis en proceso para determinar viabilidad tÃ©cnica y operativa en McVill Industrial.'}"
                   </p>
                 </div>
 
@@ -731,7 +733,7 @@ export const RecruitmentView: React.FC = () => {
                       rel="noopener noreferrer"
                       className="w-full py-4 bg-slate-900 border border-white/10 rounded-2xl text-[10px] font-black text-white uppercase tracking-widest text-center hover:bg-slate-800 transition-all flex items-center justify-center gap-2"
                     >
-                      <FileText size={16} /> Ver Currículum Original
+                      <FileText size={16} /> Ver CurrÃ­culum Original
                     </a>
                   )}
                   <button
@@ -744,7 +746,7 @@ export const RecruitmentView: React.FC = () => {
                     onClick={() => setShowAnalysis(false)}
                     className="w-full py-4 bg-mcvill-accent text-slate-950 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white transition-all"
                   >
-                    Cerrar Análisis
+                    Cerrar AnÃ¡lisis
                   </button>
                 </div>
               </div>
