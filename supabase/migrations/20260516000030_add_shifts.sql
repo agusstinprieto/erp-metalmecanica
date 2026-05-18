@@ -14,11 +14,17 @@ CREATE TABLE IF NOT EXISTS public.work_shifts (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 2. Add shift_id to employees table
+-- 2. Add shift_id to employees/empleados table
 DO $$ 
 BEGIN 
-    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'employees' AND COLUMN_NAME = 'shift_id') THEN
-        ALTER TABLE public.employees ADD COLUMN shift_id UUID REFERENCES public.work_shifts(id);
+    IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'empleados') THEN
+        IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'empleados' AND COLUMN_NAME = 'shift_id') THEN
+            ALTER TABLE public.empleados ADD COLUMN shift_id UUID REFERENCES public.work_shifts(id);
+        END IF;
+    ELSIF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'employees') THEN
+        IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'employees' AND COLUMN_NAME = 'shift_id') THEN
+            ALTER TABLE public.employees ADD COLUMN shift_id UUID REFERENCES public.work_shifts(id);
+        END IF;
     END IF;
 END $$;
 

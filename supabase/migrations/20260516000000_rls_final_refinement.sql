@@ -15,7 +15,7 @@ CREATE POLICY "profiles_read" ON public.profiles
     )
     OR (
       auth.role() = 'authenticated'
-      AND auth_user_tenant() = tenant_id -- Usuarios ven a otros en su mismo tenant (colaboración)
+      AND auth_user_tenant()::text = tenant_id::text -- Usuarios ven a otros en su mismo tenant (colaboración)
     )
   );
 
@@ -25,7 +25,7 @@ DROP POLICY IF EXISTS "empleados_authenticated" ON public.empleados;
 CREATE POLICY "empleados_isolation" ON public.empleados
   FOR ALL USING (
     auth.role() = 'authenticated'
-    AND auth_user_tenant() = tenant_id
+    AND auth_user_tenant()::text = tenant_id::text
   );
 
 -- Asistencia
@@ -33,7 +33,7 @@ DROP POLICY IF EXISTS "asistencia_authenticated" ON public.asistencia;
 CREATE POLICY "asistencia_isolation" ON public.asistencia
   FOR ALL USING (
     auth.role() = 'authenticated'
-    AND auth_user_tenant() = tenant_id
+    AND auth_user_tenant()::text = tenant_id::text
   );
 
 -- Cuentas por Cobrar
@@ -41,7 +41,7 @@ DROP POLICY IF EXISTS "cxc_authenticated" ON public.cuentas_cobrar;
 CREATE POLICY "cxc_isolation" ON public.cuentas_cobrar
   FOR ALL USING (
     auth.role() = 'authenticated'
-    AND auth_user_tenant() = tenant_id
+    AND auth_user_tenant()::text = tenant_id::text
   );
 
 -- Cuentas por Pagar
@@ -49,7 +49,7 @@ DROP POLICY IF EXISTS "cxp_authenticated" ON public.cuentas_pagar;
 CREATE POLICY "cxp_isolation" ON public.cuentas_pagar
   FOR ALL USING (
     auth.role() = 'authenticated'
-    AND auth_user_tenant() = tenant_id
+    AND auth_user_tenant()::text = tenant_id::text
   );
 
 -- 3. Grants de seguridad para funciones Edge

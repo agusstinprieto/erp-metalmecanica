@@ -18,12 +18,28 @@ export const ShiftFormModal: React.FC<ShiftFormModalProps> = ({ isOpen, onClose,
     end_time: '18:00',
     grace_period_minutes: 15,
     is_active: true,
-    tenant_id: tenantId
+    tenant_id: tenantId,
+    monday: true,
+    tuesday: true,
+    wednesday: true,
+    thursday: true,
+    friday: true,
+    saturday: false,
+    sunday: false
   });
 
   useEffect(() => {
     if (initialData) {
-      setFormData(initialData);
+      setFormData({
+        ...initialData,
+        monday: initialData.monday !== false,
+        tuesday: initialData.tuesday !== false,
+        wednesday: initialData.wednesday !== false,
+        thursday: initialData.thursday !== false,
+        friday: initialData.friday !== false,
+        saturday: !!initialData.saturday,
+        sunday: !!initialData.sunday
+      });
     } else {
       setFormData({
         name: '',
@@ -31,7 +47,14 @@ export const ShiftFormModal: React.FC<ShiftFormModalProps> = ({ isOpen, onClose,
         end_time: '18:00',
         grace_period_minutes: 15,
         is_active: true,
-        tenant_id: tenantId
+        tenant_id: tenantId,
+        monday: true,
+        tuesday: true,
+        wednesday: true,
+        thursday: true,
+        friday: true,
+        saturday: false,
+        sunday: false
       });
     }
   }, [initialData, isOpen, tenantId]);
@@ -119,6 +142,38 @@ export const ShiftFormModal: React.FC<ShiftFormModalProps> = ({ isOpen, onClose,
                 value={formData.end_time || ''}
                 onChange={e => setFormData({...formData, end_time: e.target.value})}
               />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Días Aplicables</label>
+            <div className="flex justify-between items-center gap-1.5">
+              {[
+                { key: 'monday', label: 'L', name: 'Lunes' },
+                { key: 'tuesday', label: 'M', name: 'Martes' },
+                { key: 'wednesday', label: 'M', name: 'Miércoles' },
+                { key: 'thursday', label: 'J', name: 'Jueves' },
+                { key: 'friday', label: 'V', name: 'Viernes' },
+                { key: 'saturday', label: 'S', name: 'Sábado' },
+                { key: 'sunday', label: 'D', name: 'Domingo' }
+              ].map(day => {
+                const isActive = !!formData[day.key as keyof WorkShift];
+                return (
+                  <button
+                    key={day.key}
+                    type="button"
+                    title={day.name}
+                    onClick={() => setFormData({ ...formData, [day.key]: !isActive })}
+                    className={`w-10 h-10 rounded-xl text-xs font-black transition-all duration-300 flex items-center justify-center border ${
+                      isActive 
+                        ? 'bg-mcvill-accent text-slate-950 border-mcvill-accent shadow-[0_0_12px_rgba(26,140,255,0.25)]' 
+                        : 'bg-black/40 text-slate-400 border-white/5 hover:border-white/10 hover:text-white'
+                    }`}
+                  >
+                    {day.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
 

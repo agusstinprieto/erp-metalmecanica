@@ -49,14 +49,32 @@ CREATE TABLE IF NOT EXISTS operaciones_catalogo (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+-- Ensure columns exist in case the table was created previously without them
+DO $$ BEGIN
+  IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'materiales_catalogo') THEN
+    ALTER TABLE public.materiales_catalogo ADD COLUMN IF NOT EXISTS tenant_id TEXT NOT NULL DEFAULT 'mcvill';
+    ALTER TABLE public.materiales_catalogo ADD COLUMN IF NOT EXISTS tipo TEXT DEFAULT 'placa';
+    ALTER TABLE public.materiales_catalogo ADD COLUMN IF NOT EXISTS unidad_medida TEXT DEFAULT 'kg';
+    ALTER TABLE public.materiales_catalogo ADD COLUMN IF NOT EXISTS precio_unitario NUMERIC DEFAULT 0;
+    ALTER TABLE public.materiales_catalogo ADD COLUMN IF NOT EXISTS stock_actual NUMERIC DEFAULT 0;
+    ALTER TABLE public.materiales_catalogo ADD COLUMN IF NOT EXISTS stock_minimo NUMERIC DEFAULT 0;
+    ALTER TABLE public.materiales_catalogo ADD COLUMN IF NOT EXISTS notas TEXT;
+  END IF;
+END $$;
+
 -- Enable RLS
 ALTER TABLE proveedores ENABLE ROW LEVEL SECURITY;
 ALTER TABLE materiales_catalogo ENABLE ROW LEVEL SECURITY;
 ALTER TABLE operaciones_catalogo ENABLE ROW LEVEL SECURITY;
 
 -- Basic policies for anonymous/authenticated access (McVill Demo standard)
+DROP POLICY IF EXISTS "Proveedores access" ON proveedores;
 CREATE POLICY "Proveedores access" ON proveedores FOR ALL USING (true);
+
+DROP POLICY IF EXISTS "Materiales catalogo access" ON materiales_catalogo;
 CREATE POLICY "Materiales catalogo access" ON materiales_catalogo FOR ALL USING (true);
+
+DROP POLICY IF EXISTS "Operaciones catalogo access" ON operaciones_catalogo;
 CREATE POLICY "Operaciones catalogo access" ON operaciones_catalogo FOR ALL USING (true);
 
 -- Indices for search optimization

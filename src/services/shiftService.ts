@@ -8,12 +8,19 @@ export interface WorkShift {
   grace_period_minutes: number;
   is_active: boolean;
   tenant_id: string;
+  monday?: boolean;
+  tuesday?: boolean;
+  wednesday?: boolean;
+  thursday?: boolean;
+  friday?: boolean;
+  saturday?: boolean;
+  sunday?: boolean;
 }
 
 const DEFAULT_SHIFTS = [
-  { name: 'Matutino',   start_time: '06:00:00', end_time: '14:00:00', grace_period_minutes: 10, is_active: true },
-  { name: 'Vespertino', start_time: '14:00:00', end_time: '22:00:00', grace_period_minutes: 10, is_active: true },
-  { name: 'Nocturno',   start_time: '22:00:00', end_time: '06:00:00', grace_period_minutes: 10, is_active: true },
+  { name: 'Matutino',   start_time: '06:00:00', end_time: '14:00:00', grace_period_minutes: 10, is_active: true, monday: true, tuesday: true, wednesday: true, thursday: true, friday: true, saturday: false, sunday: false },
+  { name: 'Vespertino', start_time: '14:00:00', end_time: '22:00:00', grace_period_minutes: 10, is_active: true, monday: true, tuesday: true, wednesday: true, thursday: true, friday: true, saturday: false, sunday: false },
+  { name: 'Nocturno',   start_time: '22:00:00', end_time: '06:00:00', grace_period_minutes: 10, is_active: true, monday: true, tuesday: true, wednesday: true, thursday: true, friday: true, saturday: false, sunday: false },
 ];
 
 export const shiftService = {
@@ -42,7 +49,18 @@ export const shiftService = {
       return toInsert.map((s, i) => ({ ...s, id: `local-${i}` })) as WorkShift[];
     }
 
-    return data;
+    const mapDays = (s: any): WorkShift => ({
+      ...s,
+      monday: s.monday !== false,
+      tuesday: s.tuesday !== false,
+      wednesday: s.wednesday !== false,
+      thursday: s.thursday !== false,
+      friday: s.friday !== false,
+      saturday: !!s.saturday,
+      sunday: !!s.sunday
+    });
+
+    return data.map(mapDays);
   },
 
   async getShiftById(id: string): Promise<WorkShift | null> {
@@ -53,7 +71,17 @@ export const shiftService = {
       .single();
     
     if (error) throw error;
-    return data;
+    if (!data) return null;
+    return {
+      ...data,
+      monday: data.monday !== false,
+      tuesday: data.tuesday !== false,
+      wednesday: data.wednesday !== false,
+      thursday: data.thursday !== false,
+      friday: data.friday !== false,
+      saturday: !!data.saturday,
+      sunday: !!data.sunday
+    };
   },
 
   async createShift(shift: Partial<WorkShift>) {

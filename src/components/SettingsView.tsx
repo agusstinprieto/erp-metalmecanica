@@ -854,6 +854,31 @@ const ShiftsTab: React.FC = () => {
                   <span className="text-[10px] font-mono text-slate-300">{shift.grace_period_minutes}m</span>
                 </div>
               </div>
+              <div className="mt-3 pt-3 border-t border-white/5 flex items-center justify-start gap-1">
+                {[
+                  { key: 'monday', label: 'L' },
+                  { key: 'tuesday', label: 'M' },
+                  { key: 'wednesday', label: 'M' },
+                  { key: 'thursday', label: 'J' },
+                  { key: 'friday', label: 'V' },
+                  { key: 'saturday', label: 'S' },
+                  { key: 'sunday', label: 'D' }
+                ].map(day => {
+                  const isActive = !!shift[day.key as keyof WorkShift];
+                  return (
+                    <span 
+                      key={day.key} 
+                      className={`w-5 h-5 rounded flex items-center justify-center text-[9px] font-black uppercase transition-all duration-300 ${
+                        isActive 
+                          ? 'bg-mcvill-accent/20 text-mcvill-accent border border-mcvill-accent/30' 
+                          : 'bg-black/20 text-slate-600 border border-transparent'
+                      }`}
+                    >
+                      {day.label}
+                    </span>
+                  );
+                })}
+              </div>
             </div>
           ))}
           {shifts.length === 0 && (

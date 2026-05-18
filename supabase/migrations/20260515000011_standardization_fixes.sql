@@ -3,30 +3,40 @@
 
 -- 1. ADD: tenant_id a tablas que lo requieren para aislamiento
 DO $$ 
+DECLARE
+    v_mcvill_id UUID;
 BEGIN
+    -- Obtener el ID del tenant 'mcvill'
+    SELECT id INTO v_mcvill_id FROM tenants WHERE slug = 'mcvill' LIMIT 1;
+
     -- materiales (ROI / Industrial)
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='materiales' AND column_name='tenant_id') THEN
-        ALTER TABLE materiales ADD COLUMN tenant_id UUID REFERENCES tenants(id) DEFAULT (SELECT id FROM tenants WHERE slug = 'mcvill' LIMIT 1);
+        ALTER TABLE materiales ADD COLUMN tenant_id UUID REFERENCES tenants(id);
+        UPDATE materiales SET tenant_id = v_mcvill_id WHERE tenant_id IS NULL;
     END IF;
 
     -- catalogo_ilc
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='catalogo_ilc' AND column_name='tenant_id') THEN
-        ALTER TABLE catalogo_ilc ADD COLUMN tenant_id UUID REFERENCES tenants(id) DEFAULT (SELECT id FROM tenants WHERE slug = 'mcvill' LIMIT 1);
+        ALTER TABLE catalogo_ilc ADD COLUMN tenant_id UUID REFERENCES tenants(id);
+        UPDATE catalogo_ilc SET tenant_id = v_mcvill_id WHERE tenant_id IS NULL;
     END IF;
 
     -- evaluacion_factibilidad
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='evaluacion_factibilidad' AND column_name='tenant_id') THEN
-        ALTER TABLE evaluacion_factibilidad ADD COLUMN tenant_id UUID REFERENCES tenants(id) DEFAULT (SELECT id FROM tenants WHERE slug = 'mcvill' LIMIT 1);
+        ALTER TABLE evaluacion_factibilidad ADD COLUMN tenant_id UUID REFERENCES tenants(id);
+        UPDATE evaluacion_factibilidad SET tenant_id = v_mcvill_id WHERE tenant_id IS NULL;
     END IF;
 
     -- cotizaciones_express
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='cotizaciones_express' AND column_name='tenant_id') THEN
-        ALTER TABLE cotizaciones_express ADD COLUMN tenant_id UUID REFERENCES tenants(id) DEFAULT (SELECT id FROM tenants WHERE slug = 'mcvill' LIMIT 1);
+        ALTER TABLE cotizaciones_express ADD COLUMN tenant_id UUID REFERENCES tenants(id);
+        UPDATE cotizaciones_express SET tenant_id = v_mcvill_id WHERE tenant_id IS NULL;
     END IF;
     
     -- parametros_globales
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='parametros_globales' AND column_name='tenant_id') THEN
-        ALTER TABLE parametros_globales ADD COLUMN tenant_id UUID REFERENCES tenants(id) DEFAULT (SELECT id FROM tenants WHERE slug = 'mcvill' LIMIT 1);
+        ALTER TABLE parametros_globales ADD COLUMN tenant_id UUID REFERENCES tenants(id);
+        UPDATE parametros_globales SET tenant_id = v_mcvill_id WHERE tenant_id IS NULL;
     END IF;
 END $$;
 
@@ -37,7 +47,11 @@ END $$;
 DO $$ 
 BEGIN
     IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'employees') THEN
-        ALTER TABLE employees RENAME TO empleados;
+        IF NOT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'empleados') THEN
+            ALTER TABLE employees RENAME TO empleados;
+        ELSE
+            DROP TABLE IF EXISTS employees CASCADE;
+        END IF;
     END IF;
 END $$;
 
@@ -45,7 +59,11 @@ END $$;
 DO $$ 
 BEGIN
     IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'attendance_records') THEN
-        ALTER TABLE attendance_records RENAME TO asistencia;
+        IF NOT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'asistencia') THEN
+            ALTER TABLE attendance_records RENAME TO asistencia;
+        ELSE
+            DROP TABLE IF EXISTS attendance_records CASCADE;
+        END IF;
     END IF;
 END $$;
 
@@ -53,7 +71,11 @@ END $$;
 DO $$ 
 BEGIN
     IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'materials') THEN
-        ALTER TABLE materials RENAME TO suministros;
+        IF NOT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'suministros') THEN
+            ALTER TABLE materials RENAME TO suministros;
+        ELSE
+            DROP TABLE IF EXISTS materials CASCADE;
+        END IF;
     END IF;
 END $$;
 
@@ -61,7 +83,11 @@ END $$;
 DO $$ 
 BEGIN
     IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'products') THEN
-        ALTER TABLE products RENAME TO productos;
+        IF NOT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'productos') THEN
+            ALTER TABLE products RENAME TO productos;
+        ELSE
+            DROP TABLE IF EXISTS products CASCADE;
+        END IF;
     END IF;
 END $$;
 
@@ -69,7 +95,11 @@ END $$;
 DO $$ 
 BEGIN
     IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'work_orders') THEN
-        ALTER TABLE work_orders RENAME TO ordenes_trabajo;
+        IF NOT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'ordenes_trabajo') THEN
+            ALTER TABLE work_orders RENAME TO ordenes_trabajo;
+        ELSE
+            DROP TABLE IF EXISTS work_orders CASCADE;
+        END IF;
     END IF;
 END $$;
 

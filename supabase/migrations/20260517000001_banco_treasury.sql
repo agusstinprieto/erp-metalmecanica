@@ -24,7 +24,7 @@ DROP POLICY IF EXISTS "bank_accounts_isolation" ON public.bank_accounts;
 CREATE POLICY "bank_accounts_isolation" ON public.bank_accounts
   FOR ALL USING (
     auth.role() = 'authenticated'
-    AND auth_user_tenant() = tenant_id
+    AND auth_user_tenant()::text = tenant_id::text
   );
 
 CREATE INDEX IF NOT EXISTS bank_accounts_tenant_idx ON public.bank_accounts (tenant_id);
@@ -51,7 +51,7 @@ DROP POLICY IF EXISTS "bank_transactions_isolation" ON public.bank_transactions;
 CREATE POLICY "bank_transactions_isolation" ON public.bank_transactions
   FOR ALL USING (
     auth.role() = 'authenticated'
-    AND auth_user_tenant() = tenant_id
+    AND auth_user_tenant()::text = tenant_id::text
   );
 
 CREATE INDEX IF NOT EXISTS bank_transactions_tenant_idx    ON public.bank_transactions (tenant_id);

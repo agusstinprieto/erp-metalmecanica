@@ -507,36 +507,57 @@ ALTER TABLE flujos_aprobacion    ENABLE ROW LEVEL SECURITY;
 ALTER TABLE aprobaciones         ENABLE ROW LEVEL SECURITY;
 
 -- Lectura: todos los autenticados
+DROP POLICY IF EXISTS plantas_read ON plantas;
 CREATE POLICY plantas_read        ON plantas           FOR SELECT USING (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS cc_read ON centros_costo;
 CREATE POLICY cc_read             ON centros_costo     FOR SELECT USING (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS tarifas_mo_read ON tarifas_mano_obra;
 CREATE POLICY tarifas_mo_read     ON tarifas_mano_obra FOR SELECT USING (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS tarifas_maq_read ON tarifas_maquina;
 CREATE POLICY tarifas_maq_read    ON tarifas_maquina   FOR SELECT USING (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS costos_ord_read ON costos_ordenes;
 CREATE POLICY costos_ord_read     ON costos_ordenes    FOR SELECT USING (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS costos_lin_read ON costos_lineas;
 CREATE POLICY costos_lin_read     ON costos_lineas     FOR SELECT USING (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS flujos_read ON flujos_aprobacion;
 CREATE POLICY flujos_read         ON flujos_aprobacion FOR SELECT USING (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS aprob_read ON aprobaciones;
 CREATE POLICY aprob_read          ON aprobaciones      FOR SELECT USING (auth.role() = 'authenticated');
 
 -- Escritura: roles autorizados por tabla
+DROP POLICY IF EXISTS costos_ord_write ON costos_ordenes;
 CREATE POLICY costos_ord_write ON costos_ordenes FOR ALL
   USING (auth.role() = 'authenticated')
   WITH CHECK (auth.role() = 'authenticated');
 
+DROP POLICY IF EXISTS costos_lin_write ON costos_lineas;
 CREATE POLICY costos_lin_write ON costos_lineas FOR ALL
   USING (auth.role() = 'authenticated')
   WITH CHECK (auth.role() = 'authenticated');
 
 -- Aprobaciones: solo el rol autorizado puede resolver
+DROP POLICY IF EXISTS aprob_write ON aprobaciones;
 CREATE POLICY aprob_write ON aprobaciones FOR UPDATE
   USING (auth.role() = 'authenticated');
 
+DROP POLICY IF EXISTS aprob_insert ON aprobaciones;
 CREATE POLICY aprob_insert ON aprobaciones FOR INSERT
   WITH CHECK (auth.role() = 'authenticated');
 
 -- Tarifas: solo finanzas/CEO/sistemas pueden modificar
+DROP POLICY IF EXISTS tarifas_mo_write ON tarifas_mano_obra;
 CREATE POLICY tarifas_mo_write ON tarifas_mano_obra FOR ALL
   USING (auth.role() = 'authenticated')
   WITH CHECK (auth.role() = 'authenticated');
 
+DROP POLICY IF EXISTS tarifas_maq_write ON tarifas_maquina;
 CREATE POLICY tarifas_maq_write ON tarifas_maquina FOR ALL
   USING (auth.role() = 'authenticated')
   WITH CHECK (auth.role() = 'authenticated');

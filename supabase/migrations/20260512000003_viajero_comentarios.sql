@@ -12,5 +12,6 @@ CREATE INDEX IF NOT EXISTS idx_viajero_comentarios_viajero ON viajero_comentario
 -- RLS: permitir acceso igual que otras tablas de viajeros
 ALTER TABLE viajero_comentarios ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS "viajero_comentarios_all" ON viajero_comentarios
+DROP POLICY IF EXISTS "viajero_comentarios_all" ON viajero_comentarios;
+CREATE POLICY "viajero_comentarios_all" ON viajero_comentarios
   FOR ALL USING (true) WITH CHECK (true);

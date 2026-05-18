@@ -24,4 +24,5 @@ CREATE INDEX IF NOT EXISTS idx_att_employee ON attendance_records(employee_id);
 CREATE INDEX IF NOT EXISTS idx_att_status   ON attendance_records(status);
 
 ALTER TABLE attendance_records ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "att_authenticated" ON attendance_records;
 CREATE POLICY "att_authenticated" ON attendance_records FOR ALL USING (auth.role() = 'authenticated');

@@ -278,9 +278,9 @@ export const ReportsView = () => {
     }
     const rows = tableData.slice(0, 150).map((item: any) => {
       if (activeTab === 'production') return { OT: item.order_number, PROYECTO: item.project_title || '-', ESTADO: item.status, PROGRESO: `${item.progress||0}%` };
-      if (activeTab === 'inventory')  return { MATERIAL: item.name, SKU: item.sku, STOCK: item.stock_quantity, COSTO: `$${item.unit_cost}` };
-      if (activeTab === 'payroll')    return { EMPLEADO: `${item.employees?.first_name||''} ${item.employees?.last_name||''}`, BRUTO: `$${item.gross_salary}`, NETO: `$${item.net_salary}` };
-      if (activeTab === 'finance')    return { TIPO: item.type, ENTIDAD: item.entity, MONTO: `$${item.amount}`, ESTADO: item.status };
+      if (activeTab === 'inventory')  return { MATERIAL: item.name, SKU: item.sku, STOCK: item.stock_quantity, COSTO: `$${Number(item.unit_cost || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` };
+      if (activeTab === 'payroll')    return { EMPLEADO: `${item.employees?.first_name||''} ${item.employees?.last_name||''}`, BRUTO: `$${Number(item.gross_salary || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, NETO: `$${Number(item.net_salary || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` };
+      if (activeTab === 'finance')    return { TIPO: item.type, ENTIDAD: item.entity, MONTO: `$${Number(item.amount || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, ESTADO: item.status };
       return item;
     });
     const labels: Record<string, string> = { production: 'Producción', inventory: 'Inventario', payroll: 'Nómina', finance: 'Finanzas' };
@@ -435,7 +435,7 @@ export const ReportsView = () => {
                   <td className="px-4 py-1.5 text-[11px] font-black text-white">{item.name}</td>
                   <td className="px-4 py-1.5 text-[10px] font-mono text-slate-500 uppercase">{item.sku}</td>
                   <td className={clsx('px-4 py-1.5 text-[11px] font-black text-center', item.min_stock != null && item.stock_quantity <= item.min_stock ? 'text-rose-400' : 'text-white')}>{item.stock_quantity}</td>
-                  <td className="px-4 py-1.5 text-[11px] font-black text-emerald-400 text-right">${item.unit_cost}</td>
+                  <td className="px-4 py-1.5 text-[11px] font-black text-emerald-400 text-right">${Number(item.unit_cost || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                 </tr>
               ))}
             </tbody>
@@ -453,9 +453,9 @@ export const ReportsView = () => {
               {tableData.map((item: any, i) => (
                 <tr key={i} className="hover:bg-blue-500/5 transition-colors">
                   <td className="px-4 py-1.5 text-[11px] font-black text-white uppercase">{item.employees?.first_name} {item.employees?.last_name}</td>
-                  <td className="px-4 py-1.5 text-[11px] font-bold text-slate-300 text-center">${Number(item.gross_salary||0).toLocaleString()}</td>
-                  <td className="px-4 py-1.5 text-[11px] font-bold text-rose-400 text-center">-${Number(item.deductions||0).toLocaleString()}</td>
-                  <td className="px-4 py-1.5 text-[11px] font-black text-emerald-400 text-right">${Number(item.net_salary||0).toLocaleString()}</td>
+                  <td className="px-4 py-1.5 text-[11px] font-bold text-slate-300 text-center">${Number(item.gross_salary||0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                  <td className="px-4 py-1.5 text-[11px] font-bold text-rose-400 text-center">-${Number(item.deductions||0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                  <td className="px-4 py-1.5 text-[11px] font-black text-emerald-400 text-right">${Number(item.net_salary||0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                 </tr>
               ))}
             </tbody>
@@ -479,7 +479,7 @@ export const ReportsView = () => {
                     </span>
                   </td>
                   <td className="px-4 py-1.5 text-[10px] text-slate-400 uppercase">{item.entity}</td>
-                  <td className="px-4 py-1.5 text-[11px] font-black text-white text-center">${Number(item.amount||0).toLocaleString()}</td>
+                  <td className="px-4 py-1.5 text-[11px] font-black text-white text-center">${Number(item.amount||0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                   <td className="px-4 py-1.5 text-[9px] font-black uppercase text-slate-600 tracking-widest text-right">{item.status}</td>
                 </tr>
               ))}

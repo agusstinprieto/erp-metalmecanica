@@ -84,24 +84,35 @@ ALTER TABLE activos_maquinas     ENABLE ROW LEVEL SECURITY;
 ALTER TABLE activos_edificio     ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ordenes_mantenimiento ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS maquinas_auth ON activos_maquinas;
 CREATE POLICY maquinas_auth     ON activos_maquinas      FOR ALL USING (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS edificio_auth ON activos_edificio;
 CREATE POLICY edificio_auth     ON activos_edificio      FOR ALL USING (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS ordenes_auth ON ordenes_mantenimiento;
 CREATE POLICY ordenes_auth      ON ordenes_mantenimiento FOR ALL USING (auth.role() = 'authenticated');
 
 -- Seed: datos iniciales de máquinas McVill
-INSERT INTO activos_maquinas (codigo, nombre, modelo, fabricante, ubicacion, area, horas_uso, proximo_mantenimiento, estado, tenant_id)
-VALUES
-  ('MQ-001','TORNO CNC',        'ST-30',       'Mazak',  'Área CNC',       'CNC',      4820, '2026-06-01', 'operativa',        'mcvill'),
-  ('MQ-002','FRESADORA CNC',    'VF-3',        'Haas',   'Área CNC',       'CNC',      6210, '2026-05-20', 'operativa',        'mcvill'),
-  ('MQ-003','CORTADORA LÁSER',  'FL-3015M',    'Amada',  'Área Corte',     'Corte',    2100, '2026-07-15', 'operativa',        'mcvill'),
-  ('MQ-004','SOLDADORA TIG',    'Dynasty 280', 'Miller', 'Área Soldadura', 'Soldadura',8940, '2026-05-30', 'en_mantenimiento', 'mcvill'),
-  ('MQ-005','COMPRESOR',        'GA-37',       'Atlas',  'Cuarto Máquinas','Utilities',13200,'2026-06-10', 'operativa',        'mcvill')
-ON CONFLICT (tenant_id, codigo) DO NOTHING;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM activos_maquinas WHERE codigo = 'MQ-001') THEN
+    INSERT INTO activos_maquinas (codigo, nombre, modelo, fabricante, ubicacion, area, horas_uso, proximo_mantenimiento, estado, tenant_id)
+    VALUES
+      ('MQ-001','TORNO CNC',        'ST-30',       'Mazak',  'Área CNC',       'CNC',      4820, '2026-06-01', 'operativa',        'mcvill'),
+      ('MQ-002','FRESADORA CNC',    'VF-3',        'Haas',   'Área CNC',       'CNC',      6210, '2026-05-20', 'operativa',        'mcvill'),
+      ('MQ-003','CORTADORA LÁSER',  'FL-3015M',    'Amada',  'Área Corte',     'Corte',    2100, '2026-07-15', 'operativa',        'mcvill'),
+      ('MQ-004','SOLDADORA TIG',    'Dynasty 280', 'Miller', 'Área Soldadura', 'Soldadura',8940, '2026-05-30', 'en_mantenimiento', 'mcvill'),
+      ('MQ-005','COMPRESOR',        'GA-37',       'Atlas',  'Cuarto Máquinas','Utilities',13200,'2026-06-10', 'operativa',        'mcvill');
+  END IF;
+END $$;
 
 -- Seed: instalación principal
-INSERT INTO activos_edificio (nombre, tipo, ubicacion, responsable, proximo_mantenimiento, estado, tenant_id)
-VALUES
-  ('Nave Principal',   'civil',   'Planta Baja', 'Mantenimiento',  '2026-07-01', 'bueno',   'mcvill'),
-  ('Subestación',      'electrico','Área Técnica','Ingeniería',     '2026-06-15', 'bueno',   'mcvill'),
-  ('Sistema HVAC',     'hvac',    'Azotea',      'Mantenimiento',  '2026-05-25', 'regular', 'mcvill')
-ON CONFLICT DO NOTHING;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM activos_edificio WHERE nombre = 'Nave Principal') THEN
+    INSERT INTO activos_edificio (nombre, tipo, ubicacion, responsable, proximo_mantenimiento, estado, tenant_id)
+    VALUES
+      ('Nave Principal',   'civil',   'Planta Baja', 'Mantenimiento',  '2026-07-01', 'bueno',   'mcvill'),
+      ('Subestación',      'electrico','Área Técnica','Ingeniería',     '2026-06-15', 'bueno',   'mcvill'),
+      ('Sistema HVAC',     'hvac',    'Azotea',      'Mantenimiento',  '2026-05-25', 'regular', 'mcvill');
+  END IF;
+END $$;

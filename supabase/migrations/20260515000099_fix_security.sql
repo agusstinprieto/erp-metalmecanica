@@ -20,27 +20,33 @@ ALTER TABLE public.transaction_entries   ENABLE ROW LEVEL SECURITY;
 
 -- cotizaciones: quitar la política que permite todo y reemplazarla
 DROP POLICY IF EXISTS "allow_all_cotizaciones" ON public.cotizaciones;
+DROP POLICY IF EXISTS "cotizaciones_authenticated" ON public.cotizaciones;
 CREATE POLICY "cotizaciones_authenticated" ON public.cotizaciones
   FOR ALL USING (auth.role() = 'authenticated');
 
 -- proveedores: quitar política abierta
 DROP POLICY IF EXISTS "Acceso total proveedores" ON public.proveedores;
+DROP POLICY IF EXISTS "proveedores_authenticated" ON public.proveedores;
 CREATE POLICY "proveedores_authenticated" ON public.proveedores
   FOR ALL USING (auth.role() = 'authenticated');
 
 -- ── 3. CREAR POLÍTICAS EN TABLAS QUE TENÍAN RLS DESACTIVADO ─────────────────
 
 -- Política base: solo usuarios autenticados (bloquea acceso anon con la anon key)
+DROP POLICY IF EXISTS "clientes_authenticated" ON public.clientes;
 CREATE POLICY "clientes_authenticated" ON public.clientes
   FOR ALL USING (auth.role() = 'authenticated');
 
+DROP POLICY IF EXISTS "cotizacion_partidas_authenticated" ON public.cotizacion_partidas;
 CREATE POLICY "cotizacion_partidas_authenticated" ON public.cotizacion_partidas
   FOR ALL USING (auth.role() = 'authenticated');
 
+DROP POLICY IF EXISTS "operaciones_catalogo_authenticated" ON public.operaciones_catalogo;
 CREATE POLICY "operaciones_catalogo_authenticated" ON public.operaciones_catalogo
   FOR ALL USING (auth.role() = 'authenticated');
 
 -- Datos fiscales: solo roles autorizados
+DROP POLICY IF EXISTS "employee_fiscal_data_restricted" ON public.employee_fiscal_data;
 CREATE POLICY "employee_fiscal_data_restricted" ON public.employee_fiscal_data
   FOR ALL USING (
     auth.role() = 'authenticated'
@@ -52,6 +58,7 @@ CREATE POLICY "employee_fiscal_data_restricted" ON public.employee_fiscal_data
   );
 
 -- Transacciones financieras: solo roles de finanzas
+DROP POLICY IF EXISTS "financial_transactions_restricted" ON public.financial_transactions;
 CREATE POLICY "financial_transactions_restricted" ON public.financial_transactions
   FOR ALL USING (
     auth.role() = 'authenticated'
@@ -62,6 +69,7 @@ CREATE POLICY "financial_transactions_restricted" ON public.financial_transactio
     ))
   );
 
+DROP POLICY IF EXISTS "transaction_entries_restricted" ON public.transaction_entries;
 CREATE POLICY "transaction_entries_restricted" ON public.transaction_entries
   FOR ALL USING (
     auth.role() = 'authenticated'
@@ -73,6 +81,7 @@ CREATE POLICY "transaction_entries_restricted" ON public.transaction_entries
   );
 
 -- Conceptos de nómina y tablas fiscales
+DROP POLICY IF EXISTS "payroll_concepts_restricted" ON public.payroll_concepts;
 CREATE POLICY "payroll_concepts_restricted" ON public.payroll_concepts
   FOR ALL USING (
     auth.role() = 'authenticated'
@@ -83,6 +92,7 @@ CREATE POLICY "payroll_concepts_restricted" ON public.payroll_concepts
     ))
   );
 
+DROP POLICY IF EXISTS "tax_tables_authenticated" ON public.tax_tables;
 CREATE POLICY "tax_tables_authenticated" ON public.tax_tables
   FOR ALL USING (auth.role() = 'authenticated');
 
@@ -121,6 +131,7 @@ DROP POLICY IF EXISTS "Profiles isolation" ON public.profiles;
 -- Mantener profiles_select_own y agregar acceso para admins del mismo tenant
 DROP POLICY IF EXISTS "profiles_select_own" ON public.profiles;
 
+DROP POLICY IF EXISTS "profiles_read" ON public.profiles;
 CREATE POLICY "profiles_read" ON public.profiles
   FOR SELECT USING (
     -- Cada usuario ve su propio perfil
@@ -134,9 +145,11 @@ CREATE POLICY "profiles_read" ON public.profiles
     ))
   );
 
+DROP POLICY IF EXISTS "profiles_update_own" ON public.profiles;
 CREATE POLICY "profiles_update_own" ON public.profiles
   FOR UPDATE USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "profiles_insert_admin" ON public.profiles;
 CREATE POLICY "profiles_insert_admin" ON public.profiles
   FOR INSERT WITH CHECK (
     EXISTS (
