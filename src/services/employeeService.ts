@@ -113,7 +113,7 @@ export const employeeService = {
     const filePath = `employee-photos/${fileName}`;
 
     const { error: uploadError } = await supabase.storage
-      .from('erp-assets')
+      .from('logos')
       .upload(filePath, file);
 
     if (uploadError) {
@@ -121,7 +121,7 @@ export const employeeService = {
       throw uploadError;
     }
 
-    const { data } = supabase.storage.from('erp-assets').getPublicUrl(filePath);
+    const { data } = supabase.storage.from('logos').getPublicUrl(filePath);
     return data.publicUrl;
   },
 
@@ -134,7 +134,7 @@ export const employeeService = {
     const filePath = `employee-documents/${fileName}`;
 
     const { error: uploadError } = await supabase.storage
-      .from('erp-assets')
+      .from('logos')
       .upload(filePath, file);
 
     if (uploadError) {
@@ -142,7 +142,7 @@ export const employeeService = {
       throw uploadError;
     }
 
-    const { data } = supabase.storage.from('erp-assets').getPublicUrl(filePath);
+    const { data } = supabase.storage.from('logos').getPublicUrl(filePath);
     return data.publicUrl;
   }
 };

@@ -159,7 +159,25 @@ export const RHView: React.FC = () => {
     );
   };
 
-  const filteredEmployees = employees.filter(emp => 
+  const handleDelete = async (id: string) => {
+    const emp = employees.find(e => e.id === id);
+    const name = emp ? `${emp.first_name} ${emp.last_name}` : 'este empleado';
+    const confirmed = await appConfirm(
+      `Esta acción eliminará permanentemente el expediente de ${name}. No se puede deshacer.`,
+      `ELIMINAR EMPLEADO`
+    );
+    if (!confirmed) return;
+    try {
+      await employeeService.deleteEmployee(id);
+      setEmployees(prev => prev.filter(e => e.id !== id));
+      if (selectedEmployee?.id === id) setSelectedEmployee(null);
+      toast('Empleado eliminado correctamente', 'success');
+    } catch (err: any) {
+      toast(`Error al eliminar: ${err.message}`, 'error');
+    }
+  };
+
+  const filteredEmployees = employees.filter(emp =>
     `${emp.first_name} ${emp.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
     emp.job_title?.toLowerCase().includes(searchTerm.toLowerCase())
   );
