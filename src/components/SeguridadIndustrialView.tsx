@@ -32,9 +32,9 @@ interface Incidente {
 
 const DEFAULT_CAMERAS: SecurityCamera[] = [
   { id: 'c1', nombre: 'Entrada Principal',  area: 'Acceso',      url: '', tipo: 'mjpeg', online: true  },
-  { id: 'c2', nombre: 'Área de Soldadura',  area: 'Producción',  url: 'https://assets.mixkit.co/videos/preview/mixkit-industrial-robotic-arm-in-action-40292-large.mp4', tipo: 'mjpeg', online: true  },
+  { id: 'c2', nombre: 'Área de Soldadura',  area: 'Producción',  url: 'https://www.youtube.com/watch?v=7XGplK3yV-E', tipo: 'mjpeg', online: true  },
   { id: 'c3', nombre: 'Almacén General',    area: 'Almacén',     url: '', tipo: 'mjpeg', online: true  },
-  { id: 'c4', nombre: 'Taller CNC',         area: 'Producción',  url: 'https://www.youtube.com/watch?v=5_m36N_Zk1s', tipo: 'mjpeg', online: true },
+  { id: 'c4', nombre: 'Taller CNC',         area: 'Producción',  url: 'https://www.youtube.com/watch?v=s5eA30XW-tY', tipo: 'mjpeg', online: true },
   { id: 'c5', nombre: 'Área de Pintura',    area: 'Producción',  url: '', tipo: 'mjpeg', online: true  },
   { id: 'c6', nombre: 'Estacionamiento',    area: 'Exterior',    url: '', tipo: 'mjpeg', online: true  },
 ];
@@ -474,15 +474,15 @@ export const SeguridadIndustrialView: React.FC = () => {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const hasLegacyEmpty = parsed.some(c => c.id === 'c2' && !c.url);
-          const c4Offline = parsed.some(c => c.id === 'c4' && (!c.url || !c.online));
+          const hasLegacyEmpty = parsed.some(c => c.id === 'c2' && (!c.url || c.url.includes('assets.mixkit.co')));
+          const c4Offline = parsed.some(c => c.id === 'c4' && (!c.url || !c.online || c.url.includes('5_m36N_Zk1s')));
           if (hasLegacyEmpty || c4Offline) {
             const upgraded = parsed.map(c => {
-              if (c.id === 'c2' && !c.url) {
-                return { ...c, url: 'https://assets.mixkit.co/videos/preview/mixkit-industrial-robotic-arm-in-action-40292-large.mp4', online: true };
+              if (c.id === 'c2' && (!c.url || c.url.includes('assets.mixkit.co'))) {
+                return { ...c, url: 'https://www.youtube.com/watch?v=7XGplK3yV-E', online: true };
               }
-              if (c.id === 'c4' && (!c.url || !c.online)) {
-                return { ...c, url: 'https://www.youtube.com/watch?v=5_m36N_Zk1s', online: true };
+              if (c.id === 'c4' && (!c.url || !c.online || c.url.includes('5_m36N_Zk1s'))) {
+                return { ...c, url: 'https://www.youtube.com/watch?v=s5eA30XW-tY', online: true };
               }
               return c;
             });
