@@ -26,6 +26,7 @@
 17. [Política de Datos y Privacidad](#17-política-de-datos-y-privacidad)
 18. [Soporte IA.AGUS](#18-soporte-iaagus)
 19. [Glosario de Términos](#19-glosario-de-términos)
+20. [Guía de Reportes PDF — Qué muestran y de dónde salen los datos](#20-guía-de-reportes-pdf--qué-muestran-y-de-dónde-salen-los-datos)
 
 ---
 
@@ -838,6 +839,389 @@ Las actualizaciones se despliegan automáticamente en Vercel sin tiempo de inact
 | **Vercel** | Plataforma de despliegue del frontend. Entrega la aplicación web globalmente con latencia mínima. |
 | **Viajero** | Documento de ruta que acompaña físicamente cada pieza durante su fabricación. |
 | **Voice Link** | Asistente de voz en tiempo real integrado en el ERP, powered by Gemini Live API. |
+
+---
+
+## 20. Guía de Reportes PDF — Qué muestran y de dónde salen los datos
+
+Esta sección explica cada reporte que el sistema puede generar, qué información contiene, desde qué módulo se activa, qué tablas de la base de datos alimentan los datos y —cuando aplica— las fórmulas exactas que calculan los valores mostrados.
+
+> **Cómo generar un reporte:** Cada módulo tiene un botón **"Exportar PDF"** en su barra de herramientas. Los reportes se descargan directamente como archivo `.pdf` sin necesidad de imprimir. Los marcados con `window.print()` abren el diálogo de impresión del navegador.
+
+---
+
+### R-01 · Cotización Formal al Cliente
+
+| Campo | Detalle |
+|---|---|
+| **Módulo** | Cotizaciones → Agente Cotizador IA |
+| **Botón** | "Generar PDF" dentro de cada cotización |
+| **Motor** | jsPDF + jspdf-autotable |
+| **Tabla BD** | `cotizaciones`, `cotizacion_items`, `clientes` |
+
+**Qué incluye:** Número de cotización, nombre del cliente, fecha de vigencia, tabla de partidas (descripción, cantidad, precio unitario, importe), subtotal, IVA 16%, total, condiciones comerciales y datos de la empresa.
+
+**Cómo se calcula el total:**
+```
+Subtotal = Σ (cantidad × precio_unitario) por partida
+IVA      = Subtotal × 0.16
+Total    = Subtotal + IVA
+```
+
+---
+
+### R-02 · Cotización desde Panel de Ventas
+
+| Campo | Detalle |
+|---|---|
+| **Módulo** | Ventas → Panel de Cotizaciones |
+| **Botón** | Ícono de PDF en cada fila de cotización |
+| **Motor** | jsPDF + jspdf-autotable (formato A4) |
+| **Tabla BD** | `cotizaciones`, `cotizacion_items` |
+
+**Qué incluye:** Misma estructura que R-01 pero con formato A4 estándar, útil para envío por correo electrónico. Incluye logo McVill y sello de vigencia.
+
+---
+
+### R-03 · Reporte de Ausentismo
+
+| Campo | Detalle |
+|---|---|
+| **Módulo** | Asistencia / Recursos Humanos |
+| **Botón** | "Exportar PDF" en barra superior |
+| **Motor** | `reportUtils.exportToPDF` |
+| **Tabla BD** | `attendance_records`, `employees` |
+
+**Qué incluye:** Por colaborador: días registrados, días presentes, faltas, retardos, días sin check-out, porcentaje de asistencia. Filtrable por rango de fechas y turno.
+
+**Fórmulas:**
+```
+% Asistencia = (Días presentes / Días registrados) × 100
+Faltas       = Días registrados − Días presentes − Retardos
+```
+
+---
+
+### R-04 · Recibo de Pago Individual (Nómina)
+
+| Campo | Detalle |
+|---|---|
+| **Módulo** | Nómina → Calculadora de Nómina |
+| **Botón** | "Imprimir Recibo" dentro del modal de pago |
+| **Motor** | `window.print()` con estilos `@media print` |
+| **Tabla BD** | `employees`, `payroll_records` |
+
+**Qué incluye:** Nombre del empleado, período de pago, días trabajados, salario base diario, horas extra, percepciones totales, deducciones (ISR, IMSS obrero), neto a pagar.
+
+**Fórmulas (ley IMSS México 2026):**
+```
+IMSS obrero      = Salario Diario Integrado × cuota_porcentaje
+ISR quincenal    = Se calcula por tabla de tarifas LISR Art.96
+Neto a pagar     = Percepciones totales − IMSS obrero − ISR
+Horas extra doble = horas_extra × (salario_hora × 2)
+```
+
+---
+
+### R-05 · Credencial de Empleado
+
+| Campo | Detalle |
+|---|---|
+| **Módulo** | Recursos Humanos → Directorio |
+| **Botón** | "Imprimir Credencial" en ficha del empleado |
+| **Motor** | `window.print()` — formato CR80 (tarjeta de crédito) |
+| **Tabla BD** | `employees` |
+
+**Qué incluye:** Fotografía o avatar generado, nombre completo, número de empleado, puesto, célula/área, turno asignado, código de barras para el Kiosk de asistencia, año de vigencia.
+
+---
+
+### R-06 · Minuta de Reunión
+
+| Campo | Detalle |
+|---|---|
+| **Módulo** | Minutas |
+| **Botón** | "Exportar PDF" en cada minuta |
+| **Motor** | jsPDF |
+| **Tabla BD** | `minutas`, `minuta_asistentes`, `minuta_acuerdos` |
+
+**Qué incluye:** Tipo y nombre de la reunión, fecha, lugar y facilitador; lista de asistentes con espacio de firma; puntos tratados; tabla de acuerdos con responsable y fecha límite; bloque de firmas al pie.
+
+---
+
+### R-07 · Transcripción de Sesión IA
+
+| Campo | Detalle |
+|---|---|
+| **Módulo** | Chat IA (McVill Neural) |
+| **Botón** | "Exportar PDF" en barra del chat |
+| **Motor** | jsPDF |
+| **Tabla BD** | Mensajes en memoria de sesión (no persisten en BD por defecto) |
+
+**Qué incluye:** ID de sesión, usuario, modelo de IA utilizado, duración, todos los mensajes con timestamp, highlights automáticos de recomendaciones detectadas.
+
+---
+
+### R-08 · Conciliación Bancaria IA
+
+| Campo | Detalle |
+|---|---|
+| **Módulo** | Finanzas → Conciliación IA |
+| **Botón** | "Descargar Reporte" |
+| **Motor** | `reportUtils.exportToPDF` |
+| **Tabla BD** | `bank_transactions`, `erp_transactions` (o equivalentes configurados) |
+
+**Qué incluye:** Tabla de movimientos cruzados entre el banco y el ERP: fecha, descripción banco, concepto ERP, monto, referencia, porcentaje de confianza IA, estado del match.
+
+**Estados posibles del match:**
+| Estado | Significado |
+|---|---|
+| `auto` | IA encontró coincidencia con ≥ 90% de confianza — conciliado automáticamente |
+| `sugerido` | IA sugiere coincidencia con 60–89% — requiere revisión manual |
+| `aprobado` | Supervisor validó la coincidencia manualmente |
+| `rechazado` | Supervisor descartó la sugerencia IA |
+| `sin_match_banco` | Movimiento banco sin contrapartida en ERP |
+| `sin_match_erp` | Transacción ERP sin movimiento bancario |
+
+---
+
+### R-09 · Perfil de Candidato (Reclutamiento)
+
+| Campo | Detalle |
+|---|---|
+| **Módulo** | Reclutamiento IA |
+| **Botón** | "Exportar PDF" dentro del modal de análisis IA |
+| **Motor** | `reportUtils.exportToPDF` |
+| **Tabla BD** | `candidates`, `job_openings` |
+
+**Qué incluye:** Datos del candidato (nombre, contacto), vacante aplicada, score IA (0–100), fortalezas detectadas, áreas de oportunidad, recomendación del modelo (contratar / poner en espera / descartar), justificación del análisis, etapa actual del proceso.
+
+**Cómo se calcula el Score IA:**
+El modelo Gemini analiza el CV y la descripción de la vacante, evaluando 5 dimensiones: experiencia técnica relevante, habilidades blandas, estabilidad laboral, indicadores de riesgo, y alineación cultural. El score es el promedio ponderado de las 5 dimensiones, donde experiencia técnica tiene el mayor peso (40%).
+
+---
+
+### R-10 · Lista de Materiales desde Plano (BOM Vision AI)
+
+| Campo | Detalle |
+|---|---|
+| **Módulo** | Ingeniería → Vision Planos AI |
+| **Botón** | "Exportar PDF" junto a "Integrar al BOM" |
+| **Motor** | `reportUtils.exportToPDF` |
+| **Tabla BD** | `engineering_bom_items`, `projects` |
+
+**Qué incluye:** Por cada componente detectado en el plano: número de partida, nombre del componente, cantidad, unidad de medida (pza/kg/mts), notas técnicas extraídas del plano.
+
+**Cómo funciona la extracción:** El módulo Vision de Gemini analiza la imagen o PDF del plano técnico y extrae la lista de materiales mediante reconocimiento óptico de tablas y símbolos de ingeniería. La tolerancia de error en cantidades numéricas es ±2%.
+
+---
+
+### R-11 · Análisis de Factibilidad IA
+
+| Campo | Detalle |
+|---|---|
+| **Módulo** | Cotizaciones → Factibilidad IA |
+| **Botón** | "Exportar PDF" junto a "Guardar Análisis" |
+| **Motor** | `reportUtils.exportToPDF` |
+| **Tabla BD** | `rfq_requests`, `factibilidad_analisis` |
+
+**Qué incluye:** Veredicto de factibilidad, porcentaje de confianza, rangos de costo estimado por pieza y por lote, tiempo de entrega en días hábiles, estado de capacidad de planta, riesgos identificados (nivel alto/medio/bajo), cuellos de botella, procesos críticos, recomendaciones de precio y condiciones, resumen ejecutivo.
+
+**Cómo se genera el análisis:**
+El modelo IA recibe el RFQ (solicitud de cotización) con: descripción de la pieza, alcance, materiales requeridos, volumen mensual y cliente. Cruza esta información contra la configuración de capacidad de planta, precios de materiales y parámetros del ERP para generar el análisis de factibilidad.
+
+---
+
+### R-12 · Reporte de Desempeño de Operadores
+
+| Campo | Detalle |
+|---|---|
+| **Módulo** | Desempeño + Incentivos |
+| **Botón** | "Exportar PDF" en barra superior |
+| **Motor** | `reportUtils.exportToPDF` |
+| **Tabla BD** | `operadores`, `desempeno_kpis`, `incentivos` |
+
+**Qué incluye:** Por operador: número de empleado, nombre, célula asignada, eficiencia (%), tasa de calidad (%), OEE (%), número de incidentes, bono generado en el período.
+
+**Fórmulas exactas** (estándar SMRP / OEE Foundation):
+
+```
+Eficiencia (Rendimiento)  = (Piezas producidas / Piezas meta) × 100
+Tasa de Calidad           = (Piezas OK / Piezas producidas) × 100
+Disponibilidad            = (Horas trabajadas − Horas paro) / Horas trabajadas
+OEE                       = Eficiencia/100 × Calidad/100 × Disponibilidad × 100
+```
+
+**Ejemplos de cálculo:**
+| Dato | Valor |
+|---|---|
+| Meta semanal | 180 piezas |
+| Producción real | 192 piezas |
+| Piezas OK (sin rechazo) | 190 piezas |
+| Horas turno | 40 h |
+| Horas paro (máquina) | 1.5 h |
+| **Eficiencia** | 192/180 × 100 = **106.7%** |
+| **Calidad** | 190/192 × 100 = **99.0%** |
+| **Disponibilidad** | (40−1.5)/40 = **96.25%** |
+| **OEE** | 1.067 × 0.990 × 0.9625 × 100 = **101.7%** |
+
+> Eficiencia puede superar 100% si el operador produce más piezas que la meta. OEE > 85% se considera clase mundial.
+
+**Generación automática de bonos:**
+El sistema sugiere bonos automáticamente cuando se guardan los KPIs:
+
+| Condición | Tipo de bono | % Salario base |
+|---|---|---|
+| Eficiencia ≥ 110% | Productividad Alto | 10% |
+| Eficiencia 100–109% | Productividad Bajo | 5% |
+| Calidad ≥ 98% | Calidad | 3% |
+| Incidentes = 0 | Seguridad | 2% |
+| Score 5S ≥ 90 | 5S | 1% |
+
+Los porcentajes son configurables en Administración → Políticas de Incentivos.
+
+---
+
+### R-13 · Órdenes de Compra
+
+| Campo | Detalle |
+|---|---|
+| **Módulo** | Compras |
+| **Botón** | "Exportar PDF" en panel de compras |
+| **Motor** | `reportUtils.exportToPDF` |
+| **Tabla BD** | `purchase_orders`, `suppliers`, `purchase_items` |
+
+**Qué incluye:** Número de OC, proveedor, materiales solicitados (descripción, cantidad, unidad, precio unitario, importe), subtotal, IVA, total, condiciones de pago y fecha de entrega requerida.
+
+---
+
+### R-14 · Órdenes de Producción
+
+| Campo | Detalle |
+|---|---|
+| **Módulo** | Producción |
+| **Botón** | "Exportar PDF" en lista de órdenes |
+| **Motor** | `reportUtils.exportToPDF` |
+| **Tabla BD** | `work_orders`, `operations` |
+
+**Qué incluye:** Número de orden, parte o producto, prioridad, estado actual, porcentaje de avance, operador asignado, fecha de entrega comprometida.
+
+---
+
+### R-15 · Incidentes de Seguridad Industrial (HSE)
+
+| Campo | Detalle |
+|---|---|
+| **Módulo** | Seguridad Industrial |
+| **Botón** | "Exportar PDF" en panel de incidentes |
+| **Motor** | `reportUtils.exportToPDF` |
+| **Tabla BD** | `hse_incidents` |
+
+**Qué incluye:** ID del incidente, tipo (accidente/cuasi-accidente/condición insegura), descripción, área, hora de ocurrencia, severidad (leve/moderado/grave), estado (resuelto/pendiente).
+
+---
+
+### R-16 · Reporte Six Sigma / SPC
+
+| Campo | Detalle |
+|---|---|
+| **Módulo** | Calidad → Control Estadístico (SPC) |
+| **Botón** | "Exportar PDF" en vista SPC |
+| **Motor** | `reportUtils.exportToPDF` |
+| **Tabla BD** | `spc_characteristics`, `spc_measurements` |
+
+**Qué incluye:** Característica de calidad medida, parte/producto, especificación nominal con tolerancias, índices Cp y Cpk, media del proceso (X̄̄), límite de control superior (UCL) e inferior (LCL), estado del proceso.
+
+**Fórmulas estadísticas:**
+```
+X̄  = Promedio de cada subgrupo
+X̄̄ = Promedio de todos los X̄ (gran media)
+R̄  = Promedio de rangos de los subgrupos
+σ  = R̄ / d₂  (desviación estándar estimada, d₂ según n subgrupo)
+
+UCL_X̄ = X̄̄ + A₂ × R̄
+LCL_X̄ = X̄̄ − A₂ × R̄
+
+Cp  = (USL − LSL) / (6σ)         → Capacidad potencial (solo tolancia)
+Cpk = min[(USL−X̄̄)/(3σ), (X̄̄−LSL)/(3σ)]  → Capacidad real (considera centrado)
+```
+> **Interpretación:** Cp/Cpk ≥ 1.33 = proceso capaz (estándar automotriz IATF 16949). Cpk < 1.0 = proceso fuera de control, requiere acción inmediata.
+
+---
+
+### R-17 · Simulación de Costeo por Pieza
+
+| Campo | Detalle |
+|---|---|
+| **Módulo** | Costeo |
+| **Botón** | "Exportar PDF" en dashboard de costeo |
+| **Motor** | `reportUtils.exportToPDF` |
+| **Tabla BD** | `work_orders`, `costeo_simulaciones` |
+
+**Qué incluye:** Viajero/orden de trabajo, número de parte, cliente, costo estimado, costo real acumulado, varianza en pesos y porcentaje, semáforo de rentabilidad.
+
+**Fórmula de varianza:**
+```
+Varianza $ = Costo Real − Costo Estimado
+Varianza % = (Varianza $ / Costo Estimado) × 100
+Semáforo:  Verde = varianza ≤ 5% | Amarillo = 5–15% | Rojo = > 15%
+```
+
+---
+
+### R-18 · Resumen Ejecutivo de KPIs (Dashboard)
+
+| Campo | Detalle |
+|---|---|
+| **Módulo** | Dashboard Principal |
+| **Botón** | "Exportar PDF" en barra del dashboard |
+| **Motor** | `reportUtils.exportToPDF` |
+| **Tabla BD** | Múltiples tablas vía consultas agregadas |
+
+**Qué incluye:** Los 8 KPIs principales del dashboard: OEE global de planta, % Scrap/rechazo, empleados activos, % asistencia, órdenes activas, stock en nivel crítico, días sin accidente, consumo energético (KWh/tonelada).
+
+---
+
+### R-19 · Viajero Industrial (Reporting Service)
+
+| Campo | Detalle |
+|---|---|
+| **Módulo** | Producción → Viajeros |
+| **Botón** | Botón de impresión en cada viajero |
+| **Motor** | QuestPDF (C#) vía servidor en puerto 5005 |
+| **Tabla BD** | `work_orders`, `operations`, `quality_inspections` |
+
+**Qué incluye:** Encabezado con datos de la orden, tabla completa de operaciones con descripción, tiempo estándar, operador asignado, resultado de inspección QC por etapa, firma digital por operación, código QR de trazabilidad.
+
+Este reporte **no lo genera el navegador** — lo genera el servidor de reportes .NET que debe estar corriendo en `localhost:5005`. Ver sección de Arquitectura de Servicios para instrucciones de arranque.
+
+---
+
+### Resumen de todos los reportes
+
+| # | Reporte | Módulo | Motor | Requiere servidor externo |
+|---|---|---|---|---|
+| R-01 | Cotización formal | Cotizaciones | jsPDF | No |
+| R-02 | Cotización ventas | Ventas | jsPDF | No |
+| R-03 | Ausentismo | Asistencia | reportUtils | No |
+| R-04 | Recibo de nómina | Nómina | window.print | No |
+| R-05 | Credencial empleado | RH | window.print | No |
+| R-06 | Minuta de reunión | Minutas | jsPDF | No |
+| R-07 | Transcripción IA | Chat IA | jsPDF | No |
+| R-08 | Conciliación bancaria | Finanzas | reportUtils | No |
+| R-09 | Perfil candidato | Reclutamiento | reportUtils | No |
+| R-10 | BOM desde plano | Ingeniería | reportUtils | No |
+| R-11 | Factibilidad IA | Cotizaciones | reportUtils | No |
+| R-12 | Desempeño operadores | Desempeño | reportUtils | No |
+| R-13 | Órdenes de compra | Compras | reportUtils | No |
+| R-14 | Órdenes producción | Producción | reportUtils | No |
+| R-15 | Incidentes HSE | Seguridad | reportUtils | No |
+| R-16 | SPC / Six Sigma | Calidad | reportUtils | No |
+| R-17 | Costeo por pieza | Costeo | reportUtils | No |
+| R-18 | KPIs ejecutivos | Dashboard | reportUtils | No |
+| R-19 | Viajero industrial | Producción | QuestPDF C# | **Sí — puerto 5005** |
+
+> **`reportUtils`** = utilidad compartida `src/utils/reportUtils.ts` basada en jsPDF + jspdf-autotable. Genera el PDF directamente en el navegador y lo descarga sin diálogo de impresión.
 
 ---
 

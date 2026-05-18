@@ -44,38 +44,41 @@ function buildSystemInstruction(
   const guidesDict = language === 'en' ? MODULE_GUIDES_EN : MODULE_GUIDES;
   const defaultG = language === 'en' ? DEFAULT_GUIDE_EN : DEFAULT_GUIDE;
   const guide = moduleId ? (guidesDict[moduleId] ?? defaultG) : defaultG;
-  const name   = assistantName || 'ARIA';
+  const name   = assistantName || 'Mac de McVill';
   const brand  = brandName    || 'McVill';
   const company = companyName || brand;
-
+ 
   // Dynamically compile a comprehensive dictionary of all modules in the manual
   const allModulesSummary = Object.values(guidesDict)
     .map((g) => `◆ ${g.label} (${g.emoji}): ${g.description}. Pasos clave: ${g.steps.map(s => s.title).join(' ➔ ')}`)
     .join('\n');
-
+ 
   if (language === 'en') {
     const moduleContext = moduleId
       ? `ACTIVE MODULE: ${guide.label} ${guide.emoji}\n${guide.description}\n\nHOW TO TEACH THIS MODULE (when the user asks how to use it):\n${guide.steps.map((s, i) => `${i + 1}. ${s.title} — ${s.subtitle}:\n   ${s.tips.join('\n   ')}`).join('\n\n')}`
       : 'The user is not in any specific module.';
-
+ 
     return `## IDENTITY
 You are ${name}, the Neural AI Assistant of ${brand} — the Industrial ERP Operating System of ${company}.
 You were created by IA.AGUS to maximize operational efficiency, automate industrial decisions, and serve as the intelligent backbone of the entire ${company} ecosystem.
-
+ 
+## PHONETIC PRONUNCIATION RULE (CRITICAL):
+- Your name is "${name}" (Mac de McVill). IMPORTANT: In all your voice responses, when referring to yourself or the brand, always pronounce "${name}" or "McVill" as "Macvill" (smoothly, naturally, as a single word). Never say the letters 'M' and 'C' separately! It must sound fluid like "Macvill".
+ 
 ## PRESENTATION (say EXACTLY this when the conversation starts or when someone greets you):
 "Hello! I'm ${name}, your AI assistant for the ${brand} ERP at ${company}. I have real-time access to your operations — production, inventory, quality, finance and more. How can I help you today?"
-
+ 
 ## PERSONALITY
 - Tone: Professional, direct, executive, tech-driven — Agus Pro Standard.
 - Never refer to yourself as a generic AI. You are ${name}, the Neural Core of ${company}.
 - Be confident, brief and impactful. Maximum 2-3 sentences per response.
 - Show intelligence: reference real ERP context when available.
-
+ 
 ${moduleContext}
-
+ 
 COMPLETE SYSTEM USER MANUAL:
 ${allModulesSummary}
-
+ 
 RULES:
 1. Always introduce yourself as ${name} when greeted.
 2. Respond concisely and fluidly.
@@ -86,25 +89,28 @@ RULES:
     const moduleContext = moduleId
       ? `MÓDULO ACTIVO: ${guide.label} ${guide.emoji}\n${guide.description}\n\nCÓMO ENSEÑAR ESTE MÓDULO (cuando el usuario pregunte cómo usarlo):\n${guide.steps.map((s, i) => `${i + 1}. ${s.title} — ${s.subtitle}:\n   ${s.tips.join('\n   ')}`).join('\n\n')}`
       : 'El usuario no está en ningún módulo específico.';
-
+ 
     return `## IDENTIDAD
 Eres ${name}, el Asistente Neural de Inteligencia Artificial de ${brand} — el Sistema Operativo ERP Industrial de ${company}.
 Fuiste creado por IA.AGUS para maximizar la eficiencia operativa, automatizar decisiones industriales y ser la columna vertebral inteligente del ecosistema completo de ${company}.
-
+ 
+## REGLA DE PRONUNCIACIÓN FONÉTICA (CRÍTICA):
+- Tu nombre es "${name}" (Mac de McVill). IMPORTANTE: En todas tus respuestas de voz, cuando te refieras a ti mismo o a la marca, pronuncia "${name}" o "McVill" siempre como "Macvill" (todo junto, de corrido, de forma natural). ¡Nunca digas la letra 'M' y luego la 'C' por separado! Debe sonar fluido y continuo como "Macvill".
+ 
 ## PRESENTACIÓN (di EXACTAMENTE esto cuando empiece la conversación o te saluden):
 "¡Hola! Soy ${name}, tu asistente de IA del ERP ${brand} en ${company}. Tengo acceso en tiempo real a sus operaciones — producción, inventario, calidad, finanzas y más. ¿En qué les puedo ayudar hoy?"
-
+ 
 ## PERSONALIDAD
 - Tono: Profesional, directo, ejecutivo, tecnológico — Agus Pro Standard.
 - Nunca te refieras a ti mismo como una IA genérica. Eres ${name}, el Núcleo Neural de ${company}.
 - Sé seguro, breve e impactante. Máximo 2-3 oraciones por respuesta.
 - Demuestra inteligencia: referencia el contexto real del ERP cuando esté disponible.
-
+ 
 ${moduleContext}
-
+ 
 MANUAL COMPLETO DEL SISTEMA ERP:
 ${allModulesSummary}
-
+ 
 REGLAS:
 1. Siempre preséntate como ${name} cuando te saluden.
 2. Responde de manera concisa y fluida.
@@ -138,11 +144,12 @@ export const LiveVoiceModalERP: React.FC<LiveVoiceModalERPProps> = ({
   const [transcription, setTranscription] = useState<{ user: string; model: string }>({ user: '', model: '' });
   const [duration, setDuration] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [assistantName, setAssistantName] = useState<string>('ARIA');
+  const [assistantName, setAssistantName] = useState<string>('Mac de McVill');
   const [selectedVoice, setSelectedVoice] = useState(() => {
     return localStorage.getItem('erp_selected_voice') || 'Aoede';
   });
-
+  const [loadingVoice, setLoadingVoice] = useState<string | null>(null);
+ 
   const sessionRef = useRef<any>(null);
   const audioContextInRef = useRef<AudioContext | null>(null);
   const audioContextOutRef = useRef<AudioContext | null>(null);
@@ -154,7 +161,7 @@ export const LiveVoiceModalERP: React.FC<LiveVoiceModalERPProps> = ({
   const isSocketReadyRef = useRef(false);
   const isActiveRef = useRef(false);
   const isConnectingRef = useRef(false);
-
+ 
   // Timer Effect
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -167,7 +174,7 @@ export const LiveVoiceModalERP: React.FC<LiveVoiceModalERPProps> = ({
     }
     return () => clearInterval(interval);
   }, [isActive]);
-
+ 
   // Volume visualization
   useEffect(() => {
     let animationFrame: number;
@@ -183,7 +190,7 @@ export const LiveVoiceModalERP: React.FC<LiveVoiceModalERPProps> = ({
     animate();
     return () => cancelAnimationFrame(animationFrame);
   }, [isActive]);
-
+ 
   // Auto-connect and cleanup
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
@@ -193,21 +200,87 @@ export const LiveVoiceModalERP: React.FC<LiveVoiceModalERPProps> = ({
       window.speechSynthesis.cancel();
     };
   }, [isOpen]);
-
-  const playDemo = (voiceId: string, voiceName: string) => {
-    const text = `Hola, soy ${voiceName}. ¿En qué te puedo ayudar?`;
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'es-MX';
-    
-    // Simulación aproximada de los tonos de Gemini
-    if (voiceId === 'Aoede') { utterance.pitch = 1.2; utterance.rate = 1.0; } // Femenina cálida
-    if (voiceId === 'Kore') { utterance.pitch = 1.5; utterance.rate = 1.1; } // Femenina clara
-    if (voiceId === 'Charon') { utterance.pitch = 0.5; utterance.rate = 0.9; } // Masculino grave
-    if (voiceId === 'Fenrir') { utterance.pitch = 0.3; utterance.rate = 1.0; } // Masculino imponente
-    if (voiceId === 'Puck') { utterance.pitch = 1.1; utterance.rate = 1.1; } // Masculino ágil
-
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utterance);
+ 
+  const playDemo = async (voiceId: string, voiceName: string) => {
+    if (loadingVoice) return;
+    try {
+      setLoadingVoice(voiceId);
+      window.speechSynthesis.cancel();
+ 
+      // Retrieve API Key dynamically from Supabase
+      const tenantCfg = await tenantService.getConfig();
+      const apiKey = tenantCfg.gemini_api_key?.trim();
+      if (!apiKey) {
+        throw new Error("API Key no detectada en Supabase.");
+      }
+ 
+      // Initialize SDK
+      const ai = new GoogleGenAI({ apiKey } as any);
+ 
+      // Call Gemini 2.5 Flash Lite to generate audio response
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash-lite',
+        contents: `Preséntate de forma extremadamente corta y profesional diciendo: "Hola, soy la voz de ${voiceName} del ERP McVill. ¿En qué te puedo ayudar hoy?"`,
+        config: {
+          responseModalities: ['AUDIO'],
+          speechConfig: {
+            voiceConfig: {
+              prebuiltVoiceConfig: {
+                voiceName: voiceId
+              }
+            }
+          }
+        }
+      } as any);
+ 
+      // Extract base64 audio
+      const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+      if (!base64Audio) {
+        throw new Error("No se recibió audio de la API de Gemini.");
+      }
+ 
+      // Initialize Audio Context if not present
+      if (!audioContextOutRef.current) {
+        audioContextOutRef.current = new AudioContext({ sampleRate: 24000 });
+      }
+      const ctx = audioContextOutRef.current;
+      if (ctx.state === 'suspended') {
+        await ctx.resume();
+      }
+ 
+      // Stop any active preview sources
+      sourcesRef.current.forEach(source => {
+        try { source.stop(); } catch (e) {}
+      });
+      sourcesRef.current.clear();
+ 
+      // Decode and play
+      const audioBuffer = await decodeAudioData(decode(base64Audio), ctx, 24000, 1);
+      const source = ctx.createBufferSource();
+      source.buffer = audioBuffer;
+      
+      if (analyserRef.current) {
+        source.connect(analyserRef.current);
+      } else {
+        source.connect(ctx.destination);
+      }
+      
+      source.addEventListener('ended', () => {
+        sourcesRef.current.delete(source);
+      });
+      
+      source.start(0);
+      sourcesRef.current.add(source);
+    } catch (err: any) {
+      console.error("Error playing real Gemini voice preview:", err);
+      // Fallback elegant to SpeechSynthesis if key or quota fails
+      const text = `Hola, soy ${voiceName}. ¿En qué te puedo ayudar?`;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'es-MX';
+      window.speechSynthesis.speak(utterance);
+    } finally {
+      setLoadingVoice(null);
+    }
   };
 
   // Handle voice change
@@ -283,8 +356,7 @@ export const LiveVoiceModalERP: React.FC<LiveVoiceModalERPProps> = ({
 
       // ── Resolución dinámica del nombre del asistente (Zero Hardcoding) ────
       const resolvedAssistant: string = (tenantCfg as any).ai_assistant_name?.trim()
-        || config.brandName
-        || 'ARIA';
+        || 'Mac de McVill';
       setAssistantName(resolvedAssistant);
 
       // Re-check after async gap — a parallel call may have already taken over
@@ -552,7 +624,11 @@ export const LiveVoiceModalERP: React.FC<LiveVoiceModalERPProps> = ({
                         ? voice.gender === 'F' ? 'bg-pink-500/20 text-pink-400' : 'bg-blue-500/20 text-blue-400'
                         : voice.gender === 'F' ? 'bg-pink-500/10 text-pink-500/50' : 'bg-blue-500/10 text-blue-500/50'
                     }`}>
-                      <User size={10} />
+                      {loadingVoice === voice.id ? (
+                        <Loader2 className="animate-spin" size={10} />
+                      ) : (
+                        <User size={10} />
+                      )}
                     </div>
                     <span className={`text-[7px] font-black uppercase leading-none ${
                       selectedVoice === voice.id ? 'text-mcvill-accent' : isDarkMode ? 'text-slate-500' : 'text-slate-400'
