@@ -32,9 +32,9 @@ interface Incidente {
 
 const DEFAULT_CAMERAS: SecurityCamera[] = [
   { id: 'c1', nombre: 'Entrada Principal',  area: 'Acceso',      url: '', tipo: 'mjpeg', online: true  },
-  { id: 'c2', nombre: 'Área de Soldadura',  area: 'Producción',  url: 'https://www.youtube.com/watch?v=7XGplK3yV-E', tipo: 'mjpeg', online: true  },
+  { id: 'c2', nombre: 'Área de Soldadura',  area: 'Producción',  url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', tipo: 'mjpeg', online: true  },
   { id: 'c3', nombre: 'Almacén General',    area: 'Almacén',     url: '', tipo: 'mjpeg', online: true  },
-  { id: 'c4', nombre: 'Taller CNC',         area: 'Producción',  url: 'https://www.youtube.com/watch?v=s5eA30XW-tY', tipo: 'mjpeg', online: true },
+  { id: 'c4', nombre: 'Taller CNC',         area: 'Producción',  url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4', tipo: 'mjpeg', online: true },
   { id: 'c5', nombre: 'Área de Pintura',    area: 'Producción',  url: '', tipo: 'mjpeg', online: true  },
   { id: 'c6', nombre: 'Estacionamiento',    area: 'Exterior',    url: '', tipo: 'mjpeg', online: true  },
 ];
@@ -474,15 +474,15 @@ export const SeguridadIndustrialView: React.FC = () => {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const hasLegacyEmpty = parsed.some(c => c.id === 'c2' && (!c.url || c.url.includes('assets.mixkit.co')));
-          const c4Offline = parsed.some(c => c.id === 'c4' && (!c.url || !c.online || c.url.includes('5_m36N_Zk1s')));
+          const hasLegacyEmpty = parsed.some(c => c.id === 'c2' && (!c.url || c.url.includes('assets.mixkit.co') || c.url.includes('7XGplK3yV-E')));
+          const c4Offline = parsed.some(c => c.id === 'c4' && (!c.url || !c.online || c.url.includes('5_m36N_Zk1s') || c.url.includes('s5eA30XW-tY')));
           if (hasLegacyEmpty || c4Offline) {
             const upgraded = parsed.map(c => {
-              if (c.id === 'c2' && (!c.url || c.url.includes('assets.mixkit.co'))) {
-                return { ...c, url: 'https://www.youtube.com/watch?v=7XGplK3yV-E', online: true };
+              if (c.id === 'c2' && (!c.url || c.url.includes('assets.mixkit.co') || c.url.includes('7XGplK3yV-E'))) {
+                return { ...c, url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', online: true };
               }
-              if (c.id === 'c4' && (!c.url || !c.online || c.url.includes('5_m36N_Zk1s'))) {
-                return { ...c, url: 'https://www.youtube.com/watch?v=s5eA30XW-tY', online: true };
+              if (c.id === 'c4' && (!c.url || !c.online || c.url.includes('5_m36N_Zk1s') || c.url.includes('s5eA30XW-tY'))) {
+                return { ...c, url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4', online: true };
               }
               return c;
             });

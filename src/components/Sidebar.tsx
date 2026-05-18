@@ -220,6 +220,7 @@ export const Sidebar = (props: {
     { id: 'ppap',              label: 'PPAP',             icon: FileCheck2,      godmode: true },
     { id: 'voc',               label: 'VOC',              icon: MessageCircle,   godmode: true },
     { id: 'shop_floor',        label: 'Shop Floor',       icon: Scan,            godmode: true },
+    { id: 'seguridad',         label: 'Seguridad',        icon: Camera,          godmode: true },
     { id: 'ventas',            label: 'Ventas',           icon: TrendingUp,      godmode: true },
     { id: 'compras',           label: 'Compras',          icon: ShoppingCart,    godmode: true },
     { id: 'agente_cot',        label: 'Agente Cotiz.',    icon: Sparkles,        godmode: true },
