@@ -203,23 +203,34 @@ Responde en español, formato conciso con bullets. Sé directo y específico.`;
               CONTROL DE <span className="text-mcvill-accent glow-text">SUMINISTROS</span>
             </h2>
           </div>
-          <div className="flex gap-2 relative z-10">
+          <div className="flex items-center gap-2 relative z-10">
+            {/* Acciones generales */}
             <button onClick={handleDownloadPDF} className="mcvill-btn-secondary h-8 px-3 rounded-lg text-[9px] font-black flex items-center gap-2">
               <FileDown size={12} /> REPORTE
-            </button>
-            <button onClick={generateForecast} disabled={forecastLoading} className="mcvill-btn-ai h-8 px-4 rounded-lg flex items-center gap-2 transition-all disabled:opacity-50">
-              {forecastLoading ? <Loader2 size={12} className="animate-spin" /> : <Brain size={12} />} PRONÓSTICO IA
             </button>
             <button onClick={() => setShowImportModal(true)} className="mcvill-btn-secondary h-8 px-3 rounded-lg text-[9px] font-black flex items-center gap-2">
               <Upload size={12} /> IMPORTAR
             </button>
-            <button onClick={() => setShowScrapAnalyzer(true)} className="h-8 px-3 rounded-lg bg-slate-950 border border-slate-800 text-[9px] font-black text-amber-400 hover:text-amber-300 transition-all flex items-center gap-2">
+            <button onClick={() => setShowScrapAnalyzer(true)} className="h-8 px-3 rounded-lg text-[9px] font-black flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 hover:text-amber-300 transition-all">
               <AlertCircle size={12} /> SCRAP
             </button>
-            <button onClick={() => setShowAIModal(true)} className="mcvill-btn-ai h-8 px-4 rounded-lg flex items-center gap-2 transition-all">
-              <Zap size={12} className="animate-pulse" /> IA SCANNER
+
+            {/* Separador */}
+            <div className="h-5 w-px bg-white/10 mx-1" />
+
+            {/* Herramientas IA */}
+            <button onClick={generateForecast} disabled={forecastLoading} className="mcvill-btn-ai h-8 px-4 rounded-lg flex items-center gap-2 transition-all disabled:opacity-50 text-[9px] font-black">
+              {forecastLoading ? <Loader2 size={12} className="animate-spin" /> : <Brain size={12} />} PRONÓSTICO IA
             </button>
-            <button onClick={() => setShowModal(true)} className="mcvill-btn-create h-8 px-4 rounded-lg flex items-center gap-2 transition-all shadow-lg shadow-emerald-600/20">
+            <button onClick={() => setShowAIModal(true)} className="mcvill-btn-ai h-8 px-4 rounded-lg flex items-center gap-2 transition-all text-[9px] font-black">
+              <Zap size={12} className="animate-pulse" /> SCANNER IA
+            </button>
+
+            {/* Separador */}
+            <div className="h-5 w-px bg-white/10 mx-1" />
+
+            {/* Acción principal */}
+            <button onClick={() => setShowModal(true)} className="mcvill-btn-create h-8 px-4 rounded-lg flex items-center gap-2 transition-all shadow-lg shadow-emerald-600/20 text-[9px] font-black">
               <Plus size={12} /> REGISTRAR
             </button>
           </div>

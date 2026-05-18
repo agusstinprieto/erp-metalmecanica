@@ -54,7 +54,7 @@ export const ModuleGuideModal: React.FC<ModuleGuideModalProps> = ({ isOpen, onCl
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-lg"
+        className="fixed inset-0 z-[200] flex items-start justify-center pt-20 px-4 pb-4 bg-black/80 backdrop-blur-lg"
         onClick={onClose}
       >
         <motion.div
@@ -63,7 +63,7 @@ export const ModuleGuideModal: React.FC<ModuleGuideModalProps> = ({ isOpen, onCl
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.88, opacity: 0, y: 24 }}
           transition={{ type: 'spring', damping: 22, stiffness: 260 }}
-          className={`relative w-full max-w-lg rounded-2xl border shadow-2xl overflow-hidden ${
+          className={`relative w-full max-w-lg rounded-2xl border shadow-2xl overflow-hidden max-h-[calc(100vh-5.5rem)] flex flex-col ${
             isDarkMode ? 'bg-slate-950 border-white/10' : 'bg-white border-slate-200'
           }`}
           onClick={(e) => e.stopPropagation()}
@@ -88,6 +88,9 @@ export const ModuleGuideModal: React.FC<ModuleGuideModalProps> = ({ isOpen, onCl
               <X size={17} />
             </button>
           </div>
+
+          {/* Scrollable body */}
+          <div className="overflow-y-auto flex-1 custom-scrollbar">
 
           {/* Description */}
           <div className="px-6 pt-4">
@@ -181,6 +184,8 @@ export const ModuleGuideModal: React.FC<ModuleGuideModalProps> = ({ isOpen, onCl
               )}
             </div>
           </div>
+
+          </div>{/* end scrollable body */}
         </motion.div>
       </motion.div>
     </AnimatePresence>
