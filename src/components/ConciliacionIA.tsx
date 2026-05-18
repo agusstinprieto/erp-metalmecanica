@@ -468,7 +468,7 @@ const ConciliacionIA: React.FC<ConciliacionIAProps> = ({ accounts, txs, onMarkCo
   const diferencia = saldoBanco - saldoERP;
 
   return (
-    <div className="flex flex-col h-full bg-[#060b18] text-white">
+    <div className="flex flex-col h-full bg-mcvill-bg text-white">
       {/* Header */}
       <div className="shrink-0 px-4 py-3 border-b border-white/5 flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-3">
@@ -736,7 +736,7 @@ const ConciliacionIA: React.FC<ConciliacionIAProps> = ({ accounts, txs, onMarkCo
               )}
 
               {/* Close button */}
-              <div className="sticky bottom-0 bg-[#060b18] pt-3 pb-2 border-t border-white/5">
+              <div className="sticky bottom-0 bg-mcvill-bg pt-3 pb-2 border-t border-white/5">
                 <div className="flex items-center gap-3 flex-wrap">
                   <button
                     onClick={handleClose}

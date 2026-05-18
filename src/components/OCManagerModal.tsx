@@ -10,6 +10,7 @@ import {
 import { supabase } from '../lib/supabase';
 import { appConfirm } from '../lib/dialogs';
 import { ClientManagerModal } from './ClientManagerModal';
+import { formatMoneyInput, parseFormattedNumber, stripLeadingZeros } from '../utils/inputFormatters';
 
 interface Cliente {
   id: string;
@@ -49,6 +50,8 @@ export const OCManagerModal: React.FC<OCManagerModalProps> = ({ isOpen, onClose,
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
   const [activeOCIndex, setActiveOCIndex] = useState<number | null>(null);
   const [viewMode, setViewMode] = useState<'card' | 'list'>('list');
+  const [montoInputs, setMontoInputs] = useState<Record<number, string>>({});
+  const [cantidadInputs, setCantidadInputs] = useState<Record<number, string>>({});
 
   useEffect(() => {
     if (isOpen || isInline) {
@@ -164,7 +167,7 @@ export const OCManagerModal: React.FC<OCManagerModalProps> = ({ isOpen, onClose,
   if (!isOpen && !isInline) return null;
 
   const content = (
-    <div className={`relative ${isInline ? 'w-full h-full' : 'w-full max-w-5xl bg-[#0a0f1d] border border-white/10 rounded-[40px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]'}`}>
+    <div className={`relative ${isInline ? 'w-full h-full' : 'w-full max-w-5xl bg-mcvill-bg border border-white/10 rounded-[40px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]'}`}>
       {/* Header */}
       <div className="px-8 py-6 border-b border-white/5 bg-slate-900/40 flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -196,7 +199,7 @@ export const OCManagerModal: React.FC<OCManagerModalProps> = ({ isOpen, onClose,
         </div>
       </div>
 
-      <div className="flex-1 overflow-hidden flex flex-col bg-[#060b18]">
+      <div className="flex-1 overflow-hidden flex flex-col bg-mcvill-bg">
         {/* Search & Actions */}
         <div className="px-8 py-5 border-b border-white/5 bg-slate-900/20 flex items-center justify-between gap-4">
           <div className="relative flex-1 group">
@@ -377,10 +380,21 @@ export const OCManagerModal: React.FC<OCManagerModalProps> = ({ isOpen, onClose,
                           <div>
                             <label className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1.5 block ml-1">Cant. OC</label>
                             <input 
-                              type="number"
-                              value={oc.cantidad === undefined ? 1 : oc.cantidad}
+                              type="text"
+                              value={cantidadInputs[idx] !== undefined ? cantidadInputs[idx] : (oc.cantidad === undefined ? '1' : stripLeadingZeros(oc.cantidad.toString()))}
                               onFocus={e => e.target.select()}
-                              onChange={e => updateOC(idx, 'cantidad', e.target.value === '' ? undefined : Number(e.target.value))}
+                              onChange={e => {
+                                const cleaned = stripLeadingZeros(e.target.value);
+                                setCantidadInputs(prev => ({ ...prev, [idx]: cleaned }));
+                                updateOC(idx, 'cantidad', cleaned === '' ? undefined : Number(cleaned));
+                              }}
+                              onBlur={() => {
+                                setCantidadInputs(prev => {
+                                  const copy = { ...prev };
+                                  delete copy[idx];
+                                  return copy;
+                                });
+                              }}
                               className="w-full bg-black/40 border border-white/5 rounded-2xl px-4 py-3 text-sm text-white outline-none focus:border-indigo-500/40 transition-all shadow-inner"
                             />
                           </div>
@@ -433,11 +447,19 @@ export const OCManagerModal: React.FC<OCManagerModalProps> = ({ isOpen, onClose,
                               <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600" size={16} />
                               <input 
                                 type="text"
-                                value={oc.monto_total ? new Intl.NumberFormat('en-US').format(oc.monto_total) : ''}
+                                value={montoInputs[idx] !== undefined ? montoInputs[idx] : (oc.monto_total ? formatMoneyInput(oc.monto_total) : '')}
                                 onFocus={e => e.target.select()}
                                 onChange={e => {
-                                  const val = e.target.value.replace(/[^0-9.]/g, '');
-                                  updateOC(idx, 'monto_total', val === '' ? 0 : Number(val));
+                                  const formatted = formatMoneyInput(e.target.value);
+                                  setMontoInputs(prev => ({ ...prev, [idx]: formatted }));
+                                  updateOC(idx, 'monto_total', parseFormattedNumber(formatted));
+                                }}
+                                onBlur={() => {
+                                  setMontoInputs(prev => {
+                                    const copy = { ...prev };
+                                    delete copy[idx];
+                                    return copy;
+                                  });
                                 }}
                                 className="w-full bg-black/40 border border-white/5 rounded-2xl pl-12 pr-4 py-3 text-base text-emerald-400 font-black outline-none shadow-inner"
                               />

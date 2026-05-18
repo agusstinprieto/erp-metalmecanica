@@ -32,9 +32,9 @@ interface Incidente {
 
 const DEFAULT_CAMERAS: SecurityCamera[] = [
   { id: 'c1', nombre: 'Entrada Principal',  area: 'Acceso',      url: '', tipo: 'mjpeg', online: true  },
-  { id: 'c2', nombre: 'Área de Soldadura',  area: 'Producción',  url: '', tipo: 'mjpeg', online: true  },
+  { id: 'c2', nombre: 'Área de Soldadura',  area: 'Producción',  url: 'https://assets.mixkit.co/videos/preview/mixkit-industrial-robotic-arm-in-action-40292-large.mp4', tipo: 'mjpeg', online: true  },
   { id: 'c3', nombre: 'Almacén General',    area: 'Almacén',     url: '', tipo: 'mjpeg', online: true  },
-  { id: 'c4', nombre: 'Taller CNC',         area: 'Producción',  url: '', tipo: 'mjpeg', online: false },
+  { id: 'c4', nombre: 'Taller CNC',         area: 'Producción',  url: 'https://www.youtube.com/watch?v=5_m36N_Zk1s', tipo: 'mjpeg', online: true },
   { id: 'c5', nombre: 'Área de Pintura',    area: 'Producción',  url: '', tipo: 'mjpeg', online: true  },
   { id: 'c6', nombre: 'Estacionamiento',    area: 'Exterior',    url: '', tipo: 'mjpeg', online: true  },
 ];
@@ -333,6 +333,21 @@ const SafetyFloorSimulator = React.memo(({
   return <canvas ref={canvasRef} id={`canvas-${camId}`} width={320} height={200} className="w-full h-full object-cover" />;
 });
 
+/* ────── Helper: YouTube Embed URL parser ────── */
+function getYouTubeEmbedUrl(url: string): string | null {
+  if (!url) return null;
+  let videoId = '';
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|live\/)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  if (match && match[2].length === 11) {
+    videoId = match[2];
+  }
+  if (videoId) {
+    return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&modestbranding=1&showinfo=0&rel=0&iv_load_policy=3&enablejsapi=1`;
+  }
+  return null;
+}
+
 /* ────── Camera Card ────── */
 const CameraCard = ({
   cam, onFullscreen, onEdit, onScanPPE, isScanning, scanningProgress
@@ -345,6 +360,8 @@ const CameraCard = ({
   scanningProgress: number;
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const youtubeUrl = getYouTubeEmbedUrl(cam.url);
+  const isVideo = cam.url && (cam.url.endsWith('.mp4') || cam.url.includes('assets.mixkit.co'));
 
   return (
     <motion.div
@@ -354,10 +371,16 @@ const CameraCard = ({
     >
       <div className="relative aspect-video bg-black flex items-center justify-center overflow-hidden cursor-pointer" onClick={onFullscreen}>
         {cam.url ? (
-          cam.tipo === 'iframe'
-            ? <iframe src={cam.url} className="w-full h-full border-0" title={cam.nombre} />
-            : <img src={cam.url} alt={cam.nombre} className="w-full h-full object-cover"
+          youtubeUrl ? (
+            <iframe src={youtubeUrl} className="w-full h-full border-0 pointer-events-none scale-105" title={cam.nombre} allow="autoplay; encrypted-media" />
+          ) : isVideo ? (
+            <video src={cam.url} autoPlay loop muted playsInline className="w-full h-full object-cover" />
+          ) : cam.tipo === 'iframe' ? (
+            <iframe src={cam.url} className="w-full h-full border-0" title={cam.nombre} />
+          ) : (
+            <img src={cam.url} alt={cam.nombre} className="w-full h-full object-cover"
                 onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+          )
         ) : (
           <SafetyFloorSimulator camId={cam.id} nombre={cam.nombre} area={cam.area} online={cam.online} canvasRef={canvasRef} />
         )}
@@ -443,6 +466,35 @@ export const SeguridadIndustrialView: React.FC = () => {
   const [showAdd, setShowAdd]     = useState(false);
   const [newCam, setNewCam]       = useState<Partial<SecurityCamera>>({ tipo: 'mjpeg', online: true });
   const [activeTab, setActiveTab] = useState<'cameras' | 'incidents'>('cameras');
+
+  // Self-heal/Migrate legacy local storage cameras
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('mcvill_cameras');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const hasLegacyEmpty = parsed.some(c => c.id === 'c2' && !c.url);
+          const c4Offline = parsed.some(c => c.id === 'c4' && (!c.url || !c.online));
+          if (hasLegacyEmpty || c4Offline) {
+            const upgraded = parsed.map(c => {
+              if (c.id === 'c2' && !c.url) {
+                return { ...c, url: 'https://assets.mixkit.co/videos/preview/mixkit-industrial-robotic-arm-in-action-40292-large.mp4', online: true };
+              }
+              if (c.id === 'c4' && (!c.url || !c.online)) {
+                return { ...c, url: 'https://www.youtube.com/watch?v=5_m36N_Zk1s', online: true };
+              }
+              return c;
+            });
+            setCameras(upgraded);
+            localStorage.setItem('mcvill_cameras', JSON.stringify(upgraded));
+          }
+        }
+      }
+    } catch (e) {
+      console.warn("Error migrating security cameras:", e);
+    }
+  }, []);
 
   // EPP Scan State
   const [scanningCamId, setScanningCamId] = useState<string | null>(null);
@@ -673,7 +725,7 @@ export const SeguridadIndustrialView: React.FC = () => {
   const criticalInc = incidents.filter(i => !i.resuelto && (i.severidad === 'alta' || i.severidad === 'critica')).length;
 
   return (
-    <div className="flex flex-col h-full bg-[#060b18] text-white overflow-hidden">
+    <div className="flex flex-col h-full bg-mcvill-bg text-white overflow-hidden">
 
       {/* ── Header ── */}
       <div className="shrink-0 px-5 pt-4 pb-3 border-b border-white/5">
@@ -872,9 +924,15 @@ export const SeguridadIndustrialView: React.FC = () => {
             <div className="flex-1 flex items-center justify-center p-4">
               <div className="w-full max-w-4xl rounded-2xl overflow-hidden border border-white/10">
                 {fullscreenCam.url ? (
-                  fullscreenCam.tipo === 'iframe'
-                    ? <iframe src={fullscreenCam.url} className="w-full aspect-video border-0" title={fullscreenCam.nombre} />
-                    : <img src={fullscreenCam.url} alt={fullscreenCam.nombre} className="w-full aspect-video object-cover" />
+                  getYouTubeEmbedUrl(fullscreenCam.url) ? (
+                    <iframe src={getYouTubeEmbedUrl(fullscreenCam.url) || ''} className="w-full aspect-video border-0" title={fullscreenCam.nombre} allow="autoplay; encrypted-media" />
+                  ) : (fullscreenCam.url.endsWith('.mp4') || fullscreenCam.url.includes('assets.mixkit.co')) ? (
+                    <video src={fullscreenCam.url} autoPlay loop muted playsInline className="w-full aspect-video object-cover" />
+                  ) : fullscreenCam.tipo === 'iframe' ? (
+                    <iframe src={fullscreenCam.url} className="w-full aspect-video border-0" title={fullscreenCam.nombre} />
+                  ) : (
+                    <img src={fullscreenCam.url} alt={fullscreenCam.nombre} className="w-full aspect-video object-cover" />
+                  )
                 ) : (
                   <div className="aspect-video">
                     <FullscreenSimulatorWrapper cam={fullscreenCam} />
