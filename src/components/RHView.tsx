@@ -39,7 +39,7 @@ import { RecruitmentView } from './RecruitmentView';
 import { useConfig } from '../contexts/ConfigContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useSearch } from '../contexts/SearchContext';
-import { toast, appConfirm } from '../lib/dialogs';
+import { toast } from '../lib/dialogs';
 import { employeeService } from '../services/employeeService';
 import { rhService } from '../services/rhService';
 import { reportUtils } from '../utils/reportUtils';
@@ -90,6 +90,121 @@ const StatusBadge: React.FC<{ status: Employee['status'] }> = ({ status }) => {
   );
 };
 
+// ── MODAL CHECKLIST DE BAJA DE EMPLEADO ─────────────────────────────────────
+const CHECKLIST_ITEMS = [
+  { id: 'herramientas', icon: '🔧', label: 'Herramientas de trabajo',      desc: 'Llaves, calibradores, machuelos, brocas, manómetros, etc.' },
+  { id: 'epp',          icon: '⛑️',  label: 'Equipo de protección personal', desc: 'Casco, guantes, lentes, botas, chaleco, careta, arnés.' },
+  { id: 'uniforme',     icon: '👕',  label: 'Uniforme / Ropa de trabajo',   desc: 'Camisas, pantalones, overol con logotipo de la empresa.' },
+  { id: 'equipo',       icon: '💻',  label: 'Equipo electrónico',           desc: 'Tablet, radio, escáner, lector de código, celular corporativo.' },
+  { id: 'accesos',      icon: '🪪',  label: 'Credencial y accesos',         desc: 'Gafete, tarjeta de proximidad, llaves, candados asignados.' },
+  { id: 'imss',         icon: '🏥',  label: 'Baja en el IMSS',             desc: 'Aviso de baja patronal dentro de los 5 días hábiles siguientes (Art. 15 LSS).' },
+  { id: 'finiquito',    icon: '📄',  label: 'Finiquito / Liquidación',      desc: 'Cálculo de días proporcionales, vacaciones, aguinaldo y prima de antigüedad.' },
+  { id: 'no_adeudo',    icon: '✅',  label: 'Carta de no adeudo',           desc: 'Firmada por el empleado confirmando entrega de todo el material.' },
+];
+
+interface BajaEmpleadoModalProps {
+  employee: { first_name: string; last_name: string; job_title?: string };
+  onConfirm: () => Promise<void>;
+  onCancel: () => void;
+}
+
+const BajaEmpleadoModal: React.FC<BajaEmpleadoModalProps> = ({ employee, onConfirm, onCancel }) => {
+  const [checked, setChecked] = useState<Record<string, boolean>>({});
+  const [confirming, setConfirming] = useState(false);
+  const allChecked = CHECKLIST_ITEMS.every(item => checked[item.id]);
+
+  const toggle = (id: string) => setChecked(prev => ({ ...prev, [id]: !prev[id] }));
+
+  const handleConfirm = async () => {
+    setConfirming(true);
+    await onConfirm();
+    setConfirming(false);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+      <div className="bg-slate-900 border border-rose-500/30 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
+        {/* Header */}
+        <div className="bg-rose-500/10 border-b border-rose-500/20 px-5 py-4 flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-rose-500/15 text-rose-400">
+            <AlertTriangle size={18} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-sm font-black text-white uppercase tracking-widest">Baja de Empleado</h2>
+            <p className="text-[10px] text-rose-400 font-semibold truncate">
+              {employee.first_name} {employee.last_name}
+              {employee.job_title ? ` · ${employee.job_title}` : ''}
+            </p>
+          </div>
+          <button onClick={onCancel} className="p-1.5 rounded-lg hover:bg-white/5 text-slate-500 hover:text-slate-300 transition-colors">
+            <X size={16} />
+          </button>
+        </div>
+
+        {/* Checklist */}
+        <div className="px-5 py-4 space-y-2 max-h-[60vh] overflow-y-auto custom-scrollbar">
+          <p className="text-[10px] text-slate-400 mb-3">
+            Confirma que se completaron todos los pasos antes de proceder con la baja:
+          </p>
+          {CHECKLIST_ITEMS.map(item => (
+            <button
+              key={item.id}
+              onClick={() => toggle(item.id)}
+              className={`w-full flex items-start gap-3 p-3 rounded-xl border text-left transition-all ${
+                checked[item.id]
+                  ? 'bg-emerald-500/10 border-emerald-500/30'
+                  : 'bg-slate-800/40 border-slate-700/40 hover:border-slate-600/60'
+              }`}
+            >
+              <div className={`mt-0.5 w-4 h-4 rounded shrink-0 border-2 flex items-center justify-center transition-all ${
+                checked[item.id] ? 'bg-emerald-500 border-emerald-500' : 'border-slate-600'
+              }`}>
+                {checked[item.id] && <CheckCircle2 size={10} className="text-white" />}
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[11px]">{item.icon}</span>
+                  <span className={`text-[11px] font-black uppercase tracking-wide ${
+                    checked[item.id] ? 'text-emerald-400' : 'text-slate-200'
+                  }`}>{item.label}</span>
+                </div>
+                <p className="text-[9px] text-slate-500 mt-0.5 leading-relaxed">{item.desc}</p>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        {/* Footer */}
+        <div className="px-5 py-4 border-t border-slate-800 flex items-center justify-between gap-3">
+          <div className="text-[9px] text-slate-600">
+            {CHECKLIST_ITEMS.filter(i => checked[i.id]).length} / {CHECKLIST_ITEMS.length} completados
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={onCancel}
+              className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 transition-all"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleConfirm}
+              disabled={!allChecked || confirming}
+              className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-1.5 ${
+                allChecked && !confirming
+                  ? 'bg-rose-600 hover:bg-rose-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.3)]'
+                  : 'bg-slate-800 text-slate-600 cursor-not-allowed'
+              }`}
+            >
+              {confirming ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
+              Confirmar baja
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const RHView: React.FC = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
@@ -108,12 +223,15 @@ export const RHView: React.FC = () => {
   const [viewMode, setViewMode] = useState<'census' | 'recruitment'>('census');
   const [isBadgeModalOpen, setIsBadgeModalOpen] = useState(false);
   const [badgeEmployee, setBadgeEmployee] = useState<Employee | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [bajaModal, setBajaModal] = useState<{ employee: Employee; onConfirm: () => Promise<void> } | null>(null);
 
   const fetchEmployees = async () => {
     try {
       setLoading(true);
       const data = await employeeService.listEmployees();
       setEmployees(data);
+      setSelectedIds([]);
     } catch (err) {
       console.error('Error loading employees:', err);
     } finally {
@@ -159,22 +277,61 @@ export const RHView: React.FC = () => {
     );
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
     const emp = employees.find(e => e.id === id);
-    const name = emp ? `${emp.first_name} ${emp.last_name}` : 'este empleado';
-    const confirmed = await appConfirm(
-      `Esta acción eliminará permanentemente el expediente de ${name}. No se puede deshacer.`,
-      `ELIMINAR EMPLEADO`
+    if (!emp) return;
+    setBajaModal({
+      employee: emp,
+      onConfirm: async () => {
+        await employeeService.deleteEmployee(id);
+        setEmployees(prev => prev.filter(e => e.id !== id));
+        if (selectedEmployee?.id === id) setSelectedEmployee(null);
+        setSelectedIds(prev => prev.filter(x => x !== id));
+        toast('Empleado dado de baja correctamente', 'success');
+      },
+    });
+  };
+
+  const handleSelectRow = (id: string) => {
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
     );
-    if (!confirmed) return;
-    try {
-      await employeeService.deleteEmployee(id);
-      setEmployees(prev => prev.filter(e => e.id !== id));
-      if (selectedEmployee?.id === id) setSelectedEmployee(null);
-      toast('Empleado eliminado correctamente', 'success');
-    } catch (err: any) {
-      toast(`Error al eliminar: ${err.message}`, 'error');
+  };
+
+  const handleSelectAll = () => {
+    if (selectedIds.length === filteredEmployees.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filteredEmployees.map(e => e.id));
     }
+  };
+
+  const handleDeleteSelected = () => {
+    const count = selectedIds.length;
+    if (count === 0) return;
+    // Usa el primer empleado seleccionado como representante del modal de baja
+    const first = employees.find(e => e.id === selectedIds[0]);
+    if (!first) return;
+    const representative: Employee = {
+      ...first,
+      first_name: `${count} colaboradores`,
+      last_name: 'seleccionados',
+    };
+    setBajaModal({
+      employee: representative,
+      onConfirm: async () => {
+        setLoading(true);
+        try {
+          await Promise.all(selectedIds.map(id => employeeService.deleteEmployee(id)));
+          setEmployees(prev => prev.filter(e => !selectedIds.includes(e.id)));
+          if (selectedEmployee && selectedIds.includes(selectedEmployee.id)) setSelectedEmployee(null);
+          setSelectedIds([]);
+          toast(`${count} colaboradores dados de baja correctamente`, 'success');
+        } finally {
+          setLoading(false);
+        }
+      },
+    });
   };
 
   const filteredEmployees = employees.filter(emp =>
@@ -260,6 +417,14 @@ export const RHView: React.FC = () => {
                 />
               </div>
               <div className="flex items-center gap-2 ml-auto">
+                {selectedIds.length > 0 && (
+                  <button 
+                    onClick={handleDeleteSelected}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-rose-600/20"
+                  >
+                    <Trash2 size={12} /> {language === 'en' ? 'DELETE SELECTED' : 'ELIMINAR SELECCIONADOS'} ({selectedIds.length})
+                  </button>
+                )}
                 <button onClick={handleDownloadReport} className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-white/10 text-slate-400 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all">
                   <Download size={12} /> {language === 'en' ? 'REPORT' : 'REPORTE'}
                 </button>
@@ -272,6 +437,14 @@ export const RHView: React.FC = () => {
                 <table className="w-full text-left">
                   <thead>
                     <tr className="bg-slate-950/30 text-[8px] font-black text-slate-500 uppercase tracking-widest border-b border-white/5">
+                      <th className="px-4 py-3 w-10 text-center">
+                        <input 
+                          type="checkbox" 
+                          checked={filteredEmployees.length > 0 && selectedIds.length === filteredEmployees.length}
+                          onChange={handleSelectAll}
+                          className="rounded border-white/10 bg-slate-950 text-blue-500 focus:ring-0 cursor-pointer"
+                        />
+                      </th>
                       <th className="px-4 py-3">{language === 'en' ? 'Employee / ID' : 'Colaborador / ID'}</th>
                       <th className="px-4 py-3">{language === 'en' ? 'Job Title' : 'Cargo'}</th>
                       <th className="px-4 py-3 text-center">{language === 'en' ? 'Status' : 'Estado'}</th>
@@ -280,10 +453,18 @@ export const RHView: React.FC = () => {
                   </thead>
                   <tbody className="divide-y divide-white/5">
                     {loading ? (
-                      <tr><td colSpan={4} className="py-10 text-center"><Loader2 className="animate-spin text-blue-500 mx-auto" size={20} /></td></tr>
+                      <tr><td colSpan={5} className="py-10 text-center"><Loader2 className="animate-spin text-blue-500 mx-auto" size={20} /></td></tr>
                     ) : (
                       filteredEmployees.map(e => (
                         <tr key={e.id} onClick={() => loadEmployeeDetails(e)} className="hover:bg-white/5 transition-colors group cursor-pointer">
+                          <td className="px-4 py-2 w-10 text-center" onClick={ev => ev.stopPropagation()}>
+                            <input 
+                              type="checkbox" 
+                              checked={selectedIds.includes(e.id)}
+                              onChange={() => handleSelectRow(e.id)}
+                              className="rounded border-white/10 bg-slate-950 text-blue-500 focus:ring-0 cursor-pointer"
+                            />
+                          </td>
                           <td className="px-4 py-2">
                             <div className="flex items-center gap-3">
                               <div className="w-8 h-8 rounded-lg bg-slate-900 border border-white/10 overflow-hidden flex items-center justify-center shrink-0">
@@ -428,6 +609,22 @@ export const RHView: React.FC = () => {
         onClose={() => { setIsBadgeModalOpen(false); setBadgeEmployee(null); }}
         employee={badgeEmployee}
       />
+
+      {bajaModal && (
+        <BajaEmpleadoModal
+          employee={bajaModal.employee}
+          onConfirm={async () => {
+            try {
+              await bajaModal.onConfirm();
+            } catch (err: any) {
+              toast(`Error al dar de baja: ${err.message}`, 'error');
+            } finally {
+              setBajaModal(null);
+            }
+          }}
+          onCancel={() => setBajaModal(null)}
+        />
+      )}
     </div>
   );
 };
