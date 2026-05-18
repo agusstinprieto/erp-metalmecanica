@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Desempeño de Operadores — McVill ERP</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; color: #1a202c; }
+  .page { max-width: 960px; margin: 0 auto; background: white; min-height: 100vh; }
+
+  .header { background: linear-gradient(135deg, #0f172a 0%, #0d2335 100%); color: white; padding: 36px 48px; }
+  .header-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .logo-area { display: flex; align-items: center; gap: 16px; }
+  .logo-box { width: 52px; height: 52px; background: rgba(16,185,129,0.25); border: 1px solid rgba(16,185,129,0.5); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .company-name { font-size: 24px; font-weight: 900; }
+  .company-sub { font-size: 9px; font-weight: 700; letter-spacing: 4px; color: #6ee7b7; text-transform: uppercase; margin-top: 2px; }
+  .report-meta { text-align: right; }
+  .report-type { font-size: 10px; font-weight: 700; letter-spacing: 4px; color: #6ee7b7; text-transform: uppercase; }
+  .report-title { font-size: 26px; font-weight: 900; letter-spacing: -1px; margin-top: 4px; }
+  .report-period { font-size: 11px; color: #a7f3d0; margin-top: 4px; }
+  .header-divider { margin-top: 24px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; gap: 40px; }
+  .meta-item label { font-size: 8px; font-weight: 700; letter-spacing: 3px; color: #64748b; text-transform: uppercase; display: block; }
+  .meta-item span { font-size: 13px; font-weight: 700; color: white; margin-top: 2px; display: block; }
+
+  .kpi-row { background: #1e293b; padding: 20px 48px; display: flex; gap: 0; }
+  .kpi-item { flex: 1; text-align: center; padding: 12px 0; border-right: 1px solid rgba(255,255,255,0.08); }
+  .kpi-item:last-child { border-right: none; }
+  .kpi-label { font-size: 8px; font-weight: 700; letter-spacing: 3px; color: #64748b; text-transform: uppercase; }
+  .kpi-value { font-size: 24px; font-weight: 900; margin-top: 4px; }
+  .kpi-green { color: #4ade80; }
+  .kpi-yellow { color: #fbbf24; }
+  .kpi-blue { color: #60a5fa; }
+  .kpi-red { color: #f87171; }
+
+  .content { padding: 36px 48px; }
+  .section-title { font-size: 10px; font-weight: 800; letter-spacing: 4px; color: #475569; text-transform: uppercase; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0; }
+
+  table { width: 100%; border-collapse: collapse; margin-bottom: 32px; }
+  thead tr { background: #f8fafc; }
+  th { font-size: 8px; font-weight: 800; letter-spacing: 3px; color: #64748b; text-transform: uppercase; padding: 12px 12px; text-align: left; border-bottom: 2px solid #e2e8f0; }
+  th.center { text-align: center; }
+  td { font-size: 11px; padding: 12px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+  td.center { text-align: center; }
+  tr:hover td { background: #f8fafc; }
+
+  .operator-name { font-weight: 800; color: #0f172a; font-size: 12px; }
+  .operator-area { font-size: 9px; color: #64748b; margin-top: 2px; }
+
+  .bar-cell { }
+  .bar-container { width: 100%; background: #f1f5f9; border-radius: 6px; height: 8px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 6px; }
+  .bar-value { font-family: monospace; font-weight: 700; font-size: 12px; margin-bottom: 4px; }
+  .color-green { background: linear-gradient(90deg, #10b981, #4ade80); color: #065f46; }
+  .color-yellow { background: linear-gradient(90deg, #f59e0b, #fbbf24); color: #92400e; }
+  .color-red { background: linear-gradient(90deg, #ef4444, #f87171); color: #991b1b; }
+  .color-blue { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+
+  .oee-badge { display: inline-flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 50%; font-size: 13px; font-weight: 900; border: 3px solid; }
+  .oee-high { border-color: #4ade80; background: #f0fdf4; color: #166534; }
+  .oee-med { border-color: #fbbf24; background: #fffbeb; color: #92400e; }
+  .oee-low { border-color: #f87171; background: #fff1f2; color: #991b1b; }
+
+  .incidents-dot { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; font-size: 12px; font-weight: 900; }
+  .inc-none { background: #dcfce7; color: #166534; }
+  .inc-one { background: #fef3c7; color: #92400e; }
+  .inc-many { background: #fee2e2; color: #991b1b; }
+
+  .ranking-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 9px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; }
+  .rank-mvp { background: linear-gradient(135deg, #fef9c3, #fde68a); color: #92400e; }
+  .rank-good { background: #dbeafe; color: #1e40af; }
+  .rank-avg { background: #f1f5f9; color: #475569; }
+  .rank-low { background: #fee2e2; color: #991b1b; }
+
+  .highlight-box { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 1px solid #86efac; border-radius: 14px; padding: 20px 24px; display: flex; gap: 16px; align-items: flex-start; margin-bottom: 24px; }
+  .hl-icon { font-size: 28px; }
+  .hl-text { font-size: 11px; color: #166534; line-height: 1.7; }
+  .hl-text strong { color: #14532d; }
+
+  .footer { padding: 20px 48px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+  .footer-left { font-size: 10px; color: #94a3b8; }
+  .footer-right { font-size: 9px; color: #cbd5e1; font-family: monospace; }
+
+  @media print {
+    body { background: white; }
+    .page { max-width: none; }
+    .header, .kpi-row { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="logo-area">
+        <div class="logo-box">📊</div>
+        <div>
+          <div class="company-name">McVill</div>
+          <div class="company-sub">Desempeño Operacional</div>
+        </div>
+      </div>
+      <div class="report-meta">
+        <div class="report-type">Producción · Desempeño</div>
+        <div class="report-title">Reporte de Operadores</div>
+        <div class="report-period">Período: 01 – 15 Mayo 2026</div>
+      </div>
+    </div>
+    <div class="header-divider">
+      <div class="meta-item"><label>Célula</label><span>Todas las células</span></div>
+      <div class="meta-item"><label>Turno</label><span>A · B · C</span></div>
+      <div class="meta-item"><label>Total operadores</label><span>12 activos</span></div>
+      <div class="meta-item"><label>Generado</label><span>17 Mayo 2026 · 07:00</span></div>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi-item">
+      <div class="kpi-label">OEE Promedio planta</div>
+      <div class="kpi-value kpi-green">78.4%</div>
+    </div>
+    <div class="kpi-item">
+      <div class="kpi-label">Eficiencia promedio</div>
+      <div class="kpi-value kpi-blue">82.1%</div>
+    </div>
+    <div class="kpi-item">
+      <div class="kpi-label">Calidad promedio</div>
+      <div class="kpi-value kpi-green">96.8%</div>
+    </div>
+    <div class="kpi-item">
+      <div class="kpi-label">Incidentes período</div>
+      <div class="kpi-value kpi-yellow">2</div>
+    </div>
+    <div class="kpi-item">
+      <div class="kpi-label">Operadores &gt; meta</div>
+      <div class="kpi-value kpi-green">8 / 12</div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="highlight-box">
+      <div class="hl-icon">🏆</div>
+      <div class="hl-text">
+        <strong>MVP del período:</strong> Juan Hernández (Torno CNC) logró OEE de 94% con cero rechazos en 1,240 piezas producidas. Segundo lugar: María López (Prensa 200T) con 91% OEE y 98.5% de calidad en serie FK7.
+      </div>
+    </div>
+
+    <div class="section-title">Detalle por Operador</div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Operador</th>
+          <th>Célula / Máquina</th>
+          <th class="center">OEE</th>
+          <th>Eficiencia %</th>
+          <th>Calidad %</th>
+          <th class="center">Incid.</th>
+          <th class="center">Ranking</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><div class="operator-name">Juan Hernández</div><div class="operator-area">Turno A</div></td>
+          <td>Torno CNC Mazak QT-350</td>
+          <td class="center"><div class="oee-badge oee-high">94%</div></td>
+          <td>
+            <div class="bar-value color-green">96%</div>
+            <div class="bar-container"><div class="bar-fill color-green" style="width:96%"></div></div>
+          </td>
+          <td>
+            <div class="bar-value color-green">100%</div>
+            <div class="bar-container"><div class="bar-fill color-green" style="width:100%"></div></div>
+          </td>
+          <td class="center"><span class="incidents-dot inc-none">0</span></td>
+          <td class="center"><span class="ranking-badge rank-mvp">🥇 MVP</span></td>
+        </tr>
+        <tr>
+          <td><div class="operator-name">María López</div><div class="operator-area">Turno A</div></td>
+          <td>Prensa Excéntrica 200T</td>
+          <td class="center"><div class="oee-badge oee-high">91%</div></td>
+          <td>
+            <div class="bar-value color-green">93%</div>
+            <div class="bar-container"><div class="bar-fill color-green" style="width:93%"></div></div>
+          </td>
+          <td>
+            <div class="bar-value color-green">98.5%</div>
+            <div class="bar-container"><div class="bar-fill color-green" style="width:98.5%"></div></div>
+          </td>
+          <td class="center"><span class="incidents-dot inc-none">0</span></td>
+          <td class="center"><span class="ranking-badge rank-good">✦ Excelente</span></td>
+        </tr>
+        <tr>
+          <td><div class="operator-name">Pedro Ramírez</div><div class="operator-area">Turno B</div></td>
+          <td>Centro Mecanizado VMC</td>
+          <td class="center"><div class="oee-badge oee-high">87%</div></td>
+          <td>
+            <div class="bar-value color-green">89%</div>
+            <div class="bar-container"><div class="bar-fill color-green" style="width:89%"></div></div>
+          </td>
+          <td>
+            <div class="bar-value color-green">97%</div>
+            <div class="bar-container"><div class="bar-fill color-green" style="width:97%"></div></div>
+          </td>
+          <td class="center"><span class="incidents-dot inc-none">0</span></td>
+          <td class="center"><span class="ranking-badge rank-good">✦ Excelente</span></td>
+        </tr>
+        <tr>
+          <td><div class="operator-name">Carlos Méndez</div><div class="operator-area">Turno A</div></td>
+          <td>Fresadora CNC Haas VF-2</td>
+          <td class="center"><div class="oee-badge oee-med">74%</div></td>
+          <td>
+            <div class="bar-value color-yellow">78%</div>
+            <div class="bar-container"><div class="bar-fill color-yellow" style="width:78%"></div></div>
+          </td>
+          <td>
+            <div class="bar-value color-green">95%</div>
+            <div class="bar-container"><div class="bar-fill color-green" style="width:95%"></div></div>
+          </td>
+          <td class="center"><span class="incidents-dot inc-one">1</span></td>
+          <td class="center"><span class="ranking-badge rank-avg">◌ Promedio</span></td>
+        </tr>
+        <tr>
+          <td><div class="operator-name">Ana García</div><div class="operator-area">Turno C</div></td>
+          <td>Rectificadora cilíndrica</td>
+          <td class="center"><div class="oee-badge oee-med">71%</div></td>
+          <td>
+            <div class="bar-value color-yellow">73%</div>
+            <div class="bar-container"><div class="bar-fill color-yellow" style="width:73%"></div></div>
+          </td>
+          <td>
+            <div class="bar-value color-green">98%</div>
+            <div class="bar-container"><div class="bar-fill color-green" style="width:98%"></div></div>
+          </td>
+          <td class="center"><span class="incidents-dot inc-none">0</span></td>
+          <td class="center"><span class="ranking-badge rank-avg">◌ Promedio</span></td>
+        </tr>
+        <tr>
+          <td><div class="operator-name">Luis Torres</div><div class="operator-area">Turno B</div></td>
+          <td>Soldadura MIG / TIG</td>
+          <td class="center"><div class="oee-badge oee-low">61%</div></td>
+          <td>
+            <div class="bar-value color-red">64%</div>
+            <div class="bar-container"><div class="bar-fill color-red" style="width:64%"></div></div>
+          </td>
+          <td>
+            <div class="bar-value color-yellow">91%</div>
+            <div class="bar-container"><div class="bar-fill color-yellow" style="width:91%"></div></div>
+          </td>
+          <td class="center"><span class="incidents-dot inc-one">1</span></td>
+          <td class="center"><span class="ranking-badge rank-low">▼ Requiere atención</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="background:#fff7ed; border:1px solid #fed7aa; border-radius:12px; padding:18px 22px;">
+      <div style="font-size:9px; font-weight:800; letter-spacing:3px; color:#c2410c; text-transform:uppercase; margin-bottom:8px;">Acciones recomendadas</div>
+      <div style="font-size:10px; color:#78350f; line-height:1.9;">
+        <strong>Luis Torres:</strong> OEE por debajo del 65% — agendar sesión de coaching técnico con supervisor de turno B.<br>
+        <strong>Carlos Méndez:</strong> 1 incidente registrado — revisar procedimiento de cambio de herramienta en Haas VF-2.<br>
+        <strong>Célula Soldadura:</strong> Revisar disponibilidad de equipo — tiempo de preparación excesivo afecta disponibilidad.
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-left">McVill ERP · Módulo Producción — Desempeño de Operadores &nbsp;|&nbsp; 17 Mayo 2026</div>
+    <div class="footer-right">desempeno_operadores_mayo2026.pdf &nbsp;|&nbsp; pág. 1 de 1</div>
+  </div>
+</div>
+</body>
+</html>

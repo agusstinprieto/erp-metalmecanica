@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Credencial de Empleado — McVill</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #f1f5f9; font-family: 'Segoe UI', Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+  .badge {
+    width: 85.6mm; height: 54mm; /* ISO CR80 */
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 60%, #0f172a 100%);
+    border-radius: 8px; overflow: hidden; position: relative;
+    display: flex; flex-direction: column;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  .badge-header {
+    background: linear-gradient(90deg, #1d4ed8, #3b82f6);
+    padding: 5px 10px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .badge-header .brand { color: #fff; font-size: 10px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
+  .badge-header .dept { color: rgba(255,255,255,0.8); font-size: 7px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+  .badge-body { flex: 1; display: flex; padding: 8px 10px; gap: 10px; align-items: center; }
+  .badge-avatar {
+    width: 38px; height: 38px; border-radius: 50%; background: rgba(59,130,246,0.3);
+    border: 2px solid rgba(59,130,246,0.6); display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: 14px; color: #93c5fd; font-weight: 900;
+  }
+  .badge-info { flex: 1; }
+  .badge-name { color: #fff; font-size: 11px; font-weight: 900; letter-spacing: 0.3px; line-height: 1.2; }
+  .badge-puesto { color: #93c5fd; font-size: 8px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+  .badge-num { color: rgba(255,255,255,0.6); font-size: 7px; margin-top: 4px; font-weight: bold; letter-spacing: 0.5px; }
+  .badge-meta { display: flex; gap: 6px; margin-top: 4px; }
+  .badge-chip {
+    background: rgba(59,130,246,0.2); border: 1px solid rgba(59,130,246,0.4);
+    border-radius: 4px; padding: 1px 5px; font-size: 7px; color: #93c5fd; font-weight: bold; text-transform: uppercase;
+  }
+  .badge-footer {
+    padding: 4px 10px; background: rgba(0,0,0,0.4); border-top: 1px solid rgba(255,255,255,0.05);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .badge-footer .barcode-area { font-family: monospace; font-size: 7px; color: rgba(255,255,255,0.4); letter-spacing: 1px; }
+  .badge-footer .validity { color: rgba(255,255,255,0.4); font-size: 7px; font-weight: bold; }
+  .badge-accent-line { height: 2px; background: linear-gradient(90deg, #3b82f6, #6366f1, #8b5cf6); }
+
+  /* Página de muestra con múltiples credenciales */
+  .page { background: white; padding: 20mm; width: 210mm; min-height: 297mm; margin: 0 auto; }
+  .page-title { font-size: 14px; font-weight: bold; color: #0f172a; margin-bottom: 4px; }
+  .page-sub { font-size: 10px; color: #64748b; margin-bottom: 20px; }
+  .badges-grid { display: grid; grid-template-columns: repeat(3, 85.6mm); gap: 8mm; }
+  .section { margin-bottom: 16px; }
+  .section-label { font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-bottom: 8px; }
+
+  @media print {
+    body { background: white; padding: 0; }
+    .page { box-shadow: none; margin: 0; padding: 10mm; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-title">CREDENCIALES DE EMPLEADOS — McVill SA de CV</div>
+  <div class="page-sub">Módulo RH · Impresión masiva de credenciales · Generado: 17/05/2026</div>
+
+  <div class="section">
+    <div class="section-label">Turno Matutino — SOLDADURA / CORTE / MAQUINADO</div>
+    <div class="badges-grid">
+
+      <!-- Credencial 1 -->
+      <div class="badge">
+        <div class="badge-header">
+          <span class="brand">McVill</span>
+          <span class="dept">Soldadura</span>
+        </div>
+        <div class="badge-accent-line"></div>
+        <div class="badge-body">
+          <div class="badge-avatar">JM</div>
+          <div class="badge-info">
+            <div class="badge-name">Juan Martínez<br>López</div>
+            <div class="badge-puesto">Soldador Senior</div>
+            <div class="badge-num">No. Empleado: EMP-001</div>
+            <div class="badge-meta">
+              <span class="badge-chip">Matutino</span>
+              <span class="badge-chip">Activo</span>
+            </div>
+          </div>
+        </div>
+        <div class="badge-footer">
+          <span class="barcode-area">||||| EMP001 |||||</span>
+          <span class="validity">Válido 2026</span>
+        </div>
+      </div>
+
+      <!-- Credencial 2 -->
+      <div class="badge">
+        <div class="badge-header">
+          <span class="brand">McVill</span>
+          <span class="dept">Corte Láser</span>
+        </div>
+        <div class="badge-accent-line"></div>
+        <div class="badge-body">
+          <div class="badge-avatar">LR</div>
+          <div class="badge-info">
+            <div class="badge-name">Luis Ramírez<br>García</div>
+            <div class="badge-puesto">Operador Láser</div>
+            <div class="badge-num">No. Empleado: EMP-002</div>
+            <div class="badge-meta">
+              <span class="badge-chip">Matutino</span>
+              <span class="badge-chip">Activo</span>
+            </div>
+          </div>
+        </div>
+        <div class="badge-footer">
+          <span class="barcode-area">||||| EMP002 |||||</span>
+          <span class="validity">Válido 2026</span>
+        </div>
+      </div>
+
+      <!-- Credencial 3 -->
+      <div class="badge">
+        <div class="badge-header">
+          <span class="brand">McVill</span>
+          <span class="dept">Maquinado CNC</span>
+        </div>
+        <div class="badge-accent-line"></div>
+        <div class="badge-body">
+          <div class="badge-avatar">PG</div>
+          <div class="badge-info">
+            <div class="badge-name">Pedro González<br>Soto</div>
+            <div class="badge-puesto">Maquinista CNC</div>
+            <div class="badge-num">No. Empleado: EMP-003</div>
+            <div class="badge-meta">
+              <span class="badge-chip">Matutino</span>
+              <span class="badge-chip">Activo</span>
+            </div>
+          </div>
+        </div>
+        <div class="badge-footer">
+          <span class="barcode-area">||||| EMP003 |||||</span>
+          <span class="validity">Válido 2026</span>
+        </div>
+      </div>
+
+      <!-- Credencial 4 -->
+      <div class="badge" style="background: linear-gradient(135deg, #1a0a2e 0%, #4c1d95 60%, #1a0a2e 100%);">
+        <div class="badge-header" style="background: linear-gradient(90deg, #7c3aed, #8b5cf6);">
+          <span class="brand">McVill</span>
+          <span class="dept">Ensamble</span>
+        </div>
+        <div class="badge-accent-line" style="background: linear-gradient(90deg, #7c3aed, #a78bfa);"></div>
+        <div class="badge-body">
+          <div class="badge-avatar" style="background: rgba(124,58,237,0.3); border-color: rgba(124,58,237,0.6); color: #c4b5fd;">AF</div>
+          <div class="badge-info">
+            <div class="badge-name">Ana Flores<br>Méndez</div>
+            <div class="badge-puesto" style="color: #c4b5fd;">Ensambladora</div>
+            <div class="badge-num">No. Empleado: EMP-004</div>
+            <div class="badge-meta">
+              <span class="badge-chip" style="background: rgba(124,58,237,0.2); border-color: rgba(124,58,237,0.4); color: #c4b5fd;">Vespertino</span>
+              <span class="badge-chip" style="background: rgba(124,58,237,0.2); border-color: rgba(124,58,237,0.4); color: #c4b5fd;">Activo</span>
+            </div>
+          </div>
+        </div>
+        <div class="badge-footer">
+          <span class="barcode-area">||||| EMP004 |||||</span>
+          <span class="validity">Válido 2026</span>
+        </div>
+      </div>
+
+      <!-- Credencial 5 -->
+      <div class="badge" style="background: linear-gradient(135deg, #0a2218 0%, #065f46 60%, #0a2218 100%);">
+        <div class="badge-header" style="background: linear-gradient(90deg, #059669, #10b981);">
+          <span class="brand">McVill</span>
+          <span class="dept">Pintura</span>
+        </div>
+        <div class="badge-accent-line" style="background: linear-gradient(90deg, #10b981, #34d399);"></div>
+        <div class="badge-body">
+          <div class="badge-avatar" style="background: rgba(5,150,105,0.3); border-color: rgba(5,150,105,0.6); color: #6ee7b7;">CT</div>
+          <div class="badge-info">
+            <div class="badge-name">Carlos Torres<br>Vega</div>
+            <div class="badge-puesto" style="color: #6ee7b7;">Aplicador Pintura</div>
+            <div class="badge-num">No. Empleado: EMP-005</div>
+            <div class="badge-meta">
+              <span class="badge-chip" style="background: rgba(5,150,105,0.2); border-color: rgba(5,150,105,0.4); color: #6ee7b7;">Matutino</span>
+              <span class="badge-chip" style="background: rgba(5,150,105,0.2); border-color: rgba(5,150,105,0.4); color: #6ee7b7;">Activo</span>
+            </div>
+          </div>
+        </div>
+        <div class="badge-footer">
+          <span class="barcode-area">||||| EMP005 |||||</span>
+          <span class="validity">Válido 2026</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="margin-top: 24px; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 9px; color: #64748b;">
+    <strong>Instrucciones de impresión:</strong> Imprimir en papel couché brillante 200g/m². Cortar con guillotina al tamaño CR80 (85.6 × 54 mm).
+    Plastificar con funda termorretráctil 80 micras. El código de barras del empleado puede usarse con el lector Kiosk de asistencia.
+  </div>
+</div>
+</body>
+</html>

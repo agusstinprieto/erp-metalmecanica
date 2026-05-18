@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Análisis de Costos — Costeo Industrial — McVill MetalMecánica</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #f8fafc; color: #0f172a; font-size: 11px; }
+  .header { background: #1a4a8a; color: white; }
+  .header-top { padding: 12px 20px 10px; display: flex; justify-content: space-between; align-items: center; }
+  .header-title { background: #2563eb; padding: 8px 20px; }
+  .header-title h1 { font-size: 11px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: white; }
+  .company-name { font-size: 14px; font-weight: 900; }
+  .company-sub { font-size: 8px; color: #93c5fd; margin-top: 2px; }
+  .date-info { text-align: right; font-size: 8px; color: #e2e8f0; }
+  .content { padding: 16px 20px; }
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .box { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px; }
+  .box-title { font-size: 8px; font-weight: 900; color: #1e3a5f; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1.5px solid #2563eb; }
+  .row-item { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #f1f5f9; }
+  .row-item:last-child { border-bottom: none; }
+  .row-label { font-size: 9px; color: #475569; }
+  .row-val { font-size: 9px; font-weight: 900; }
+  .val-green { color: #10b981; }
+  .val-rose { color: #f43f5e; }
+  .val-amber { color: #f59e0b; }
+  .val-blue { color: #2563eb; }
+  table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 16px; }
+  thead tr { background: #2563eb; color: white; }
+  thead th { padding: 7px 10px; font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.8px; text-align: left; }
+  thead th.right { text-align: right; }
+  thead th.center { text-align: center; }
+  tbody tr:nth-child(even) { background: #f1f5f9; }
+  tbody tr:nth-child(odd) { background: white; }
+  tbody td { padding: 6px 10px; font-size: 9px; color: #0f172a; border-bottom: 1px solid #e2e8f0; }
+  tbody td.right { text-align: right; font-weight: 700; }
+  tbody td.center { text-align: center; }
+  .badge { display: inline-block; padding: 2px 7px; border-radius: 999px; font-size: 7px; font-weight: 900; text-transform: uppercase; }
+  .b-draft { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+  .b-approved { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+  .b-review { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+  .section-title { font-size: 9px; font-weight: 900; color: #1e3a5f; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 2px solid #2563eb; display: inline-block; }
+  .total-highlight { background: #1e3a5f; color: white; padding: 10px 14px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin: 14px 0; }
+  .total-highlight .tl { font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 1.5px; }
+  .total-highlight .tv { font-size: 22px; font-weight: 900; color: #93c5fd; }
+  footer { border-top: 1px solid #2563eb; padding: 8px 20px; display: flex; justify-content: space-between; margin-top: 14px; }
+  footer p { font-size: 7px; color: #94a3b8; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="company-name">McVill MetalMecánica S.A. de C.V.</div>
+      <div class="company-sub">METALMECÁNICA • Sistema ERP Industrial</div>
+    </div>
+    <div class="date-info">
+      <div>17 may. 2026</div>
+      <div>11:00 hrs</div>
+    </div>
+  </div>
+  <div class="header-title">
+    <h1>Análisis de Costos — Proyecto: Soportes Estructura Plataforma PEMEX — Finanzas</h1>
+  </div>
+</div>
+
+<div class="content" style="margin-top:14px;">
+
+  <div class="detail-grid">
+    <div class="box">
+      <div class="box-title">Datos del Proyecto</div>
+      <div class="row-item"><span class="row-label">Proyecto</span><span class="row-val">Soportes Estructura Plataforma PEMEX</span></div>
+      <div class="row-item"><span class="row-label">No. Simulación</span><span class="row-val">SIM-2026-0094</span></div>
+      <div class="row-item"><span class="row-label">Elaboró</span><span class="row-val">Ing. Laura B. Salinas</span></div>
+      <div class="row-item"><span class="row-label">Fecha Simulación</span><span class="row-val">17/05/2026</span></div>
+      <div class="row-item"><span class="row-label">Estatus</span><span class="row-val"><span class="badge b-review">En Revisión</span></span></div>
+    </div>
+    <div class="box">
+      <div class="box-title">Estructura de Costos</div>
+      <div class="row-item"><span class="row-label">Costo de Materiales</span><span class="row-val">$92,000.00</span></div>
+      <div class="row-item"><span class="row-label">Mano de Obra Directa</span><span class="row-val">$48,500.00</span></div>
+      <div class="row-item"><span class="row-label">Subtotal Directo</span><span class="row-val">$140,500.00</span></div>
+      <div class="row-item"><span class="row-label">Overhead (18%)</span><span class="row-val val-amber">$25,290.00</span></div>
+      <div class="row-item" style="border-top:2px solid #2563eb; margin-top:4px; padding-top:8px;"><span class="row-label"><strong>COSTO TOTAL</strong></span><span class="row-val val-rose"><strong>$165,790.00</strong></span></div>
+    </div>
+  </div>
+
+  <div class="total-highlight">
+    <div>
+      <div class="tl">Precio de Venta Sugerido (Margen 35%)</div>
+      <div style="font-size:8px; color:#93c5fd; margin-top:2px;">Costo Total ÷ (1 – Margen) = $165,790 ÷ 0.65</div>
+    </div>
+    <div class="tv">$255,061.54</div>
+  </div>
+
+  <div class="detail-grid">
+    <div class="box">
+      <div class="box-title">Desglose de Mano de Obra</div>
+      <div class="row-item"><span class="row-label">Operador CNC (40h × $145/h)</span><span class="row-val">$5,800.00</span></div>
+      <div class="row-item"><span class="row-label">Soldador TIG (80h × $165/h)</span><span class="row-val">$13,200.00</span></div>
+      <div class="row-item"><span class="row-label">Operador Dobladora (24h × $125/h)</span><span class="row-val">$3,000.00</span></div>
+      <div class="row-item"><span class="row-label">Pintura / Acabado (20h × $110/h)</span><span class="row-val">$2,200.00</span></div>
+      <div class="row-item"><span class="row-label">Inspector Calidad (16h × $150/h)</span><span class="row-val">$2,400.00</span></div>
+      <div class="row-item"><span class="row-label">Ingeniería (32h × $220/h)</span><span class="row-val">$7,040.00</span></div>
+      <div class="row-item"><span class="row-label">Logística y embalaje (12h × $98/h)</span><span class="row-val">$1,176.00</span></div>
+      <div class="row-item" style="border-top:1.5px solid #2563eb; margin-top:4px; padding-top:8px;"><span class="row-label"><strong>TOTAL M.O.</strong></span><span class="row-val val-rose"><strong>$34,816.00</strong></span></div>
+    </div>
+    <div class="box">
+      <div class="box-title">KPIs de Rentabilidad</div>
+      <div class="row-item"><span class="row-label">Precio de Venta</span><span class="row-val val-green">$255,061.54</span></div>
+      <div class="row-item"><span class="row-label">Costo Total</span><span class="row-val val-rose">$165,790.00</span></div>
+      <div class="row-item"><span class="row-label">Utilidad Bruta</span><span class="row-val val-green">$89,271.54</span></div>
+      <div class="row-item"><span class="row-label">Margen Bruto</span><span class="row-val val-green">35.0%</span></div>
+      <div class="row-item"><span class="row-label">% Material sobre costo</span><span class="row-val">55.5%</span></div>
+      <div class="row-item"><span class="row-label">% M.O. sobre costo</span><span class="row-val">29.3%</span></div>
+      <div class="row-item"><span class="row-label">% Overhead sobre costo</span><span class="row-val">15.2%</span></div>
+      <div class="row-item"><span class="row-label">Punto de Equilibrio</span><span class="row-val">34 pzas (de 50)</span></div>
+    </div>
+  </div>
+
+  <p class="section-title">Historial de Simulaciones — Mayo 2026</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Simulación</th>
+        <th>Proyecto</th>
+        <th class="right">Materiales</th>
+        <th class="right">M.O.</th>
+        <th class="right">Overhead</th>
+        <th class="center">Margen</th>
+        <th class="right">Costo Total</th>
+        <th class="right">Precio Sugerido</th>
+        <th class="center">Estatus</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>SIM-2026-0094</td><td>Soportes Plataforma PEMEX</td><td class="right">$92,000</td><td class="right">$48,500</td><td class="center">18%</td><td class="center">35%</td><td class="right">$165,790</td><td class="right val-green">$255,061</td><td class="center"><span class="badge b-review">En Revisión</span></td></tr>
+      <tr><td>SIM-2026-0088</td><td>Marco estructural CEMEX</td><td class="right">$58,400</td><td class="right">$31,200</td><td class="center">15%</td><td class="center">30%</td><td class="right">$103,030</td><td class="right val-green">$147,186</td><td class="center"><span class="badge b-approved">Aprobado</span></td></tr>
+      <tr><td>SIM-2026-0081</td><td>Flechas CNC ALFA Industrial</td><td class="right">$24,600</td><td class="right">$18,400</td><td class="center">15%</td><td class="center">28%</td><td class="right">$49,450</td><td class="right val-green">$68,681</td><td class="center"><span class="badge b-approved">Aprobado</span></td></tr>
+      <tr><td>SIM-2026-0074</td><td>Bridas RF 150# PEMEX</td><td class="right">$36,800</td><td class="right">$22,100</td><td class="center">18%</td><td class="center">32%</td><td class="right">$69,888</td><td class="right val-green">$102,776</td><td class="center"><span class="badge b-approved">Aprobado</span></td></tr>
+      <tr><td>SIM-2026-0068</td><td>Estructura Nave Industrial</td><td class="right">$182,000</td><td class="right">$94,000</td><td class="center">20%</td><td class="center">25%</td><td class="right">$331,200</td><td class="right val-green">$441,600</td><td class="center"><span class="badge b-draft">Borrador</span></td></tr>
+    </tbody>
+  </table>
+
+</div>
+
+<footer>
+  <p>McVill MetalMecánica S.A. de C.V.  •  Documento de Uso Interno Confidencial</p>
+  <p>Página 1 de 1  |  Generado: 17/05/2026 11:00 hrs</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Producción — Órdenes de Trabajo — McVill MetalMecánica</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #f8fafc; color: #0f172a; font-size: 11px; }
+  .header { background: #1a4a8a; color: white; }
+  .header-top { padding: 12px 20px 10px; display: flex; justify-content: space-between; align-items: center; }
+  .header-title { background: #2563eb; padding: 8px 20px; }
+  .header-title h1 { font-size: 11px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: white; }
+  .company-name { font-size: 14px; font-weight: 900; }
+  .company-sub { font-size: 8px; color: #93c5fd; margin-top: 2px; }
+  .date-info { text-align: right; font-size: 8px; color: #e2e8f0; }
+  .content { padding: 16px 20px; }
+  .kpi-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 16px; }
+  .kpi-card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 8px; text-align: center; }
+  .kpi-label { font-size: 7px; font-weight: 900; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .kpi-value { font-size: 18px; font-weight: 900; }
+  .val-green { color: #10b981; }
+  .val-rose { color: #f43f5e; }
+  .val-amber { color: #f59e0b; }
+  .val-white { color: #0f172a; }
+  .val-blue { color: #2563eb; }
+  table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 16px; }
+  thead tr { background: #2563eb; color: white; }
+  thead th { padding: 7px 10px; font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.8px; text-align: left; }
+  thead th.center { text-align: center; }
+  tbody tr:nth-child(even) { background: #f1f5f9; }
+  tbody tr:nth-child(odd) { background: white; }
+  tbody td { padding: 6px 10px; font-size: 9px; color: #0f172a; border-bottom: 1px solid #e2e8f0; }
+  tbody td.center { text-align: center; }
+  .badge { display: inline-block; padding: 2px 7px; border-radius: 999px; font-size: 7px; font-weight: 900; text-transform: uppercase; }
+  .b-completed { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+  .b-inprogress { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+  .b-pending { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+  .b-paused { background: #f3e8ff; color: #6b21a8; border: 1px solid #d8b4fe; }
+  .b-urgent { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+  .prog-bar { width: 100%; height: 5px; background: #e2e8f0; border-radius: 999px; overflow: hidden; margin-top: 3px; }
+  .prog-fill { height: 100%; border-radius: 999px; }
+  .prog-green { background: #10b981; }
+  .prog-amber { background: #f59e0b; }
+  .prog-blue { background: #2563eb; }
+  .section-title { font-size: 9px; font-weight: 900; color: #1e3a5f; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 2px solid #2563eb; display: inline-block; }
+  footer { border-top: 1px solid #2563eb; padding: 8px 20px; display: flex; justify-content: space-between; margin-top: 14px; }
+  footer p { font-size: 7px; color: #94a3b8; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="company-name">McVill MetalMecánica S.A. de C.V.</div>
+      <div class="company-sub">METALMECÁNICA • Sistema ERP Industrial</div>
+    </div>
+    <div class="date-info">
+      <div>17 may. 2026</div>
+      <div>05:30 hrs</div>
+    </div>
+  </div>
+  <div class="header-title">
+    <h1>Producción — Órdenes de Trabajo Activas — Reportes</h1>
+  </div>
+</div>
+
+<div class="content" style="margin-top:14px;">
+
+  <div class="kpi-row">
+    <div class="kpi-card"><div class="kpi-label">OTs Totales</div><div class="kpi-value val-white">87</div></div>
+    <div class="kpi-card"><div class="kpi-label">Completadas</div><div class="kpi-value val-green">54</div></div>
+    <div class="kpi-card"><div class="kpi-label">En Proceso</div><div class="kpi-value val-blue">21</div></div>
+    <div class="kpi-card"><div class="kpi-label">Pendientes</div><div class="kpi-value val-amber">8</div></div>
+    <div class="kpi-card"><div class="kpi-label">En Retraso</div><div class="kpi-value val-rose">4</div></div>
+    <div class="kpi-card"><div class="kpi-label">Completitud</div><div class="kpi-value val-green">62%</div></div>
+  </div>
+
+  <p class="section-title">Órdenes de Trabajo — Mayo 2026</p>
+  <table>
+    <thead>
+      <tr>
+        <th>OT No.</th>
+        <th>Proyecto / Descripción</th>
+        <th>Cliente</th>
+        <th>No. Parte</th>
+        <th class="center">Cantidad</th>
+        <th class="center">Progreso</th>
+        <th>Centro de Trabajo</th>
+        <th class="center">F. Entrega</th>
+        <th class="center">Prioridad</th>
+        <th class="center">Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>OT-2026-0487</strong></td><td>Soportes estructurales plataforma marina</td><td>PEMEX E&P</td><td>40124710.01</td><td class="center">50</td>
+        <td class="center">
+          <div>78%</div>
+          <div class="prog-bar"><div class="prog-fill prog-blue" style="width:78%"></div></div>
+        </td>
+        <td>CNC + Soldadura</td><td class="center">25/05/2026</td>
+        <td class="center"><span class="badge b-urgent">URGENTE</span></td>
+        <td class="center"><span class="badge b-inprogress">EN PROCESO</span></td>
+      </tr>
+      <tr>
+        <td><strong>OT-2026-0491</strong></td><td>Flechas transmisión CNC</td><td>ALFA Industrial</td><td>40165388.01</td><td class="center">20</td>
+        <td class="center">
+          <div>45%</div>
+          <div class="prog-bar"><div class="prog-fill prog-amber" style="width:45%"></div></div>
+        </td>
+        <td>Torno CNC</td><td class="center">30/05/2026</td>
+        <td class="center"><span class="badge b-inprogress">NORMAL</span></td>
+        <td class="center"><span class="badge b-inprogress">EN PROCESO</span></td>
+      </tr>
+      <tr>
+        <td><strong>OT-2026-0495</strong></td><td>Marco estructural nave industrial</td><td>CEMEX</td><td>40133044.01</td><td class="center">8</td>
+        <td class="center">
+          <div>100%</div>
+          <div class="prog-bar"><div class="prog-fill prog-green" style="width:100%"></div></div>
+        </td>
+        <td>Plasma + Soldadura</td><td class="center">15/05/2026</td>
+        <td class="center"><span class="badge b-inprogress">NORMAL</span></td>
+        <td class="center"><span class="badge b-completed">COMPLETADA</span></td>
+      </tr>
+      <tr>
+        <td><strong>OT-2026-0499</strong></td><td>Bridas RF 150# ANSI B16.5</td><td>ICA Industrial</td><td>40133045.01</td><td class="center">120</td>
+        <td class="center">
+          <div>22%</div>
+          <div class="prog-bar"><div class="prog-fill prog-amber" style="width:22%"></div></div>
+        </td>
+        <td>Tornería</td><td class="center">28/05/2026</td>
+        <td class="center"><span class="badge b-inprogress">ALTA</span></td>
+        <td class="center"><span class="badge b-inprogress">EN PROCESO</span></td>
+      </tr>
+      <tr>
+        <td><strong>OT-2026-0503</strong></td><td>Tubo cuadrado estructura andamio</td><td>Construcciones GMA</td><td>40169077</td><td class="center">200</td>
+        <td class="center">
+          <div>100%</div>
+          <div class="prog-bar"><div class="prog-fill prog-green" style="width:100%"></div></div>
+        </td>
+        <td>Corte Láser</td><td class="center">12/05/2026</td>
+        <td class="center"><span class="badge b-inprogress">NORMAL</span></td>
+        <td class="center"><span class="badge b-completed">COMPLETADA</span></td>
+      </tr>
+      <tr>
+        <td><strong>OT-2026-0507</strong></td><td>Soporte colgante tipo Z — especial</td><td>Grupo ALFA</td><td>40165389.01</td><td class="center">35</td>
+        <td class="center">
+          <div>0%</div>
+          <div class="prog-bar"><div class="prog-fill prog-amber" style="width:0%"></div></div>
+        </td>
+        <td>Asignar</td><td class="center">07/06/2026</td>
+        <td class="center"><span class="badge b-pending">NORMAL</span></td>
+        <td class="center"><span class="badge b-pending">PENDIENTE</span></td>
+      </tr>
+      <tr>
+        <td><strong>OT-2026-0511</strong></td><td>Chapa lateral refuerzo ASTM A36</td><td>PEMEX E&P</td><td>40124711.01</td><td class="center">60</td>
+        <td class="center">
+          <div>64%</div>
+          <div class="prog-bar"><div class="prog-fill prog-blue" style="width:64%"></div></div>
+        </td>
+        <td>Plasma + CNC</td><td class="center">21/05/2026</td>
+        <td class="center"><span class="badge b-urgent">URGENTE</span></td>
+        <td class="center"><span class="badge b-inprogress">EN PROCESO</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="background:#fff7ed; border:1px solid #fed7aa; border-radius:8px; padding:10px 14px;">
+    <p style="font-size:8px; font-weight:900; color:#9a3412; margin-bottom:4px;">OTs EN RIESGO DE RETRASO</p>
+    <p style="font-size:8px; color:#7c2d12; line-height:1.6;">
+      • <strong>OT-2026-0487</strong> — PEMEX — Entrega 25/May, avance 78%. Se requiere acelerar etapa de pintura anticorrosiva. 8 días hábiles disponibles.<br>
+      • <strong>OT-2026-0511</strong> — PEMEX — Entrega 21/May, avance 64%. Centro CNC con capacidad al 110%. Evaluar horas extra turno nocturno.
+    </p>
+  </div>
+
+</div>
+
+<footer>
+  <p>McVill MetalMecánica S.A. de C.V.  •  Documento de Uso Interno Confidencial</p>
+  <p>Página 1 de 1  |  Generado: 17/05/2026 05:30 hrs</p>
+</footer>
+
+</body>
+</html>

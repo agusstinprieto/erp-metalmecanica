@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Orden de Compra — McVill ERP</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; color: #1a202c; }
+  .page { max-width: 900px; margin: 0 auto; background: white; min-height: 100vh; }
+
+  .header { background: linear-gradient(135deg, #0f172a 0%, #082f4b 100%); color: white; padding: 36px 48px; }
+  .header-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .logo-area { display: flex; align-items: center; gap: 16px; }
+  .logo-box { width: 52px; height: 52px; background: rgba(14,165,233,0.25); border: 1px solid rgba(14,165,233,0.5); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .company-name { font-size: 24px; font-weight: 900; }
+  .company-sub { font-size: 9px; font-weight: 700; letter-spacing: 4px; color: #7dd3fc; text-transform: uppercase; margin-top: 2px; }
+  .report-meta { text-align: right; }
+  .report-type { font-size: 10px; font-weight: 700; letter-spacing: 4px; color: #7dd3fc; text-transform: uppercase; }
+  .oc-number { font-size: 30px; font-weight: 900; letter-spacing: -1px; margin-top: 4px; }
+  .oc-date { font-size: 11px; color: #bae6fd; margin-top: 4px; }
+
+  .parties { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #e2e8f0; border: 1px solid #e2e8f0; }
+  .party-box { background: white; padding: 24px 32px; }
+  .party-label { font-size: 8px; font-weight: 800; letter-spacing: 4px; color: #94a3b8; text-transform: uppercase; margin-bottom: 10px; }
+  .party-name { font-size: 18px; font-weight: 900; color: #0f172a; }
+  .party-detail { font-size: 11px; color: #475569; margin-top: 4px; line-height: 1.7; }
+
+  .oc-info { background: #f8fafc; padding: 16px 32px; display: flex; gap: 48px; border-bottom: 1px solid #e2e8f0; }
+  .oc-info-item label { font-size: 8px; font-weight: 700; letter-spacing: 3px; color: #94a3b8; text-transform: uppercase; display: block; }
+  .oc-info-item span { font-size: 12px; font-weight: 700; color: #0f172a; margin-top: 2px; display: block; }
+
+  .content { padding: 32px 48px; }
+  .section-title { font-size: 10px; font-weight: 800; letter-spacing: 4px; color: #475569; text-transform: uppercase; margin-bottom: 14px; }
+
+  table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+  thead tr { background: #f1f5f9; }
+  th { font-size: 8px; font-weight: 800; letter-spacing: 3px; color: #64748b; text-transform: uppercase; padding: 12px 14px; text-align: left; border-bottom: 2px solid #e2e8f0; }
+  th.right { text-align: right; }
+  td { font-size: 11px; padding: 12px 14px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+  td.right { text-align: right; }
+  tr:hover td { background: #f8fafc; }
+  .item-name { font-weight: 800; color: #0369a1; font-size: 12px; }
+  .item-spec { font-size: 10px; color: #64748b; font-style: italic; margin-top: 2px; }
+  .mono { font-family: 'Courier New', monospace; font-weight: 700; }
+
+  .totals-section { display: flex; justify-content: flex-end; margin-bottom: 32px; }
+  .totals-table { min-width: 300px; }
+  .totals-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 11px; }
+  .totals-row label { color: #64748b; }
+  .totals-row span { font-weight: 700; font-family: monospace; }
+  .totals-total { background: #0f172a; color: white; border-radius: 10px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+  .totals-total-label { font-size: 10px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: #94a3b8; }
+  .totals-total-value { font-size: 22px; font-weight: 900; font-family: monospace; }
+
+  .conditions { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px 24px; margin-bottom: 28px; }
+  .conditions-title { font-size: 9px; font-weight: 800; letter-spacing: 3px; color: #64748b; text-transform: uppercase; margin-bottom: 12px; }
+  .conditions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .cond-item { font-size: 10px; color: #475569; display: flex; gap: 8px; }
+  .cond-icon { color: #0369a1; font-weight: 700; }
+
+  .signatures { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 32px; }
+  .sig-box { border-top: 2px solid #e2e8f0; padding-top: 12px; }
+  .sig-title { font-size: 9px; font-weight: 800; letter-spacing: 3px; color: #94a3b8; text-transform: uppercase; }
+  .sig-name { font-size: 11px; font-weight: 700; color: #475569; margin-top: 4px; }
+  .sig-line { height: 36px; border-bottom: 1px solid #cbd5e1; margin-top: 8px; }
+
+  .footer { padding: 18px 48px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+  .footer-left { font-size: 10px; color: #94a3b8; }
+  .footer-right { font-size: 9px; color: #cbd5e1; font-family: monospace; }
+
+  @media print {
+    body { background: white; }
+    .page { max-width: none; }
+    .header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="logo-area">
+        <div class="logo-box">🛒</div>
+        <div>
+          <div class="company-name">McVill</div>
+          <div class="company-sub">Metalmecánica Industrial</div>
+        </div>
+      </div>
+      <div class="report-meta">
+        <div class="report-type">Compras · Orden de Compra</div>
+        <div class="oc-number">OC-2026-0187</div>
+        <div class="oc-date">Emitida: 17 Mayo 2026 · Vigencia: 30 días</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="parties">
+    <div class="party-box">
+      <div class="party-label">Empresa Compradora</div>
+      <div class="party-name">McVill Metalmecánica S.A. de C.V.</div>
+      <div class="party-detail">
+        Blvd. Industrial 4821, Parque Nordika<br>
+        Tijuana, B.C., C.P. 22215<br>
+        RFC: MME9204123R7 &nbsp;|&nbsp; Tel. (664) 200-4000
+      </div>
+    </div>
+    <div class="party-box">
+      <div class="party-label">Proveedor</div>
+      <div class="party-name">Aceros del Norte S.A. de C.V.</div>
+      <div class="party-detail">
+        Av. Acero 890, Zona Industrial<br>
+        Monterrey, N.L., C.P. 64850<br>
+        RFC: ANO9801054M2 &nbsp;|&nbsp; Tel. (81) 8355-2200
+      </div>
+    </div>
+  </div>
+
+  <div class="oc-info">
+    <div class="oc-info-item"><label>Pago</label><span>30 días netos</span></div>
+    <div class="oc-info-item"><label>Entrega requerida</label><span>27 Mayo 2026</span></div>
+    <div class="oc-info-item"><label>Lugar de entrega</label><span>Almacén McVill — Puerta 3</span></div>
+    <div class="oc-info-item"><label>Solicitado por</label><span>Ing. Roberto Flores — Compras</span></div>
+    <div class="oc-info-item"><label>Proyecto relacionado</label><span>PROJ-2026-041 / FK7</span></div>
+  </div>
+
+  <div class="content">
+    <div class="section-title">Materiales Solicitados</div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Partida</th>
+          <th>Descripción del material</th>
+          <th class="right">Cantidad</th>
+          <th>Unidad</th>
+          <th class="right">P. Unitario</th>
+          <th class="right">Importe</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="mono">01</td>
+          <td>
+            <div class="item-name">Acero 4140 barra redonda Ø50mm</div>
+            <div class="item-spec">AISI 4140 · Temple y revenido 28–34 HRC · cert. de material incluido</div>
+          </td>
+          <td class="right mono">850</td>
+          <td>kg</td>
+          <td class="right mono">$48.50</td>
+          <td class="right mono">$41,225.00</td>
+        </tr>
+        <tr>
+          <td class="mono">02</td>
+          <td>
+            <div class="item-name">Placa de acero A36 — 6.35mm × 1.2m × 2.4m</div>
+            <div class="item-spec">ASTM A36 · Laminada en caliente · Tolerancia ±0.3mm en espesor</div>
+          </td>
+          <td class="right mono">12</td>
+          <td>hojas</td>
+          <td class="right mono">$2,850.00</td>
+          <td class="right mono">$34,200.00</td>
+        </tr>
+        <tr>
+          <td class="mono">03</td>
+          <td>
+            <div class="item-name">Tubo estructural cuadrado 50×50×3mm</div>
+            <div class="item-spec">ASTM A500 Grado B · Galvanizado en caliente · L=6mts por tramo</div>
+          </td>
+          <td class="right mono">40</td>
+          <td>tramos</td>
+          <td class="right mono">$485.00</td>
+          <td class="right mono">$19,400.00</td>
+        </tr>
+        <tr>
+          <td class="mono">04</td>
+          <td>
+            <div class="item-name">Varilla corrugada 3/8" Grado 60</div>
+            <div class="item-spec">NMX-B-294 · Paquetes de 12m · Mínimo 60,000 psi fy</div>
+          </td>
+          <td class="right mono">200</td>
+          <td>kg</td>
+          <td class="right mono">$22.80</td>
+          <td class="right mono">$4,560.00</td>
+        </tr>
+        <tr>
+          <td class="mono">05</td>
+          <td>
+            <div class="item-name">Electrodo de soldadura 7018 3/32"</div>
+            <div class="item-spec">AWS E7018 · Bajo hidrógeno · Caja 5kg · Estuche hermético</div>
+          </td>
+          <td class="right mono">15</td>
+          <td>caja</td>
+          <td class="right mono">$680.00</td>
+          <td class="right mono">$10,200.00</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="totals-section">
+      <div class="totals-table">
+        <div class="totals-row"><label>Subtotal</label><span>$109,585.00</span></div>
+        <div class="totals-row"><label>IVA 16%</label><span>$17,533.60</span></div>
+        <div class="totals-row"><label>Flete incluido</label><span>—</span></div>
+        <div class="totals-total">
+          <div class="totals-total-label">Total OC</div>
+          <div class="totals-total-value">$127,118.60</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="conditions">
+      <div class="conditions-title">Condiciones de la orden</div>
+      <div class="conditions-grid">
+        <div class="cond-item"><span class="cond-icon">▸</span> Todos los materiales deben incluir certificado de calidad.</div>
+        <div class="cond-item"><span class="cond-icon">▸</span> Entrega en almacén McVill, Puerta 3 — con remisión firmada.</div>
+        <div class="cond-item"><span class="cond-icon">▸</span> Material rechazado en inspección será devuelto sin costo.</div>
+        <div class="cond-item"><span class="cond-icon">▸</span> Precio fijo por 30 días sin ajuste por tipo de cambio.</div>
+        <div class="cond-item"><span class="cond-icon">▸</span> Pago a 30 días netos contra factura y remisión conforme.</div>
+        <div class="cond-item"><span class="cond-icon">▸</span> El proveedor garantiza trazabilidad de colada por partida.</div>
+      </div>
+    </div>
+
+    <div class="signatures">
+      <div class="sig-box">
+        <div class="sig-title">Solicitado por</div>
+        <div class="sig-name">Ing. Roberto Flores</div>
+        <div class="sig-name" style="color:#94a3b8">Compras / Abastecimiento</div>
+        <div class="sig-line"></div>
+      </div>
+      <div class="sig-box">
+        <div class="sig-title">Autorizado por</div>
+        <div class="sig-name">L.A. Carmen Vidal</div>
+        <div class="sig-name" style="color:#94a3b8">Gerencia General</div>
+        <div class="sig-line"></div>
+      </div>
+      <div class="sig-box">
+        <div class="sig-title">Recibido por proveedor</div>
+        <div class="sig-name">&nbsp;</div>
+        <div class="sig-name" style="color:#94a3b8">Aceros del Norte S.A.</div>
+        <div class="sig-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-left">McVill ERP · Módulo Compras &nbsp;|&nbsp; Documento oficial sujeto a condiciones de compra McVill</div>
+    <div class="footer-right">OC-2026-0187.pdf &nbsp;|&nbsp; pág. 1 de 1</div>
+  </div>
+</div>
+</body>
+</html>

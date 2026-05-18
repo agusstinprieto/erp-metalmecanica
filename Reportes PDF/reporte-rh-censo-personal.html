@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Censo de Capital Humano — McVill MetalMecánica</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #f8fafc; color: #0f172a; font-size: 11px; }
+  .header { background: #1a4a8a; color: white; }
+  .header-top { padding: 12px 20px 10px; display: flex; justify-content: space-between; align-items: center; }
+  .header-title { background: #2563eb; padding: 8px 20px; }
+  .header-title h1 { font-size: 11px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: white; }
+  .company-name { font-size: 14px; font-weight: 900; }
+  .company-sub { font-size: 8px; color: #93c5fd; margin-top: 2px; }
+  .date-info { text-align: right; font-size: 8px; color: #e2e8f0; }
+  .content { padding: 16px 20px; }
+  .kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 16px; }
+  .kpi-card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 8px; text-align: center; }
+  .kpi-label { font-size: 7px; font-weight: 900; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .kpi-value { font-size: 20px; font-weight: 900; }
+  .val-green { color: #10b981; }
+  .val-rose { color: #f43f5e; }
+  .val-amber { color: #f59e0b; }
+  .val-white { color: #0f172a; }
+  .val-blue { color: #2563eb; }
+  .val-pink { color: #ec4899; }
+  table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 16px; }
+  thead tr { background: #2563eb; color: white; }
+  thead th { padding: 7px 10px; font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.8px; text-align: left; }
+  thead th.center { text-align: center; }
+  tbody tr:nth-child(even) { background: #f1f5f9; }
+  tbody tr:nth-child(odd) { background: white; }
+  tbody td { padding: 6px 10px; font-size: 9px; color: #0f172a; border-bottom: 1px solid #e2e8f0; }
+  tbody td.center { text-align: center; }
+  .badge { display: inline-block; padding: 2px 7px; border-radius: 999px; font-size: 7px; font-weight: 900; text-transform: uppercase; }
+  .b-active { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+  .b-inactive { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+  .b-vac { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+  .b-leave { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+  .b-medleave { background: #f3e8ff; color: #6b21a8; border: 1px solid #d8b4fe; }
+  .section-title { font-size: 9px; font-weight: 900; color: #1e3a5f; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 2px solid #2563eb; display: inline-block; }
+  .dept-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+  .dept-card { background: white; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; }
+  .dept-name { font-size: 8px; font-weight: 700; color: #334155; }
+  .dept-count { font-size: 16px; font-weight: 900; color: #2563eb; }
+  footer { border-top: 1px solid #2563eb; padding: 8px 20px; display: flex; justify-content: space-between; margin-top: 14px; }
+  footer p { font-size: 7px; color: #94a3b8; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="company-name">McVill MetalMecánica S.A. de C.V.</div>
+      <div class="company-sub">METALMECÁNICA • Sistema ERP Industrial</div>
+    </div>
+    <div class="date-info">
+      <div>17 may. 2026</div>
+      <div>08:00 hrs</div>
+    </div>
+  </div>
+  <div class="header-title">
+    <h1>Censo de Capital Humano — Recursos Humanos</h1>
+  </div>
+</div>
+
+<div class="content" style="margin-top:14px;">
+
+  <div class="kpi-row">
+    <div class="kpi-card"><div class="kpi-label">Total Empleados</div><div class="kpi-value val-white">62</div></div>
+    <div class="kpi-card"><div class="kpi-label">Activos</div><div class="kpi-value val-green">57</div></div>
+    <div class="kpi-card"><div class="kpi-label">Inactivos</div><div class="kpi-value val-rose">2</div></div>
+    <div class="kpi-card"><div class="kpi-label">Vacaciones</div><div class="kpi-value val-blue">2</div></div>
+    <div class="kpi-card"><div class="kpi-label">Incapacidades</div><div class="kpi-value val-amber">1</div></div>
+  </div>
+
+  <p class="section-title">Distribución por Departamento</p>
+  <div class="dept-grid">
+    <div class="dept-card"><div class="dept-name">Producción CNC</div><div class="dept-count">14</div></div>
+    <div class="dept-card"><div class="dept-name">Soldadura MIG/TIG</div><div class="dept-count">9</div></div>
+    <div class="dept-card"><div class="dept-name">Corte Láser y Plasma</div><div class="dept-count">6</div></div>
+    <div class="dept-card"><div class="dept-name">Calidad SGC</div><div class="dept-count">5</div></div>
+    <div class="dept-card"><div class="dept-name">Mantenimiento</div><div class="dept-count">4</div></div>
+    <div class="dept-card"><div class="dept-name">Logística / Almacén</div><div class="dept-count">5</div></div>
+    <div class="dept-card"><div class="dept-name">Ingeniería</div><div class="dept-count">4</div></div>
+    <div class="dept-card"><div class="dept-name">Finanzas / Nómina</div><div class="dept-count">4</div></div>
+    <div class="dept-card"><div class="dept-name">RH / HSE</div><div class="dept-count">4</div></div>
+    <div class="dept-card"><div class="dept-name">Ventas / Cotizaciones</div><div class="dept-count">4</div></div>
+    <div class="dept-card"><div class="dept-name">Dirección / Gerencia</div><div class="dept-count">3</div></div>
+  </div>
+
+  <p class="section-title">Directorio General de Personal</p>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:50px">No. Emp.</th>
+        <th>Nombre</th>
+        <th>Puesto</th>
+        <th>Departamento</th>
+        <th class="center">Fecha Ingreso</th>
+        <th class="center">Antigüedad</th>
+        <th class="center">Estatus</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>MCE-001</td><td>Carlos Ramírez Soto</td><td>Operador CNC Sr.</td><td>Producción CNC</td><td class="center">15/03/2019</td><td class="center">7 años 2 meses</td><td class="center"><span class="badge b-active">ACTIVO</span></td></tr>
+      <tr><td>MCE-002</td><td>Ana Lucía Hernández</td><td>Inspector de Calidad</td><td>Calidad SGC</td><td class="center">01/06/2020</td><td class="center">5 años 11 meses</td><td class="center"><span class="badge b-active">ACTIVO</span></td></tr>
+      <tr><td>MCE-003</td><td>Roberto Mendoza Cárdenas</td><td>Técnico Mantenimiento</td><td>Mantenimiento</td><td class="center">10/01/2021</td><td class="center">5 años 4 meses</td><td class="center"><span class="badge b-active">ACTIVO</span></td></tr>
+      <tr><td>MCE-004</td><td>María Fernanda Orozco</td><td>Gerente de Finanzas</td><td>Finanzas</td><td class="center">03/08/2018</td><td class="center">7 años 9 meses</td><td class="center"><span class="badge b-active">ACTIVO</span></td></tr>
+      <tr><td>MCE-005</td><td>José Luis Villanueva</td><td>Soldador TIG Certificado</td><td>Soldadura MIG/TIG</td><td class="center">20/04/2022</td><td class="center">4 años 1 mes</td><td class="center"><span class="badge b-active">ACTIVO</span></td></tr>
+      <tr><td>MCE-006</td><td>Patricia Ávila Torres</td><td>Coordinadora RH</td><td>RH / Capital Humano</td><td class="center">15/07/2020</td><td class="center">5 años 10 meses</td><td class="center"><span class="badge b-active">ACTIVO</span></td></tr>
+      <tr><td>MCE-007</td><td>Miguel Ángel Cortés</td><td>Op. Corte Láser</td><td>Corte Láser y Plasma</td><td class="center">05/09/2021</td><td class="center">4 años 8 meses</td><td class="center"><span class="badge b-active">ACTIVO</span></td></tr>
+      <tr><td>MCE-008</td><td>Laura Beatriz Salinas</td><td>Ingeniero de Diseño</td><td>Ingeniería</td><td class="center">12/02/2019</td><td class="center">7 años 3 meses</td><td class="center"><span class="badge b-active">ACTIVO</span></td></tr>
+      <tr><td>MCE-009</td><td>Fernando Gutiérrez Leal</td><td>Almacenista Sr.</td><td>Logística / Almacén</td><td class="center">08/11/2022</td><td class="center">2 años 6 meses</td><td class="center"><span class="badge b-vac">VACACIONES</span></td></tr>
+      <tr><td>MCE-010</td><td>Alejandra Morales Vega</td><td>Ejecutiva de Ventas</td><td>Ventas / Cotizaciones</td><td class="center">03/03/2021</td><td class="center">5 años 2 meses</td><td class="center"><span class="badge b-active">ACTIVO</span></td></tr>
+      <tr><td>MCE-011</td><td>Eduardo Pérez Garza</td><td>Operador CNC Jr.</td><td>Producción CNC</td><td class="center">14/06/2023</td><td class="center">1 año 11 meses</td><td class="center"><span class="badge b-active">ACTIVO</span></td></tr>
+      <tr><td>MCE-012</td><td>Sofía Reyes Montoya</td><td>Ing. HSE / Seguridad</td><td>HSE / Seguridad</td><td class="center">01/10/2020</td><td class="center">5 años 7 meses</td><td class="center"><span class="badge b-active">ACTIVO</span></td></tr>
+      <tr><td>MCE-013</td><td>Luis Alberto Pedroza</td><td>Operador Grúa Puente</td><td>Logística / Almacén</td><td class="center">22/05/2018</td><td class="center">8 años 0 meses</td><td class="center"><span class="badge b-medleave">INCAPACIDAD</span></td></tr>
+      <tr><td>MCE-014</td><td>Claudia Vidal Mora</td><td>Op. Láser Jr.</td><td>Corte Láser y Plasma</td><td class="center">10/01/2024</td><td class="center">1 año 4 meses</td><td class="center"><span class="badge b-active">ACTIVO</span></td></tr>
+      <tr><td>MCE-015</td><td>Pedro García Lozano</td><td>Soldador MIG</td><td>Soldadura MIG/TIG</td><td class="center">05/08/2022</td><td class="center">2 años 9 meses</td><td class="center"><span class="badge b-active">ACTIVO</span></td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:8px; color:#64748b; font-style:italic;">* Listado parcial. Total 62 empleados. Reporte completo disponible en módulo RH del ERP.</p>
+
+</div>
+
+<footer>
+  <p>McVill MetalMecánica S.A. de C.V.  •  Documento de Uso Interno Confidencial</p>
+  <p>Página 1 de 1  |  Generado: 17/05/2026 08:00 hrs</p>
+</footer>
+
+</body>
+</html>

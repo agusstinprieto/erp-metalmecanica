@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Conciliación Bancaria — McVill ERP</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; color: #1a202c; }
+  .page { max-width: 960px; margin: 0 auto; background: white; min-height: 100vh; }
+
+  .header { background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%); color: white; padding: 36px 48px; position: relative; overflow: hidden; }
+  .header::before { content: ''; position: absolute; top: -40px; right: -40px; width: 200px; height: 200px; border-radius: 50%; background: rgba(59,130,246,0.15); }
+  .header-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .logo-area { display: flex; align-items: center; gap: 16px; }
+  .logo-box { width: 52px; height: 52px; background: rgba(59,130,246,0.3); border: 1px solid rgba(59,130,246,0.5); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .company-name { font-size: 24px; font-weight: 900; letter-spacing: -0.5px; }
+  .company-sub { font-size: 9px; font-weight: 700; letter-spacing: 4px; color: #93c5fd; text-transform: uppercase; margin-top: 2px; }
+  .report-meta { text-align: right; }
+  .report-type { font-size: 10px; font-weight: 700; letter-spacing: 4px; color: #93c5fd; text-transform: uppercase; }
+  .report-title { font-size: 28px; font-weight: 900; letter-spacing: -1px; margin-top: 4px; }
+  .report-period { font-size: 12px; color: #bfdbfe; margin-top: 4px; }
+  .header-divider { margin-top: 28px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; gap: 40px; }
+  .meta-item label { font-size: 8px; font-weight: 700; letter-spacing: 3px; color: #64748b; text-transform: uppercase; display: block; }
+  .meta-item span { font-size: 13px; font-weight: 700; color: white; margin-top: 2px; display: block; }
+
+  .summary-bar { background: #1e293b; padding: 20px 48px; display: flex; gap: 0; }
+  .summary-item { flex: 1; text-align: center; padding: 12px 0; border-right: 1px solid rgba(255,255,255,0.08); }
+  .summary-item:last-child { border-right: none; }
+  .summary-label { font-size: 8px; font-weight: 700; letter-spacing: 3px; color: #64748b; text-transform: uppercase; }
+  .summary-value { font-size: 22px; font-weight: 900; margin-top: 4px; }
+  .summary-value.green { color: #4ade80; }
+  .summary-value.yellow { color: #fbbf24; }
+  .summary-value.red { color: #f87171; }
+  .summary-value.blue { color: #60a5fa; }
+
+  .content { padding: 40px 48px; }
+  .section-title { font-size: 10px; font-weight: 800; letter-spacing: 4px; color: #475569; text-transform: uppercase; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0; }
+
+  table { width: 100%; border-collapse: collapse; margin-bottom: 32px; }
+  thead tr { background: #f8fafc; }
+  th { font-size: 8px; font-weight: 800; letter-spacing: 3px; color: #64748b; text-transform: uppercase; padding: 12px 14px; text-align: left; border-bottom: 2px solid #e2e8f0; }
+  td { font-size: 11px; padding: 11px 14px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+  tr:hover td { background: #f8fafc; }
+  .mono { font-family: 'Courier New', monospace; font-weight: 700; }
+
+  .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 8px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; }
+  .badge-auto { background: #dcfce7; color: #166534; }
+  .badge-aprobado { background: #d1fae5; color: #065f46; }
+  .badge-sugerido { background: #fef3c7; color: #92400e; }
+  .badge-sin-match { background: #fee2e2; color: #991b1b; }
+  .badge-rechazado { background: #fce7f3; color: #9d174d; }
+
+  .confidence { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 9px; font-weight: 700; font-family: monospace; }
+  .conf-high { background: #dcfce7; color: #166534; }
+  .conf-med { background: #fef3c7; color: #92400e; }
+  .conf-low { background: #fee2e2; color: #991b1b; }
+
+  .footer { margin-top: 40px; padding: 24px 48px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+  .footer-left { font-size: 10px; color: #94a3b8; }
+  .footer-right { font-size: 9px; color: #cbd5e1; font-family: monospace; }
+
+  .legend { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 9px; color: #64748b; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  @media print {
+    body { background: white; }
+    .page { max-width: none; }
+    .summary-bar { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="logo-area">
+        <div class="logo-box">⚡</div>
+        <div>
+          <div class="company-name">McVill</div>
+          <div class="company-sub">Metalmecánica Industrial</div>
+        </div>
+      </div>
+      <div class="report-meta">
+        <div class="report-type">Finanzas · Conciliación</div>
+        <div class="report-title">Conciliación Bancaria</div>
+        <div class="report-period">Período: Mayo 2026</div>
+      </div>
+    </div>
+    <div class="header-divider">
+      <div class="meta-item"><label>Banco</label><span>BBVA Empresarial</span></div>
+      <div class="meta-item"><label>Cuenta</label><span>••••  ••••  4821</span></div>
+      <div class="meta-item"><label>Generado</label><span>17 Mayo 2026 · 14:32</span></div>
+      <div class="meta-item"><label>Usuario</label><span>Finanzas — McVill ERP</span></div>
+    </div>
+  </div>
+
+  <div class="summary-bar">
+    <div class="summary-item">
+      <div class="summary-label">Total movimientos</div>
+      <div class="summary-value blue">24</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-label">Auto-conciliados</div>
+      <div class="summary-value green">17</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-label">Sugeridos IA</div>
+      <div class="summary-value yellow">4</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-label">Sin match</div>
+      <div class="summary-value red">3</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-label">Diferencia</div>
+      <div class="summary-value red">$8,450</div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="section-title">Movimientos Conciliados</div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#4ade80"></div> Auto-match (IA ≥ 90%)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#fbbf24"></div> Sugerido IA (requiere revisión)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f87171"></div> Sin coincidencia</div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Descripción Banco</th>
+          <th>Concepto ERP</th>
+          <th>Monto</th>
+          <th>Referencia</th>
+          <th>Confianza</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>02/05/2026</td>
+          <td>PAGO PROVEEDOR ACEROS DEL NORTE</td>
+          <td>Pago OC-2026-041 Materia Prima</td>
+          <td class="mono">-$45,200.00</td>
+          <td class="mono">TRF-8821</td>
+          <td><span class="confidence conf-high">98%</span></td>
+          <td><span class="badge badge-auto">● Auto</span></td>
+        </tr>
+        <tr>
+          <td>03/05/2026</td>
+          <td>DEPOSITO CLIENTE METALFORJA SA</td>
+          <td>Cobro Fact. MCV-0512 Troquelado</td>
+          <td class="mono">+$87,500.00</td>
+          <td class="mono">DEP-4402</td>
+          <td><span class="confidence conf-high">96%</span></td>
+          <td><span class="badge badge-auto">● Auto</span></td>
+        </tr>
+        <tr>
+          <td>05/05/2026</td>
+          <td>SPEI RECIBIDO TERMOPLASTICOS</td>
+          <td>Anticipo Proyecto TP-2026-07</td>
+          <td class="mono">+$32,000.00</td>
+          <td class="mono">SPE-9901</td>
+          <td><span class="confidence conf-high">94%</span></td>
+          <td><span class="badge badge-aprobado">✓ Aprobado</span></td>
+        </tr>
+        <tr>
+          <td>07/05/2026</td>
+          <td>CARGO SERVICIO MAQUILA EXT</td>
+          <td>Maquila CNC Piezas Serie B</td>
+          <td class="mono">-$18,750.00</td>
+          <td class="mono">CAR-2204</td>
+          <td><span class="confidence conf-med">78%</span></td>
+          <td><span class="badge badge-sugerido">⚠ Sugerido</span></td>
+        </tr>
+        <tr>
+          <td>08/05/2026</td>
+          <td>PAGO NOMINA QUINCENAL</td>
+          <td>Nómina Quincena 1 Mayo</td>
+          <td class="mono">-$124,800.00</td>
+          <td class="mono">NOM-0501</td>
+          <td><span class="confidence conf-high">99%</span></td>
+          <td><span class="badge badge-auto">● Auto</span></td>
+        </tr>
+        <tr>
+          <td>10/05/2026</td>
+          <td>CARGO COMISION BANCO 0.45%</td>
+          <td>—</td>
+          <td class="mono">-$562.50</td>
+          <td class="mono">COM-0510</td>
+          <td><span class="confidence conf-low">—</span></td>
+          <td><span class="badge badge-sin-match">✕ Sin match</span></td>
+        </tr>
+        <tr>
+          <td>12/05/2026</td>
+          <td>DEPOSITO AUTOPARTES BAJA</td>
+          <td>Cobro Fact. MCV-0498 Estampado</td>
+          <td class="mono">+$56,000.00</td>
+          <td class="mono">DEP-5510</td>
+          <td><span class="confidence conf-high">92%</span></td>
+          <td><span class="badge badge-auto">● Auto</span></td>
+        </tr>
+        <tr>
+          <td>14/05/2026</td>
+          <td>SPEI ENVIADO PROVEEDOR TORNILLERIA</td>
+          <td>—</td>
+          <td class="mono">-$7,887.50</td>
+          <td class="mono">SPE-1104</td>
+          <td><span class="confidence conf-low">—</span></td>
+          <td><span class="badge badge-sin-match">✕ Sin match</span></td>
+        </tr>
+        <tr>
+          <td>15/05/2026</td>
+          <td>CARGO MANTENIMIENTO MAQUINARIA</td>
+          <td>Mantenimiento Preventivo Torno CNC</td>
+          <td class="mono">-$22,400.00</td>
+          <td class="mono">MAN-0515</td>
+          <td><span class="confidence conf-med">81%</span></td>
+          <td><span class="badge badge-sugerido">⚠ Sugerido</span></td>
+        </tr>
+        <tr>
+          <td>16/05/2026</td>
+          <td>DEPOSITO REMESA CORPORATIVO</td>
+          <td>Transferencia Intragrupo Mayo</td>
+          <td class="mono">+$200,000.00</td>
+          <td class="mono">REM-0501</td>
+          <td><span class="confidence conf-high">95%</span></td>
+          <td><span class="badge badge-auto">● Auto</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="background:#fff7ed; border:1px solid #fed7aa; border-radius:12px; padding:20px 24px; display:flex; gap:20px; align-items:flex-start;">
+      <div style="font-size:24px;">⚠️</div>
+      <div>
+        <div style="font-size:11px; font-weight:800; color:#c2410c; margin-bottom:6px;">DIFERENCIAS PENDIENTES DE REVISIÓN</div>
+        <div style="font-size:10px; color:#78350f; line-height:1.8;">
+          <strong>Cargo Comisión Banco $562.50</strong> — No encontrado en ERP. Registrar como gasto bancario.<br>
+          <strong>SPEI Tornillería $7,887.50</strong> — Pago sin OC asociada en sistema. Verificar con compras.<br>
+          <strong>Cargo Maquila $18,750</strong> — Sugerencia IA con 78% de confianza. Confirmar concepto antes de aprobar.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-left">McVill ERP · Módulo Finanzas — Conciliación IA &nbsp;|&nbsp; Generado automáticamente por IA Neural</div>
+    <div class="footer-right">conciliacion_mayo_2026.pdf &nbsp;|&nbsp; pág. 1 de 1</div>
+  </div>
+</div>
+</body>
+</html>

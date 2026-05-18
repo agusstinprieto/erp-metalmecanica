@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Minuta de Reunión — McVill</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8fafc; }
+  .page { background: white; padding: 20mm 22mm; width: 210mm; min-height: 297mm; margin: 0 auto; font-size: 10px; color: #1e293b; }
+
+  .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #1d4ed8; padding-bottom: 12px; margin-bottom: 18px; }
+  .header-left .brand { font-size: 20px; font-weight: 900; color: #0f172a; letter-spacing: -0.5px; }
+  .header-left .brand span { color: #1d4ed8; }
+  .header-left .tagline { font-size: 8px; color: #64748b; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 2px; }
+  .header-right { text-align: right; }
+  .doc-type { font-size: 12px; font-weight: 900; color: #1d4ed8; text-transform: uppercase; letter-spacing: 1px; }
+  .doc-num { font-size: 9px; color: #64748b; margin-top: 2px; }
+
+  .meeting-info { background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px 16px; margin-bottom: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 20px; }
+  .info-row { display: flex; gap: 8px; align-items: baseline; }
+  .info-label { font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; white-space: nowrap; min-width: 70px; }
+  .info-value { font-size: 10px; font-weight: 700; color: #1e293b; }
+  .info-row.full-width { grid-column: 1 / -1; }
+
+  h2 { font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #0f172a; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid #e2e8f0; }
+
+  .asistentes { margin-bottom: 16px; }
+  .asistentes table { width: 100%; border-collapse: collapse; }
+  .asistentes th { background: #1d4ed8; color: white; padding: 5px 8px; font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; text-align: left; }
+  .asistentes td { padding: 5px 8px; font-size: 9px; border-bottom: 1px solid #f1f5f9; }
+  .asistentes tr:nth-child(even) td { background: #f8fafc; }
+  .badge-firma { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+  .badge-verde { background: #10b981; }
+  .badge-amarillo { background: #f59e0b; }
+
+  .agenda { margin-bottom: 16px; }
+  .agenda-item { margin-bottom: 10px; padding: 10px 12px; border-left: 3px solid #1d4ed8; background: #fafcff; border-radius: 0 4px 4px 0; }
+  .agenda-item.completado { border-left-color: #10b981; background: #f0fdf4; }
+  .agenda-item.pendiente { border-left-color: #f59e0b; background: #fffbeb; }
+  .agenda-num { font-size: 8px; font-weight: 900; color: #1d4ed8; text-transform: uppercase; margin-bottom: 3px; }
+  .agenda-item.completado .agenda-num { color: #10b981; }
+  .agenda-item.pendiente .agenda-num { color: #f59e0b; }
+  .agenda-title { font-size: 10px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+  .agenda-desc { font-size: 9px; color: #475569; line-height: 1.5; }
+
+  .acuerdos { margin-bottom: 16px; }
+  .acuerdo { display: flex; gap: 10px; margin-bottom: 8px; padding: 8px 10px; border: 1px solid #e2e8f0; border-radius: 4px; }
+  .acuerdo-num { font-size: 11px; font-weight: 900; color: #1d4ed8; min-width: 20px; }
+  .acuerdo-body { flex: 1; }
+  .acuerdo-titulo { font-size: 9px; font-weight: 700; color: #0f172a; margin-bottom: 2px; }
+  .acuerdo-resp { font-size: 8px; color: #64748b; }
+  .acuerdo-fecha { font-size: 8px; color: #ef4444; font-weight: bold; }
+
+  .firmas { margin-top: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .firma-box { text-align: center; }
+  .firma-line { border-top: 1px solid #475569; margin-bottom: 4px; padding-top: 4px; }
+  .firma-nombre { font-size: 8px; font-weight: 700; color: #0f172a; }
+  .firma-cargo { font-size: 7px; color: #64748b; }
+
+  .footer { margin-top: 16px; padding-top: 8px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; font-size: 7px; color: #94a3b8; }
+
+  @media print {
+    body { background: white; }
+    .page { box-shadow: none; margin: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="brand">Mc<span>Vill</span></div>
+      <div class="tagline">Manufactura Industrial de Precisión</div>
+    </div>
+    <div class="header-right">
+      <div class="doc-type">Minuta de Reunión</div>
+      <div class="doc-num">MIN-2026-047 · Revisión: A</div>
+    </div>
+  </div>
+
+  <!-- Info de la reunión -->
+  <div class="meeting-info">
+    <div class="info-row">
+      <span class="info-label">Tipo</span>
+      <span class="info-value">Revisión Semanal de Producción</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Fecha</span>
+      <span class="info-value">Martes 13 de Mayo, 2026 — 09:00 h</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Duración</span>
+      <span class="info-value">75 minutos</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Lugar</span>
+      <span class="info-value">Sala de Juntas Planta 1</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Facilitador</span>
+      <span class="info-value">Ing. Roberto Méndez — Gerente de Producción</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Secretario</span>
+      <span class="info-value">Ana Flores Méndez — Jefa de Calidad</span>
+    </div>
+    <div class="info-row full-width">
+      <span class="info-label">Objetivo</span>
+      <span class="info-value">Revisar OEE semana 19, cerrar acuerdos pendientes MIN-2026-043, definir plan de acción para falla Mazak Nexus</span>
+    </div>
+  </div>
+
+  <!-- Asistentes -->
+  <div class="asistentes">
+    <h2>Asistentes</h2>
+    <table>
+      <thead>
+        <tr><th>Nombre</th><th>Área / Puesto</th><th>Asistencia</th><th>Firma</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Ing. Roberto Méndez</strong></td><td>Gerente de Producción</td>
+          <td><span class="badge-firma badge-verde"></span>Presente</td><td></td>
+        </tr>
+        <tr>
+          <td><strong>Ana Flores Méndez</strong></td><td>Jefa de Calidad / SPC</td>
+          <td><span class="badge-firma badge-verde"></span>Presente</td><td></td>
+        </tr>
+        <tr>
+          <td><strong>Carlos Torres Vega</strong></td><td>Supervisor Turno Matutino</td>
+          <td><span class="badge-firma badge-verde"></span>Presente</td><td></td>
+        </tr>
+        <tr>
+          <td><strong>Lic. Sofía Castro</strong></td><td>RH / Capital Humano</td>
+          <td><span class="badge-firma badge-verde"></span>Presente</td><td></td>
+        </tr>
+        <tr>
+          <td><strong>Ing. Mario Herrera</strong></td><td>Mantenimiento Industrial</td>
+          <td><span class="badge-firma badge-amarillo"></span>Tardanza (09:18)</td><td></td>
+        </tr>
+        <tr>
+          <td><strong>Luis Ramírez García</strong></td><td>Operador Láser Trumpf</td>
+          <td><span class="badge-firma badge-verde"></span>Presente</td><td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Agenda y puntos tratados -->
+  <div class="agenda">
+    <h2>Puntos Tratados</h2>
+
+    <div class="agenda-item completado">
+      <div class="agenda-num">PUNTO 1 — COMPLETADO</div>
+      <div class="agenda-title">Revisión OEE Semana 19 (5–9 Mayo 2026)</div>
+      <div class="agenda-desc">
+        Se revisaron los indicadores de OEE por célula. Resultados: SOLDADURA 94.2% (meta 90% ✓), CORTE LÁSER 88.7% (meta 90% ✗ — requiere atención), MAQUINADO 96.1% (meta 90% ✓), ENSAMBLE 91.3% (meta 90% ✓), PINTURA 93.8% (meta 90% ✓). Se identificó que la caída en CORTE se debe a 3.2 horas de paro no programado el miércoles por mantenimiento a Trumpf 3kW. <strong>Acuerdo: programar mantenimiento preventivo mensual los lunes antes del turno matutino.</strong>
+      </div>
+    </div>
+
+    <div class="agenda-item completado">
+      <div class="agenda-num">PUNTO 2 — COMPLETADO</div>
+      <div class="agenda-title">Cierre de Acuerdos MIN-2026-043</div>
+      <div class="agenda-desc">
+        Acuerdo 1 (Calibración CMM): CERRADO — la CMM Hexagon fue calibrada el 07/05, certificado en archivo de calidad. Acuerdo 2 (Capacitación operadores CNC): EN PROCESO — 4 de 6 operadores completaron el curso, los 2 restantes programados para semana 21. Acuerdo 3 (Cotización herramental): CERRADO — se aprobó la cotización de ISCAR por $48,500 MXN.
+      </div>
+    </div>
+
+    <div class="agenda-item pendiente">
+      <div class="agenda-num">PUNTO 3 — EN SEGUIMIENTO</div>
+      <div class="agenda-title">Falla Intermitente Mazak Nexus 250-II</div>
+      <div class="agenda-desc">
+        Ing. Herrera reportó que la falla de vibración excesiva en husillo (reportada semana 17) sigue sin diagnóstico definitivo. Se activó el protocolo de monitoreo con acelerómetro portátil. Lectura actual: 4.8 mm/s (límite ISO 10816: 7.1 mm/s para máquina de producción). Por precaución se redujo velocidad máxima a 8,000 RPM hasta nuevo aviso. <strong>Acuerdo: Mazak enviará técnico especialista el 20/05. Costo estimado visita: $12,000 MXN — aprobado por gerencia.</strong>
+      </div>
+    </div>
+
+    <div class="agenda-item completado">
+      <div class="agenda-num">PUNTO 4 — COMPLETADO</div>
+      <div class="agenda-title">Ausentismo y Rotación — Semana 19</div>
+      <div class="agenda-desc">
+        Lic. Castro presentó resumen: tasa de asistencia 93.4% (benchmark industria: 95%), 4 retardos registrados en turno matutino. Se aprobó implementar sistema de incentivo por puntualidad: bono $200 MXN adicionales para empleados con 0 retardos en el mes. Arranque en junio 2026.
+      </div>
+    </div>
+  </div>
+
+  <!-- Acuerdos y compromisos -->
+  <div class="acuerdos">
+    <h2>Acuerdos y Compromisos</h2>
+    <div class="acuerdo">
+      <div class="acuerdo-num">A1</div>
+      <div class="acuerdo-body">
+        <div class="acuerdo-titulo">Programar mantenimiento preventivo mensual Trumpf 3kW los lunes (primer lunes de cada mes, turno nocturno)</div>
+        <div class="acuerdo-resp">Responsable: Ing. Mario Herrera &nbsp;|&nbsp; <span class="acuerdo-fecha">Fecha límite: 01/06/2026</span></div>
+      </div>
+    </div>
+    <div class="acuerdo">
+      <div class="acuerdo-num">A2</div>
+      <div class="acuerdo-body">
+        <div class="acuerdo-titulo">Completar capacitación CNC para 2 operadores restantes (Pedro González y Julio Sánchez)</div>
+        <div class="acuerdo-resp">Responsable: Lic. Sofía Castro &nbsp;|&nbsp; <span class="acuerdo-fecha">Fecha límite: 23/05/2026</span></div>
+      </div>
+    </div>
+    <div class="acuerdo">
+      <div class="acuerdo-num">A3</div>
+      <div class="acuerdo-body">
+        <div class="acuerdo-titulo">Coordinación visita técnico Mazak — logística, acceso a planta, herramientas requeridas</div>
+        <div class="acuerdo-resp">Responsable: Ing. Roberto Méndez &nbsp;|&nbsp; <span class="acuerdo-fecha">Fecha límite: 19/05/2026</span></div>
+      </div>
+    </div>
+    <div class="acuerdo">
+      <div class="acuerdo-num">A4</div>
+      <div class="acuerdo-body">
+        <div class="acuerdo-titulo">Diseñar mecánica e implementar bono de puntualidad mensual ($200 MXN) — política escrita y comunicada a todos</div>
+        <div class="acuerdo-resp">Responsable: Lic. Sofía Castro &nbsp;|&nbsp; <span class="acuerdo-fecha">Fecha límite: 28/05/2026</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firmas -->
+  <div class="firmas">
+    <div class="firma-box">
+      <div style="height: 20px;"></div>
+      <div class="firma-line">
+        <div class="firma-nombre">Ing. Roberto Méndez</div>
+        <div class="firma-cargo">Gerente de Producción</div>
+      </div>
+    </div>
+    <div class="firma-box">
+      <div style="height: 20px;"></div>
+      <div class="firma-line">
+        <div class="firma-nombre">Ana Flores Méndez</div>
+        <div class="firma-cargo">Jefa de Calidad — Secretaria</div>
+      </div>
+    </div>
+    <div class="firma-box">
+      <div style="height: 20px;"></div>
+      <div class="firma-line">
+        <div class="firma-nombre">Lic. Sofía Castro</div>
+        <div class="firma-cargo">Capital Humano</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>MIN-2026-047 — Generado desde ERP McVill · Módulo Minutas</span>
+    <span>Próxima reunión: Martes 20/05/2026 · 09:00 h · Sala Juntas P1</span>
+    <span>Página 1 de 1</span>
+  </div>
+</div>
+</body>
+</html>

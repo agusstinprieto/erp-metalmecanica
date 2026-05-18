@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Inventario General — McVill MetalMecánica</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #f8fafc; color: #0f172a; font-size: 11px; }
+  .header { background: #1a4a8a; color: white; }
+  .header-top { padding: 12px 20px 10px; display: flex; justify-content: space-between; align-items: center; }
+  .header-title { background: #2563eb; padding: 8px 20px; }
+  .header-title h1 { font-size: 11px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: white; }
+  .company-name { font-size: 14px; font-weight: 900; }
+  .company-sub { font-size: 8px; color: #93c5fd; margin-top: 2px; }
+  .date-info { text-align: right; font-size: 8px; color: #e2e8f0; }
+  .content { padding: 16px 20px; }
+  .kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 16px; }
+  .kpi-card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 8px; text-align: center; }
+  .kpi-label { font-size: 7px; font-weight: 900; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .kpi-value { font-size: 20px; font-weight: 900; }
+  .val-green { color: #10b981; }
+  .val-rose { color: #f43f5e; }
+  .val-amber { color: #f59e0b; }
+  .val-white { color: #0f172a; }
+  .val-violet { color: #7c3aed; }
+  table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 16px; }
+  thead tr { background: #2563eb; color: white; }
+  thead th { padding: 7px 10px; font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.8px; text-align: left; }
+  thead th.right { text-align: right; }
+  thead th.center { text-align: center; }
+  tbody tr:nth-child(even) { background: #f1f5f9; }
+  tbody tr:nth-child(odd) { background: white; }
+  tbody td { padding: 6px 10px; font-size: 9px; color: #0f172a; border-bottom: 1px solid #e2e8f0; }
+  tbody td.right { text-align: right; font-weight: 700; }
+  tbody td.center { text-align: center; }
+  .badge { display: inline-block; padding: 2px 7px; border-radius: 999px; font-size: 7px; font-weight: 900; text-transform: uppercase; }
+  .b-opt { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+  .b-crit { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+  .b-ago { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+  .section-title { font-size: 9px; font-weight: 900; color: #1e3a5f; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 2px solid #2563eb; display: inline-block; }
+  footer { border-top: 1px solid #2563eb; padding: 8px 20px; display: flex; justify-content: space-between; margin-top: 14px; }
+  footer p { font-size: 7px; color: #94a3b8; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="company-name">McVill MetalMecánica S.A. de C.V.</div>
+      <div class="company-sub">METALMECÁNICA • Sistema ERP Industrial</div>
+    </div>
+    <div class="date-info">
+      <div>17 may. 2026</div>
+      <div>07:45 hrs</div>
+    </div>
+  </div>
+  <div class="header-title">
+    <h1>Inventario General McVill — Logística</h1>
+  </div>
+</div>
+
+<div class="content" style="margin-top:14px;">
+
+  <div class="kpi-row">
+    <div class="kpi-card"><div class="kpi-label">Total SKUs</div><div class="kpi-value val-white">312</div></div>
+    <div class="kpi-card"><div class="kpi-label">Valor Inventario</div><div class="kpi-value val-violet" style="font-size:15px">$4.21M</div></div>
+    <div class="kpi-card"><div class="kpi-label">En Nivel Óptimo</div><div class="kpi-value val-green">291</div></div>
+    <div class="kpi-card"><div class="kpi-label">Stock Crítico</div><div class="kpi-value val-amber">18</div></div>
+    <div class="kpi-card"><div class="kpi-label">Agotados</div><div class="kpi-value val-rose">3</div></div>
+  </div>
+
+  <p class="section-title">Inventario de Materia Prima y Consumibles</p>
+  <table>
+    <thead>
+      <tr>
+        <th>SKU</th>
+        <th>Material / Descripción</th>
+        <th>Categoría</th>
+        <th class="center">Stock Actual</th>
+        <th class="center">Unidad</th>
+        <th class="center">Mín. Stock</th>
+        <th class="right">Costo Unit.</th>
+        <th class="right">Valor Total</th>
+        <th>Ubicación</th>
+        <th class="center">Estatus</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>MCM-001</td><td>Placa ASTM A36 3/8" × 4'×8'</td><td>Acero Estructural</td><td class="center">142 pzas</td><td class="center">pza</td><td class="center">20</td><td class="right">$2,840</td><td class="right">$403,280</td><td>Rack-A1</td><td class="center"><span class="badge b-opt">ÓPTIMO</span></td></tr>
+      <tr><td>MCM-002</td><td>Placa ASTM A572 Gr50 1/2" × 4'×8'</td><td>Acero Alta Resistencia</td><td class="center">64 pzas</td><td class="center">pza</td><td class="center">15</td><td class="right">$3,920</td><td class="right">$250,880</td><td>Rack-A2</td><td class="center"><span class="badge b-opt">ÓPTIMO</span></td></tr>
+      <tr><td>MCM-003</td><td>Tubo cuadrado 2"×2"×3mm ASTM A500</td><td>Tubería</td><td class="center">8 pzas</td><td class="center">tramos</td><td class="center">10</td><td class="right">$580</td><td class="right">$4,640</td><td>Rack-B3</td><td class="center"><span class="badge b-crit">CRÍTICO</span></td></tr>
+      <tr><td>MCM-004</td><td>Alambre MIG ER70S-6 0.9mm — carrete 15kg</td><td>Consumible Soldadura</td><td class="center">22 carretes</td><td class="center">carrete</td><td class="center">8</td><td class="right">$1,240</td><td class="right">$27,280</td><td>Almacén-C1</td><td class="center"><span class="badge b-opt">ÓPTIMO</span></td></tr>
+      <tr><td>MCM-005</td><td>Electrodo TIG 2% Torio 1/8" × 7"</td><td>Consumible Soldadura</td><td class="center">0 pzas</td><td class="center">pza</td><td class="center">50</td><td class="right">$48</td><td class="right">$0</td><td>—</td><td class="center"><span class="badge b-ago">AGOTADO</span></td></tr>
+      <tr><td>MCM-006</td><td>Gas Argón 99.999% — cilindro 50L</td><td>Gas Industrial</td><td class="center">7 cilindros</td><td class="center">cil.</td><td class="center">5</td><td class="right">$1,890</td><td class="right">$13,230</td><td>Zona-Gas</td><td class="center"><span class="badge b-opt">ÓPTIMO</span></td></tr>
+      <tr><td>MCM-007</td><td>Aceite de corte CNC Blaser Coolant B 52 — bidón 20L</td><td>Consumible CNC</td><td class="center">3 bids.</td><td class="center">bidón</td><td class="center">4</td><td class="right">$2,100</td><td class="right">$6,300</td><td>Almacén-C2</td><td class="center"><span class="badge b-crit">CRÍTICO</span></td></tr>
+      <tr><td>MCM-008</td><td>Brocas HSS Ø12mm TiN Dormer</td><td>Herramienta Corte</td><td class="center">0 pzas</td><td class="center">pza</td><td class="center">10</td><td class="right">$340</td><td class="right">$0</td><td>—</td><td class="center"><span class="badge b-ago">AGOTADO</span></td></tr>
+      <tr><td>MCM-009</td><td>Pintura anticorrosiva Hempel Hempadur — cubeta 4L</td><td>Acabado Superficial</td><td class="center">18 cubetas</td><td class="center">cubeta</td><td class="center">6</td><td class="right">$890</td><td class="right">$16,020</td><td>Almacén-D1</td><td class="center"><span class="badge b-opt">ÓPTIMO</span></td></tr>
+      <tr><td>MCM-010</td><td>Ángulo acero A36 3" × 3" × 5/16" barra 6m</td><td>Acero Estructural</td><td class="center">4 barras</td><td class="center">barra</td><td class="center">8</td><td class="right">$760</td><td class="right">$3,040</td><td>Rack-A3</td><td class="center"><span class="badge b-crit">CRÍTICO</span></td></tr>
+      <tr><td>MCM-011</td><td>Balineras SKF 6205 ZZ</td><td>Mecánico / Repuesto</td><td class="center">45 pzas</td><td class="center">pza</td><td class="center">10</td><td class="right">$245</td><td class="right">$11,025</td><td>Almacén-E3</td><td class="center"><span class="badge b-opt">ÓPTIMO</span></td></tr>
+      <tr><td>MCM-012</td><td>Disco de corte abrasivo 14" × 3mm Flexovit</td><td>Consumible Corte</td><td class="center">0 pzas</td><td class="center">pza</td><td class="center">24</td><td class="right">$88</td><td class="right">$0</td><td>—</td><td class="center"><span class="badge b-ago">AGOTADO</span></td></tr>
+    </tbody>
+  </table>
+
+  <p class="section-title">Sugerencias de Reabastecimiento Urgente</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Material</th>
+        <th>SKU</th>
+        <th class="center">Stock Actual</th>
+        <th class="center">Stock Mínimo</th>
+        <th class="center">Cantidad a Pedir</th>
+        <th class="center">Urgencia</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Electrodo TIG 2% Torio 1/8"</td><td>MCM-005</td><td class="center val-rose">0 pzas</td><td class="center">50 pzas</td><td class="center">100 pzas</td><td class="center"><span class="badge b-ago">CRÍTICO</span></td></tr>
+      <tr><td>Brocas HSS Ø12mm TiN Dormer</td><td>MCM-008</td><td class="center val-rose">0 pzas</td><td class="center">10 pzas</td><td class="center">30 pzas</td><td class="center"><span class="badge b-ago">CRÍTICO</span></td></tr>
+      <tr><td>Disco de corte 14" Flexovit</td><td>MCM-012</td><td class="center val-rose">0 pzas</td><td class="center">24 pzas</td><td class="center">48 pzas</td><td class="center"><span class="badge b-ago">CRÍTICO</span></td></tr>
+      <tr><td>Aceite de Corte Blaser 20L</td><td>MCM-007</td><td class="center val-amber">3 bids.</td><td class="center">4 bids.</td><td class="center">8 bids.</td><td class="center"><span class="badge b-crit">BAJO</span></td></tr>
+      <tr><td>Tubo cuadrado 2"×2"×3mm</td><td>MCM-003</td><td class="center val-amber">8 tramos</td><td class="center">10 tramos</td><td class="center">20 tramos</td><td class="center"><span class="badge b-crit">BAJO</span></td></tr>
+    </tbody>
+  </table>
+
+</div>
+
+<footer>
+  <p>McVill MetalMecánica S.A. de C.V.  •  Documento de Uso Interno Confidencial</p>
+  <p>Página 1 de 1  |  Generado: 17/05/2026 07:45 hrs</p>
+</footer>
+
+</body>
+</html>

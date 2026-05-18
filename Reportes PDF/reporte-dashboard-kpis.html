@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KPI Ejecutivo — McVill MetalMecánica</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #f8fafc; color: #0f172a; }
+  .header { background: #1a4a8a; color: white; padding: 0; }
+  .header-top { padding: 12px 20px 10px; display: flex; justify-content: space-between; align-items: center; }
+  .header-title { background: #2563eb; padding: 8px 20px; }
+  .header-title h1 { font-size: 11px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: white; }
+  .company-name { font-size: 14px; font-weight: 900; }
+  .company-sub { font-size: 8px; color: #93c5fd; margin-top: 2px; }
+  .date-info { text-align: right; font-size: 8px; color: #e2e8f0; }
+  .content { padding: 20px; }
+  .section { margin-bottom: 18px; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; }
+  .section-header { background: #1e3a5f; color: white; padding: 8px 14px; display: flex; align-items: center; gap: 8px; }
+  .section-header h2 { font-size: 9px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; padding: 14px; background: #f8fafc; }
+  .kpi-card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 8px; text-align: center; }
+  .kpi-label { font-size: 7px; font-weight: 900; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .kpi-value { font-size: 22px; font-weight: 900; letter-spacing: -1px; }
+  .val-white { color: #0f172a; }
+  .val-green { color: #10b981; }
+  .val-blue { color: #2563eb; }
+  .val-amber { color: #f59e0b; }
+  .val-rose { color: #f43f5e; }
+  .val-cyan { color: #06b6d4; }
+  .val-violet { color: #7c3aed; }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+  .dot-orange { background: #f97316; }
+  .dot-violet { background: #7c3aed; }
+  .dot-emerald { background: #10b981; }
+  .dot-cyan { background: #06b6d4; }
+  .dot-pink { background: #ec4899; }
+  footer { border-top: 1px solid #2563eb; padding: 8px 20px; display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+  footer p { font-size: 7px; color: #94a3b8; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 7px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+  .badge-ok { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+  .badge-warn { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+  .badge-crit { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="company-name">McVill MetalMecánica S.A. de C.V.</div>
+      <div class="company-sub">METALMECÁNICA • Sistema ERP Industrial</div>
+    </div>
+    <div class="date-info">
+      <div>17 may. 2026</div>
+      <div>08:45 hrs</div>
+    </div>
+  </div>
+  <div class="header-title">
+    <h1>KPI Ejecutivo Consolidado — Multi-Módulo</h1>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- Producción -->
+  <div class="section">
+    <div class="section-header">
+      <span class="dot dot-orange"></span>
+      <h2>Producción — Órdenes de Trabajo</h2>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-label">OTs Totales</div><div class="kpi-value val-white">87</div></div>
+      <div class="kpi-card"><div class="kpi-label">Completadas</div><div class="kpi-value val-green">54</div></div>
+      <div class="kpi-card"><div class="kpi-label">En Proceso</div><div class="kpi-value val-blue">21</div></div>
+      <div class="kpi-card"><div class="kpi-label">Pendientes</div><div class="kpi-value val-amber">12</div></div>
+      <div class="kpi-card"><div class="kpi-label">% Avance</div><div class="kpi-value val-green">62%</div></div>
+      <div class="kpi-card"><div class="kpi-label">En Retraso</div><div class="kpi-value val-rose">4</div></div>
+    </div>
+  </div>
+
+  <!-- Inventario -->
+  <div class="section">
+    <div class="section-header">
+      <span class="dot dot-violet"></span>
+      <h2>Inventario y Almacén</h2>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-label">Materiales</div><div class="kpi-value val-white">312</div></div>
+      <div class="kpi-card"><div class="kpi-label">Valor Total</div><div class="kpi-value val-violet" style="font-size:16px">$4.2M</div></div>
+      <div class="kpi-card"><div class="kpi-label">Bajo Mínimo</div><div class="kpi-value val-rose">18</div></div>
+      <div class="kpi-card"><div class="kpi-label">Agotados</div><div class="kpi-value val-rose">3</div></div>
+      <div class="kpi-card"><div class="kpi-label">OC Sugeridas</div><div class="kpi-value val-amber">6</div></div>
+      <div class="kpi-card"><div class="kpi-label">Rotación</div><div class="kpi-value val-green">4.1x</div></div>
+    </div>
+  </div>
+
+  <!-- Finanzas -->
+  <div class="section">
+    <div class="section-header">
+      <span class="dot dot-emerald"></span>
+      <h2>Finanzas y Tesorería</h2>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-label">Ingresos Mes</div><div class="kpi-value val-green" style="font-size:15px">$2.87M</div></div>
+      <div class="kpi-card"><div class="kpi-label">Gastos Mes</div><div class="kpi-value val-rose" style="font-size:15px">$1.94M</div></div>
+      <div class="kpi-card"><div class="kpi-label">Balance</div><div class="kpi-value val-green" style="font-size:15px">$931k</div></div>
+      <div class="kpi-card"><div class="kpi-label">CxC Pend.</div><div class="kpi-value val-blue" style="font-size:15px">$680k</div></div>
+      <div class="kpi-card"><div class="kpi-label">CxC Vencido</div><div class="kpi-value val-rose" style="font-size:15px">$142k</div></div>
+      <div class="kpi-card"><div class="kpi-label">CxP Crítico</div><div class="kpi-value val-rose" style="font-size:15px">$89k</div></div>
+    </div>
+  </div>
+
+  <!-- Calidad -->
+  <div class="section">
+    <div class="section-header">
+      <span class="dot dot-cyan"></span>
+      <h2>Calidad SGC — Six Sigma</h2>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-label">Inspecciones</div><div class="kpi-value val-white">148</div></div>
+      <div class="kpi-card"><div class="kpi-label">Tasa de Pase</div><div class="kpi-value val-green">97.3%</div></div>
+      <div class="kpi-card"><div class="kpi-label">NCs Abiertas</div><div class="kpi-value val-rose">5</div></div>
+      <div class="kpi-card"><div class="kpi-label">Auditorías</div><div class="kpi-value val-white">3</div></div>
+      <div class="kpi-card"><div class="kpi-label">PPAPs Activos</div><div class="kpi-value val-blue">4</div></div>
+      <div class="kpi-card"><div class="kpi-label">Nivel Sigma</div><div class="kpi-value val-green">3.8σ</div></div>
+    </div>
+  </div>
+
+  <!-- Capital Humano -->
+  <div class="section">
+    <div class="section-header">
+      <span class="dot dot-pink"></span>
+      <h2>Capital Humano — Nómina</h2>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-label">Reg. Nómina</div><div class="kpi-value val-white">62</div></div>
+      <div class="kpi-card"><div class="kpi-label">Bruto Total</div><div class="kpi-value" style="color:#ec4899; font-size:14px">$1.24M</div></div>
+      <div class="kpi-card"><div class="kpi-label">Neto Total</div><div class="kpi-value val-green" style="font-size:14px">$964k</div></div>
+      <div class="kpi-card"><div class="kpi-label">Asistencia</div><div class="kpi-value val-green">94.1%</div></div>
+      <div class="kpi-card"><div class="kpi-label">Retardos Hoy</div><div class="kpi-value val-amber">3</div></div>
+      <div class="kpi-card"><div class="kpi-label">Ausentes Hoy</div><div class="kpi-value val-rose">2</div></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p>McVill MetalMecánica S.A. de C.V.  •  Documento de Uso Interno Confidencial</p>
+  <p>Página 1 de 1  |  Generado: 17/05/2026 08:45 hrs</p>
+</footer>
+
+</body>
+</html>

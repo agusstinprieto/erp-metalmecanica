@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Reporte HSE — Seguridad Industrial — McVill MetalMecánica</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #f8fafc; color: #0f172a; font-size: 11px; }
+  .header { background: #1a4a8a; color: white; }
+  .header-top { padding: 12px 20px 10px; display: flex; justify-content: space-between; align-items: center; }
+  .header-title { background: #2563eb; padding: 8px 20px; }
+  .header-title h1 { font-size: 11px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: white; }
+  .company-name { font-size: 14px; font-weight: 900; }
+  .company-sub { font-size: 8px; color: #93c5fd; margin-top: 2px; }
+  .date-info { text-align: right; font-size: 8px; color: #e2e8f0; }
+  .content { padding: 16px 20px; }
+  .kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 16px; }
+  .kpi-card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 10px; text-align: center; }
+  .kpi-label { font-size: 7px; font-weight: 900; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .kpi-value { font-size: 20px; font-weight: 900; }
+  .val-green { color: #10b981; }
+  .val-rose { color: #f43f5e; }
+  .val-amber { color: #f59e0b; }
+  .val-white { color: #0f172a; }
+  .val-blue { color: #2563eb; }
+  table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 16px; }
+  thead tr { background: #2563eb; color: white; }
+  thead th { padding: 7px 10px; font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.8px; text-align: left; }
+  thead th.center { text-align: center; }
+  tbody tr:nth-child(even) { background: #f1f5f9; }
+  tbody tr:nth-child(odd) { background: white; }
+  tbody td { padding: 6px 10px; font-size: 9px; color: #0f172a; border-bottom: 1px solid #e2e8f0; }
+  tbody td.center { text-align: center; }
+  .badge { display: inline-block; padding: 2px 7px; border-radius: 999px; font-size: 7px; font-weight: 900; text-transform: uppercase; }
+  .b-green { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+  .b-amber { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+  .b-rose { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+  .b-blue { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+  .section-title { font-size: 9px; font-weight: 900; color: #1e3a5f; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 2px solid #2563eb; display: inline-block; }
+  .alert-box { background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; }
+  .alert-box .alert-title { font-size: 8px; font-weight: 900; color: #92400e; text-transform: uppercase; margin-bottom: 4px; }
+  .alert-box p { font-size: 8px; color: #78350f; line-height: 1.6; }
+  footer { border-top: 1px solid #2563eb; padding: 8px 20px; display: flex; justify-content: space-between; margin-top: 14px; }
+  footer p { font-size: 7px; color: #94a3b8; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="company-name">McVill MetalMecánica S.A. de C.V.</div>
+      <div class="company-sub">METALMECÁNICA • Sistema ERP Industrial</div>
+    </div>
+    <div class="date-info">
+      <div>17 may. 2026</div>
+      <div>07:30 hrs</div>
+    </div>
+  </div>
+  <div class="header-title">
+    <h1>Bitácora de Incidentes y Auditoría HSE Control — Seguridad Industrial</h1>
+  </div>
+</div>
+
+<div class="content" style="margin-top:14px;">
+
+  <div class="kpi-row">
+    <div class="kpi-card"><div class="kpi-label">Días sin Accidentes</div><div class="kpi-value val-green">47</div></div>
+    <div class="kpi-card"><div class="kpi-label">Incidentes Mes</div><div class="kpi-value val-amber">3</div></div>
+    <div class="kpi-card"><div class="kpi-label">Incidentes Graves</div><div class="kpi-value val-rose">0</div></div>
+    <div class="kpi-card"><div class="kpi-label">Certs. Vigentes</div><div class="kpi-value val-green">28</div></div>
+    <div class="kpi-card"><div class="kpi-label">Certs. Vencidas</div><div class="kpi-value val-rose">4</div></div>
+  </div>
+
+  <div class="alert-box">
+    <div class="alert-title">Alerta — Certificaciones Próximas a Vencer (30 días)</div>
+    <p>• <strong>Operador Grúa Puente</strong> — Luis A. Pedroza — Vence 01/06/2026 — Renovar ante STPS<br>
+       • <strong>Soldador AWS D1.1</strong> — Miguel Á. Cortés — Vence 05/06/2026 — Programar recalificación<br>
+       • <strong>Curso IMSS SIPA</strong> — Grupo 4 Turno Noche — Vence 12/06/2026 — Coordinar con RH</p>
+  </div>
+
+  <p class="section-title">Bitácora de Incidentes — Mayo 2026</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Folio</th>
+        <th>Fecha</th>
+        <th>Área / Máquina</th>
+        <th>Descripción del Incidente</th>
+        <th>Involucrado</th>
+        <th class="center">Severidad</th>
+        <th>Acción Inmediata</th>
+        <th class="center">Estatus</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>INC-2026-014</td>
+        <td>08/05/2026</td>
+        <td>Soldadura — Celda 3</td>
+        <td>Quemadura leve mano derecha por salpicadura de soldadura MIG. Falta de uso de guante reforzado.</td>
+        <td>Pedro García L.</td>
+        <td class="center"><span class="badge b-amber">LEVE</span></td>
+        <td>Atención médica, refuerzo EPP, reentrenamiento.</td>
+        <td class="center"><span class="badge b-green">CERRADO</span></td>
+      </tr>
+      <tr>
+        <td>INC-2026-012</td>
+        <td>05/05/2026</td>
+        <td>Almacén — Rack A3</td>
+        <td>Caída de material (tubo 2" × 6m) desde estante. Golpe en bota de seguridad sin daño personal.</td>
+        <td>Juan E. Ramírez</td>
+        <td class="center"><span class="badge b-amber">LEVE</span></td>
+        <td>Asegurar material en rack, inspección de estantería.</td>
+        <td class="center"><span class="badge b-green">CERRADO</span></td>
+      </tr>
+      <tr>
+        <td>INC-2026-009</td>
+        <td>29/04/2026</td>
+        <td>CNC Mazak — Área 1</td>
+        <td>Derrame menor de aceite de corte — 5 litros. Sin contacto personal. Limpieza inmediata.</td>
+        <td>Área / Sin personal</td>
+        <td class="center"><span class="badge b-blue">AMBIENTAL</span></td>
+        <td>Limpieza con adsorbente, revisión de manguera hidráulica.</td>
+        <td class="center"><span class="badge b-green">CERRADO</span></td>
+      </tr>
+      <tr>
+        <td>INC-2026-007</td>
+        <td>22/04/2026</td>
+        <td>Corte Láser — Sala 2</td>
+        <td>Falta de lentes de protección durante cambio de piezas en zona de riesgo óptico.</td>
+        <td>Claudia V. Mora</td>
+        <td class="center"><span class="badge b-amber">LEVE</span></td>
+        <td>Llamada de atención formal, reentrenamiento obligatorio.</td>
+        <td class="center"><span class="badge b-green">CERRADO</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="section-title">Certificaciones HSE Activas</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Empleado</th>
+        <th>Tipo de Certificación / Normativa</th>
+        <th class="center">Fecha Obtención</th>
+        <th class="center">Fecha Vencimiento</th>
+        <th class="center">Organismo</th>
+        <th class="center">Estatus</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Carlos Ramírez Soto</td><td>Operador CNC — ISO 9001:2015 Alineado</td><td class="center">15/01/2025</td><td class="center">15/01/2027</td><td class="center">IMMCO</td><td class="center"><span class="badge b-green">VIGENTE</span></td></tr>
+      <tr><td>Miguel Á. Cortés</td><td>Soldador AWS D1.1 / Structural Welding</td><td class="center">05/06/2024</td><td class="center">05/06/2026</td><td class="center">AWS</td><td class="center"><span class="badge b-amber">POR VENCER</span></td></tr>
+      <tr><td>Ana L. Hernández</td><td>Inspector de Calidad CMQI / ASQ</td><td class="center">20/03/2024</td><td class="center">20/03/2027</td><td class="center">ASQ</td><td class="center"><span class="badge b-green">VIGENTE</span></td></tr>
+      <tr><td>Luis A. Pedroza</td><td>Operador Grúa Puente — STPS NOM-006</td><td class="center">01/06/2023</td><td class="center">01/06/2026</td><td class="center">STPS</td><td class="center"><span class="badge b-rose">VENCE 16D</span></td></tr>
+      <tr><td>Roberto M. Cárdenas</td><td>Mecánico Industrial — ISO 55001 Mantenimiento</td><td class="center">10/08/2024</td><td class="center">10/08/2026</td><td class="center">ICONTEC</td><td class="center"><span class="badge b-green">VIGENTE</span></td></tr>
+      <tr><td>Sofía R. Montoya</td><td>Auditor Interno ISO 9001 y ISO 14001</td><td class="center">11/11/2024</td><td class="center">11/11/2026</td><td class="center">BUREAU VERITAS</td><td class="center"><span class="badge b-green">VIGENTE</span></td></tr>
+    </tbody>
+  </table>
+
+</div>
+
+<footer>
+  <p>McVill MetalMecánica S.A. de C.V.  •  Documento de Uso Interno Confidencial</p>
+  <p>Página 1 de 1  |  Generado: 17/05/2026 07:30 hrs</p>
+</footer>
+
+</body>
+</html>

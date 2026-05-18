@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Flujo de Caja Proyectado — Finanzas — McVill MetalMecánica</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #f8fafc; color: #0f172a; font-size: 11px; }
+  .header { background: #1a4a8a; color: white; }
+  .header-top { padding: 12px 20px 10px; display: flex; justify-content: space-between; align-items: center; }
+  .header-title { background: #2563eb; padding: 8px 20px; }
+  .header-title h1 { font-size: 11px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: white; }
+  .company-name { font-size: 14px; font-weight: 900; }
+  .company-sub { font-size: 8px; color: #93c5fd; margin-top: 2px; }
+  .date-info { text-align: right; font-size: 8px; color: #e2e8f0; }
+  .content { padding: 16px 20px; }
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+  .kpi-card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 10px; }
+  .kpi-label { font-size: 7px; font-weight: 900; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .kpi-value { font-size: 20px; font-weight: 900; }
+  .val-green { color: #10b981; }
+  .val-rose { color: #f43f5e; }
+  .val-amber { color: #f59e0b; }
+  .val-blue { color: #2563eb; }
+  table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 16px; }
+  thead tr { background: #2563eb; color: white; }
+  thead th { padding: 7px 10px; font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.8px; text-align: left; }
+  thead th.right { text-align: right; }
+  thead th.center { text-align: center; }
+  tbody tr:nth-child(even) { background: #f1f5f9; }
+  tbody tr:nth-child(odd) { background: white; }
+  tbody td { padding: 7px 10px; font-size: 9px; color: #0f172a; border-bottom: 1px solid #e2e8f0; }
+  tbody td.right { text-align: right; font-weight: 700; }
+  tbody td.center { text-align: center; }
+  .badge { display: inline-block; padding: 2px 7px; border-radius: 999px; font-size: 7px; font-weight: 900; text-transform: uppercase; }
+  .b-green { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+  .b-rose { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+  .b-amber { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+  .b-blue { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+  .section-title { font-size: 9px; font-weight: 900; color: #1e3a5f; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 2px solid #2563eb; display: inline-block; }
+  .chart-bar { display: flex; align-items: flex-end; gap: 6px; height: 80px; margin: 14px 0; }
+  .bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .bar { width: 100%; border-radius: 3px 3px 0 0; }
+  .bar-label { font-size: 7px; font-weight: 700; color: #64748b; text-align: center; margin-top: 2px; }
+  .bar-val { font-size: 7px; font-weight: 900; text-align: center; }
+  footer { border-top: 1px solid #2563eb; padding: 8px 20px; display: flex; justify-content: space-between; margin-top: 14px; }
+  footer p { font-size: 7px; color: #94a3b8; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="company-name">McVill MetalMecánica S.A. de C.V.</div>
+      <div class="company-sub">METALMECÁNICA • Sistema ERP Industrial</div>
+    </div>
+    <div class="date-info">
+      <div>17 may. 2026</div>
+      <div>09:15 hrs</div>
+    </div>
+  </div>
+  <div class="header-title">
+    <h1>Flujo de Caja Proyectado — Finanzas y Tesorería — FISCAL-PRO</h1>
+  </div>
+</div>
+
+<div class="content" style="margin-top:14px;">
+
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <div class="kpi-label">Por Cobrar (CxC)</div>
+      <div class="kpi-value val-blue">$680k</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">CxC Vencido</div>
+      <div class="kpi-value val-rose">$142k</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Por Pagar (CxP)</div>
+      <div class="kpi-value val-amber">$390k</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Posición Neta 30d</div>
+      <div class="kpi-value val-green">+$290k</div>
+    </div>
+  </div>
+
+  <p class="section-title">Flujo de Caja Proyectado — 4 Semanas</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Semana</th>
+        <th>Periodo</th>
+        <th class="right">Cobros Proyectados</th>
+        <th class="right">Pagos Proyectados</th>
+        <th class="right">Flujo Neto</th>
+        <th class="center">Posición</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Sem 1</strong></td><td>19–23 Mayo</td>
+        <td class="right val-green">$245,000</td>
+        <td class="right val-rose">$168,400</td>
+        <td class="right"><strong>+$76,600</strong></td>
+        <td class="center"><span class="badge b-green">POSITIVO</span></td>
+      </tr>
+      <tr>
+        <td><strong>Sem 2</strong></td><td>26–30 Mayo</td>
+        <td class="right val-green">$310,000</td>
+        <td class="right val-rose">$221,000</td>
+        <td class="right"><strong>+$89,000</strong></td>
+        <td class="center"><span class="badge b-green">POSITIVO</span></td>
+      </tr>
+      <tr>
+        <td><strong>Sem 3</strong></td><td>2–6 Junio</td>
+        <td class="right val-green">$125,000</td>
+        <td class="right val-rose">$312,500</td>
+        <td class="right" style="color:#f43f5e"><strong>-$187,500</strong></td>
+        <td class="center"><span class="badge b-rose">NEGATIVO</span></td>
+      </tr>
+      <tr>
+        <td><strong>Sem 4</strong></td><td>9–13 Junio</td>
+        <td class="right val-green">$420,000</td>
+        <td class="right val-rose">$108,000</td>
+        <td class="right"><strong>+$312,000</strong></td>
+        <td class="center"><span class="badge b-green">POSITIVO</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="section-title">Cuentas por Cobrar (CxC) — Detalle</p>
+  <table>
+    <thead>
+      <tr>
+        <th>No. Factura</th>
+        <th>Cliente</th>
+        <th>Concepto</th>
+        <th class="right">Monto</th>
+        <th class="right">Saldo Pend.</th>
+        <th class="center">Vencimiento</th>
+        <th class="center">Días Rest.</th>
+        <th class="center">Estatus</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>FAC-2026-0421</td><td>PEMEX E&P</td><td>Soportes Plataforma — OT-0487</td><td class="right">$306,008</td><td class="right val-amber">$306,008</td><td class="center">30/05/2026</td><td class="center">13</td><td class="center"><span class="badge b-amber">PENDIENTE</span></td></tr>
+      <tr><td>FAC-2026-0398</td><td>CEMEX Concretos</td><td>Estructura metálica nave — OT-0412</td><td class="right">$184,500</td><td class="right val-green">$92,250</td><td class="center">20/05/2026</td><td class="center">3</td><td class="center"><span class="badge b-blue">PARCIAL</span></td></tr>
+      <tr><td>FAC-2026-0371</td><td>Grupo ALFA</td><td>Maquinado de precisión CNC</td><td class="right">$78,400</td><td class="right val-rose">$78,400</td><td class="center">10/05/2026</td><td class="center">-7</td><td class="center"><span class="badge b-rose">VENCIDA</span></td></tr>
+      <tr><td>FAC-2026-0345</td><td>ICA Industrial</td><td>Corte láser y doblado</td><td class="right">$63,700</td><td class="right val-rose">$63,700</td><td class="center">05/05/2026</td><td class="center">-12</td><td class="center"><span class="badge b-rose">VENCIDA</span></td></tr>
+    </tbody>
+  </table>
+
+  <p class="section-title">Cuentas por Pagar (CxP) — Detalle</p>
+  <table>
+    <thead>
+      <tr>
+        <th>No. Factura Prov.</th>
+        <th>Proveedor</th>
+        <th>Concepto</th>
+        <th class="right">Monto</th>
+        <th class="right">Saldo Pend.</th>
+        <th class="center">Vencimiento</th>
+        <th class="center">Prioridad</th>
+        <th class="center">Estatus</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>PROV-A241</td><td>Aceros Monterrey SA</td><td>Placa A36 — OC-2026-0182</td><td class="right">$248,400</td><td class="right">$248,400</td><td class="center">22/05/2026</td><td class="center"><span class="badge b-rose">CRÍTICA</span></td><td class="center"><span class="badge b-amber">PENDIENTE</span></td></tr>
+      <tr><td>PROV-B089</td><td>Gases Industriales del Norte</td><td>Suministro gases industriales Mayo</td><td class="right">$42,800</td><td class="right">$42,800</td><td class="center">31/05/2026</td><td class="center"><span class="badge b-amber">ALTA</span></td><td class="center"><span class="badge b-amber">PENDIENTE</span></td></tr>
+      <tr><td>PROV-C312</td><td>Herramental Industrial MX</td><td>Brocas, fresas, insertos CNC</td><td class="right">$31,200</td><td class="right">$31,200</td><td class="center">28/05/2026</td><td class="center"><span class="badge b-blue">NORMAL</span></td><td class="center"><span class="badge b-amber">PENDIENTE</span></td></tr>
+      <tr><td>PROV-D047</td><td>Consumibles Soldadura SA</td><td>Alambres MIG y electrodos</td><td class="right">$18,600</td><td class="right">$9,300</td><td class="center">25/05/2026</td><td class="center"><span class="badge b-blue">NORMAL</span></td><td class="center"><span class="badge b-blue">PARCIAL</span></td></tr>
+    </tbody>
+  </table>
+
+</div>
+
+<footer>
+  <p>McVill MetalMecánica S.A. de C.V.  •  Documento de Uso Interno Confidencial</p>
+  <p>Página 1 de 1  |  Generado: 17/05/2026 09:15 hrs</p>
+</footer>
+
+</body>
+</html>

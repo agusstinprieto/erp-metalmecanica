@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Reporte de Ausentismo — Control de Asistencia — McVill MetalMecánica</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #f8fafc; color: #0f172a; font-size: 11px; }
+  .header { background: #1a4a8a; color: white; }
+  .header-top { padding: 12px 20px 10px; display: flex; justify-content: space-between; align-items: center; }
+  .header-title { background: #2563eb; padding: 8px 20px; }
+  .header-title h1 { font-size: 11px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: white; }
+  .company-name { font-size: 14px; font-weight: 900; }
+  .company-sub { font-size: 8px; color: #93c5fd; margin-top: 2px; }
+  .date-info { text-align: right; font-size: 8px; color: #e2e8f0; }
+  .content { padding: 16px 20px; }
+  .kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 16px; }
+  .kpi-card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 8px; text-align: center; }
+  .kpi-label { font-size: 7px; font-weight: 900; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .kpi-value { font-size: 20px; font-weight: 900; }
+  .val-green { color: #10b981; }
+  .val-rose { color: #f43f5e; }
+  .val-amber { color: #f59e0b; }
+  .val-white { color: #0f172a; }
+  .val-blue { color: #2563eb; }
+  .val-purple { color: #7c3aed; }
+  table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 16px; }
+  thead tr { background: #2563eb; color: white; }
+  thead th { padding: 7px 10px; font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.8px; text-align: left; }
+  thead th.center { text-align: center; }
+  tbody tr:nth-child(even) { background: #f1f5f9; }
+  tbody tr:nth-child(odd) { background: white; }
+  tbody td { padding: 6px 10px; font-size: 9px; color: #0f172a; border-bottom: 1px solid #e2e8f0; }
+  tbody td.center { text-align: center; }
+  .badge { display: inline-block; padding: 2px 7px; border-radius: 999px; font-size: 7px; font-weight: 900; text-transform: uppercase; }
+  .b-green { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+  .b-amber { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+  .b-rose { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+  .b-blue { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+  .section-title { font-size: 9px; font-weight: 900; color: #1e3a5f; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 2px solid #2563eb; display: inline-block; }
+  .prog-bar { width: 100%; height: 6px; background: #e2e8f0; border-radius: 999px; overflow: hidden; margin-top: 3px; }
+  .prog-fill { height: 100%; border-radius: 999px; }
+  .prog-green { background: #10b981; }
+  .prog-amber { background: #f59e0b; }
+  .prog-rose { background: #f43f5e; }
+  footer { border-top: 1px solid #2563eb; padding: 8px 20px; display: flex; justify-content: space-between; margin-top: 14px; }
+  footer p { font-size: 7px; color: #94a3b8; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="company-name">McVill MetalMecánica S.A. de C.V.</div>
+      <div class="company-sub">METALMECÁNICA • Sistema ERP Industrial</div>
+    </div>
+    <div class="date-info">
+      <div>17 may. 2026</div>
+      <div>07:00 hrs</div>
+    </div>
+  </div>
+  <div class="header-title">
+    <h1>Reporte de Ausentismo — 11/May/2026 al 17/May/2026 — Capital Humano</h1>
+  </div>
+</div>
+
+<div class="content" style="margin-top:14px;">
+
+  <div class="kpi-row">
+    <div class="kpi-card"><div class="kpi-label">Presentes Hoy</div><div class="kpi-value val-green">57</div></div>
+    <div class="kpi-card"><div class="kpi-label">Retardos Hoy</div><div class="kpi-value val-amber">3</div></div>
+    <div class="kpi-card"><div class="kpi-label">Ausentes Hoy</div><div class="kpi-value val-rose">2</div></div>
+    <div class="kpi-card"><div class="kpi-label">Sin Check-Out</div><div class="kpi-value val-amber">1</div></div>
+    <div class="kpi-card"><div class="kpi-label">Horas Extra</div><div class="kpi-value val-purple">24.5h</div></div>
+  </div>
+
+  <p class="section-title">Reporte de Ausentismo por Colaborador — Semana 11-17 Mayo 2026</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Colaborador</th>
+        <th>Depto.</th>
+        <th class="center">Días Reg.</th>
+        <th class="center">Presentes</th>
+        <th class="center">Faltas</th>
+        <th class="center">Retardos</th>
+        <th class="center">Sin C/O</th>
+        <th class="center">% Asist.</th>
+        <th class="center">Tendencia</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Carlos Ramírez Soto</td><td>CNC</td><td class="center">5</td><td class="center">5</td><td class="center">0</td><td class="center">0</td><td class="center">0</td>
+        <td class="center"><strong class="val-green">100%</strong></td>
+        <td><div class="prog-bar"><div class="prog-fill prog-green" style="width:100%"></div></div></td>
+      </tr>
+      <tr>
+        <td>José Luis Villanueva</td><td>Soldadura</td><td class="center">5</td><td class="center">4</td><td class="center">1</td><td class="center">0</td><td class="center">0</td>
+        <td class="center"><strong class="val-amber">80%</strong></td>
+        <td><div class="prog-bar"><div class="prog-fill prog-amber" style="width:80%"></div></div></td>
+      </tr>
+      <tr>
+        <td>Miguel Ángel Cortés</td><td>Láser</td><td class="center">5</td><td class="center">5</td><td class="center">0</td><td class="center">2</td><td class="center">0</td>
+        <td class="center"><strong class="val-green">100%</strong></td>
+        <td><div class="prog-bar"><div class="prog-fill prog-green" style="width:100%"></div></div></td>
+      </tr>
+      <tr>
+        <td>Pedro García Lozano</td><td>Soldadura</td><td class="center">5</td><td class="center">4</td><td class="center">0</td><td class="center">1</td><td class="center">1</td>
+        <td class="center"><strong class="val-green">80%</strong></td>
+        <td><div class="prog-bar"><div class="prog-fill prog-amber" style="width:80%"></div></div></td>
+      </tr>
+      <tr>
+        <td>Eduardo Pérez Garza</td><td>CNC</td><td class="center">5</td><td class="center">3</td><td class="center">2</td><td class="center">0</td><td class="center">0</td>
+        <td class="center"><strong class="val-rose">60%</strong></td>
+        <td><div class="prog-bar"><div class="prog-fill prog-rose" style="width:60%"></div></div></td>
+      </tr>
+      <tr>
+        <td>Ana Lucía Hernández</td><td>Calidad</td><td class="center">5</td><td class="center">5</td><td class="center">0</td><td class="center">0</td><td class="center">0</td>
+        <td class="center"><strong class="val-green">100%</strong></td>
+        <td><div class="prog-bar"><div class="prog-fill prog-green" style="width:100%"></div></div></td>
+      </tr>
+      <tr>
+        <td>Roberto Mendoza Cárdenas</td><td>Mtto</td><td class="center">5</td><td class="center">5</td><td class="center">0</td><td class="center">0</td><td class="center">0</td>
+        <td class="center"><strong class="val-green">100%</strong></td>
+        <td><div class="prog-bar"><div class="prog-fill prog-green" style="width:100%"></div></div></td>
+      </tr>
+      <tr>
+        <td>Laura Beatriz Salinas</td><td>Ingeniería</td><td class="center">5</td><td class="center">5</td><td class="center">0</td><td class="center">0</td><td class="center">0</td>
+        <td class="center"><strong class="val-green">100%</strong></td>
+        <td><div class="prog-bar"><div class="prog-fill prog-green" style="width:100%"></div></div></td>
+      </tr>
+      <tr>
+        <td>Claudia Vidal Mora</td><td>Láser</td><td class="center">5</td><td class="center">4</td><td class="center">1</td><td class="center">0</td><td class="center">0</td>
+        <td class="center"><strong class="val-amber">80%</strong></td>
+        <td><div class="prog-bar"><div class="prog-fill prog-amber" style="width:80%"></div></div></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="section-title">Registro de Anomalías del Día — 17 Mayo 2026</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Empleado</th>
+        <th>Turno</th>
+        <th class="center">Entrada</th>
+        <th class="center">Salida</th>
+        <th class="center">Hrs Trabajadas</th>
+        <th class="center">Horas Extra</th>
+        <th class="center">Anomalía</th>
+        <th class="center">Estatus</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Miguel Ángel Cortés</td><td>Matutino 6-14h</td><td class="center">06:24</td><td class="center">14:00</td><td class="center">7h 36m</td><td class="center">0</td><td class="center"><span class="badge b-amber">RETARDO</span></td><td class="center"><span class="badge b-blue">PRESENTE</span></td></tr>
+      <tr><td>Pedro García Lozano</td><td>Matutino 6-14h</td><td class="center">06:18</td><td class="center">—</td><td class="center">—</td><td class="center">0</td><td class="center"><span class="badge b-rose">SIN C/O</span></td><td class="center"><span class="badge b-amber">INCOMPLETO</span></td></tr>
+      <tr><td>Eduardo Pérez Garza</td><td>Matutino 6-14h</td><td class="center">—</td><td class="center">—</td><td class="center">0</td><td class="center">0</td><td class="center"><span class="badge b-rose">AUSENTE</span></td><td class="center"><span class="badge b-rose">AUSENTE</span></td></tr>
+      <tr><td>José Luis Villanueva</td><td>Matutino 6-14h</td><td class="center">—</td><td class="center">—</td><td class="center">0</td><td class="center">0</td><td class="center"><span class="badge b-rose">AUSENTE</span></td><td class="center"><span class="badge b-rose">AUSENTE</span></td></tr>
+      <tr><td>Carlos Ramírez Soto</td><td>Matutino 6-14h</td><td class="center">06:01</td><td class="center">16:45</td><td class="center">10h 44m</td><td class="center">2.75h</td><td class="center"><span class="badge b-amber">TIEMPO EXTRA</span></td><td class="center"><span class="badge b-green">PRESENTE</span></td></tr>
+    </tbody>
+  </table>
+
+</div>
+
+<footer>
+  <p>McVill MetalMecánica S.A. de C.V.  •  Documento de Uso Interno Confidencial</p>
+  <p>Página 1 de 1  |  Generado: 17/05/2026 07:00 hrs</p>
+</footer>
+
+</body>
+</html>

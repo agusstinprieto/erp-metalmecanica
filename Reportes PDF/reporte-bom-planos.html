@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>BOM — Extracción de Plano IA — McVill ERP</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; color: #1a202c; }
+  .page { max-width: 900px; margin: 0 auto; background: white; min-height: 100vh; }
+
+  .header { background: linear-gradient(135deg, #0f172a 0%, #0c1a2e 100%); color: white; padding: 36px 48px; position: relative; overflow: hidden; }
+  .header::before { content: ''; position: absolute; top: -40px; right: -60px; width: 240px; height: 240px; border-radius: 50%; background: rgba(6,182,212,0.1); }
+  .header-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .logo-area { display: flex; align-items: center; gap: 16px; }
+  .logo-box { width: 52px; height: 52px; background: rgba(6,182,212,0.2); border: 1px solid rgba(6,182,212,0.4); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .company-name { font-size: 24px; font-weight: 900; }
+  .company-sub { font-size: 9px; font-weight: 700; letter-spacing: 4px; color: #67e8f9; text-transform: uppercase; margin-top: 2px; }
+  .report-meta { text-align: right; }
+  .report-type { font-size: 10px; font-weight: 700; letter-spacing: 4px; color: #67e8f9; text-transform: uppercase; }
+  .report-title { font-size: 26px; font-weight: 900; letter-spacing: -1px; margin-top: 4px; }
+  .report-sub { font-size: 11px; color: #a5f3fc; margin-top: 4px; }
+  .header-divider { margin-top: 24px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; gap: 36px; }
+  .meta-item label { font-size: 8px; font-weight: 700; letter-spacing: 3px; color: #64748b; text-transform: uppercase; display: block; }
+  .meta-item span { font-size: 13px; font-weight: 700; color: white; margin-top: 2px; display: block; }
+
+  .ai-banner { background: linear-gradient(135deg, #083344, #0e4f5f); border-bottom: 1px solid rgba(6,182,212,0.3); padding: 16px 48px; display: flex; align-items: center; gap: 16px; }
+  .ai-icon { width: 40px; height: 40px; background: rgba(6,182,212,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .ai-text { font-size: 11px; color: #a5f3fc; line-height: 1.6; }
+  .ai-text strong { color: #67e8f9; }
+
+  .summary-row { background: #f8fafc; padding: 20px 48px; display: flex; gap: 0; border-bottom: 1px solid #e2e8f0; }
+  .summary-item { flex: 1; padding: 8px 0; text-align: center; border-right: 1px solid #e2e8f0; }
+  .summary-item:last-child { border-right: none; }
+  .summary-label { font-size: 8px; font-weight: 700; letter-spacing: 3px; color: #94a3b8; text-transform: uppercase; }
+  .summary-value { font-size: 22px; font-weight: 900; color: #0e7490; margin-top: 4px; }
+
+  .content { padding: 40px 48px; }
+  .section-title { font-size: 10px; font-weight: 800; letter-spacing: 4px; color: #475569; text-transform: uppercase; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0; }
+
+  table { width: 100%; border-collapse: collapse; margin-bottom: 32px; }
+  thead tr { background: #ecfeff; }
+  th { font-size: 8px; font-weight: 800; letter-spacing: 3px; color: #0e7490; text-transform: uppercase; padding: 12px 14px; text-align: left; border-bottom: 2px solid #cffafe; }
+  td { font-size: 11px; padding: 11px 14px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+  tr:nth-child(even) td { background: #f8fafc; }
+  tr:hover td { background: #ecfeff; }
+  .num { font-family: 'Courier New', monospace; font-weight: 700; color: #0e7490; text-align: center; }
+  .component { font-weight: 800; color: #0c4a6e; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; }
+  .qty { font-family: 'Courier New', monospace; font-weight: 900; color: #0e7490; text-align: center; font-size: 14px; }
+  .unit { display: inline-flex; align-items: center; justify-content: center; background: #e0f2fe; color: #0369a1; border-radius: 6px; padding: 2px 8px; font-size: 9px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; }
+  .notes { font-size: 10px; color: #64748b; font-style: italic; }
+
+  .totals-box { background: linear-gradient(135deg, #ecfeff, #e0f2fe); border: 1px solid #bae6fd; border-radius: 14px; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+  .totals-label { font-size: 11px; font-weight: 700; color: #0369a1; }
+  .totals-value { font-size: 28px; font-weight: 900; color: #0c4a6e; }
+
+  .actions-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 20px 24px; display: flex; align-items: center; gap: 16px; }
+  .actions-icon { font-size: 28px; }
+  .actions-text { font-size: 11px; color: #475569; line-height: 1.6; }
+  .actions-text strong { color: #0c4a6e; }
+
+  .footer { padding: 20px 48px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+  .footer-left { font-size: 10px; color: #94a3b8; }
+  .footer-right { font-size: 9px; color: #cbd5e1; font-family: monospace; }
+
+  @media print {
+    body { background: white; }
+    .page { max-width: none; }
+    .ai-banner, .header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="logo-area">
+        <div class="logo-box">🔵</div>
+        <div>
+          <div class="company-name">McVill</div>
+          <div class="company-sub">Ingeniería · Vision AI</div>
+        </div>
+      </div>
+      <div class="report-meta">
+        <div class="report-type">Ingeniería · BOM</div>
+        <div class="report-title">Lista de Materiales</div>
+        <div class="report-sub">Extraída automáticamente de plano técnico</div>
+      </div>
+    </div>
+    <div class="header-divider">
+      <div class="meta-item"><label>Proyecto</label><span>PROJ-2026-041</span></div>
+      <div class="meta-item"><label>Plano analizado</label><span>conjunto_valvula_hidraulica_v3.pdf</span></div>
+      <div class="meta-item"><label>Fecha extracción</label><span>17 Mayo 2026 · 10:15</span></div>
+      <div class="meta-item"><label>Ingeniero</label><span>Ing. Martínez — CAD/CAM</span></div>
+    </div>
+  </div>
+
+  <div class="ai-banner">
+    <div class="ai-icon">🧠</div>
+    <div class="ai-text">
+      <strong>Vision Planos AI</strong> — Lista de materiales extraída automáticamente mediante análisis de imagen con IA neural.<br>
+      Verificar contra plano original antes de procesar órdenes de compra. Tolerancia de lectura OCR: ±2% en cantidades numéricas.
+    </div>
+  </div>
+
+  <div class="summary-row">
+    <div class="summary-item">
+      <div class="summary-label">Total componentes</div>
+      <div class="summary-value">14</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-label">Tipos de unidad</div>
+      <div class="summary-value">4</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-label">Piezas críticas</div>
+      <div class="summary-value">3</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-label">Confianza análisis</div>
+      <div class="summary-value">94%</div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="section-title">Lista de Materiales — BOM Extraído</div>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width:40px">#</th>
+          <th>Pieza / Componente</th>
+          <th style="width:70px; text-align:center">Cant.</th>
+          <th style="width:80px">Unidad</th>
+          <th>Notas Técnicas</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="num">01</td>
+          <td class="component">Cuerpo principal válvula hidráulica</td>
+          <td class="qty">1</td>
+          <td><span class="unit">pza</span></td>
+          <td class="notes">Acero inox 304, maquinado CNC — Dim: Ø85 × 120mm</td>
+        </tr>
+        <tr>
+          <td class="num">02</td>
+          <td class="component">Émbolo de control de flujo</td>
+          <td class="qty">1</td>
+          <td><span class="unit">pza</span></td>
+          <td class="notes">Acero 1045 nitrurado, tolerancia H7/g6</td>
+        </tr>
+        <tr>
+          <td class="num">03</td>
+          <td class="component">Resorte de retorno</td>
+          <td class="qty">2</td>
+          <td><span class="unit">pza</span></td>
+          <td class="notes">Acero resorte 65Mn — K = 12 N/mm, L₀ = 45mm</td>
+        </tr>
+        <tr>
+          <td class="num">04</td>
+          <td class="component">Sello O-Ring NBR 70</td>
+          <td class="qty">6</td>
+          <td><span class="unit">pza</span></td>
+          <td class="notes">Ø28 × 3.5mm — resistente a aceite hidráulico ISO 46</td>
+        </tr>
+        <tr>
+          <td class="num">05</td>
+          <td class="component">Tapa superior roscada</td>
+          <td class="qty">1</td>
+          <td><span class="unit">pza</span></td>
+          <td class="notes">Aluminio 6061-T6, anodizado negro — Rosca M52×2</td>
+        </tr>
+        <tr>
+          <td class="num">06</td>
+          <td class="component">Tornillo hex cabeza cilíndrica M8</td>
+          <td class="qty">8</td>
+          <td><span class="unit">pza</span></td>
+          <td class="notes">Clase 12.9, cadmiado — DIN 912, L=25mm</td>
+        </tr>
+        <tr>
+          <td class="num">07</td>
+          <td class="component">Rondana de presión M8</td>
+          <td class="qty">8</td>
+          <td><span class="unit">pza</span></td>
+          <td class="notes">Acero galvanizado — DIN 127B</td>
+        </tr>
+        <tr>
+          <td class="num">08</td>
+          <td class="component">Buje de bronce fosforoso</td>
+          <td class="qty">2</td>
+          <td><span class="unit">pza</span></td>
+          <td class="notes">Ø30/Ø22 × 20mm — CuSn8 autolubricante</td>
+        </tr>
+        <tr>
+          <td class="num">09</td>
+          <td class="component">Conector hidráulico BSP 3/4"</td>
+          <td class="qty">3</td>
+          <td><span class="unit">pza</span></td>
+          <td class="notes">Acero carb., cromado — ISO 228/1 Gr.B</td>
+        </tr>
+        <tr>
+          <td class="num">10</td>
+          <td class="component">Junta de cobre recocido Ø28</td>
+          <td class="qty">3</td>
+          <td><span class="unit">pza</span></td>
+          <td class="notes">Para sellado en conectores BSP — uso único</td>
+        </tr>
+        <tr>
+          <td class="num">11</td>
+          <td class="component">Placa de identificación aluminio</td>
+          <td class="qty">1</td>
+          <td><span class="unit">pza</span></td>
+          <td class="notes">Grabado láser con N/S, fecha fab. y presión máx.</td>
+        </tr>
+        <tr>
+          <td class="num">12</td>
+          <td class="component">Aceite hidráulico ISO 46</td>
+          <td class="qty">0.25</td>
+          <td><span class="unit">lts</span></td>
+          <td class="notes">Para llenado inicial y prueba de presión en banco</td>
+        </tr>
+        <tr>
+          <td class="num">13</td>
+          <td class="component">Cable de acero recubrimiento PVC Ø4mm</td>
+          <td class="qty">0.8</td>
+          <td><span class="unit">mts</span></td>
+          <td class="notes">Para amarre de seguridad — 7×7 hilos galv.</td>
+        </tr>
+        <tr>
+          <td class="num">14</td>
+          <td class="component">Etiqueta adhesiva de peligro (bilingüe)</td>
+          <td class="qty">2</td>
+          <td><span class="unit">pza</span></td>
+          <td class="notes">Presión máx. operación: 350 bar — norma ISO 11684</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="totals-box">
+      <div>
+        <div class="totals-label">Total de partidas en BOM</div>
+        <div style="font-size:11px; color:#0369a1; margin-top:4px;">14 componentes · 4 unidades de medida distintas</div>
+      </div>
+      <div class="totals-value">14 partidas</div>
+    </div>
+
+    <div class="actions-box">
+      <div class="actions-icon">📦</div>
+      <div class="actions-text">
+        <strong>Próximo paso:</strong> Esta lista de materiales ha sido integrada al BOM del proyecto PROJ-2026-041.<br>
+        Para generar las órdenes de compra correspondientes, acceder al módulo de Compras → Sugerencia IA → Vincular BOM.
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-left">McVill ERP · Módulo Ingeniería — Vision Planos AI &nbsp;|&nbsp; Extracción automática por análisis neural</div>
+    <div class="footer-right">bom_PROJ-2026-041.pdf &nbsp;|&nbsp; pág. 1 de 1</div>
+  </div>
+</div>
+</body>
+</html>

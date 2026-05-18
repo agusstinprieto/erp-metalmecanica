@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Análisis de Factibilidad IA — McVill ERP</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; color: #1a202c; }
+  .page { max-width: 900px; margin: 0 auto; background: white; min-height: 100vh; }
+
+  .header { background: linear-gradient(135deg, #0f172a 0%, #1a0533 100%); color: white; padding: 36px 48px; position: relative; overflow: hidden; }
+  .header::before { content: ''; position: absolute; top: -50px; right: -50px; width: 260px; height: 260px; border-radius: 50%; background: rgba(168,85,247,0.12); }
+  .header::after { content: ''; position: absolute; bottom: -30px; left: 30%; width: 160px; height: 160px; border-radius: 50%; background: rgba(168,85,247,0.06); }
+  .header-top { display: flex; justify-content: space-between; align-items: flex-start; position: relative; z-index: 1; }
+  .logo-area { display: flex; align-items: center; gap: 16px; }
+  .logo-box { width: 52px; height: 52px; background: rgba(168,85,247,0.25); border: 1px solid rgba(168,85,247,0.5); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .company-name { font-size: 24px; font-weight: 900; }
+  .company-sub { font-size: 9px; font-weight: 700; letter-spacing: 4px; color: #d8b4fe; text-transform: uppercase; margin-top: 2px; }
+  .report-meta { text-align: right; }
+  .report-type { font-size: 10px; font-weight: 700; letter-spacing: 4px; color: #d8b4fe; text-transform: uppercase; }
+  .report-title { font-size: 26px; font-weight: 900; letter-spacing: -1px; margin-top: 4px; }
+  .report-sub { font-size: 11px; color: #e9d5ff; margin-top: 4px; }
+  .header-divider { margin-top: 24px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; gap: 36px; position: relative; z-index: 1; }
+  .meta-item label { font-size: 8px; font-weight: 700; letter-spacing: 3px; color: #64748b; text-transform: uppercase; display: block; }
+  .meta-item span { font-size: 13px; font-weight: 700; color: white; margin-top: 2px; display: block; }
+
+  .verdict-bar { padding: 24px 48px; display: flex; align-items: center; gap: 24px; border-bottom: 1px solid #e2e8f0; }
+  .verdict-box { background: #f0fdf4; border: 2px solid #86efac; border-radius: 16px; padding: 16px 28px; display: flex; align-items: center; gap: 16px; flex: 1; }
+  .verdict-icon { font-size: 36px; }
+  .verdict-text { flex: 1; }
+  .verdict-label { font-size: 9px; font-weight: 800; letter-spacing: 3px; color: #16a34a; text-transform: uppercase; }
+  .verdict-value { font-size: 22px; font-weight: 900; color: #15803d; margin-top: 4px; }
+  .verdict-conf { font-size: 11px; color: #4ade80; font-weight: 600; }
+  .conf-badge { background: #dcfce7; color: #166534; border-radius: 8px; padding: 4px 14px; font-size: 14px; font-weight: 900; font-family: monospace; border: 1px solid #86efac; }
+
+  .cost-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 28px 48px; background: #fafafa; border-bottom: 1px solid #e2e8f0; }
+  .cost-card { background: white; border: 1px solid #e2e8f0; border-radius: 14px; padding: 18px 20px; }
+  .cost-label { font-size: 8px; font-weight: 800; letter-spacing: 3px; color: #94a3b8; text-transform: uppercase; }
+  .cost-range { font-size: 20px; font-weight: 900; color: #1e293b; margin-top: 6px; }
+  .cost-range span { color: #6366f1; }
+  .cost-sub { font-size: 10px; color: #64748b; margin-top: 4px; }
+  .delivery-card { background: white; border: 1px solid #e2e8f0; border-radius: 14px; padding: 18px 20px; display: flex; align-items: center; gap: 16px; }
+  .delivery-number { font-size: 48px; font-weight: 900; color: #6366f1; line-height: 1; }
+  .delivery-info { }
+  .delivery-label { font-size: 8px; font-weight: 800; letter-spacing: 3px; color: #94a3b8; text-transform: uppercase; }
+  .delivery-sub { font-size: 11px; color: #475569; margin-top: 4px; line-height: 1.5; }
+  .capacity-card { background: white; border: 1px solid #e2e8f0; border-radius: 14px; padding: 18px 20px; }
+
+  .content { padding: 32px 48px; }
+  .section { margin-bottom: 28px; }
+  .section-title { font-size: 10px; font-weight: 800; letter-spacing: 4px; color: #475569; text-transform: uppercase; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0; }
+
+  .risks-list { display: flex; flex-direction: column; gap: 10px; }
+  .risk-item { display: flex; align-items: center; gap: 14px; background: #f8fafc; border-radius: 10px; padding: 14px 18px; border-left: 4px solid; }
+  .risk-alto { border-color: #ef4444; background: #fff1f2; }
+  .risk-medio { border-color: #f59e0b; background: #fffbeb; }
+  .risk-bajo { border-color: #22c55e; background: #f0fdf4; }
+  .risk-nivel { font-size: 8px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; min-width: 50px; }
+  .risk-nivel-alto { color: #dc2626; }
+  .risk-nivel-medio { color: #d97706; }
+  .risk-nivel-bajo { color: #16a34a; }
+  .risk-cat { font-size: 9px; font-weight: 700; color: #64748b; min-width: 110px; }
+  .risk-desc { font-size: 11px; color: #374151; flex: 1; }
+
+  .tags-list { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag { padding: 6px 14px; border-radius: 8px; font-size: 10px; font-weight: 700; }
+  .tag-bottleneck { background: #fee2e2; color: #991b1b; }
+  .tag-process { background: #dbeafe; color: #1e40af; }
+  .tag-rec { background: #d1fae5; color: #065f46; }
+  .tag-cond { background: #fef3c7; color: #92400e; }
+
+  .executive-box { background: linear-gradient(135deg, #f5f3ff, #ede9fe); border: 1px solid #ddd6fe; border-radius: 14px; padding: 24px; }
+  .exec-label { font-size: 9px; font-weight: 800; letter-spacing: 3px; color: #7c3aed; text-transform: uppercase; margin-bottom: 10px; }
+  .exec-text { font-size: 12px; color: #4c1d95; line-height: 1.8; }
+
+  .footer { padding: 20px 48px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+  .footer-left { font-size: 10px; color: #94a3b8; }
+  .footer-right { font-size: 9px; color: #cbd5e1; font-family: monospace; }
+
+  @media print {
+    body { background: white; }
+    .page { max-width: none; }
+    .header, .verdict-bar, .cost-grid { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="logo-area">
+        <div class="logo-box">⚡</div>
+        <div>
+          <div class="company-name">McVill</div>
+          <div class="company-sub">Cotizaciones · Factibilidad IA</div>
+        </div>
+      </div>
+      <div class="report-meta">
+        <div class="report-type">Cotizaciones · Análisis</div>
+        <div class="report-title">Factibilidad IA</div>
+        <div class="report-sub">Análisis técnico-económico automático</div>
+      </div>
+    </div>
+    <div class="header-divider">
+      <div class="meta-item"><label>Cliente</label><span>Autopartes Baja S.A. de C.V.</span></div>
+      <div class="meta-item"><label>Descripción</label><span>Soporte de suspensión delantera — Serie FK7</span></div>
+      <div class="meta-item"><label>Lote estimado</label><span>500 piezas / mes</span></div>
+      <div class="meta-item"><label>Analizado</label><span>17 Mayo 2026 · 09:48</span></div>
+    </div>
+  </div>
+
+  <!-- Verdict -->
+  <div class="verdict-bar">
+    <div class="verdict-box">
+      <div class="verdict-icon">✅</div>
+      <div class="verdict-text">
+        <div class="verdict-label">Veredicto del análisis neural</div>
+        <div class="verdict-value">FACTIBLE — Recomendado Cotizar</div>
+        <div class="verdict-conf">Capacidad de planta disponible · Sin restricciones críticas</div>
+      </div>
+      <div class="conf-badge">93%</div>
+    </div>
+  </div>
+
+  <!-- Cost & Delivery Grid -->
+  <div class="cost-grid">
+    <div class="cost-card">
+      <div class="cost-label">Costo estimado por pieza</div>
+      <div class="cost-range">$320 <span>—</span> $385 <span style="font-size:13px; color:#94a3b8">MXN</span></div>
+      <div class="cost-sub">Incluye material + proceso + overhead (sin utilidad)</div>
+    </div>
+    <div class="cost-card">
+      <div class="cost-label">Costo estimado por lote (500 pzas)</div>
+      <div class="cost-range">$160,000 <span>—</span> $192,500 <span style="font-size:13px; color:#94a3b8">MXN</span></div>
+      <div class="cost-sub">Economías de escala aplicadas desde 300 piezas</div>
+    </div>
+    <div class="delivery-card">
+      <div class="delivery-number">18</div>
+      <div class="delivery-info">
+        <div class="delivery-label">Tiempo de entrega</div>
+        <div class="delivery-sub">días hábiles desde aprobación<br>de muestra inicial (PPAP)</div>
+      </div>
+    </div>
+    <div class="capacity-card">
+      <div class="cost-label">Capacidad de planta</div>
+      <div style="font-size:14px; font-weight:800; color:#0369a1; margin-top:8px;">Alta — sin restricciones</div>
+      <div style="font-size:10px; color:#64748b; margin-top:6px; line-height:1.6;">Torno CNC disponible al 62% de carga<br>Prensa de 200T libre los turnos A y B</div>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- Riesgos -->
+    <div class="section">
+      <div class="section-title">Riesgos Identificados</div>
+      <div class="risks-list">
+        <div class="risk-item risk-medio">
+          <div class="risk-nivel risk-nivel-medio">MEDIO</div>
+          <div class="risk-cat">Material / Suministro</div>
+          <div class="risk-desc">Acero 4140 con variación de precio +8% en últimas 4 semanas por demanda automotriz. Considerar fixed-price en cotización o cláusula de ajuste trimestral.</div>
+        </div>
+        <div class="risk-item risk-bajo">
+          <div class="risk-nivel risk-nivel-bajo">BAJO</div>
+          <div class="risk-cat">Proceso / Calidad</div>
+          <div class="risk-desc">Tolerancia de ±0.02mm requiere calibración adicional del torno Mazak antes de inicio de serie. Tiempo estimado: 4 horas en mantenimiento preventivo.</div>
+        </div>
+        <div class="risk-item risk-bajo">
+          <div class="risk-nivel risk-nivel-bajo">BAJO</div>
+          <div class="risk-cat">Tiempo / Logística</div>
+          <div class="risk-desc">Si el cliente solicita entrega antes de 12 días hábiles se requiere autorización de turno nocturno. Sobrecosto aproximado de $12,000 por turno extra.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cuellos de botella -->
+    <div class="section">
+      <div class="section-title">Cuellos de Botella</div>
+      <div class="tags-list">
+        <span class="tag tag-bottleneck">Tratamiento térmico (subcontrato 3–4 días)</span>
+        <span class="tag tag-bottleneck">Inspección CMM — solo 1 turno disponible</span>
+        <span class="tag tag-bottleneck">Rectificado cilíndrico con agenda completa semana 21</span>
+      </div>
+    </div>
+
+    <!-- Procesos críticos -->
+    <div class="section">
+      <div class="section-title">Procesos Críticos</div>
+      <div class="tags-list">
+        <span class="tag tag-process">Maquinado CNC (Mazak QT-350)</span>
+        <span class="tag tag-process">Temple y revenido 58–62 HRC</span>
+        <span class="tag tag-process">Rectificado superficial Ra 0.8</span>
+        <span class="tag tag-process">Inspección 100% por CMM</span>
+        <span class="tag tag-process">Fosfatizado anticorrosión</span>
+      </div>
+    </div>
+
+    <!-- Recomendaciones -->
+    <div class="section">
+      <div class="section-title">Recomendaciones IA</div>
+      <div class="tags-list">
+        <span class="tag tag-rec">Cotizar con precio fijo a 90 días (cláusula ajuste acero)</span>
+        <span class="tag tag-rec">Negociar anticipo del 30% para cubrir material</span>
+        <span class="tag tag-rec">Proponer primera entrega de 100 piezas para validación PPAP</span>
+        <span class="tag tag-rec">Incluir costo de utillaje $45,000 en primera OC</span>
+      </div>
+    </div>
+
+    <!-- Condiciones especiales -->
+    <div class="section">
+      <div class="section-title">Condiciones Especiales</div>
+      <div class="tags-list">
+        <span class="tag tag-cond">Certificado de material con colada requerido por cliente</span>
+        <span class="tag tag-cond">Empaque individual en espuma EPS — costo $8/pza adicional</span>
+        <span class="tag tag-cond">Etiquetado en código de barras 1D estándar automotriz</span>
+      </div>
+    </div>
+
+    <!-- Resumen ejecutivo -->
+    <div class="section">
+      <div class="section-title">Resumen Ejecutivo</div>
+      <div class="executive-box">
+        <div class="exec-label">Conclusión del análisis</div>
+        <div class="exec-text">
+          El proyecto de fabricación del soporte de suspensión FK7 para Autopartes Baja es técnicamente factible y rentable dentro de los parámetros actuales de planta. McVill cuenta con la capacidad instalada, el equipo especializado y el personal certificado para atender el volumen de 500 piezas/mes sin comprometer otros proyectos en curso. El principal factor de atención es la volatilidad del precio del acero 4140, por lo que se recomienda asegurar el precio del material en la primera semana de aprobación de cotización. Con una utilidad objetivo del 22–28% sobre costo, el precio sugerido de venta se ubica entre $390 y $492 MXN por pieza. Se recomienda proceder con elaboración de cotización formal.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-left">McVill ERP · Módulo Cotizaciones — Factibilidad IA &nbsp;|&nbsp; Análisis generado por IA Neural</div>
+    <div class="footer-right">factibilidad_autopartes_baja_2026.pdf &nbsp;|&nbsp; pág. 1 de 1</div>
+  </div>
+</div>
+</body>
+</html>

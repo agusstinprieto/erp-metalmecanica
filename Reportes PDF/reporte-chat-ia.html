@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Conversación IA — McVill Chat</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8fafc; }
+  .page { background: white; padding: 18mm 22mm; width: 210mm; min-height: 297mm; margin: 0 auto; font-size: 10px; color: #1e293b; }
+
+  .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #1d4ed8; padding-bottom: 10px; margin-bottom: 16px; }
+  .header-left .brand { font-size: 18px; font-weight: 900; color: #0f172a; }
+  .header-left .brand span { color: #1d4ed8; }
+  .header-left .tagline { font-size: 8px; color: #64748b; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px; }
+  .header-right { text-align: right; }
+  .doc-type { font-size: 11px; font-weight: 900; color: #6366f1; text-transform: uppercase; letter-spacing: 1px; }
+  .doc-meta { font-size: 8px; color: #94a3b8; margin-top: 2px; }
+
+  .session-info { background: #f0f4ff; border: 1px solid #c7d2fe; border-radius: 6px; padding: 10px 14px; margin-bottom: 16px; display: flex; gap: 24px; align-items: center; }
+  .session-badge { background: #6366f1; color: white; padding: 3px 10px; border-radius: 20px; font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+  .session-detail { font-size: 8px; color: #475569; }
+  .session-detail strong { color: #1e293b; }
+
+  .chat-container { margin-bottom: 16px; }
+  .message { margin-bottom: 12px; }
+  .message-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .avatar { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 900; flex-shrink: 0; }
+  .avatar-user { background: #1d4ed8; color: white; }
+  .avatar-ai { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; }
+  .message-sender { font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
+  .sender-user { color: #1d4ed8; }
+  .sender-ai { color: #6366f1; }
+  .message-time { font-size: 8px; color: #94a3b8; margin-left: auto; }
+
+  .message-bubble { padding: 8px 12px; border-radius: 6px; font-size: 9.5px; line-height: 1.6; color: #1e293b; }
+  .bubble-user { background: #eff6ff; border: 1px solid #bfdbfe; border-left: 3px solid #1d4ed8; }
+  .bubble-ai { background: #f5f3ff; border: 1px solid #ddd6fe; border-left: 3px solid #6366f1; }
+
+  .bubble-ai strong { color: #4338ca; }
+  .bubble-ai ul { margin: 4px 0 4px 16px; }
+  .bubble-ai li { margin-bottom: 2px; }
+
+  .highlight-box { background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 4px; padding: 6px 10px; margin: 6px 0; font-size: 9px; color: #065f46; }
+  .highlight-box strong { color: #047857; }
+
+  .warning-box { background: #fffbeb; border: 1px solid #fde68a; border-radius: 4px; padding: 6px 10px; margin: 6px 0; font-size: 9px; color: #78350f; }
+
+  .divider { border: none; border-top: 1px dashed #e2e8f0; margin: 16px 0; }
+
+  .footer { margin-top: 16px; padding-top: 8px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; font-size: 7px; color: #94a3b8; }
+
+  @media print {
+    body { background: white; }
+    .page { box-shadow: none; margin: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="brand">Mc<span>Vill</span> <span style="font-size:12px;color:#6366f1;font-weight:900;">IA</span></div>
+      <div class="tagline">Asistente de Inteligencia Artificial Industrial</div>
+    </div>
+    <div class="header-right">
+      <div class="doc-type">Transcripción de Sesión IA</div>
+      <div class="doc-meta">Exportado el 17/05/2026 · 14:32 h<br>McVill Chat · Módulo Análisis</div>
+    </div>
+  </div>
+
+  <!-- Datos de sesión -->
+  <div class="session-info">
+    <span class="session-badge">Sesión #CH-2026-0142</span>
+    <div class="session-detail"><strong>Usuario:</strong> Roberto Méndez (Gerente Producción)</div>
+    <div class="session-detail"><strong>Modelo:</strong> Gemini 2.5 Pro</div>
+    <div class="session-detail"><strong>Duración:</strong> 18 minutos · 6 mensajes</div>
+    <div class="session-detail"><strong>Contexto:</strong> ERP McVill — Módulo Producción</div>
+  </div>
+
+  <!-- Conversación -->
+  <div class="chat-container">
+
+    <!-- Mensaje 1: Usuario -->
+    <div class="message">
+      <div class="message-header">
+        <div class="avatar avatar-user">RM</div>
+        <span class="message-sender sender-user">Roberto Méndez</span>
+        <span class="message-time">14:14</span>
+      </div>
+      <div class="message-bubble bubble-user">
+        Tenemos el OEE de la célula de corte láser en 88.7% esta semana, meta es 90%. La Trumpf 3kW tuvo 3.2 horas de paro el miércoles. ¿Cuáles son las causas más comunes de este tipo de paros en máquinas de corte láser y qué acciones preventivas deberíamos implementar?
+      </div>
+    </div>
+
+    <!-- Mensaje 2: IA -->
+    <div class="message">
+      <div class="message-header">
+        <div class="avatar avatar-ai">IA</div>
+        <span class="message-sender sender-ai">McVill IA</span>
+        <span class="message-time">14:15</span>
+      </div>
+      <div class="message-bubble bubble-ai">
+        <strong>Análisis de paros en cortadoras láser CO₂/fibra tipo Trumpf:</strong><br><br>
+        Las causas más frecuentes de paros no programados en este tipo de máquinas son:
+
+        <ul>
+          <li><strong>Óptica contaminada</strong> (35% de los casos) — partículas de humo o metal en lentes del cabezal. Síntoma: baja calidad de corte o cortes incompletos antes del paro.</li>
+          <li><strong>Variación en presión de gas asistente</strong> (20%) — nitrógeno u oxígeno fuera de spec. Revisar reguladores y manómetros semanalmente.</li>
+          <li><strong>Desgaste en boquilla (nozzle)</strong> (18%) — requiere inspección visual diaria y cambio cada 80–120 horas de corte.</li>
+          <li><strong>Falla en sistema de agua de enfriamiento</strong> (15%) — temperatura del chiller fuera de rango (nominal: 20°C ±1°C).</li>
+          <li><strong>Errores de programa CNC</strong> (12%) — parámetros de velocidad o potencia incorrectos para el material.</li>
+        </ul>
+
+        <div class="highlight-box">
+          <strong>Recomendación inmediata:</strong> Para una Trumpf 3kW, un paro de 3.2 horas apunta a falla en óptica o sistema de enfriamiento. Verificar temperatura del chiller y limpiar/reemplazar lente focal esta semana.
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Mensaje 3: Usuario -->
+    <div class="message">
+      <div class="message-header">
+        <div class="avatar avatar-user">RM</div>
+        <span class="message-sender sender-user">Roberto Méndez</span>
+        <span class="message-time">14:19</span>
+      </div>
+      <div class="message-bubble bubble-user">
+        Perfecto. Ahora dime: si tengo un OEE de 88.7% en corte y necesito llegar a 92% el próximo mes, ¿cuántas horas productivas adicionales necesito recuperar en un turno de 8 horas al día, 22 días laborables?
+      </div>
+    </div>
+
+    <!-- Mensaje 4: IA -->
+    <div class="message">
+      <div class="message-header">
+        <div class="avatar avatar-ai">IA</div>
+        <span class="message-sender sender-ai">McVill IA</span>
+        <span class="message-time">14:20</span>
+      </div>
+      <div class="message-bubble bubble-ai">
+        <strong>Cálculo de brecha OEE:</strong><br><br>
+        Tiempo total disponible = 8 h × 22 días = <strong>176 horas</strong><br><br>
+        <ul>
+          <li>Tiempo productivo actual (88.7%): 176 × 0.887 = <strong>156.1 horas</strong></li>
+          <li>Tiempo productivo meta (92.0%): 176 × 0.920 = <strong>161.9 horas</strong></li>
+          <li><strong>Brecha a recuperar: 5.8 horas mensuales (≈ 16 min/día)</strong></li>
+        </ul>
+
+        <div class="highlight-box">
+          <strong>Traducción práctica:</strong> Reducir el tiempo de paro diario en 16 minutos es suficiente para alcanzar el 92%. Esto equivale a eliminar 1 arranque tardío de máquina o reducir el tiempo de setup en 1 cambio de material por turno.
+        </div>
+
+        <div class="warning-box">
+          <strong>Nota:</strong> Si la brecha viene principalmente de disponibilidad (paros), el mantenimiento preventivo tiene más impacto que optimizar velocidad de corte.
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Mensaje 5: Usuario -->
+    <div class="message">
+      <div class="message-header">
+        <div class="avatar avatar-user">RM</div>
+        <span class="message-sender sender-user">Roberto Méndez</span>
+        <span class="message-time">14:28</span>
+      </div>
+      <div class="message-bubble bubble-user">
+        Genera un plan de acción de 4 semanas para mejorar el OEE de corte láser de 88.7% a 92%.
+      </div>
+    </div>
+
+    <!-- Mensaje 6: IA -->
+    <div class="message">
+      <div class="message-header">
+        <div class="avatar avatar-ai">IA</div>
+        <span class="message-sender sender-ai">McVill IA</span>
+        <span class="message-time">14:29</span>
+      </div>
+      <div class="message-bubble bubble-ai">
+        <strong>Plan de Acción — Mejora OEE Corte Láser Trumpf 3kW</strong><br>
+        Objetivo: 88.7% → 92% en 4 semanas<br><br>
+
+        <strong>SEMANA 1 (19–23 May) — Diagnóstico y Limpieza</strong>
+        <ul>
+          <li>Limpieza completa de óptica y lente focal (Ing. Herrera)</li>
+          <li>Revisión y calibración del chiller — registro de temperatura cada turno</li>
+          <li>Inspección de boquillas — reemplazar las que superen 80h uso</li>
+          <li>Instalación de check-list diario de 5 min antes de arranque</li>
+        </ul>
+
+        <strong>SEMANA 2 (26–30 May) — Setup y Procedimientos</strong>
+        <ul>
+          <li>Reducir tiempo de setup con kit de herramientas dedicado en célula</li>
+          <li>Crear tabla de parámetros de corte por material (A36, inox, aluminio)</li>
+          <li>Capacitación operadores: procedimiento de cambio de boquilla en &lt;5 min</li>
+        </ul>
+
+        <strong>SEMANA 3 (2–6 Jun) — Mantenimiento Preventivo</strong>
+        <ul>
+          <li>PM completo lunes 2/jun (4h, turno nocturno anterior)</li>
+          <li>Programar mantenimiento mensual en sistema ERP</li>
+          <li>Revisar presiones de gas: nitrógeno 12–14 bar, oxígeno 4–6 bar</li>
+        </ul>
+
+        <strong>SEMANA 4 (9–13 Jun) — Medición y Ajuste</strong>
+        <ul>
+          <li>Análisis de OEE vs baseline — comparar con semana 19</li>
+          <li>Identificar los 3 paros más frecuentes del mes y documentar causa raíz</li>
+          <li>Presentar resultados en reunión semanal del 10/jun</li>
+        </ul>
+
+        <div class="highlight-box">
+          <strong>KPI de seguimiento:</strong> Registrar disponibilidad, rendimiento y calidad diariamente en el ERP (módulo SPC → Calidad Corte) para visibilidad en tiempo real.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <span>Sesión CH-2026-0142 — McVill IA · Exportado desde Módulo Chat</span>
+    <span>Confidencial — uso interno McVill SA de CV</span>
+    <span>Página 1 de 1</span>
+  </div>
+</div>
+</body>
+</html>

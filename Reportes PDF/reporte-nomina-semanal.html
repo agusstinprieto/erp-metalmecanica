@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Estado General de Nómina — McVill MetalMecánica</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #f8fafc; color: #0f172a; font-size: 11px; }
+  .header { background: #1a4a8a; color: white; }
+  .header-top { padding: 12px 20px 10px; display: flex; justify-content: space-between; align-items: center; }
+  .header-title { background: #2563eb; padding: 8px 20px; }
+  .header-title h1 { font-size: 11px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: white; }
+  .company-name { font-size: 14px; font-weight: 900; }
+  .company-sub { font-size: 8px; color: #93c5fd; margin-top: 2px; }
+  .date-info { text-align: right; font-size: 8px; color: #e2e8f0; }
+  .content { padding: 16px 20px; }
+  .summary-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+  .summary-card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; }
+  .summary-label { font-size: 7px; font-weight: 900; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .summary-value { font-size: 18px; font-weight: 900; }
+  .val-green { color: #10b981; }
+  .val-blue { color: #2563eb; }
+  .val-rose { color: #f43f5e; }
+  .val-amber { color: #f59e0b; }
+  table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  thead tr { background: #2563eb; color: white; }
+  thead th { padding: 8px 10px; font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; text-align: left; }
+  thead th.right { text-align: right; }
+  tbody tr:nth-child(even) { background: #f1f5f9; }
+  tbody tr:nth-child(odd) { background: white; }
+  tbody tr:hover { background: #dbeafe; }
+  tbody td { padding: 7px 10px; font-size: 9px; color: #0f172a; border-bottom: 1px solid #e2e8f0; }
+  tbody td.right { text-align: right; font-weight: 700; }
+  tbody td.center { text-align: center; }
+  .badge { display: inline-block; padding: 2px 7px; border-radius: 999px; font-size: 7px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.8px; }
+  .badge-paid { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+  .badge-approved { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+  .badge-calculated { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+  .badge-draft { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+  .total-row td { font-weight: 900; font-size: 10px; background: #1e3a5f !important; color: white; }
+  footer { border-top: 1px solid #2563eb; padding: 8px 20px; display: flex; justify-content: space-between; margin-top: 14px; }
+  footer p { font-size: 7px; color: #94a3b8; }
+  .section-title { font-size: 9px; font-weight: 900; color: #1e3a5f; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 2px solid #2563eb; display: inline-block; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="company-name">McVill MetalMecánica S.A. de C.V.</div>
+      <div class="company-sub">METALMECÁNICA • Sistema ERP Industrial</div>
+    </div>
+    <div class="date-info">
+      <div>17 may. 2026</div>
+      <div>09:00 hrs</div>
+    </div>
+  </div>
+  <div class="header-title">
+    <h1>Estado General de Nómina y Dispersión Control — Finanzas / Nómina</h1>
+  </div>
+</div>
+
+<div class="content">
+
+  <div class="summary-row" style="margin-top: 14px;">
+    <div class="summary-card">
+      <div class="summary-label">Empleados en Nómina</div>
+      <div class="summary-value val-blue">62</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Total Bruto</div>
+      <div class="summary-value" style="color:#7c3aed; font-size:16px;">$1,243,680</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Total Neto a Pagar</div>
+      <div class="summary-value val-green" style="font-size:16px;">$964,102</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Pendientes Dispersar</div>
+      <div class="summary-value val-amber">14</div>
+    </div>
+  </div>
+
+  <p class="section-title">Desglose por Empleado — Periodo: 12 Mayo – 18 Mayo 2026</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Nombre del Empleado</th>
+        <th>Depto.</th>
+        <th>Periodo</th>
+        <th class="right">Salario Bruto</th>
+        <th class="right">Deducciones</th>
+        <th class="right">Neto a Pagar</th>
+        <th class="center">Estatus</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>Carlos Ramírez Soto</td><td>Producción CNC</td><td>12/05 – 18/05</td><td class="right">$24,500</td><td class="right">$4,802</td><td class="right val-green">$19,698</td><td class="center"><span class="badge badge-paid">Dispersado</span></td></tr>
+      <tr><td>2</td><td>Ana Lucía Hernández</td><td>Calidad SGC</td><td>12/05 – 18/05</td><td class="right">$21,800</td><td class="right">$4,012</td><td class="right val-green">$17,788</td><td class="center"><span class="badge badge-paid">Dispersado</span></td></tr>
+      <tr><td>3</td><td>Roberto Mendoza Cárdenas</td><td>Mantenimiento</td><td>12/05 – 18/05</td><td class="right">$19,200</td><td class="right">$3,456</td><td class="right val-green">$15,744</td><td class="center"><span class="badge badge-approved">Autorizado</span></td></tr>
+      <tr><td>4</td><td>María Fernanda Orozco</td><td>Finanzas</td><td>12/05 – 18/05</td><td class="right">$28,400</td><td class="right">$5,680</td><td class="right val-green">$22,720</td><td class="center"><span class="badge badge-paid">Dispersado</span></td></tr>
+      <tr><td>5</td><td>José Luis Villanueva</td><td>Soldadura MIG/TIG</td><td>12/05 – 18/05</td><td class="right">$18,600</td><td class="right">$3,348</td><td class="right val-green">$15,252</td><td class="center"><span class="badge badge-approved">Autorizado</span></td></tr>
+      <tr><td>6</td><td>Patricia Ávila Torres</td><td>RH / Capital Humano</td><td>12/05 – 18/05</td><td class="right">$22,000</td><td class="right">$4,180</td><td class="right val-green">$17,820</td><td class="center"><span class="badge badge-paid">Dispersado</span></td></tr>
+      <tr><td>7</td><td>Miguel Ángel Cortés</td><td>Producción Corte Láser</td><td>12/05 – 18/05</td><td class="right">$17,900</td><td class="right">$3,043</td><td class="right val-green">$14,857</td><td class="center"><span class="badge badge-calculated">Calculado</span></td></tr>
+      <tr><td>8</td><td>Laura Beatriz Salinas</td><td>Ingeniería</td><td>12/05 – 18/05</td><td class="right">$31,500</td><td class="right">$6,615</td><td class="right val-green">$24,885</td><td class="center"><span class="badge badge-paid">Dispersado</span></td></tr>
+      <tr><td>9</td><td>Fernando Gutiérrez Leal</td><td>Logística / Almacén</td><td>12/05 – 18/05</td><td class="right">$15,800</td><td class="right">$2,528</td><td class="right val-green">$13,272</td><td class="center"><span class="badge badge-draft">Borrador</span></td></tr>
+      <tr><td>10</td><td>Alejandra Morales Vega</td><td>Ventas y Cotizaciones</td><td>12/05 – 18/05</td><td class="right">$25,200</td><td class="right">$4,788</td><td class="right val-green">$20,412</td><td class="center"><span class="badge badge-paid">Dispersado</span></td></tr>
+      <tr><td>11</td><td>Eduardo Pérez Garza</td><td>Producción CNC</td><td>12/05 – 18/05</td><td class="right">$16,400</td><td class="right">$2,952</td><td class="right val-green">$13,448</td><td class="center"><span class="badge badge-calculated">Calculado</span></td></tr>
+      <tr><td>12</td><td>Sofía Reyes Montoya</td><td>HSE / Seguridad</td><td>12/05 – 18/05</td><td class="right">$20,100</td><td class="right">$3,618</td><td class="right val-green">$16,482</td><td class="center"><span class="badge badge-approved">Autorizado</span></td></tr>
+      <tr class="total-row">
+        <td colspan="4"><strong>TOTALES GENERALES (62 empleados — muestra 12)</strong></td>
+        <td class="right">$1,243,680</td>
+        <td class="right">$279,578</td>
+        <td class="right">$964,102</td>
+        <td class="center">—</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="margin-top: 12px; padding: 10px 14px; background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px;">
+    <p style="font-size: 8px; font-weight: 900; color: #92400e; text-transform: uppercase; letter-spacing: 1px;">Nota de Auditoría</p>
+    <p style="font-size: 8px; color: #78350f; margin-top: 4px;">Las deducciones incluyen: IMSS 6.18%, INFONAVIT 5%, ISR variable según tabla SAT. Nómina sujeta a revisión del Director de Finanzas antes de dispersión masiva. Documento generado automáticamente por ERP McVill.</p>
+  </div>
+
+</div>
+
+<footer>
+  <p>McVill MetalMecánica S.A. de C.V.  •  Documento de Uso Interno Confidencial</p>
+  <p>Página 1 de 1  |  Generado: 17/05/2026</p>
+</footer>
+
+</body>
+</html>
