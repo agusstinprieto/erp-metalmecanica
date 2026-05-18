@@ -3,7 +3,7 @@ import {
   Plus, X, Loader2, CheckCircle2, Link2, Upload, Key, BookOpen,
   Clock, Zap, Factory, Users, Wrench, Cpu, AlertTriangle,
   TrendingUp, Database, BarChart3, Package, FileText, Shield, Activity,
-  ChevronDown, ChevronRight, Info, FileDown
+  ChevronDown, ChevronRight, Info, FileDown, Award
 } from 'lucide-react';
 import { useConfig } from '../contexts/ConfigContext';
 import { supabase } from '../lib/supabase';
@@ -424,7 +424,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
     ordenes: 0,
     stockCritico: 0,
   });
-  
+
+  const [primaData, setPrimaData] = useState<{
+    totalPasivo: number;
+    elegibles: number;
+    top5: Array<{ nombre: string; anos: number; prima: number; salarioDiario: number }>;
+  } | null>(null);
+
   const [telemetryData, setTelemetryData] = useState<any[]>([]);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [isBancoModalOpen, setIsBancoModalOpen] = useState(false);
@@ -432,6 +438,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
 
   useEffect(() => {
     loadDbStats();
+    loadPrimaAntiguedad();
   }, []);
 
   useEffect(() => {
@@ -504,6 +511,48 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
     } catch (error) {
       console.error('Error loading stats:', error);
       setErrorMsg('No se pudieron cargar los indicadores de base de datos. Usando simulación de planta activa.');
+    }
+  };
+
+  const loadPrimaAntiguedad = async () => {
+    try {
+      // Art. 162 LFT: 12 días de salario × años de servicio
+      // Tope salario: 2 × Salario Mínimo General diario (SMG 2026 zona general)
+      const SMG_DIARIO = 278.80;
+      const TOPE_DIARIO = SMG_DIARIO * 2; // $557.60
+      const hoy = new Date();
+
+      const { data: empleados, error } = await supabase
+        .from('employees')
+        .select('first_name, last_name, hire_date, daily_salary')
+        .eq('status', 'active')
+        .not('hire_date', 'is', null);
+
+      if (error || !empleados) return;
+
+      const elegibles = empleados
+        .map(emp => {
+          const ingreso = new Date(emp.hire_date);
+          const anos = (hoy.getTime() - ingreso.getTime()) / (365.25 * 24 * 60 * 60 * 1000);
+          if (anos < 15) return null;
+          const anosCompletos = Math.floor(anos);
+          const salarioDiario = Number(emp.daily_salary) || 0;
+          const salarioBase = Math.min(salarioDiario, TOPE_DIARIO);
+          return {
+            nombre: `${emp.first_name} ${emp.last_name}`,
+            anos: anosCompletos,
+            salarioDiario,
+            prima: 12 * anosCompletos * salarioBase,
+          };
+        })
+        .filter(Boolean) as Array<{ nombre: string; anos: number; prima: number; salarioDiario: number }>;
+
+      const totalPasivo = elegibles.reduce((s, e) => s + e.prima, 0);
+      const top5 = [...elegibles].sort((a, b) => b.prima - a.prima).slice(0, 5);
+
+      setPrimaData({ totalPasivo, elegibles: elegibles.length, top5 });
+    } catch (e) {
+      console.error('Error cargando prima de antigüedad:', e);
     }
   };
 
@@ -926,6 +975,71 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
 
         </div>
 
+        {/* ── PRIMA DE ANTIGÜEDAD 15 AÑOS (Art. 162 LFT) ─────────────────── */}
+        <div className="bg-slate-900/40 border border-amber-500/20 rounded-2xl p-4 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="flex items-start justify-between mb-4 relative z-10">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400">
+                <Award size={16} />
+              </div>
+              <div>
+                <h3 className="text-[11px] font-black text-white uppercase tracking-widest">Prima de Antigüedad — 15 años</h3>
+                <p className="text-[9px] text-slate-500 mt-0.5">Art. 162 LFT · 12 días × años · tope 2× SMG ($557.60/día)</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-[8px] font-black text-amber-400/70 uppercase tracking-widest">Pasivo Total</p>
+              <p className="text-2xl font-black text-amber-400 tracking-tight leading-none">
+                {primaData
+                  ? `$${primaData.totalPasivo.toLocaleString('es-MX', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
+                  : '—'}
+              </p>
+              <p className="text-[8px] text-slate-500 mt-0.5">
+                {primaData ? `${primaData.elegibles} empleado${primaData.elegibles !== 1 ? 's' : ''} elegible${primaData.elegibles !== 1 ? 's' : ''}` : 'Cargando...'}
+              </p>
+            </div>
+          </div>
+
+          {primaData && primaData.top5.length > 0 ? (
+            <div className="relative z-10">
+              <div className="grid grid-cols-[1fr_auto_auto_auto] gap-x-3 mb-1.5 px-2">
+                <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest">Empleado</span>
+                <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest text-right">Años</span>
+                <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest text-right">Sal. diario</span>
+                <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest text-right">Prima</span>
+              </div>
+              <div className="space-y-1">
+                {primaData.top5.map((emp, i) => (
+                  <div key={i} className="grid grid-cols-[1fr_auto_auto_auto] gap-x-3 items-center bg-slate-800/30 rounded-xl px-2 py-2 hover:bg-slate-800/50 transition-colors">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-[9px] font-black text-amber-500/60 w-4 shrink-0">#{i + 1}</span>
+                      <span className="text-[10px] font-semibold text-slate-200 truncate">{emp.nombre}</span>
+                    </div>
+                    <span className="text-[10px] font-black text-slate-300 text-right tabular-nums">{emp.anos} <span className="text-slate-600 font-normal">años</span></span>
+                    <span className="text-[10px] font-mono text-slate-400 text-right tabular-nums">${emp.salarioDiario.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    <span className="text-[10px] font-black text-amber-400 text-right tabular-nums">${emp.prima.toLocaleString('es-MX', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
+                  </div>
+                ))}
+              </div>
+              {primaData.elegibles > 5 && (
+                <p className="text-[8px] text-slate-600 text-center mt-2">
+                  + {primaData.elegibles - 5} empleado{primaData.elegibles - 5 !== 1 ? 's' : ''} más · ver detalle en módulo RH
+                </p>
+              )}
+            </div>
+          ) : primaData && primaData.elegibles === 0 ? (
+            <p className="text-[10px] text-slate-500 text-center py-3 relative z-10">
+              Ningún empleado activo cumple 15 años de antigüedad aún.
+            </p>
+          ) : (
+            <div className="flex items-center justify-center py-3 relative z-10">
+              <Loader2 size={14} className="animate-spin text-amber-500/50" />
+            </div>
+          )}
+        </div>
+
         {/* ── MULTI-CHART GRID + AI PANEL ─────────────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
@@ -1169,13 +1283,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
                   <circle 
                     cx="50" cy="50" r="35" 
                     fill="none" 
-                    stroke="var(--mcvill-accent)" 
+                    stroke="var(--theme-accent)" 
                     strokeWidth="18" 
                     strokeDasharray={`${(Math.round(metrics.empleados * 0.68) / metrics.empleados) * 219.91} 219.91`} 
                     strokeDashoffset={219.91 * 0.25} 
                     strokeLinecap="round"
                     className="transition-all duration-1000"
-                    style={{ filter: 'drop-shadow(0 0 6px rgba(0, 128, 255, 0.4))' }}
+                    style={{ filter: 'drop-shadow(0 0 6px var(--theme-glow))' }}
                   />
                   
                   {/* Centro oscuro */}
