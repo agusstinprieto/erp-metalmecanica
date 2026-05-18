@@ -181,35 +181,37 @@ export const RecruitmentView: React.FC = () => {
   };
 
   const handleCVUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || !e.target.files[0]) return;
+    if (!e.target.files || e.target.files.length === 0) return;
     
     setAnalyzingCV(true);
-    const file = e.target.files[0];
+    const files = Array.from(e.target.files);
     
     try {
-      const name = file.name.split('.')[0].replace(/_/g, ' ').replace(/-/g, ' ');
-      const resumeUrl = await recruitmentService.uploadCV(name, file);
-      
-      const candidate = await recruitmentService.addCandidate({
-        name,
-        vacancy_id: selectedVacancy?.id || null,
-        resume_url: resumeUrl,
-        status: 'pending'
-      });
+      for (const file of files) {
+        const name = file.name.split('.')[0].replace(/_/g, ' ').replace(/-/g, ' ');
+        const resumeUrl = await recruitmentService.uploadCV(name, file);
+        
+        const candidate = await recruitmentService.addCandidate({
+          name,
+          vacancy_id: selectedVacancy?.id || null,
+          resume_url: resumeUrl,
+          status: 'pending'
+        });
 
-      if (selectedVacancy) {
-        await recruitmentService.analyzeCandidate(candidate, selectedVacancy);
-        showAlert('Ã‰xito', 'AnÃ¡lisis de IA completado', 'success');
-      } else {
-        showAlert('Éxito', 'Candidato guardado en bolsa', 'success');
+        if (selectedVacancy) {
+          await recruitmentService.analyzeCandidate(candidate, selectedVacancy);
+        }
       }
-
+      
+      showAlert('Éxito', `Se procesaron ${files.length} candidatos correctamente`, 'success');
       fetchInitialData();
+      setIsAddingCandidate(false);
     } catch (err) {
-      console.error('Error analyzing CV:', err);
-      showAlert('Error', 'Error al procesar CV', 'error');
+      console.error('Error procesando CVs masivos:', err);
+      showAlert('Error', 'Hubo un problema al procesar uno o más CVs', 'error');
     } finally {
       setAnalyzingCV(false);
+      e.target.value = '';
     }
   };
 
@@ -615,6 +617,26 @@ export const RecruitmentView: React.FC = () => {
             </div>
 
             <form onSubmit={handleAddCandidate} className="space-y-6">
+              
+              {/* ZONA DE CARGA MASIVA */}
+              <div className="w-full relative group">
+                <div className="absolute inset-0 bg-emerald-500/10 rounded-xl blur-md group-hover:bg-emerald-500/20 transition-all"></div>
+                <label className="relative flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-emerald-500/40 rounded-xl bg-slate-950/50 hover:bg-emerald-500/10 hover:border-emerald-500 transition-all cursor-pointer">
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    {analyzingCV ? <Loader2 className="w-8 h-8 text-emerald-500 animate-spin mb-3" /> : <Upload className="w-8 h-8 text-emerald-400 mb-3 group-hover:-translate-y-1 transition-transform" />}
+                    <p className="mb-1 text-sm text-emerald-400 font-bold tracking-tight">{analyzingCV ? 'Procesando Lote de CVs...' : 'Haz clic o arrastra múltiples CVs aquí'}</p>
+                    <p className="text-[10px] text-emerald-500/70 font-black uppercase tracking-[0.2em] mt-1">Carga masiva inteligente (PDF, DOCX)</p>
+                  </div>
+                  <input type="file" className="hidden" multiple onChange={handleCVUpload} disabled={analyzingCV} accept=".pdf,.doc,.docx,.jpg,.png" />
+                </label>
+              </div>
+
+              <div className="flex items-center gap-4 py-2">
+                <div className="h-px bg-white/5 flex-1"></div>
+                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-600">O CAPTURA MANUAL</span>
+                <div className="h-px bg-white/5 flex-1"></div>
+              </div>
+
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Nombre Completo</label>
