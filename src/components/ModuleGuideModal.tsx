@@ -54,7 +54,7 @@ export const ModuleGuideModal: React.FC<ModuleGuideModalProps> = ({ isOpen, onCl
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[200] flex items-start justify-center pt-20 px-4 pb-4 bg-black/80 backdrop-blur-lg"
+        className="fixed inset-0 z-[9999] flex items-start justify-center pt-20 px-4 pb-4 bg-black/80 backdrop-blur-lg"
         onClick={onClose}
       >
         <motion.div

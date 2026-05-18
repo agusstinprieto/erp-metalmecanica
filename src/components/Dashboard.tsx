@@ -640,10 +640,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
         const label = getLabel(i);
 
         if (subset.length > 0) {
-          const avgOEE = subset.reduce((acc, r) => acc + Number(r.oee_pct), 0) / subset.length;
-          const avgScrap = subset.reduce((acc, r) => acc + Number(r.scrap_pct), 0) / subset.length;
-          const avgEnergy = subset.reduce((acc, r) => acc + Number(r.consumo_kwh), 0) / subset.length;
-          const sumProd = subset.reduce((acc, r) => acc + Number(r.piezas_producidas), 0);
+          const avgOEE = subset.reduce((acc, r) => acc + Number(r.oee_pct || 0), 0) / subset.length;
+          const avgScrap = subset.reduce((acc, r) => acc + Number(r.scrap_pct || 0), 0) / subset.length;
+          const avgEnergy = subset.reduce((acc, r) => acc + Number(r.consumo_kwh || 0), 0) / subset.length;
+          const sumProd = subset.reduce((acc, r) => acc + Number(r.piezas_producidas || 0), 0);
           return {
             name: label,
             oee: Number(avgOEE.toFixed(1)),
@@ -849,10 +849,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
               </div>
               <div className="flex gap-1.5">
                 <span className="text-[8px] font-mono text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded uppercase font-black">
-                  {Math.round((metrics.presentes / metrics.empleados) * 100)}% PRES
+                  {Math.round((metrics.presentes / (metrics.empleados || 1)) * 100)}% PRES
                 </span>
                 <span className="text-[8px] font-mono text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded uppercase font-black">
-                  {Math.round(((metrics.empleados - metrics.presentes) / metrics.empleados) * 100)}% AUS
+                  {Math.round(((metrics.empleados - metrics.presentes) / (metrics.empleados || 1)) * 100)}% AUS
                 </span>
               </div>
             </div>
@@ -947,7 +947,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
               { key: 'energia',    label: 'Energía',        unit: ' KWh', color: '#f87171',              colorRgb: '248,113,113',             icon: '⚡', good: (v: number) => v <= metrics.energy, type: 'line' },
               { key: 'calidad',    label: 'Calidad FPY',    unit: '%',    color: '#a855f7',              colorRgb: '168,85,247',              icon: '🎯', good: (v: number) => v >= 98, type: 'bar' },
             ] as const).map(({ key, label, unit, color, colorRgb, icon, good, type }) => {
-              const vals = allCharts.map(d => d[key] as number);
+              const rawVals = allCharts.map(d => d[key as keyof typeof d] as number);
+              const vals = rawVals.map(v => isNaN(v) ? 0 : v);
               const min = Math.min(...vals); const max = Math.max(...vals);
               const range = max - min || 1;
               const last = vals[vals.length - 1];
@@ -983,16 +984,16 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
                         <polygon points={`0,100 ${pts} 100,100`} fill={`url(#g-${key})`} />
                         <polyline points={pts} fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                         {vals.map((v, i) => {
-                          const x = (i / (vals.length - 1)) * 100;
-                          const y = 100 - ((v - min) / range) * 80 - 10;
+                          const x = (i / (Math.max(1, vals.length - 1))) * 100;
+                          const y = isNaN(v) ? 100 : 100 - ((v - min) / range) * 80 - 10;
                           return <circle key={i} cx={x} cy={y} r="2" fill={color} opacity={i === vals.length - 1 ? 1 : 0.5} />;
                         })}
                       </>
                     ) : (
                       <>
                         {vals.map((v, i) => {
-                          const x = (i / (vals.length - 1)) * 100;
-                          const y = 100 - ((v - min) / range) * 80 - 10;
+                          const x = (i / (Math.max(1, vals.length - 1))) * 100;
+                          const y = isNaN(v) ? 100 : 100 - ((v - min) / range) * 80 - 10;
                           const barWidth = 100 / (vals.length * 1.8);
                           return (
                             <rect 
@@ -1000,7 +1001,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
                               x={Math.max(0, x - barWidth/2)}
                               y={y}
                               width={barWidth}
-                              height={100 - y}
+                              height={Math.max(0, 100 - y)}
                               fill={`url(#g-${key})`}
                               stroke={color}
                               strokeWidth="1"
@@ -1097,13 +1098,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
                   { label: 'Vespertino 14-22h',  pct: 0.88, color: 'bg-blue-400' },
                   { label: 'Nocturno 22-06h',    pct: 0.72, color: 'bg-purple-400' },
                 ].map(t => {
-                  const n = Math.round(metrics.empleados / 3);
+                  const n = Math.max(1, Math.round(metrics.empleados / 3));
                   const present = Math.round(n * t.pct * (selectedTurno === 'todos' ? 1 : selectedTurno === 'matutino' && t.label.startsWith('Mat') ? 1 : selectedTurno === 'vespertino' && t.label.startsWith('Ves') ? 1 : selectedTurno === 'nocturno' && t.label.startsWith('Noc') ? 1 : 0.82));
                   return (
                     <div key={t.label}>
                       <div className="flex justify-between text-[8px] font-black mb-1">
                         <span className="text-slate-400">{t.label}</span>
-                        <span className="text-white">{present}<span className="text-slate-600">/{n}</span></span>
+                        <span className="text-white">{present}<span className="text-slate-600">/{n === 1 && metrics.empleados === 0 ? 0 : n}</span></span>
                       </div>
                       <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
                         <div className={`h-full ${t.color} rounded-full transition-all duration-700`} style={{ width: `${(present/n)*100}%` }} />
@@ -1168,9 +1169,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
                   <div className="flex items-center gap-2">
                     <div className="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden">
                       <div className="h-full bg-gradient-to-r from-mcvill-accent to-emerald-400 rounded-full transition-all duration-700"
-                        style={{ width: `${Math.round((metrics.presentes / metrics.empleados) * 100)}%` }} />
+                        style={{ width: `${Math.round((metrics.presentes / (metrics.empleados || 1)) * 100)}%` }} />
                     </div>
-                    <span className="text-[9px] font-black text-white">{Math.round((metrics.presentes / metrics.empleados) * 100)}%</span>
+                    <span className="text-[9px] font-black text-white">{Math.round((metrics.presentes / (metrics.empleados || 1)) * 100)}%</span>
                   </div>
                 </div>
               </div>

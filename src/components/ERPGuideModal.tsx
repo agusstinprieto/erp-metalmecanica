@@ -271,7 +271,7 @@ export const ERPGuideModal: React.FC<ERPGuideModalProps> = ({ isOpen, onClose })
   const filtered = filter === 'ALL' ? DEPARTMENTS : DEPARTMENTS.filter(d => d.badge === filter);
 
   return (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-sm" onClick={onClose} />
 
       <div className={clsx(
