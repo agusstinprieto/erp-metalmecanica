@@ -17,8 +17,23 @@ import { MODULE_GUIDES, DEFAULT_GUIDE } from './data/moduleGuides';
 import { setSentryUser, clearSentryUser } from './lib/sentry';
 
 // Lazy-loaded view components — split into separate chunks to reduce initial bundle
+// On chunk fetch failure (stale cache after new Vercel deploy), reload once automatically.
 const lz = <T extends object>(fn: () => Promise<{ [k: string]: T }>, key: string) =>
-  lazy(() => fn().then(m => ({ default: (m as any)[key] as React.ComponentType<any> })));
+  lazy(() =>
+    fn()
+      .then(m => ({ default: (m as any)[key] as React.ComponentType<any> }))
+      .catch((err: Error) => {
+        const isChunkError =
+          err?.message?.includes('Failed to fetch dynamically imported module') ||
+          err?.message?.includes('Importing a module script failed') ||
+          err?.name === 'ChunkLoadError';
+        if (isChunkError && !sessionStorage.getItem('__chunk_reload')) {
+          sessionStorage.setItem('__chunk_reload', '1');
+          window.location.reload();
+        }
+        throw err;
+      })
+  );
 
 const Dashboard              = lz(() => import('./components/Dashboard'),              'Dashboard');
 const McVillChat             = lz(() => import('./components/McVillChat'),             'McVillChat');
