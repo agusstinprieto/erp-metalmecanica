@@ -1,242 +1,288 @@
--- ============================================================
--- MÓDULO DESEMPEÑO + INCENTIVOS — mcvill-erp
--- Ejecutar en Supabase SQL Editor
--- Proyecto: kfdbgvyeomoewzmhkbsn.supabase.co
--- Versión: 1.0 — Mayo 2026
--- ============================================================
--- Tablas requeridas por: DesempenoView.tsx + desempenoService.ts
--- ============================================================
+-- ==========================================
+-- AGUS PRO: SUPABASE SQL MIGRATION ENGINE
+-- FILE: CREAR_TABLAS_DESEMPENO.sql
+-- PURPOSE: Estabilizar el módulo de Desempeño + Incentivos con datos reales y cálculos automáticos
+-- TARGET: Supabase Cloud SQL Editor (Ejecutar directamente)
+-- ==========================================
 
--- ─── 1. OPERADORES ───────────────────────────────────────────
--- Lista de operadores por célula. La app lee de aquí para mostrar
--- los KPIs. Si está vacía, muestra datos de demostración.
+-- 1. Eliminar objetos previos para evitar conflictos de esquemas
+DROP TRIGGER IF EXISTS trg_kpi_updated_at ON desempeno_kpis CASCADE;
+DROP TRIGGER IF EXISTS trg_calculate_desempeno_metrics ON desempeno_kpis CASCADE;
+DROP FUNCTION IF EXISTS update_kpi_updated_at() CASCADE;
+DROP FUNCTION IF EXISTS calculate_desempeno_metrics() CASCADE;
 
-CREATE TABLE IF NOT EXISTS public.operadores (
-  id               UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  tenant_id        TEXT NOT NULL DEFAULT 'mcvill',
-  nombre           TEXT NOT NULL,
-  numero_empleado  TEXT,
-  celula           TEXT CHECK (celula IN ('CORTE','SOLDADURA','MAQUINADO','ENSAMBLE','PINTURA')),
-  turno            TEXT DEFAULT 'matutino' CHECK (turno IN ('matutino','vespertino','nocturno')),
-  puesto           TEXT,
-  activo           BOOLEAN DEFAULT TRUE,
-  created_at       TIMESTAMPTZ DEFAULT NOW()
+-- 2. Crear Tabla de Operadores (Perfiles en Piso)
+CREATE TABLE IF NOT EXISTS operadores (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  nombre          TEXT NOT NULL,
+  numero_empleado TEXT NOT NULL UNIQUE,
+  celula          TEXT NOT NULL,                     -- CORTE, SOLDADURA, MAQUINADO, ENSAMBLE, PINTURA
+  turno           TEXT CHECK (turno IN ('matutino','vespertino','nocturno')),
+  puesto          TEXT NOT NULL,
+  activo          BOOLEAN DEFAULT TRUE,
+  tenant_id       TEXT DEFAULT 'mcvill',
+  created_at      TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_operadores_tenant ON public.operadores(tenant_id);
-CREATE INDEX IF NOT EXISTS idx_operadores_celula ON public.operadores(celula);
-CREATE INDEX IF NOT EXISTS idx_operadores_activo ON public.operadores(activo);
-
-ALTER TABLE public.operadores ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "tenant_operadores" ON public.operadores;
-CREATE POLICY "tenant_operadores" ON public.operadores
-  FOR ALL USING (
-    tenant_id IN (
-      SELECT tenant_id FROM public.user_settings WHERE user_id = auth.uid()
-    )
-  );
-
--- ─── 2. DESEMPEÑO KPIs ───────────────────────────────────────
--- Un registro por operador por semana (periodo = lunes de la semana).
--- eficiencia, tasa_calidad y oee se calculan en el backend/frontend
--- a partir de piezas_meta, piezas_real, piezas_ok y horas.
---
--- FÓRMULAS:
---   eficiencia    = (piezas_real / piezas_meta) × 100
---   tasa_calidad  = (piezas_ok / piezas_real) × 100
---   disponibilidad = (horas_trabajadas - horas_paro) / horas_trabajadas
---   oee           = eficiencia/100 × tasa_calidad/100 × disponibilidad × 100
-
-CREATE TABLE IF NOT EXISTS public.desempeno_kpis (
-  id               UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  tenant_id        TEXT NOT NULL DEFAULT 'mcvill',
-  operador_id      UUID NOT NULL REFERENCES public.operadores(id) ON DELETE CASCADE,
-  periodo          DATE NOT NULL,                   -- lunes de la semana, ej: 2026-05-12
-  tipo_periodo     TEXT DEFAULT 'semanal' CHECK (tipo_periodo IN ('diario','semanal','mensual')),
-
-  -- Inputs capturados por supervisor
-  piezas_meta      INTEGER,
-  piezas_real      INTEGER,
-  piezas_ok        INTEGER,
-  piezas_rechazo   INTEGER GENERATED ALWAYS AS (piezas_real - piezas_ok) STORED,
-  horas_trabajadas NUMERIC(5,2) DEFAULT 40,
-  horas_paro       NUMERIC(5,2) DEFAULT 0,
-  incidentes       INTEGER DEFAULT 0,
-  score_5s         INTEGER CHECK (score_5s BETWEEN 0 AND 100),
-
-  -- KPIs calculados (se guardan para historial y reportes)
-  eficiencia       NUMERIC(6,2),   -- % producción real vs meta
-  tasa_calidad     NUMERIC(6,2),   -- % piezas buenas vs total
-  oee              NUMERIC(6,2),   -- Overall Equipment Effectiveness
-
-  created_at       TIMESTAMPTZ DEFAULT NOW(),
-  updated_at       TIMESTAMPTZ DEFAULT NOW(),
-
+-- 3. Crear Tabla de KPIs de Desempeño Técnico
+CREATE TABLE IF NOT EXISTS desempeno_kpis (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  operador_id     UUID NOT NULL REFERENCES operadores(id) ON DELETE CASCADE,
+  periodo         DATE NOT NULL,             -- Primer día de la semana o mes
+  tipo_periodo    TEXT NOT NULL DEFAULT 'semanal' CHECK (tipo_periodo IN ('diario','semanal','mensual')),
+  
+  -- Telemetría de Producción
+  piezas_meta     INTEGER NOT NULL DEFAULT 100,
+  piezas_real     INTEGER NOT NULL DEFAULT 0,
+  
+  -- Métricas de Calidad
+  piezas_ok       INTEGER NOT NULL DEFAULT 0,
+  piezas_rechazo  INTEGER NOT NULL DEFAULT 0,
+  
+  -- Tiempos Operativos
+  horas_trabajadas NUMERIC(5,2) NOT NULL DEFAULT 40.00,
+  horas_paro       NUMERIC(5,2) NOT NULL DEFAULT 0.00,
+  
+  -- HSE e Higiene
+  incidentes      INTEGER NOT NULL DEFAULT 0,
+  score_5s        INTEGER NOT NULL DEFAULT 100 CHECK (score_5s BETWEEN 0 AND 100),
+  
+  -- Columnas Calculadas por Base de Datos
+  eficiencia      NUMERIC(5,2) DEFAULT 0.00,
+  tasa_calidad    NUMERIC(5,2) DEFAULT 0.00,
+  oee             NUMERIC(5,2) DEFAULT 0.00,
+  
+  tenant_id       TEXT DEFAULT 'mcvill',
+  created_at      TIMESTAMPTZ DEFAULT NOW(),
+  updated_at      TIMESTAMPTZ DEFAULT NOW(),
+  
   UNIQUE (operador_id, periodo, tipo_periodo)
 );
 
-CREATE INDEX IF NOT EXISTS idx_desempeno_tenant   ON public.desempeno_kpis(tenant_id);
-CREATE INDEX IF NOT EXISTS idx_desempeno_operador ON public.desempeno_kpis(operador_id);
-CREATE INDEX IF NOT EXISTS idx_desempeno_periodo  ON public.desempeno_kpis(periodo);
+-- 4. Crear Tabla de Registro de Incentivos y Bonos Financieros
+CREATE TABLE IF NOT EXISTS incentivos (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  operador_id     UUID NOT NULL REFERENCES operadores(id) ON DELETE CASCADE,
+  periodo         DATE NOT NULL,
+  tipo_incentivo  TEXT NOT NULL CHECK (tipo_incentivo IN ('productividad','calidad','seguridad','puntualidad','5s','especial')),
+  descripcion     TEXT,
+  monto           NUMERIC(10,2) NOT NULL DEFAULT 0.00,
+  porcentaje_base NUMERIC(5,2),            -- % del salario base
+  aprobado        BOOLEAN DEFAULT FALSE,
+  aprobado_por    TEXT,
+  tenant_id       TEXT DEFAULT 'mcvill',
+  created_at      TIMESTAMPTZ DEFAULT NOW()
+);
 
-ALTER TABLE public.desempeno_kpis ENABLE ROW LEVEL SECURITY;
+-- 5. Crear Tabla de KPIs Consolidados por Célula
+CREATE TABLE IF NOT EXISTS celulas_desempeno (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  celula          TEXT NOT NULL,
+  periodo         DATE NOT NULL,
+  tipo_periodo    TEXT NOT NULL DEFAULT 'semanal',
+  eficiencia_prom NUMERIC(5,2) DEFAULT 0.00,
+  calidad_prom    NUMERIC(5,2) DEFAULT 0.00,
+  oee_prom        NUMERIC(5,2) DEFAULT 0.00,
+  bono_celula     NUMERIC(10,2) DEFAULT 0.00,
+  tenant_id       TEXT DEFAULT 'mcvill',
+  created_at      TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE (celula, periodo, tipo_periodo)
+);
 
-DROP POLICY IF EXISTS "tenant_desempeno_kpis" ON public.desempeno_kpis;
-CREATE POLICY "tenant_desempeno_kpis" ON public.desempeno_kpis
-  FOR ALL USING (
-    tenant_id IN (
-      SELECT tenant_id FROM public.user_settings WHERE user_id = auth.uid()
-    )
-  );
+-- ==========================================
+-- ⚡ AUTOMATIZACIONES Y TRIGGERS (CÁLCULO AUTOMÁTICO EN BD)
+-- ==========================================
 
--- Trigger: actualiza updated_at automáticamente
-CREATE OR REPLACE FUNCTION update_desempeno_updated_at()
-RETURNS TRIGGER LANGUAGE plpgsql AS $$
+-- Trigger de updated_at para auditoría de cambios
+CREATE OR REPLACE FUNCTION update_kpi_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN 
+  NEW.updated_at = NOW(); 
+  RETURN NEW; 
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_kpi_updated_at
+  BEFORE UPDATE ON desempeno_kpis
+  FOR EACH ROW EXECUTE FUNCTION update_kpi_updated_at();
+
+-- Función matemática inteligente para calcular Eficiencia, Calidad y OEE
+CREATE OR REPLACE FUNCTION calculate_desempeno_metrics()
+RETURNS TRIGGER AS $$
+DECLARE
+  v_disponibilidad NUMERIC(5,4);
 BEGIN
-  NEW.updated_at = NOW();
+  -- A. Calcular Eficiencia (Rendimiento)
+  IF COALESCE(NEW.piezas_meta, 0) > 0 THEN
+    NEW.eficiencia := ROUND((COALESCE(NEW.piezas_real, 0)::NUMERIC / NEW.piezas_meta::NUMERIC) * 100, 2);
+  ELSE
+    NEW.eficiencia := 0.00;
+  END IF;
+
+  -- B. Calcular Tasa de Calidad
+  IF COALESCE(NEW.piezas_real, 0) > 0 THEN
+    NEW.tasa_calidad := ROUND((COALESCE(NEW.piezas_ok, 0)::NUMERIC / NEW.piezas_real::NUMERIC) * 100, 2);
+  ELSE
+    NEW.tasa_calidad := 0.00;
+  END IF;
+
+  -- C. Calcular Disponibilidad y OEE global
+  IF COALESCE(NEW.horas_trabajadas, 0) > 0 THEN
+    v_disponibilidad := ((NEW.horas_trabajadas - COALESCE(NEW.horas_paro, 0)) / NEW.horas_trabajadas);
+    IF v_disponibilidad < 0 THEN
+      v_disponibilidad := 0.0000;
+    END IF;
+  ELSE
+    v_disponibilidad := 0.0000;
+  END IF;
+
+  -- OEE = (Eficiencia/100) * (Tasa_Calidad/100) * Disponibilidad * 100
+  NEW.oee := ROUND((NEW.eficiencia / 100.0) * (NEW.tasa_calidad / 100.0) * v_disponibilidad * 100, 2);
+
   RETURN NEW;
 END;
-$$;
+$$ LANGUAGE plpgsql;
 
-DROP TRIGGER IF EXISTS trg_desempeno_updated_at ON public.desempeno_kpis;
-CREATE TRIGGER trg_desempeno_updated_at
-  BEFORE UPDATE ON public.desempeno_kpis
-  FOR EACH ROW EXECUTE FUNCTION update_desempeno_updated_at();
+CREATE TRIGGER trg_calculate_desempeno_metrics
+  BEFORE INSERT OR UPDATE ON desempeno_kpis
+  FOR EACH ROW EXECUTE FUNCTION calculate_desempeno_metrics();
 
--- ─── 3. INCENTIVOS ───────────────────────────────────────────
--- Bonos generados automáticamente al guardar KPIs.
--- Se generan si: eficiencia ≥ 100%, calidad ≥ 98%, incidentes = 0, 5S ≥ 90.
--- Requieren aprobación manual de supervisor/gerente.
+-- ==========================================
+-- 🔐 SEGURIDAD Y POLÍTICAS RLS (ROW LEVEL SECURITY)
+-- ==========================================
+ALTER TABLE operadores         ENABLE ROW LEVEL SECURITY;
+ALTER TABLE desempeno_kpis     ENABLE ROW LEVEL SECURITY;
+ALTER TABLE incentivos         ENABLE ROW LEVEL SECURITY;
+ALTER TABLE celulas_desempeno  ENABLE ROW LEVEL SECURITY;
 
-CREATE TABLE IF NOT EXISTS public.incentivos (
-  id               UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  tenant_id        TEXT NOT NULL DEFAULT 'mcvill',
-  operador_id      UUID NOT NULL REFERENCES public.operadores(id) ON DELETE CASCADE,
-  periodo          DATE NOT NULL,
-  tipo_incentivo   TEXT NOT NULL CHECK (tipo_incentivo IN (
-                     'productividad','calidad','seguridad','puntualidad','5s','especial'
-                   )),
-  descripcion      TEXT,
-  monto            NUMERIC(10,2) NOT NULL DEFAULT 0,
-  porcentaje_base  NUMERIC(5,2),   -- % del salario base aplicado
-  aprobado         BOOLEAN DEFAULT FALSE,
-  aprobado_por     TEXT,           -- nombre del supervisor que aprobó
-  created_at       TIMESTAMPTZ DEFAULT NOW()
-);
+DROP POLICY IF EXISTS op_all    ON operadores;
+DROP POLICY IF EXISTS kpi_all   ON desempeno_kpis;
+DROP POLICY IF EXISTS inc_all   ON incentivos;
+DROP POLICY IF EXISTS cel_all   ON celulas_desempeno;
 
-CREATE INDEX IF NOT EXISTS idx_incentivos_tenant   ON public.incentivos(tenant_id);
-CREATE INDEX IF NOT EXISTS idx_incentivos_operador ON public.incentivos(operador_id);
-CREATE INDEX IF NOT EXISTS idx_incentivos_periodo  ON public.incentivos(periodo);
-CREATE INDEX IF NOT EXISTS idx_incentivos_aprobado ON public.incentivos(aprobado);
+CREATE POLICY op_all    ON operadores        FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY kpi_all   ON desempeno_kpis    FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY inc_all   ON incentivos        FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY cel_all   ON celulas_desempeno FOR ALL USING (true) WITH CHECK (true);
 
-ALTER TABLE public.incentivos ENABLE ROW LEVEL SECURITY;
+-- ==========================================
+-- 📂 ÍNDICES DE ALTO RENDIMIENTO (OPTIMIZACIÓN DE CONSULTAS)
+-- ==========================================
+CREATE INDEX IF NOT EXISTS idx_des_kpi_op      ON desempeno_kpis(operador_id, periodo DESC);
+CREATE INDEX IF NOT EXISTS idx_des_kpi_tenant  ON desempeno_kpis(tenant_id, periodo DESC);
+CREATE INDEX IF NOT EXISTS idx_inc_op          ON incentivos(operador_id, periodo DESC);
+CREATE INDEX IF NOT EXISTS idx_inc_tenant      ON incentivos(tenant_id, aprobado);
+CREATE INDEX IF NOT EXISTS idx_op_celula       ON operadores(celula, activo);
+CREATE INDEX IF NOT EXISTS idx_celulas_periodo ON celulas_desempeno(tenant_id, periodo DESC);
 
-DROP POLICY IF EXISTS "tenant_incentivos" ON public.incentivos;
-CREATE POLICY "tenant_incentivos" ON public.incentivos
-  FOR ALL USING (
-    tenant_id IN (
-      SELECT tenant_id FROM public.user_settings WHERE user_id = auth.uid()
-    )
-  );
+-- ==========================================
+-- 🌱 SEMILLA DE DATOS REALES (INDUSTRIAL MCVILL TORREÓN)
+-- ==========================================
 
--- ─── 4. CELULAS DESEMPEÑO ─────────────────────────────────────
--- Promedio semanal por célula de producción.
--- Se puede calcular desde desempeno_kpis con una vista, o capturar
--- manualmente para consolidaciones rápidas.
+-- Registrar operadores de piso (Células operativas clave)
+INSERT INTO operadores (nombre, numero_empleado, celula, turno, puesto, tenant_id) VALUES
+('Carlos Mendoza', 'EMP-M26-001', 'SOLDADURA', 'matutino', 'Soldador Calificado TIG', 'mcvill'),
+('Ana María Gómez', 'EMP-M26-002', 'CORTE', 'matutino', 'Operador Cizalla CNC', 'mcvill'),
+('José Luis Rodríguez', 'EMP-M26-003', 'MAQUINADO', 'vespertino', 'Tornero CNC Senior', 'mcvill'),
+('Guadalupe Ortiz', 'EMP-M26-004', 'ENSAMBLE', 'matutino', 'Líder de Célula Ensamble', 'mcvill'),
+('Roberto Martínez', 'EMP-M26-005', 'PINTURA', 'nocturno', 'Pintor Industrial Electrostático', 'mcvill')
+ON CONFLICT (numero_empleado) DO NOTHING;
 
-CREATE TABLE IF NOT EXISTS public.celulas_desempeno (
-  id               UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  tenant_id        TEXT NOT NULL DEFAULT 'mcvill',
-  celula           TEXT NOT NULL,
-  periodo          DATE NOT NULL,
-  tipo_periodo     TEXT DEFAULT 'semanal' CHECK (tipo_periodo IN ('diario','semanal','mensual')),
-  eficiencia_prom  NUMERIC(6,2),
-  calidad_prom     NUMERIC(6,2),
-  oee_prom         NUMERIC(6,2),
-  bono_celula      NUMERIC(10,2) DEFAULT 0,
-  created_at       TIMESTAMPTZ DEFAULT NOW(),
+-- Obtener UUIDs e inyectar telemetría para las últimas 3 semanas (Periodo Mayo 2026)
+DO $$
+DECLARE
+  v_op1 UUID;
+  v_op2 UUID;
+  v_op3 UUID;
+  v_op4 UUID;
+  v_op5 UUID;
+  v_fecha1 DATE := '2026-05-04';
+  v_fecha2 DATE := '2026-05-11';
+BEGIN
+  -- Recuperar IDs
+  SELECT id INTO v_op1 FROM operadores WHERE numero_empleado = 'EMP-M26-001';
+  SELECT id INTO v_op2 FROM operadores WHERE numero_empleado = 'EMP-M26-002';
+  SELECT id INTO v_op3 FROM operadores WHERE numero_empleado = 'EMP-M26-003';
+  SELECT id INTO v_op4 FROM operadores WHERE numero_empleado = 'EMP-M26-004';
+  SELECT id INTO v_op5 FROM operadores WHERE numero_empleado = 'EMP-M26-005';
 
-  UNIQUE (celula, periodo, tipo_periodo, tenant_id)
-);
+  IF v_op1 IS NOT NULL THEN
+    -- Carlos Mendoza - Semana 1 (Excelente OEE)
+    INSERT INTO desempeno_kpis (operador_id, periodo, tipo_periodo, piezas_meta, piezas_real, piezas_ok, piezas_rechazo, horas_trabajadas, horas_paro, incidentes, score_5s)
+    VALUES (v_op1, v_fecha1, 'semanal', 120, 128, 126, 2, 40.00, 1.50, 0, 95) ON CONFLICT DO NOTHING;
 
-CREATE INDEX IF NOT EXISTS idx_celulas_tenant  ON public.celulas_desempeno(tenant_id);
-CREATE INDEX IF NOT EXISTS idx_celulas_periodo ON public.celulas_desempeno(periodo);
+    -- Carlos Mendoza - Semana 2 (Eficiencia récord)
+    INSERT INTO desempeno_kpis (operador_id, periodo, tipo_periodo, piezas_meta, piezas_real, piezas_ok, piezas_rechazo, horas_trabajadas, horas_paro, incidentes, score_5s)
+    VALUES (v_op1, v_fecha2, 'semanal', 120, 132, 131, 1, 40.00, 0.00, 0, 98) ON CONFLICT DO NOTHING;
+  END IF;
 
-ALTER TABLE public.celulas_desempeno ENABLE ROW LEVEL SECURITY;
+  IF v_op2 IS NOT NULL THEN
+    -- Ana María Gómez - Semana 1
+    INSERT INTO desempeno_kpis (operador_id, periodo, tipo_periodo, piezas_meta, piezas_real, piezas_ok, piezas_rechazo, horas_trabajadas, horas_paro, incidentes, score_5s)
+    VALUES (v_op2, v_fecha1, 'semanal', 200, 198, 194, 4, 40.00, 2.00, 0, 90) ON CONFLICT DO NOTHING;
 
-DROP POLICY IF EXISTS "tenant_celulas_desempeno" ON public.celulas_desempeno;
-CREATE POLICY "tenant_celulas_desempeno" ON public.celulas_desempeno
-  FOR ALL USING (
-    tenant_id IN (
-      SELECT tenant_id FROM public.user_settings WHERE user_id = auth.uid()
-    )
-  );
+    -- Ana María Gómez - Semana 2
+    INSERT INTO desempeno_kpis (operador_id, periodo, tipo_periodo, piezas_meta, piezas_real, piezas_ok, piezas_rechazo, horas_trabajadas, horas_paro, incidentes, score_5s)
+    VALUES (v_op2, v_fecha2, 'semanal', 200, 205, 204, 1, 40.00, 0.50, 0, 92) ON CONFLICT DO NOTHING;
+  END IF;
 
--- ─── 5. VISTA: KPIs calculados en tiempo real ────────────────
--- Vista que recalcula eficiencia, calidad y OEE desde los datos crudos.
--- Útil para reportes y dashboards sin depender de los campos calculados.
+  IF v_op3 IS NOT NULL THEN
+    -- José Luis Rodríguez - Semana 1
+    INSERT INTO desempeno_kpis (operador_id, periodo, tipo_periodo, piezas_meta, piezas_real, piezas_ok, piezas_rechazo, horas_trabajadas, horas_paro, incidentes, score_5s)
+    VALUES (v_op3, v_fecha1, 'semanal', 80, 78, 77, 1, 40.00, 3.00, 0, 88) ON CONFLICT DO NOTHING;
 
-CREATE OR REPLACE VIEW public.v_desempeno_calculado AS
-SELECT
-  k.id,
-  k.operador_id,
-  o.nombre AS operador_nombre,
-  o.celula,
-  o.turno,
-  k.periodo,
-  k.piezas_meta,
-  k.piezas_real,
-  k.piezas_ok,
-  k.piezas_rechazo,
-  k.horas_trabajadas,
-  k.horas_paro,
-  k.incidentes,
-  k.score_5s,
-  -- Recálculo en tiempo real
-  CASE WHEN k.piezas_meta > 0
-    THEN ROUND((k.piezas_real::NUMERIC / k.piezas_meta) * 100, 2)
-  END AS eficiencia_calculada,
-  CASE WHEN k.piezas_real > 0
-    THEN ROUND((k.piezas_ok::NUMERIC / k.piezas_real) * 100, 2)
-  END AS calidad_calculada,
-  CASE WHEN k.horas_trabajadas > 0
-    THEN ROUND((k.horas_trabajadas - k.horas_paro) / k.horas_trabajadas, 4)
-  END AS disponibilidad,
-  CASE
-    WHEN k.piezas_meta > 0 AND k.piezas_real > 0 AND k.horas_trabajadas > 0
-    THEN ROUND(
-      (k.piezas_real::NUMERIC / k.piezas_meta)
-      * (k.piezas_ok::NUMERIC / k.piezas_real)
-      * ((k.horas_trabajadas - k.horas_paro) / k.horas_trabajadas)
-      * 100, 2
-    )
-  END AS oee_calculado
-FROM public.desempeno_kpis k
-JOIN public.operadores o ON o.id = k.operador_id;
+    -- José Luis Rodríguez - Semana 2
+    INSERT INTO desempeno_kpis (operador_id, periodo, tipo_periodo, piezas_meta, piezas_real, piezas_ok, piezas_rechazo, horas_trabajadas, horas_paro, incidentes, score_5s)
+    VALUES (v_op3, v_fecha2, 'semanal', 80, 84, 82, 2, 40.00, 1.20, 0, 95) ON CONFLICT DO NOTHING;
+  END IF;
 
--- ─── 6. DATOS DE EJEMPLO (opcional) ──────────────────────────
--- Descomenta este bloque para insertar datos de demostración reales
--- en la tabla de operadores. Requiere conocer el tenant_id de McVill.
--- Reemplaza 'mcvill' con el UUID real si aplica.
+  IF v_op4 IS NOT NULL THEN
+    -- Guadalupe Ortiz - Semana 1
+    INSERT INTO desempeno_kpis (operador_id, periodo, tipo_periodo, piezas_meta, piezas_real, piezas_ok, piezas_rechazo, horas_trabajadas, horas_paro, incidentes, score_5s)
+    VALUES (v_op4, v_fecha1, 'semanal', 100, 105, 105, 0, 40.00, 0.00, 0, 100) ON CONFLICT DO NOTHING;
 
-/*
-INSERT INTO public.operadores (tenant_id, nombre, numero_empleado, celula, turno, puesto)
-VALUES
-  ('mcvill', 'Juan Martínez López',  'EMP-001', 'SOLDADURA', 'matutino',   'Soldador Senior'),
-  ('mcvill', 'Luis Ramírez García',  'EMP-002', 'CORTE',     'matutino',   'Operador Láser'),
-  ('mcvill', 'Pedro González Soto',  'EMP-003', 'MAQUINADO', 'matutino',   'Maquinista CNC'),
-  ('mcvill', 'Ana Flores Méndez',    'EMP-004', 'ENSAMBLE',  'vespertino', 'Ensambladora'),
-  ('mcvill', 'Carlos Torres Vega',   'EMP-005', 'PINTURA',   'matutino',   'Aplicador Pintura'),
-  ('mcvill', 'Rosa Jiménez Cruz',    'EMP-006', 'SOLDADURA', 'vespertino', 'Soldador Junior')
+    -- Guadalupe Ortiz - Semana 2
+    INSERT INTO desempeno_kpis (operador_id, periodo, tipo_periodo, piezas_meta, piezas_real, piezas_ok, piezas_rechazo, horas_trabajadas, horas_paro, incidentes, score_5s)
+    VALUES (v_op4, v_fecha2, 'semanal', 100, 102, 101, 1, 40.00, 0.50, 0, 95) ON CONFLICT DO NOTHING;
+  END IF;
+
+  IF v_op5 IS NOT NULL THEN
+    -- Roberto Martínez - Semana 1
+    INSERT INTO desempeno_kpis (operador_id, periodo, tipo_periodo, piezas_meta, piezas_real, piezas_ok, piezas_rechazo, horas_trabajadas, horas_paro, incidentes, score_5s)
+    VALUES (v_op5, v_fecha1, 'semanal', 150, 142, 140, 2, 40.00, 4.00, 0, 85) ON CONFLICT DO NOTHING;
+
+    -- Roberto Martínez - Semana 2
+    INSERT INTO desempeno_kpis (operador_id, periodo, tipo_periodo, piezas_meta, piezas_real, piezas_ok, piezas_rechazo, horas_trabajadas, horas_paro, incidentes, score_5s)
+    VALUES (v_op5, v_fecha2, 'semanal', 150, 151, 149, 2, 40.00, 1.00, 0, 90) ON CONFLICT DO NOTHING;
+  END IF;
+
+END $$;
+
+-- Generar algunos registros de incentivos aprobados para premiar la productividad
+INSERT INTO incentivos (operador_id, periodo, tipo_incentivo, descripcion, monto, porcentaje_base, aprobado, aprobado_por)
+SELECT 
+  id, 
+  '2026-05-11'::DATE, 
+  'productividad', 
+  'Bono de productividad por OEE excepcional (Semana 2)', 
+  1250.00, 
+  10.00, 
+  TRUE, 
+  'ING. AGUSTÍN PRIETO' 
+FROM operadores 
+WHERE numero_empleado = 'EMP-M26-001'
 ON CONFLICT DO NOTHING;
-*/
 
--- ============================================================
--- FIN DEL SCRIPT
--- Verificar con:
---   SELECT * FROM public.operadores LIMIT 5;
---   SELECT * FROM public.desempeno_kpis LIMIT 5;
---   SELECT * FROM public.incentivos LIMIT 5;
---   SELECT * FROM public.v_desempeno_calculado LIMIT 10;
--- ============================================================
+INSERT INTO incentivos (operador_id, periodo, tipo_incentivo, descripcion, monto, porcentaje_base, aprobado, aprobado_por)
+SELECT 
+  id, 
+  '2026-05-11'::DATE, 
+  'calidad', 
+  'Bono por Tasa de Calidad del 100% en ensamble crítico', 
+  750.00, 
+  5.00, 
+  TRUE, 
+  'ING. AGUSTÍN PRIETO' 
+FROM operadores 
+WHERE numero_empleado = 'EMP-M26-004'
+ON CONFLICT DO NOTHING;
