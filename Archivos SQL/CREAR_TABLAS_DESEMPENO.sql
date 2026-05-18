@@ -15,7 +15,7 @@ DROP FUNCTION IF EXISTS calculate_desempeno_metrics() CASCADE;
 CREATE TABLE IF NOT EXISTS operadores (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   nombre          TEXT NOT NULL,
-  numero_empleado TEXT NOT NULL UNIQUE,
+  numero_empleado TEXT NOT NULL,
   celula          TEXT NOT NULL,                     -- CORTE, SOLDADURA, MAQUINADO, ENSAMBLE, PINTURA
   turno           TEXT CHECK (turno IN ('matutino','vespertino','nocturno')),
   puesto          TEXT NOT NULL,
@@ -23,6 +23,10 @@ CREATE TABLE IF NOT EXISTS operadores (
   tenant_id       TEXT DEFAULT 'mcvill',
   created_at      TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- 🔥 GARANTIZAR RESTRICCIÓN DE UNICIDAD EN numero_empleado SI LA TABLA YA EXISTÍA
+ALTER TABLE operadores DROP CONSTRAINT IF EXISTS operadores_numero_empleado_key;
+ALTER TABLE operadores ADD CONSTRAINT operadores_numero_empleado_key UNIQUE (numero_empleado);
 
 -- 3. Crear Tabla de KPIs de Desempeño Técnico
 CREATE TABLE IF NOT EXISTS desempeno_kpis (
@@ -54,10 +58,12 @@ CREATE TABLE IF NOT EXISTS desempeno_kpis (
   
   tenant_id       TEXT DEFAULT 'mcvill',
   created_at      TIMESTAMPTZ DEFAULT NOW(),
-  updated_at      TIMESTAMPTZ DEFAULT NOW(),
-  
-  UNIQUE (operador_id, periodo, tipo_periodo)
+  updated_at      TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- 🔥 GARANTIZAR RESTRICCIÓN DE UNICIDAD MULTI-COLUMNA EN desempeno_kpis
+ALTER TABLE desempeno_kpis DROP CONSTRAINT IF EXISTS desempeno_kpis_operador_id_periodo_tipo_periodo_key;
+ALTER TABLE desempeno_kpis ADD CONSTRAINT desempeno_kpis_operador_id_periodo_tipo_periodo_key UNIQUE (operador_id, periodo, tipo_periodo);
 
 -- 4. Crear Tabla de Registro de Incentivos y Bonos Financieros
 CREATE TABLE IF NOT EXISTS incentivos (
