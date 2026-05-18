@@ -505,14 +505,16 @@ export const SeguridadIndustrialView: React.FC = () => {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          // Robust initial self-heal to catch cached empty/YouTube links for all 6 channels
+          // Robust initial self-heal to catch cached empty/YouTube/GoogleStorage links for all 6 channels
           const hasLegacy = parsed.some(c => 
             !c.url || 
             c.url.includes('youtube.com') || 
             c.url.includes('youtu.be') || 
             c.url.includes('assets.mixkit.co') ||
             c.url.includes('7XGplK3yV-E') ||
-            c.url.includes('s5eA30XW-tY')
+            c.url.includes('s5eA30XW-tY') ||
+            c.url.includes('googleapis.com') ||
+            c.url.includes('googleusercontent.com')
           );
           if (hasLegacy) {
             return DEFAULT_CAMERAS;
@@ -544,7 +546,9 @@ export const SeguridadIndustrialView: React.FC = () => {
             c.url.includes('youtu.be') || 
             c.url.includes('assets.mixkit.co') ||
             c.url.includes('7XGplK3yV-E') ||
-            c.url.includes('s5eA30XW-tY')
+            c.url.includes('s5eA30XW-tY') ||
+            c.url.includes('googleapis.com') ||
+            c.url.includes('googleusercontent.com')
           );
           if (hasLegacy) {
             setCameras(DEFAULT_CAMERAS);
