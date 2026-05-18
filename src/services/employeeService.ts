@@ -26,6 +26,7 @@ export interface Employee {
   celula_operador?: string;      // CORTE | SOLDADURA | MAQUINADO | ENSAMBLE | PINTURA
   turno_operador?: string;       // matutino | vespertino | nocturno
   puesto_operador?: string;      // Soldador Senior, Operador CNC, etc.
+  notes?: string;                // Notas especiales del colaborador
 }
 
 export const employeeService = {

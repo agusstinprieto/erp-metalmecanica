@@ -119,6 +119,7 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({ isOpen, on
     celula_operador: CELULAS[0],
     turno_operador: 'matutino',
     puesto_operador: '',
+    notes: '',
   });
   const [puestoOtro, setPuestoOtro] = useState('');
 
@@ -170,6 +171,7 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({ isOpen, on
       celula_operador: CELULAS[0],
       turno_operador: 'matutino',
       puesto_operador: '',
+      notes: '',
     });
     setPuestoOtro('');
   };
@@ -927,6 +929,21 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({ isOpen, on
                     </div>
                   </div>
                 </div>
+
+                {/* Notas Especiales */}
+                <div className="space-y-3">
+                  <h3 className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
+                    <FileText size={14} /> Notas Especiales
+                  </h3>
+                  <textarea
+                    rows={4}
+                    className="cyber-input w-full text-sm bg-black/40 resize-none py-4 px-5 leading-relaxed"
+                    placeholder="Condiciones especiales del contrato, restricciones médicas, acuerdos particulares, observaciones de RH…"
+                    value={formData.notes ?? ''}
+                    onChange={e => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+                  />
+                </div>
+
               </div>
             )}
 
