@@ -21,7 +21,7 @@ export interface Employee {
   photo_url?: string;
   documents?: Record<string, string>;
   shift_id?: string;
-  // Categoría para vincular automáticamente con módulo de Desempeño
+  // CategorÃ­a para vincular automÃ¡ticamente con mÃ³dulo de DesempeÃ±o
   tipo_empleado?: string;        // administrativo | supervisor | operador | almacenista | mantenimiento | vigilancia
   celula_operador?: string;      // CORTE | SOLDADURA | MAQUINADO | ENSAMBLE | PINTURA
   turno_operador?: string;       // matutino | vespertino | nocturno
@@ -35,7 +35,7 @@ export const employeeService = {
    */
   async listEmployees() {
     const tenantId = await getActiveTenantId();
-    let query = supabase.from('employees').select('*').order('employee_number', { ascending: true });
+    let query = supabase.from('empleados').select('*').order('employee_number', { ascending: true });
 
     if (tenantId) {
       query = query.eq('tenant_id', tenantId);
@@ -58,7 +58,7 @@ export const employeeService = {
     const tenantId = await getActiveTenantId();
 
     const { data, error } = await supabase
-      .from('employees')
+      .from('empleados')
       .insert({ ...employee, tenant_id: tenantId })
       .select()
       .single();
@@ -76,7 +76,7 @@ export const employeeService = {
    */
   async updateEmployee(id: string, updates: Partial<Employee>) {
     const { data, error } = await supabase
-      .from('employees')
+      .from('empleados')
       .update(updates)
       .eq('id', id)
       .select()
@@ -95,7 +95,7 @@ export const employeeService = {
    */
   async deleteEmployee(id: string) {
     const { error } = await supabase
-      .from('employees')
+      .from('empleados')
       .delete()
       .eq('id', id);
 
