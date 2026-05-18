@@ -361,7 +361,7 @@ const CameraCard = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const youtubeUrl = getYouTubeEmbedUrl(cam.url);
-  const isVideo = cam.url && (cam.url.endsWith('.mp4') || cam.url.includes('assets.mixkit.co'));
+  const isVideo = cam.url && (cam.url.endsWith('.mp4') || cam.url.includes('assets.mixkit.co') || cam.url.includes('googleapis.com') || cam.url.includes('googleusercontent.com'));
 
   return (
     <motion.div
@@ -457,7 +457,26 @@ const FullscreenSimulatorWrapper = ({ cam }: { cam: SecurityCamera }) => {
 /* ────── Main View ────── */
 export const SeguridadIndustrialView: React.FC = () => {
   const [cameras, setCameras]     = useState<SecurityCamera[]>(() => {
-    try { return JSON.parse(localStorage.getItem('mcvill_cameras') || 'null') ?? DEFAULT_CAMERAS; }
+    try {
+      const saved = localStorage.getItem('mcvill_cameras');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // Robust initial self-heal to catch cached YouTube links
+          const migrated = parsed.map(c => {
+            if (c.id === 'c2' && (!c.url || c.url.includes('youtube.com') || c.url.includes('youtu.be') || c.url.includes('7XGplK3yV-E') || c.url.includes('assets.mixkit.co'))) {
+              return { ...c, url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', online: true };
+            }
+            if (c.id === 'c4' && (!c.url || c.url.includes('youtube.com') || c.url.includes('youtu.be') || c.url.includes('s5eA30XW-tY') || c.url.includes('assets.mixkit.co'))) {
+              return { ...c, url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4', online: true };
+            }
+            return c;
+          });
+          return migrated;
+        }
+      }
+      return DEFAULT_CAMERAS;
+    }
     catch { return DEFAULT_CAMERAS; }
   });
   const [incidents, setIncidents] = useState<Incidente[]>(DEMO_INCIDENTS);
@@ -474,14 +493,16 @@ export const SeguridadIndustrialView: React.FC = () => {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const hasLegacyEmpty = parsed.some(c => c.id === 'c2' && (!c.url || c.url.includes('assets.mixkit.co') || c.url.includes('7XGplK3yV-E')));
-          const c4Offline = parsed.some(c => c.id === 'c4' && (!c.url || !c.online || c.url.includes('5_m36N_Zk1s') || c.url.includes('s5eA30XW-tY')));
-          if (hasLegacyEmpty || c4Offline) {
+          const hasLegacy = parsed.some(c => 
+            (c.id === 'c2' && (!c.url || c.url.includes('youtube.com') || c.url.includes('youtu.be') || c.url.includes('7XGplK3yV-E') || c.url.includes('assets.mixkit.co'))) ||
+            (c.id === 'c4' && (!c.url || c.url.includes('youtube.com') || c.url.includes('youtu.be') || c.url.includes('s5eA30XW-tY') || c.url.includes('assets.mixkit.co')))
+          );
+          if (hasLegacy) {
             const upgraded = parsed.map(c => {
-              if (c.id === 'c2' && (!c.url || c.url.includes('assets.mixkit.co') || c.url.includes('7XGplK3yV-E'))) {
+              if (c.id === 'c2' && (!c.url || c.url.includes('youtube.com') || c.url.includes('youtu.be') || c.url.includes('7XGplK3yV-E') || c.url.includes('assets.mixkit.co'))) {
                 return { ...c, url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', online: true };
               }
-              if (c.id === 'c4' && (!c.url || !c.online || c.url.includes('5_m36N_Zk1s') || c.url.includes('s5eA30XW-tY'))) {
+              if (c.id === 'c4' && (!c.url || c.url.includes('youtube.com') || c.url.includes('youtu.be') || c.url.includes('s5eA30XW-tY') || c.url.includes('assets.mixkit.co'))) {
                 return { ...c, url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4', online: true };
               }
               return c;
@@ -908,39 +929,63 @@ export const SeguridadIndustrialView: React.FC = () => {
       {/* ── Fullscreen modal ── */}
       <AnimatePresence>
         {fullscreenCam && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[300] bg-black/95 flex flex-col">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
-              <div className="flex items-center gap-3">
-                <span className={clsx('w-2 h-2 rounded-full', fullscreenCam.online ? 'bg-emerald-400 animate-pulse' : 'bg-rose-500')} />
-                <span className="text-[11px] font-black text-white uppercase">{fullscreenCam.nombre}</span>
-                <span className="text-[9px] text-slate-500">{fullscreenCam.area}</span>
-              </div>
-              <button onClick={() => setFullscreenCam(null)}
-                className="p-2 rounded-lg border border-white/10 text-slate-400 hover:text-white transition-colors">
-                <X size={14} />
-              </button>
-            </div>
-            <div className="flex-1 flex items-center justify-center p-4">
-              <div className="w-full max-w-4xl rounded-2xl overflow-hidden border border-white/10">
-                {fullscreenCam.url ? (
-                  getYouTubeEmbedUrl(fullscreenCam.url) ? (
-                    <iframe src={getYouTubeEmbedUrl(fullscreenCam.url) || ''} className="w-full aspect-video border-0" title={fullscreenCam.nombre} allow="autoplay; encrypted-media" />
-                  ) : (fullscreenCam.url.endsWith('.mp4') || fullscreenCam.url.includes('assets.mixkit.co')) ? (
-                    <video src={fullscreenCam.url} autoPlay loop muted playsInline className="w-full aspect-video object-cover" />
-                  ) : fullscreenCam.tipo === 'iframe' ? (
-                    <iframe src={fullscreenCam.url} className="w-full aspect-video border-0" title={fullscreenCam.nombre} />
-                  ) : (
-                    <img src={fullscreenCam.url} alt={fullscreenCam.nombre} className="w-full aspect-video object-cover" />
-                  )
-                ) : (
-                  <div className="aspect-video">
-                    <FullscreenSimulatorWrapper cam={fullscreenCam} />
+          <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              exit={{ opacity: 0 }}
+              onClick={() => setFullscreenCam(null)}
+              className="absolute inset-0 bg-slate-950/80 backdrop-blur-md" 
+            />
+            
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              onClick={e => e.stopPropagation()}
+              className="relative w-full max-w-4xl bg-slate-950 border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+            >
+              {/* Header */}
+              <div className="px-6 py-4 border-b border-white/5 bg-slate-900/40 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className={clsx('w-2 h-2 rounded-full', fullscreenCam.online ? 'bg-emerald-400 animate-pulse' : 'bg-rose-500')} />
+                  <div>
+                    <span className="text-xs font-black text-white uppercase tracking-wider">{fullscreenCam.nombre}</span>
+                    <span className="ml-2.5 px-2 py-0.5 rounded bg-white/5 border border-white/5 text-[9px] text-slate-400 font-bold uppercase tracking-widest">{fullscreenCam.area}</span>
                   </div>
-                )}
+                </div>
+                <button 
+                  onClick={() => setFullscreenCam(null)}
+                  className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 hover:border-rose-500/20 transition-all cursor-pointer flex items-center justify-center gap-1.5 text-[9px] font-black uppercase tracking-wider"
+                  title="Cerrar Feed"
+                >
+                  <X size={13} />
+                  <span>Cerrar</span>
+                </button>
               </div>
-            </div>
-          </motion.div>
+
+              {/* Body */}
+              <div className="p-4 bg-slate-950/60 flex-1 flex items-center justify-center">
+                <div className="w-full aspect-video rounded-xl overflow-hidden border border-white/10 bg-black shadow-inner relative">
+                  {fullscreenCam.url ? (
+                    getYouTubeEmbedUrl(fullscreenCam.url) ? (
+                      <iframe src={getYouTubeEmbedUrl(fullscreenCam.url) || ''} className="w-full h-full border-0" title={fullscreenCam.nombre} allow="autoplay; encrypted-media" />
+                    ) : (fullscreenCam.url.endsWith('.mp4') || fullscreenCam.url.includes('assets.mixkit.co') || fullscreenCam.url.includes('googleapis.com')) ? (
+                      <video src={fullscreenCam.url} autoPlay loop muted playsInline className="w-full h-full object-cover" />
+                    ) : fullscreenCam.tipo === 'iframe' ? (
+                      <iframe src={fullscreenCam.url} className="w-full h-full border-0" title={fullscreenCam.nombre} />
+                    ) : (
+                      <img src={fullscreenCam.url} alt={fullscreenCam.nombre} className="w-full h-full object-cover" />
+                    )
+                  ) : (
+                    <div className="w-full h-full">
+                      <FullscreenSimulatorWrapper cam={fullscreenCam} />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
 
