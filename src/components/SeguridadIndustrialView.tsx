@@ -348,6 +348,39 @@ function getYouTubeEmbedUrl(url: string): string | null {
   return null;
 }
 
+/* ────── Video Player Helper with Autoplay Force ────── */
+interface VideoPlayerProps {
+  src: string;
+  className?: string;
+  title?: string;
+  onError?: () => void;
+}
+const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, className, title, onError }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.muted = true;
+      videoRef.current.play().catch(err => {
+        console.warn("Video autoplay blocked or error:", err);
+      });
+    }
+  }, [src]);
+
+  return (
+    <video
+      ref={videoRef}
+      src={src}
+      autoPlay
+      loop
+      muted
+      playsInline
+      className={className}
+      title={title}
+      onError={onError}
+    />
+  );
+};
+
 /* ────── Camera Card ────── */
 const CameraCard = ({
   cam, onFullscreen, onEdit, onScanPPE, isScanning, scanningProgress
@@ -361,7 +394,17 @@ const CameraCard = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const youtubeUrl = getYouTubeEmbedUrl(cam.url);
-  const isVideo = cam.url && (cam.url.endsWith('.mp4') || cam.url.includes('assets.mixkit.co') || cam.url.includes('googleapis.com') || cam.url.includes('googleusercontent.com'));
+  const [videoError, setVideoError] = useState(false);
+  const isVideo = cam.url && (
+    cam.url.endsWith('.mp4') || 
+    cam.url.includes('assets.mixkit.co') || 
+    cam.url.includes('googleapis.com') || 
+    cam.url.includes('googleusercontent.com') ||
+    cam.url.includes('w3.org') ||
+    cam.url.includes('zencdn.net') ||
+    cam.url.includes('w3schools.com') ||
+    cam.url.includes('mozilla.net')
+  );
 
   return (
     <motion.div
@@ -370,16 +413,16 @@ const CameraCard = ({
       className="relative flex flex-col rounded-xl overflow-hidden border border-white/5 bg-slate-950/60 hover:border-sky-500/30 transition-all duration-300 group"
     >
       <div className="relative aspect-video bg-black flex items-center justify-center overflow-hidden cursor-pointer" onClick={onFullscreen}>
-        {cam.url ? (
+        {cam.url && !videoError ? (
           youtubeUrl ? (
             <iframe src={youtubeUrl} className="w-full h-full border-0 pointer-events-none scale-105" title={cam.nombre} allow="autoplay; encrypted-media" />
           ) : isVideo ? (
-            <video src={cam.url} autoPlay loop muted playsInline className="w-full h-full object-cover" />
+            <VideoPlayer src={cam.url} className="w-full h-full object-cover" title={cam.nombre} onError={() => setVideoError(true)} />
           ) : cam.tipo === 'iframe' ? (
             <iframe src={cam.url} className="w-full h-full border-0" title={cam.nombre} />
           ) : (
             <img src={cam.url} alt={cam.nombre} className="w-full h-full object-cover"
-                onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                onError={e => { (e.target as HTMLImageElement).style.display = 'none'; setVideoError(true); }} />
           )
         ) : (
           <SafetyFloorSimulator camId={cam.id} nombre={cam.nombre} area={cam.area} online={cam.online} canvasRef={canvasRef} />
