@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  X, User, Briefcase, Mail, Phone, Calendar, ShieldCheck, 
-  DollarSign, Loader2, CreditCard, Scan, Camera, Upload, 
+import {
+  X, User, Briefcase, Mail, Phone, Calendar, ShieldCheck,
+  DollarSign, Loader2, CreditCard, Scan, Camera, Upload,
   Trash2, CheckCircle2, FileText, Download, Plus, AlertCircle,
-  FileBadge, Users
+  FileBadge, Users, Factory, HardHat, ChevronDown
 } from 'lucide-react';
 import { employeeService } from '../services/employeeService';
 import type { Employee } from '../services/employeeService';
 import { shiftService, type WorkShift } from '../services/shiftService';
+import { createOperador, updateOperador, CELULAS } from '../services/desempenoService';
 import { toast } from '../lib/dialogs';
 import { useBarcodeScanner } from '../hooks/useBarcodeScanner';
 import Webcam from 'react-webcam';
@@ -40,6 +41,34 @@ const DOCUMENT_TYPES = [
   { id: 'nss', label: 'Número de Seguridad Social' },
   { id: 'acta', label: 'Acta de Nacimiento' },
   { id: 'contrato', label: 'Contrato Firmado' }
+];
+
+const CATEGORIAS_EMPLEADO = [
+  { value: '',              label: 'Seleccionar categoría…', dept: '' },
+  { value: 'operador',      label: '🏭  Operador de Producción', dept: 'Producción' },
+  { value: 'supervisor',    label: '👷  Supervisor / Jefe de Área', dept: 'Producción' },
+  { value: 'almacenista',   label: '📦  Almacenista / Logística', dept: 'Logística' },
+  { value: 'administrativo',label: '💼  Administrativo / Oficinas', dept: 'Administración' },
+  { value: 'ingeniero',     label: '⚙️  Ingeniero / Técnico', dept: 'Ingeniería' },
+  { value: 'mantenimiento', label: '🔧  Mantenimiento', dept: 'Producción' },
+  { value: 'vigilancia',    label: '🛡️  Vigilancia / Seguridad', dept: 'Administración' },
+  { value: 'rh',            label: '👥  Recursos Humanos', dept: 'RH' },
+  { value: 'ventas',        label: '📊  Ventas / Comercial', dept: 'Ventas' },
+];
+
+const PUESTOS_POR_CELULA: Record<string, string[]> = {
+  SOLDADURA:  ['Soldador Senior', 'Soldador Semi Senior', 'Soldador Junior', 'Soldador MIG/TIG'],
+  MAQUINADO:  ['Operador Torno CNC', 'Operador Fresadora CNC', 'Operador Centro de Mecanizado', 'Rectificador', 'Operador Torno Convencional'],
+  CORTE:      ['Operador Corte Láser', 'Operador Corte Plasma', 'Operador Cizalla', 'Operador Punzonado'],
+  ENSAMBLE:   ['Ensamblador Senior', 'Ensamblador Junior', 'Operador de Ensamble'],
+  PINTURA:    ['Aplicador de Pintura', 'Operador Cabina Pintura', 'Preparador de Superficies'],
+};
+const PUESTOS_GENERALES = ['Operador General', 'Otro (especificar)'];
+
+const TURNOS_OP = [
+  { value: 'matutino',   label: 'Matutino  (06:00 – 14:00)' },
+  { value: 'vespertino', label: 'Vespertino (14:00 – 22:00)' },
+  { value: 'nocturno',   label: 'Nocturno  (22:00 – 06:00)' },
 ];
 
 export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({ isOpen, onClose, onSuccess, employee }) => {
@@ -75,8 +104,13 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({ isOpen, on
     curp: '',
     nss: '',
     photo_url: '',
-    documents: {}
+    documents: {},
+    tipo_empleado: '',
+    celula_operador: CELULAS[0],
+    turno_operador: 'matutino',
+    puesto_operador: '',
   });
+  const [puestoOtro, setPuestoOtro] = useState('');
 
   useBarcodeScanner((code) => {
     if (scanningBadge) {
@@ -121,8 +155,13 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({ isOpen, on
       curp: '',
       nss: '',
       photo_url: '',
-      documents: {}
+      documents: {},
+      tipo_empleado: '',
+      celula_operador: CELULAS[0],
+      turno_operador: 'matutino',
+      puesto_operador: '',
     });
+    setPuestoOtro('');
   };
 
   const capturePhoto = React.useCallback(() => {
@@ -233,6 +272,35 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({ isOpen, on
         await employeeService.createEmployee(formData);
         toast('Colaborador registrado correctamente', 'success');
       }
+
+      // ── Vínculo automático con módulo de Desempeño ──────────────────────────
+      if (formData.tipo_empleado === 'operador') {
+        const fullName = `${formData.first_name ?? ''} ${formData.last_name ?? ''}`.trim();
+        const puestoFinal = formData.puesto_operador === 'Otro (especificar)'
+          ? (puestoOtro || 'Operador General')
+          : (formData.puesto_operador || 'Operador General');
+        try {
+          if (employee?.id && employee.tipo_empleado === 'operador') {
+            // Si ya era operador, actualizamos via número de empleado
+            // (no tenemos el operador_id directamente, así que upsert por número)
+          }
+          await createOperador({
+            nombre:          fullName,
+            numero_empleado: formData.employee_number ?? '',
+            celula:          formData.celula_operador ?? CELULAS[0],
+            turno:           formData.turno_operador as any ?? 'matutino',
+            puesto:          puestoFinal,
+          });
+          toast('Operador vinculado al módulo de Desempeño automáticamente.', 'success');
+        } catch (opErr: any) {
+          // Si ya existe (duplicate), no es error crítico
+          if (!opErr?.message?.includes('duplicate') && !opErr?.message?.includes('unique')) {
+            console.warn('[EmployeeForm] No se pudo vincular con Desempeño:', opErr?.message);
+          }
+        }
+      }
+      // ────────────────────────────────────────────────────────────────────────
+
       onSuccess();
       onClose();
     } catch (err: any) {
@@ -585,6 +653,132 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({ isOpen, on
 
             {activeTab === 'contratacion' && (
               <div className="space-y-10 animate-in fade-in duration-500">
+
+                {/* ── Categoría de empleado ─────────────────────────────────── */}
+                <div className="space-y-4">
+                  <h3 className="text-xs font-black text-mcvill-accent uppercase tracking-[0.2em] flex items-center gap-2">
+                    <HardHat size={14} /> Categoría de Empleado
+                  </h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+                    {CATEGORIAS_EMPLEADO.filter(c => c.value).map(cat => (
+                      <button
+                        key={cat.value}
+                        type="button"
+                        onClick={() => {
+                          const dept = cat.dept || formData.department || 'Producción';
+                          setFormData(prev => ({
+                            ...prev,
+                            tipo_empleado: cat.value,
+                            department: dept,
+                            celula_operador: prev.celula_operador ?? CELULAS[0],
+                            turno_operador:  prev.turno_operador  ?? 'matutino',
+                            puesto_operador: cat.value === 'operador' ? '' : prev.puesto_operador,
+                          }));
+                        }}
+                        className={clsx(
+                          'relative px-3 py-3 rounded-2xl border text-left transition-all group',
+                          formData.tipo_empleado === cat.value
+                            ? 'bg-blue-500/15 border-blue-500/50 text-white'
+                            : 'bg-white/5 border-white/10 text-slate-400 hover:border-white/20 hover:text-slate-200'
+                        )}
+                      >
+                        <span className="text-base">{cat.label.split('  ')[0]}</span>
+                        <span className={clsx(
+                          'block text-[10px] font-black uppercase tracking-wider mt-1 truncate',
+                          formData.tipo_empleado === cat.value ? 'text-blue-300' : 'text-slate-500'
+                        )}>
+                          {cat.label.split('  ')[1]}
+                        </span>
+                        {formData.tipo_empleado === cat.value && (
+                          <span className="absolute top-2 right-2 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                            <CheckCircle2 size={10} className="text-white" />
+                          </span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* ── Sección Piso de Producción (solo si es Operador) ──────── */}
+                {formData.tipo_empleado === 'operador' && (
+                  <div className="space-y-4 animate-in slide-in-from-top-2 duration-300">
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1 h-px bg-blue-500/20" />
+                      <h3 className="text-xs font-black text-blue-400 uppercase tracking-[0.2em] flex items-center gap-2 whitespace-nowrap">
+                        <Factory size={14} /> Datos de Piso de Producción
+                      </h3>
+                      <div className="flex-1 h-px bg-blue-500/20" />
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                      {/* Célula */}
+                      <div className="space-y-2.5">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Célula</label>
+                        <select
+                          className="cyber-select w-full h-14 text-sm bg-black/40 px-6"
+                          value={formData.celula_operador}
+                          onChange={e => setFormData(prev => ({
+                            ...prev,
+                            celula_operador: e.target.value,
+                            puesto_operador: '',
+                          }))}
+                        >
+                          {CELULAS.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                      </div>
+                      {/* Turno */}
+                      <div className="space-y-2.5">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Turno de Piso</label>
+                        <select
+                          className="cyber-select w-full h-14 text-sm bg-black/40 px-6"
+                          value={formData.turno_operador}
+                          onChange={e => setFormData(prev => ({ ...prev, turno_operador: e.target.value }))}
+                        >
+                          {TURNOS_OP.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                        </select>
+                      </div>
+                      {/* Puesto específico */}
+                      <div className="space-y-2.5">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Puesto en Célula</label>
+                        <select
+                          className="cyber-select w-full h-14 text-sm bg-black/40 px-6"
+                          value={formData.puesto_operador}
+                          onChange={e => {
+                            setFormData(prev => ({ ...prev, puesto_operador: e.target.value, job_title: e.target.value !== 'Otro (especificar)' ? e.target.value : prev.job_title }));
+                            if (e.target.value !== 'Otro (especificar)') setPuestoOtro('');
+                          }}
+                        >
+                          <option value="">Seleccionar puesto…</option>
+                          {[...(PUESTOS_POR_CELULA[formData.celula_operador ?? ''] ?? []), ...PUESTOS_GENERALES].map(p => (
+                            <option key={p} value={p}>{p}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                    {/* Campo libre si elige "Otro" */}
+                    {formData.puesto_operador === 'Otro (especificar)' && (
+                      <div className="space-y-2.5">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Especificar puesto</label>
+                        <input
+                          type="text"
+                          className="cyber-input w-full h-14 text-sm bg-black/40"
+                          placeholder="Describe el puesto exacto…"
+                          value={puestoOtro}
+                          onChange={e => {
+                            setPuestoOtro(e.target.value);
+                            setFormData(prev => ({ ...prev, job_title: e.target.value }));
+                          }}
+                        />
+                      </div>
+                    )}
+                    <div className="flex items-center gap-3 px-4 py-3 bg-blue-500/5 border border-blue-500/20 rounded-xl">
+                      <CheckCircle2 size={14} className="text-blue-400 shrink-0" />
+                      <p className="text-[10px] text-blue-300/80 leading-relaxed">
+                        Al guardar, este colaborador se registrará automáticamente en el módulo de <strong>Desempeño + Incentivos</strong> para seguimiento de KPIs semanales.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-2 gap-8">
                   <div className="space-y-6">
                     <h3 className="text-xs font-black text-blue-500 uppercase tracking-[0.2em] flex items-center gap-2">
@@ -593,7 +787,7 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({ isOpen, on
                     <div className="grid grid-cols-1 gap-6">
                       <div className="space-y-2.5">
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Departamento</label>
-                        <select 
+                        <select
                           className="cyber-select w-full h-14 text-sm bg-black/40 px-6"
                           value={formData.department}
                           onChange={e => setFormData({...formData, department: e.target.value})}
@@ -608,7 +802,7 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({ isOpen, on
                       </div>
                       <div className="space-y-2.5">
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Puesto Nominal</label>
-                        <input 
+                        <input
                           type="text" required
                           className="cyber-input w-full h-14 text-sm bg-black/40"
                           placeholder="Ej. Operador CNC Senior"

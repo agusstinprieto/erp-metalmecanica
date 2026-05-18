@@ -21,6 +21,11 @@ export interface Employee {
   photo_url?: string;
   documents?: Record<string, string>;
   shift_id?: string;
+  // Categoría para vincular automáticamente con módulo de Desempeño
+  tipo_empleado?: string;        // administrativo | supervisor | operador | almacenista | mantenimiento | vigilancia
+  celula_operador?: string;      // CORTE | SOLDADURA | MAQUINADO | ENSAMBLE | PINTURA
+  turno_operador?: string;       // matutino | vespertino | nocturno
+  puesto_operador?: string;      // Soldador Senior, Operador CNC, etc.
 }
 
 export const employeeService = {
