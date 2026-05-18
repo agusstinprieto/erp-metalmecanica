@@ -217,9 +217,9 @@ export const LiveVoiceModalERP: React.FC<LiveVoiceModalERPProps> = ({
       // Initialize SDK
       const ai = new GoogleGenAI({ apiKey } as any);
  
-      // Call Gemini 2.5 Flash Lite to generate audio response
+      // Call authorized native audio model for perfect voice fidelity
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash-lite',
+        model: 'models/gemini-2.5-flash-native-audio-preview-12-2025',
         contents: `Preséntate de forma extremadamente corta y profesional diciendo: "Hola, soy la voz de ${voiceName} del ERP McVill. ¿En qué te puedo ayudar hoy?"`,
         config: {
           responseModalities: ['AUDIO'],
