@@ -2,8 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import clsx from 'clsx';
 import {
   Activity, AlertTriangle, CheckCircle, Plus, RefreshCw,
-  Bell, X, Shield
+  Bell, X, Shield, FileDown
 } from 'lucide-react';
+import { reportUtils } from '../utils/reportUtils';
 import type { SPCCaracteristica, SPCMedicion, SPCAlerta, SPCStats, SubgrupoStats, NewMedicionInput } from '../services/spcService';
 import { fetchCaracteristicas, fetchMediciones, fetchAlertas, calcularEstadisticas, detectarAlertas, createMedicion, resolverAlerta, TURNOS } from '../services/spcService';
 
@@ -266,6 +267,24 @@ export const SPCView: React.FC = () => {
     if (caracs.length > 0 && !selectedCarac) loadCarac(caracs[0]);
   }, [caracs, selectedCarac, loadCarac]);
 
+  const handleExportPDF = () => {
+    const data = caracs.map(c => {
+      const s = c.id === selectedCarac?.id && stats ? stats : null;
+      return {
+        CARACTERISTICA: c.nombre,
+        PARTE: c.numero_parte ?? '—',
+        ESPECIFICACION: `LSL: ${c.lsl ?? '—'} / USL: ${c.usl ?? '—'}`,
+        CP: s?.cp != null ? s.cp.toFixed(3) : '—',
+        CPK: s?.cpk != null ? s.cpk.toFixed(3) : '—',
+        XBARBAR: s?.xbarbar != null ? s.xbarbar.toFixed(4) : '—',
+        UCL: s?.ucl_x != null ? s.ucl_x.toFixed(4) : '—',
+        LCL: s?.lcl_x != null ? s.lcl_x.toFixed(4) : '—',
+        ESTADO: s?.cpk != null ? (s.cpk >= 1.33 ? 'CAPAZ' : s.cpk >= 1.0 ? 'MARGINAL' : 'NO CAPAZ') : '—',
+      };
+    });
+    reportUtils.exportToPDF('Reporte SPC — Control Estadístico de Proceso', data, 'spc_caracteristicas', 'CALIDAD');
+  };
+
   const nextSubgrupo = mediciones.length > 0
     ? Math.max(...mediciones.map(m => m.subgrupo_id)) + 1
     : 1;
@@ -315,6 +334,9 @@ export const SPCView: React.FC = () => {
                 {pendingAlertas.length}
               </span>
             )}
+          </button>
+          <button onClick={handleExportPDF} className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-white/10 text-slate-400 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all">
+            <FileDown size={11} /> EXPORTAR PDF
           </button>
           <button onClick={() => selectedCarac && loadCarac(selectedCarac)}
             className="p-2 bg-mcvill-card border border-mcvill-accent/20 rounded-xl text-mcvill-text-muted hover:text-mcvill-accent hover:border-mcvill-accent/40 transition-all">

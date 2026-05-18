@@ -24,7 +24,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
     try {
       // Bypass solo en desarrollo local — no llega al bundle de producción
       if (import.meta.env.DEV) {
-        if (username.trim() === 'agus' && password === 'godmode22') {
+        if ((username.trim() === 'agus' || username.trim() === 'agus@mcvill.com') && password === 'godmode22') {
           setNotification({ message: 'Acceso total habilitado', type: 'success' });
           setTimeout(() => { setLoading(false); onLogin('admin'); }, 1000);
           return;

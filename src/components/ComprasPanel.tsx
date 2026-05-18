@@ -2,11 +2,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Truck, Package, Wrench, Plus, Pencil, Trash2, Save, X,
-  Loader2, AlertCircle, Search, ChevronRight, FileText, ShoppingCart
+  Loader2, AlertCircle, Search, ChevronRight, FileText, ShoppingCart, FileDown
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { OCProveedorManagerModal } from './OCProveedorManagerModal';
 import { useTenant } from '../hooks/useTenant';
+import { reportUtils } from '../utils/reportUtils';
 
 type TabId = 'proveedores' | 'materiales' | 'operaciones' | 'ordenes_compra';
 
@@ -612,6 +613,37 @@ export const ComprasPanel: React.FC = () => {
   const [tab, setTab] = useState<TabId>('proveedores');
   const tenantId = useTenant();
 
+  const handleExportPDF = async () => {
+    if (tab === 'proveedores') {
+      const { data } = await supabase.from('proveedores').select('*').order('razon_social');
+      const rows = (data ?? []).map((r: any) => ({
+        RAZON_SOCIAL: r.razon_social ?? '—',
+        RFC: r.rfc ?? '—',
+        CATEGORIA: r.categoria ?? '—',
+        CONTACTO: r.nombre_contacto ?? '—',
+        EMAIL: r.email ?? '—',
+        CIUDAD: r.ciudad ?? '—',
+        CONDICION_PAGO: r.condicion_pago ?? '—',
+        ACTIVO: r.activo ? 'SÍ' : 'NO',
+      }));
+      reportUtils.exportToPDF('Directorio de Proveedores', rows.length ? rows : [{ AVISO: 'Sin datos disponibles' }], 'proveedores', 'COMPRAS');
+    } else if (tab === 'materiales') {
+      const { data } = await supabase.from('materiales_catalogo').select('*').order('clave');
+      const rows = (data ?? []).map((r: any) => ({
+        CLAVE: r.clave ?? '—',
+        DESCRIPCION: r.descripcion ?? '—',
+        TIPO: r.tipo ?? '—',
+        UNIDAD: r.unidad_medida ?? '—',
+        PRECIO_UNIT: r.precio_unitario != null ? `$${Number(r.precio_unitario).toLocaleString('es-MX')}` : '—',
+        STOCK_ACT: r.stock_actual ?? '—',
+        STOCK_MIN: r.stock_minimo ?? '—',
+      }));
+      reportUtils.exportToPDF('Catálogo de Materiales', rows.length ? rows : [{ AVISO: 'Sin datos disponibles' }], 'materiales_catalogo', 'COMPRAS');
+    } else {
+      reportUtils.exportToPDF('Resumen Compras', [{ MODULO: 'Operaciones / Órdenes de Compra', NOTA: 'Use la vista específica para exportar este reporte.' }], 'compras_resumen', 'COMPRAS');
+    }
+  };
+
   const TAB_COLOR: Record<TabId, string> = {
     proveedores:   'text-amber-400',
     materiales:    'text-blue-400',
@@ -637,8 +669,13 @@ export const ComprasPanel: React.FC = () => {
           </div>
         </div>
         
-        <div className="text-[8px] font-mono text-slate-500 uppercase tracking-widest">
-          CADENA DE SUMINISTRO: <span className="text-amber-400">ACTIVO</span>
+        <div className="flex items-center gap-3">
+          <button onClick={handleExportPDF} className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-white/10 text-slate-400 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all">
+            <FileDown size={11} /> EXPORTAR PDF
+          </button>
+          <div className="text-[8px] font-mono text-slate-500 uppercase tracking-widest">
+            CADENA DE SUMINISTRO: <span className="text-amber-400">ACTIVO</span>
+          </div>
         </div>
       </div>
 

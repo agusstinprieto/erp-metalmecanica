@@ -4,8 +4,9 @@ import clsx from 'clsx';
 import {
   Users, TrendingUp, Award, AlertTriangle, CheckCircle,
   ChevronUp, ChevronDown, Minus, Star, Shield, Zap,
-  DollarSign, BarChart2, Factory, RefreshCw, Plus, X
+  DollarSign, BarChart2, Factory, RefreshCw, Plus, X, FileDown
 } from 'lucide-react';
+import { reportUtils } from '../utils/reportUtils';
 import type {
   Operador, DesempenoKPI, Incentivo, CelulaDesempeno,
   TipoPeriodo, TipoIncentivo,
@@ -270,6 +271,24 @@ export const DesempenoView: React.FC = () => {
   const selectedKPI = kpis.find(k => k.operador_id === selectedOp?.id);
   const selectedIncentivos = incentivos.filter(i => i.operador_id === selectedOp?.id);
 
+  const handleExportPDF = () => {
+    const data = operadores.map(op => {
+      const kpi = kpis.find(k => k.operador_id === op.id);
+      const bono = incentivos.filter(i => i.operador_id === op.id).reduce((s, i) => s + i.monto, 0);
+      return {
+        EMPLEADO: op.numero_empleado ?? '—',
+        OPERADOR: op.nombre,
+        CELULA: op.celula ?? '—',
+        EFICIENCIA_PCT: kpi?.eficiencia != null ? `${kpi.eficiencia.toFixed(1)}%` : '—',
+        CALIDAD_PCT: kpi?.tasa_calidad != null ? `${kpi.tasa_calidad.toFixed(1)}%` : '—',
+        OEE_PCT: kpi?.oee != null ? `${kpi.oee.toFixed(1)}%` : '—',
+        INCIDENTES: kpi?.incidentes != null ? String(kpi.incidentes) : '0',
+        BONO_MXN: bono > 0 ? `$${bono.toLocaleString('es-MX')}` : '$0',
+      };
+    });
+    reportUtils.exportToPDF('Reporte de Desempeño de Operadores', data, 'desempeno_operadores', 'PRODUCCIÓN');
+  };
+
   const handleKPISave = (newKPI: DesempenoKPI) => {
     setKpis(prev => {
       const idx = prev.findIndex(k => k.operador_id === newKPI.operador_id && k.periodo === newKPI.periodo);
@@ -323,6 +342,9 @@ export const DesempenoView: React.FC = () => {
               <Award size={14} /> {pendientesAprobacion} bono{pendientesAprobacion > 1 ? 's' : ''} pendiente{pendientesAprobacion > 1 ? 's' : ''}
             </span>
           )}
+          <button onClick={handleExportPDF} className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-white/10 text-slate-400 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all">
+            <FileDown size={11} /> EXPORTAR PDF
+          </button>
           <div className="text-right">
             <p className="text-[10px] text-mcvill-text-muted font-black uppercase tracking-wider">Semana</p>
             <p className="text-sm font-black text-mcvill-text tabular-nums">{periodo}</p>

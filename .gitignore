@@ -42,3 +42,7 @@ env
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Reportes PDF locales
+Reportes PDF/
+

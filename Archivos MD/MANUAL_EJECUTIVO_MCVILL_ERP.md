@@ -231,8 +231,19 @@ Registro de incidentes de seguridad con causa raíz y acción correctiva. Contro
 ### 📉 Control Estadístico (SPC)
 Cartas de control X̄-R y X̄-S. Detección automática de las 4 reglas de Nelson. Cálculo de Cp y Cpk. Alertas cuando el proceso sale de control estadístico.
 
-### 📊 Reportes Ejecutivos
-Dashboard de KPIs multi-módulo: producción, calidad, inventario, finanzas, RH. Exportación a PDF. Programación de reportes automáticos.
+### 📊 Reportes Ejecutivos & Exportación PDF Corporativa
+Centro neurálgico de consolidación de datos y distribución de inteligencia operativa. El módulo cuenta con un **Motor de Generación de PDFs Corporativo de Alta Fidelidad** (`reportUtils.ts`) y un sistema de distribución omnicanal:
+- **Motor de PDFs Integrado:** Produce de manera instantánea reportes con diseño sobrio y moderno (encabezados de color azul industrial oscuro, logotipos dinámicos del tenant, y metadatos de compilación en tiempo real). El motor realiza carga diferida (*lazy loading*) de jsPDF en el cliente para conservar el desempeño óptimo de la aplicación.
+- **Identidad de Marca Dinámica:** Carga de forma automática la firma, nombre de empresa, y lemas corporativos desde Supabase/LocalStorage en los pies de página de cada hoja para garantizar la confidencialidad técnica.
+- **Fichas Técnicas y Reportes por Módulo:**
+  - **Gerencia General (Reporte KPI Consolidado):** Compila en un solo documento la salud de la planta (OTs, Almacén, Finanzas, y Calidad SGC) al instante.
+  - **Ingenieros y Operadores (Viajero QR e Instrucciones):** Genera la ficha de viajero de producción que acompaña a las piezas, incluyendo códigos QR para escaneo y registro inmediato de avances.
+  - **Calidad (Six Sigma y CAPA):** Genera PDFs de análisis de no conformidad con fotos de defectos analizadas por visión IA y reportes Six Sigma.
+  - **Almacén (Valuación de Almacén y Mínimos):** Reporte de stock físico valorizado para planeación de compras.
+  - **RH y Finanzas (Nóminas y Cash Flow):** Exporta resúmenes de egresos por turnos e incidencias, y el flujo de caja semanal.
+- **Distribución Omnicanal e Inteligente:**
+  - **Compartir al Instante:** Permite despachar resúmenes ejecutivos directamente a los supervisores por **WhatsApp**, **Microsoft Teams**, o **Correo Electrónico**.
+  - **Programación Recurrente de Envíos:** Permite calendarizar envíos automáticos del reporte seleccionado a destinatarios definidos con frecuencia diaria, semanal o mensual a una hora específica.
 
 ### 📋 Minutas de Reunión
 Generador de actas con IA. Registra los puntos de la reunión y la IA estructura el acta formal. Compartir por Email, WhatsApp o Teams.

@@ -3,12 +3,13 @@ import {
   TrendingUp, TrendingDown, AlertTriangle, CheckCircle2,
   DollarSign, BarChart3, RefreshCw, ChevronRight,
   Loader2, XCircle, ThumbsUp, ThumbsDown, Clock,
-  Activity, Target, Minus
+  Activity, Target, Minus, FileDown
 } from 'lucide-react';
 import clsx from 'clsx';
 import { costeoService, type CosteoDashboardRow, type Aprobacion } from '../services/costeoService';
 import { toast, appConfirm } from '../lib/dialogs';
 import { useConfig } from '../contexts/ConfigContext';
+import { reportUtils } from '../utils/reportUtils';
 
 const fmt = (n: number | null, decimals = 0) =>
   n == null ? '—' : n.toLocaleString('es-MX', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
@@ -146,6 +147,20 @@ export const CosteoDashboard: React.FC<{ userRole?: string }> = ({ userRole = 'e
 
   const canApprove = ['ceo', 'gerencia', 'finanzas', 'sistemas'].includes(userRole);
 
+  const handleExportPDF = () => {
+    const data = rows.map(r => ({
+      VIAJERO: r.viajero_id ?? '—',
+      PARTE: r.numero_parte ?? '—',
+      CLIENTE: r.cliente ?? '—',
+      DESCRIPCION: r.descripcion ?? '—',
+      COSTO_EST: r.total_est != null ? `$${r.total_est.toLocaleString('es-MX')}` : '—',
+      COSTO_REAL: r.total_real != null ? `$${r.total_real.toLocaleString('es-MX')}` : '—',
+      VARIANZA_PCT: r.varianza_pct != null ? `${r.varianza_pct > 0 ? '+' : ''}${r.varianza_pct.toFixed(1)}%` : '—',
+      SEMAFORO: r.semaforo?.toUpperCase() ?? '—',
+    }));
+    reportUtils.exportToPDF('Reporte de Costeo Dinámico', data, 'costeo_dinamico', 'COSTEO');
+  };
+
   const load = useCallback(async () => {
     setLoading(true);
     try {
@@ -207,14 +222,22 @@ export const CosteoDashboard: React.FC<{ userRole?: string }> = ({ userRole = 'e
           <h2 className="text-lg font-black text-mcvill-text tracking-tight">Costeo Dinámico</h2>
           <p className="text-[11px] text-slate-500 mt-0.5">Proyectado vs Real · Semáforo de varianza</p>
         </div>
-        <button
-          onClick={load}
-          disabled={loading}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-mcvill-accent/10 border border-mcvill-accent/20 text-mcvill-accent text-[11px] font-bold hover:bg-mcvill-accent/20 transition-colors disabled:opacity-50"
-        >
-          <RefreshCw size={12} className={loading ? 'animate-spin' : ''} role={loading ? 'status' : undefined} aria-label={loading ? 'Cargando' : undefined} />
-          Actualizar
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleExportPDF}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-white/10 text-slate-400 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all"
+          >
+            <FileDown size={11} /> EXPORTAR PDF
+          </button>
+          <button
+            onClick={load}
+            disabled={loading}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-mcvill-accent/10 border border-mcvill-accent/20 text-mcvill-accent text-[11px] font-bold hover:bg-mcvill-accent/20 transition-colors disabled:opacity-50"
+          >
+            <RefreshCw size={12} className={loading ? 'animate-spin' : ''} role={loading ? 'status' : undefined} aria-label={loading ? 'Cargando' : undefined} />
+            Actualizar
+          </button>
+        </div>
       </div>
 
       {/* KPI Cards */}

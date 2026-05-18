@@ -1165,10 +1165,27 @@ El agente calcula automáticamente:
 
 <!-- ═══════════════════════════════════════════════════ -->
 <section id="reportes">
-<h2>Reportes KPI</h2>
-<p>Genera reportes en PDF con gráficas, tablas y análisis comparativo para cualquier período. La IA añade un resumen ejecutivo con los 3 puntos más importantes. Configura envíos automáticos por correo con la frecuencia deseada.</p>
-<h3>Dashboard Gerencial</h3>
-<p>KPIs consolidados para junta directiva: OEE, FTT, entregas a tiempo, margen promedio, rotación de inventario. Ideal para revisiones mensuales S&amp;OP.</p>
+<h2>Reportes KPI &amp; Exportación PDF Corporativa</h2>
+<p>El módulo representa el centro neurálgico de consolidación de datos y distribución de inteligencia operativa de la planta. Cuenta con un <strong>Motor de Generación de PDFs Corporativo de Alta Fidelidad</strong> (<code>reportUtils.ts</code>) y un sistema de distribución inteligente omnicanal:</p>
+<ul>
+  <li><strong>Motor de PDFs Integrado:</strong> Produce de manera instantánea reportes ejecutivos con diseño sobrio y moderno (encabezados de color azul industrial oscuro, logotipos dinámicos del tenant, y metadatos de compilación en tiempo real). El motor realiza carga diferida (<em>lazy loading</em>) de la librería jsPDF para no impactar el desempeño inicial de la aplicación.</li>
+  <li><strong>Identidad de Marca Dinámica:</strong> Carga de forma automática la firma, nombre de empresa, y lemas corporativos desde Supabase/LocalStorage en los pies de página de cada hoja para garantizar la confidencialidad de la información.</li>
+  <li><strong>Fichas Técnicas y Reportes por Módulo:</strong>
+    <ul>
+      <li><strong>Gerencia General (Reporte KPI Consolidado):</strong> Compila en un solo documento la salud de la planta (OTs, Almacén, Finanzas y Calidad SGC) al instante.</li>
+      <li><strong>Ingenieros y Operadores (Viajero QR e Instrucciones):</strong> Genera la ficha de viajero de producción física que acompaña a las piezas, incluyendo códigos QR para escaneo y registro inmediato de avances.</li>
+      <li><strong>Calidad (Six Sigma y CAPA):</strong> Genera PDFs de análisis de no conformidad con fotos de defectos analizadas por visión IA y reportes de control estadístico.</li>
+      <li><strong>Almacén (Valuación de Almacén y Mínimos):</strong> Reporte de stock físico valorizado para planeación de compras y alertas de críticos.</li>
+      <li><strong>RH y Finanzas (Nóminas y Cash Flow):</strong> Exporta resúmenes de egresos por turnos e incidencias, y el flujo de caja semanal.</li>
+    </ul>
+  </li>
+  <li><strong>Distribución Omnicanal e Inteligente:</strong>
+    <ul>
+      <li><strong>Compartir al Instante:</strong> Permite despachar resúmenes ejecutivos directamente a los supervisores por <strong>WhatsApp</strong>, <strong>Microsoft Teams</strong> o <strong>Correo Electrónico</strong>.</li>
+      <li><strong>Programación Recurrente de Envíos:</strong> Permite calendarizar envíos automáticos del reporte seleccionado a destinatarios definidos con frecuencia diaria, semanal o mensual a una hora específica.</li>
+    </ul>
+  </li>
+</ul>
 </section>
 
 <!-- ═══════════════════════════════════════════════════ -->

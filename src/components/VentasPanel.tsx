@@ -11,6 +11,8 @@ import autoTable from 'jspdf-autotable';
 import { supabase } from '../lib/supabase';
 import { useConfig } from '../contexts/ConfigContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { reportUtils } from '../utils/reportUtils';
+import { FileDown } from 'lucide-react';
 import { OCManagerModal } from './OCManagerModal';
 import { FactibilidadGatekeeper } from './FactibilidadGatekeeper';
 
@@ -1531,6 +1533,37 @@ export const VentasPanel: React.FC<{ initialTab?: TabId }> = ({ initialTab }) =>
   }, [initialTab]);
   const isFactibilidad = tab === 'factibilidad';
 
+  const handleExportPDF = async () => {
+    if (tab === 'cotizaciones') {
+      const { data } = await supabase
+        .from('cotizaciones')
+        .select('numero_cotizacion, cliente_nombre, fecha_cotizacion, monto_total, estatus, fecha_vigencia')
+        .order('fecha_cotizacion', { ascending: false })
+        .limit(200);
+      const rows = (data ?? []).map((r: any) => ({
+        NO_COTIZACION: r.numero_cotizacion ?? '—',
+        CLIENTE: r.cliente_nombre ?? '—',
+        FECHA: r.fecha_cotizacion ? new Date(r.fecha_cotizacion).toLocaleDateString('es-MX') : '—',
+        MONTO_TOTAL: r.monto_total != null ? `$${Number(r.monto_total).toLocaleString('es-MX')}` : '—',
+        ESTATUS: r.estatus?.toUpperCase() ?? '—',
+        VIGENCIA: r.fecha_vigencia ? new Date(r.fecha_vigencia).toLocaleDateString('es-MX') : '—',
+      }));
+      reportUtils.exportToPDF('Reporte de Cotizaciones — Ventas', rows.length ? rows : [{ AVISO: 'Sin cotizaciones registradas' }], 'reporte_cotizaciones', 'VENTAS');
+    } else if (tab === 'clientes') {
+      const { data } = await supabase.from('clientes').select('nombre, rfc, ciudad, contacto_nombre, email').order('nombre');
+      const rows = (data ?? []).map((r: any) => ({
+        CLIENTE: r.nombre ?? '—',
+        RFC: r.rfc ?? '—',
+        CIUDAD: r.ciudad ?? '—',
+        CONTACTO: r.contacto_nombre ?? '—',
+        EMAIL: r.email ?? '—',
+      }));
+      reportUtils.exportToPDF('Directorio de Clientes', rows.length ? rows : [{ AVISO: 'Sin clientes registrados' }], 'directorio_clientes', 'VENTAS');
+    } else {
+      reportUtils.exportToPDF('Resumen Ventas & CRM', [{ MODULO: tab.toUpperCase(), NOTA: 'Selecciona la pestaña Cotizaciones o Clientes para exportar.' }], 'ventas_resumen', 'VENTAS');
+    }
+  };
+
   const tabLabels: Record<TabId, string> = {
     clientes: language === 'en' ? 'Clients' : 'Clientes',
     factibilidad: language === 'en' ? 'Feasibility' : 'Factibilidad',
@@ -1570,6 +1603,9 @@ export const VentasPanel: React.FC<{ initialTab?: TabId }> = ({ initialTab }) =>
           </div>
         </div>
         <div className="flex items-center gap-3">
+          <button onClick={handleExportPDF} className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-white/10 text-slate-400 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all">
+            <FileDown size={11} /> EXPORTAR PDF
+          </button>
           <div className="text-[9px] font-mono text-slate-500 uppercase tracking-widest">
             {isFactibilidad ? 'RISK_ANALYSIS: ' : 'CRM_ACTIVE_FLOW: '}
             <span className={isFactibilidad ? 'text-rose-400 font-black' : 'text-emerald-400 font-black'}>SYNCED</span>

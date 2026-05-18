@@ -3,11 +3,12 @@ import {
   Plus, X, Loader2, CheckCircle2, Link2, Upload, Key, BookOpen,
   Clock, Zap, Factory, Users, Wrench, Cpu, AlertTriangle,
   TrendingUp, Database, BarChart3, Package, FileText, Shield, Activity,
-  ChevronDown, ChevronRight, Info
+  ChevronDown, ChevronRight, Info, FileDown
 } from 'lucide-react';
 import { useConfig } from '../contexts/ConfigContext';
 import { supabase } from '../lib/supabase';
 import { productionService } from '../services/productionService';
+import { reportUtils } from '../utils/reportUtils';
 
 const DAY_LABELS = ['DOM', 'LUN', 'MAR', 'MIE', 'JUE', 'VIE', 'SAB'];
 const BANK_API_KEY = 'mcvill_bank_api_key';
@@ -580,6 +581,21 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
 
   const metrics = getFilteredMetrics();
 
+  const handleExportPDF = () => {
+    const m = metrics;
+    const data = [
+      { KPI: 'Empleados Activos',  VALOR: String(m.empleados),    META: '45',    PCT_CUMPLIMIENTO: `${Math.round((m.empleados / 45) * 100)}%`,       SEMAFORO: m.empleados >= 40 ? 'VERDE' : 'ROJO' },
+      { KPI: 'Asistencia Hoy',     VALOR: String(m.presentes),    META: String(m.empleados), PCT_CUMPLIMIENTO: m.empleados > 0 ? `${Math.round((m.presentes / m.empleados) * 100)}%` : '—', SEMAFORO: m.presentes >= m.empleados * 0.9 ? 'VERDE' : 'AMARILLO' },
+      { KPI: 'OEE Global (%)',     VALOR: `${m.oee}%`,            META: '85%',   PCT_CUMPLIMIENTO: `${Math.round((m.oee / 85) * 100)}%`,               SEMAFORO: m.oee >= 85 ? 'VERDE' : m.oee >= 75 ? 'AMARILLO' : 'ROJO' },
+      { KPI: 'Scrap (%)',          VALOR: `${m.scrap}%`,          META: '<2%',   PCT_CUMPLIMIENTO: m.scrap <= 2 ? 'CUMPLE' : 'EXCEDE',                 SEMAFORO: m.scrap <= 2 ? 'VERDE' : 'ROJO' },
+      { KPI: 'Ordenes Activas',    VALOR: String(m.ordenes),      META: '<10',   PCT_CUMPLIMIENTO: m.ordenes <= 10 ? 'CUMPLE' : 'EXCEDE',              SEMAFORO: m.ordenes <= 10 ? 'VERDE' : 'AMARILLO' },
+      { KPI: 'Stock Critico',      VALOR: String(m.stockCritico), META: '0',     PCT_CUMPLIMIENTO: m.stockCritico === 0 ? '100%' : '—',                SEMAFORO: m.stockCritico === 0 ? 'VERDE' : 'ROJO' },
+      { KPI: 'Dias sin Accidente', VALOR: String(m.safetyDays),   META: '365',   PCT_CUMPLIMIENTO: `${Math.round((m.safetyDays / 365) * 100)}%`,       SEMAFORO: m.safetyDays >= 100 ? 'VERDE' : 'AMARILLO' },
+      { KPI: 'Energia KWh/t',      VALOR: String(m.energy),       META: '<200',  PCT_CUMPLIMIENTO: m.energy <= 200 ? 'CUMPLE' : 'EXCEDE',              SEMAFORO: m.energy <= 200 ? 'VERDE' : 'ROJO' },
+    ];
+    reportUtils.exportToPDF('Dashboard de KPIs — McVill Control Predictivo', data, 'dashboard_kpis', 'GERENCIA');
+  };
+
   // ── MULTI-CHART DATA GENERATION (all 5 KPIs, dynamic range) ──────────────
   const getAllChartsData = () => {
     const today = new Date();
@@ -771,6 +787,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={handleExportPDF}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-white/10 text-slate-400 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all whitespace-nowrap"
+            >
+              <FileDown size={11} /> EXPORTAR PDF
+            </button>
             <button
               onClick={() => setIsBancoModalOpen(true)}
               className="px-4 py-2 bg-slate-900 border border-slate-800 hover:border-blue-500/50 text-white text-[9px] font-black uppercase rounded-xl tracking-wider transition-all flex items-center gap-1.5 whitespace-nowrap"

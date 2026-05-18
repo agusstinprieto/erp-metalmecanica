@@ -9,6 +9,7 @@ import { supabase } from '../lib/supabase';
 import { useConfig } from '../contexts/ConfigContext';
 import clsx from 'clsx';
 import { TraceTimeline } from './TraceTimeline';
+import { reportUtils } from '../utils/reportUtils';
 
 interface Props {
   viajeroId: string;
@@ -141,7 +142,10 @@ Dame recomendaciones de optimización, posibles riesgos de calidad y sugerencias
           >
             <Sparkles size={14} /> Consultar IA
           </button>
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-600/20 active:scale-95">
+          <button
+            onClick={() => reportUtils.exportViajeroPDF(data, ops, mats)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-600/20 active:scale-95"
+          >
             <Printer size={14} /> Imprimir Hoja
           </button>
         </div>

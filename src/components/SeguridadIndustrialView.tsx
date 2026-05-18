@@ -4,11 +4,12 @@ import {
   Camera, Shield, AlertTriangle, CheckCircle2,
   Plus, Maximize2, X, WifiOff, Wifi,
   Bell, Trash2, Edit3, Save, AlertOctagon,
-  Eye, Lock, ChevronRight, RefreshCw, Video,
+  Eye, Lock, ChevronRight, RefreshCw, Video, FileDown,
 } from 'lucide-react';
 import clsx from 'clsx';
 import { aiService } from '../services/aiService';
 import { eventBus } from '../utils/eventBus';
+import { reportUtils } from '../utils/reportUtils';
 
 interface SecurityCamera {
   id: string;
@@ -447,6 +448,19 @@ export const SeguridadIndustrialView: React.FC = () => {
   const [scanningCamId, setScanningCamId] = useState<string | null>(null);
   const [scanProgress, setScanProgress] = useState(0);
 
+  const handleExportPDF = () => {
+    const data = incidents.map(inc => ({
+      ID: inc.id,
+      TIPO: inc.tipo,
+      DESCRIPCION: inc.descripcion,
+      AREA: inc.area,
+      HORA: inc.hora,
+      SEVERIDAD: inc.severidad.toUpperCase(),
+      ESTADO: inc.resuelto ? 'RESUELTO' : 'PENDIENTE',
+    }));
+    reportUtils.exportToPDF('Reporte de Incidentes de Seguridad Industrial', data, 'seguridad_incidentes', 'SEGURIDAD');
+  };
+
   const saveCameras = useCallback((cams: SecurityCamera[]) => {
     setCameras(cams);
     localStorage.setItem('mcvill_cameras', JSON.stringify(cams));
@@ -682,6 +696,10 @@ export const SeguridadIndustrialView: React.FC = () => {
                 <span className="sm:hidden">{pendingInc}</span>
               </motion.div>
             )}
+            <button onClick={handleExportPDF}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-white/10 text-slate-400 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all">
+              <FileDown size={11} /> <span className="hidden sm:inline">EXPORTAR PDF</span>
+            </button>
             <button onClick={() => setShowAdd(true)}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-sky-600/20 border border-sky-500/30 text-sky-400 hover:bg-sky-600/30 text-[9px] font-black uppercase transition-all">
               <Plus size={12} /> <span className="hidden sm:inline">Cámara</span>

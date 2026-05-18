@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Hammer, Settings, Play, CheckCircle2, Clock, 
+import {
+  Hammer, Settings, Play, CheckCircle2, Clock,
   AlertTriangle, Search, Plus, Filter, Activity,
-  User, Calendar, Loader2, X, ChevronRight, 
-  ClipboardList, FileText, Edit3, Trash2, Zap, 
-  BarChart3, Scan, ArrowLeft, Factory, TrendingUp
+  User, Calendar, Loader2, X, ChevronRight,
+  ClipboardList, FileText, Edit3, Trash2, Zap,
+  BarChart3, Scan, ArrowLeft, Factory, TrendingUp, FileDown
 } from 'lucide-react';
 import { productionService } from '../services/productionService';
 import type { WorkOrder } from '../services/productionService';
@@ -118,10 +118,23 @@ export const ProductionView: React.FC = () => {
     }
   };
 
-  const filteredOrders = workOrders.filter(wo => 
+  const filteredOrders = workOrders.filter(wo =>
     wo.order_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
     wo.project_title?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleExportPDF = () => {
+    const data = workOrders.map(wo => ({
+      ORDEN: wo.order_number,
+      PARTE: wo.project_title ?? '—',
+      PRIORIDAD: wo.priority?.toUpperCase() ?? '—',
+      ESTADO: wo.status?.toUpperCase() ?? '—',
+      PROGRESO: wo.progress != null ? `${wo.progress}%` : '—',
+      ASIGNADO: wo.assigned_to ?? '—',
+      FECHA_ENTREGA: wo.due_date ? new Date(wo.due_date).toLocaleDateString('es-MX') : '—',
+    }));
+    reportUtils.exportToPDF('Reporte de Órdenes de Trabajo — Producción', data, 'ordenes_trabajo', 'PRODUCCIÓN');
+  };
 
   const StatCard = ({ title, value, icon: Icon, color, trend }: any) => (
     <div className="bg-white/[0.03] border border-white/5 rounded-xl p-3 flex flex-col gap-1">
@@ -172,6 +185,9 @@ export const ProductionView: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
+          <button onClick={handleExportPDF} className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-white/10 text-slate-400 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all">
+            <FileDown size={11} /> EXPORTAR PDF
+          </button>
           <button onClick={() => setView('dashboard')} className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 text-slate-400 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all">
             <BarChart3 size={13} /> Dashboard
           </button>

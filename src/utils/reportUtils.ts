@@ -249,10 +249,195 @@ async function exportToPDF(
   }
 }
 
+// ── Exporta PDF personalizado para Viajero de Producción ─────────────────────
+async function exportViajeroPDF(viajero: any, ops: any[], mats: any[]) {
+  if (!viajero) {
+    notifyError('No hay datos válidos para este viajero.');
+    return;
+  }
+
+  notifyProgress(`Compilando PDF del Viajero ${viajero.id}...`);
+
+  try {
+    const [logo, { jsPDF, autoTable }] = await Promise.all([loadLogo(), loadPDF()]);
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'letter' });
+    
+    // Draw Header
+    const startY = await drawHeader(doc, `Viajero de Producción: ${viajero.id}`, 'PRODUCCIÓN', logo);
+    
+    // Theme Colors
+    const { dark: BLUE_DARK, mid: BLUE_MID } = getThemeColors();
+    
+    // General Metadata block
+    doc.setFillColor(248, 250, 252); // light slate background
+    doc.setDrawColor(226, 232, 240); // slate-200 border
+    doc.rect(10, startY, 196, 36, 'FD');
+    
+    doc.setTextColor(15, 23, 42); // SLATE_900
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    
+    // Column 1
+    doc.text('ID VIAJERO:', 14, startY + 6);
+    doc.setFont('helvetica', 'normal');
+    doc.text(String(viajero.id), 46, startY + 6);
+    
+    doc.setFont('helvetica', 'bold');
+    doc.text('NÚMERO DE PARTE:', 14, startY + 12);
+    doc.setFont('helvetica', 'normal');
+    doc.text(String(viajero.numero_parte || 'S/N'), 46, startY + 12);
+    
+    doc.setFont('helvetica', 'bold');
+    doc.text('CLIENTE:', 14, startY + 18);
+    doc.setFont('helvetica', 'normal');
+    doc.text(String(viajero.cliente || 'S/C'), 46, startY + 18);
+    
+    doc.setFont('helvetica', 'bold');
+    doc.text('DESCRIPCIÓN:', 14, startY + 24);
+    doc.setFont('helvetica', 'normal');
+    const descText = doc.splitTextToSize(String(viajero.descripcion || 'Sin descripción'), 54);
+    doc.text(descText, 46, startY + 24);
+
+    // Column 2
+    doc.setFont('helvetica', 'bold');
+    doc.text('CANTIDAD ORDEN:', 110, startY + 6);
+    doc.setFont('helvetica', 'normal');
+    doc.text(String(viajero.cantidad_orden || '0'), 148, startY + 6);
+    
+    doc.setFont('helvetica', 'bold');
+    doc.text('FECHA ENTREGA:', 110, startY + 12);
+    doc.setFont('helvetica', 'normal');
+    const fechaEnt = viajero.fecha_entrega ? new Date(viajero.fecha_entrega).toLocaleDateString() : 'S/F';
+    doc.text(fechaEnt, 148, startY + 12);
+    
+    doc.setFont('helvetica', 'bold');
+    doc.text('PRIORIDAD:', 110, startY + 18);
+    doc.setFont('helvetica', 'normal');
+    doc.text(String(viajero.prioridad || 'NORMAL').toUpperCase(), 148, startY + 18);
+    
+    doc.setFont('helvetica', 'bold');
+    doc.text('AVANCE DE PROCESO:', 110, startY + 24);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${viajero.avance_porcentaje || 0}%`, 148, startY + 24);
+
+    // Operational Route Table
+    doc.setTextColor(...BLUE_DARK);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.text('RUTA DE OPERACIONES (SECUENCIA EN PISO)', 10, startY + 45);
+    
+    const opHeaders = ['Paso', 'Centro de Trabajo', 'Operación', 'Tiempo Est.', 'Estado'];
+    const opRows = ops.map((op, idx) => [
+      String(idx + 1),
+      String(op.centro_trabajo || '').toUpperCase(),
+      String(op.nombre_operacion || '').toUpperCase(),
+      `${op.tiempo_estimado || 0} Hrs`,
+      String(op.estado || 'pendiente').toUpperCase()
+    ]);
+    
+    autoTable(doc, {
+      startY: startY + 48,
+      head: [opHeaders],
+      body: opRows,
+      theme: 'grid',
+      headStyles: {
+        fillColor: BLUE_MID,
+        textColor: WHITE,
+        fontSize: 7.5,
+        fontStyle: 'bold',
+        halign: 'center',
+      },
+      bodyStyles: {
+        fontSize: 7,
+        cellPadding: 2.5,
+        textColor: [15, 23, 42],
+      },
+      alternateRowStyles: { fillColor: [248, 250, 252] },
+      margin: { left: 10, right: 10 },
+    });
+    
+    // Bill of Materials (BOM)
+    let currentY = (doc as any).lastAutoTable.finalY + 8;
+    if (currentY > 230) {
+      doc.addPage();
+      currentY = 44;
+    }
+    
+    doc.setTextColor(...BLUE_DARK);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.text('LISTA DE MATERIALES (BOM REQUERIDO)', 10, currentY);
+    
+    const matHeaders = ['Descripción / Componente', 'Clave Insumo', 'Cantidad', 'Unidad', 'Ubicación'];
+    const matRows = mats.map(m => [
+      String(m.descripcion || '').toUpperCase(),
+      String(m.clave || 'S/K').toUpperCase(),
+      String(m.cantidad || 0),
+      String(m.unidad || '').toUpperCase(),
+      String(m.ubicacion || 'ALMACÉN GRAL').toUpperCase()
+    ]);
+    
+    autoTable(doc, {
+      startY: currentY + 3,
+      head: [matHeaders],
+      body: matRows,
+      theme: 'grid',
+      headStyles: {
+        fillColor: BLUE_MID,
+        textColor: WHITE,
+        fontSize: 7.5,
+        fontStyle: 'bold',
+        halign: 'center',
+      },
+      bodyStyles: {
+        fontSize: 7,
+        cellPadding: 2.5,
+        textColor: [15, 23, 42],
+      },
+      alternateRowStyles: { fillColor: [248, 250, 252] },
+      margin: { left: 10, right: 10 },
+    });
+    
+    let notesY = (doc as any).lastAutoTable.finalY + 8;
+    if (notesY > 230) {
+      doc.addPage();
+      notesY = 44;
+    }
+    
+    // Notes & Protocols
+    doc.setFillColor(254, 243, 199); // light amber bg for alerts
+    doc.setDrawColor(245, 158, 11); // amber border
+    doc.rect(10, notesY, 196, 26, 'FD');
+    
+    doc.setTextColor(180, 83, 9); // amber text
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.text('NOTAS TÉCNICAS & PROTOCOLO DE SEGURIDAD:', 14, notesY + 6);
+    
+    doc.setTextColor(15, 23, 42);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    const safetyText = `• Uso obligatorio de EPP completo para el área de maquinado y soldadura.
+• Verificar tolerancias críticas en dibujo técnico Rev. ${viajero.revision || '0'}.
+• Reportar de inmediato cualquier desviación al supervisor de calidad.
+Notas: ${viajero.notas || 'Sin notas técnicas adicionales.'}`;
+    
+    const splitText = doc.splitTextToSize(safetyText, 186);
+    doc.text(splitText, 14, notesY + 12);
+    
+    drawFooters(doc);
+    doc.save(`Viajero_${viajero.id}_${viajero.numero_parte}.pdf`);
+  } catch (err) {
+    console.error('PDF Traveler Error:', err);
+    notifyError('Error al generar el PDF del viajero.');
+  }
+}
+
 // ── API pública ───────────────────────────────────────────────────────────────
 export const reportUtils = {
   exportToCSV,
   exportToPDF,
+  exportViajeroPDF,
   /** Helpers para reportes personalizados — cargan jsPDF bajo demanda */
   loadLogo,
   drawHeader,
