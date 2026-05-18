@@ -31,12 +31,12 @@ interface Incidente {
 }
 
 const DEFAULT_CAMERAS: SecurityCamera[] = [
-  { id: 'c1', nombre: 'Entrada Principal',  area: 'Acceso',      url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4', tipo: 'mjpeg', online: true  },
-  { id: 'c2', nombre: 'Área de Soldadura',  area: 'Producción',  url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', tipo: 'mjpeg', online: true  },
-  { id: 'c3', nombre: 'Almacén General',    area: 'Almacén',     url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', tipo: 'mjpeg', online: true  },
-  { id: 'c4', nombre: 'Taller CNC',         area: 'Producción',  url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4', tipo: 'mjpeg', online: true },
-  { id: 'c5', nombre: 'Área de Pintura',    area: 'Producción',  url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4', tipo: 'mjpeg', online: true  },
-  { id: 'c6', nombre: 'Estacionamiento',    area: 'Exterior',    url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4', tipo: 'mjpeg', online: true  },
+  { id: 'c1', nombre: 'Entrada Principal',  area: 'Acceso',      url: 'https://vjs.zencdn.net/v/oceans.mp4', tipo: 'mjpeg', online: true  },
+  { id: 'c2', nombre: 'Área de Soldadura',  area: 'Producción',  url: 'https://media.w3.org/2010/05/sintel/trailer_hd.mp4', tipo: 'mjpeg', online: true  },
+  { id: 'c3', nombre: 'Almacén General',    area: 'Almacén',     url: 'https://www.w3schools.com/html/mov_bbb.mp4', tipo: 'mjpeg', online: true  },
+  { id: 'c4', nombre: 'Taller CNC',         area: 'Producción',  url: 'https://www.w3schools.com/html/movie.mp4', tipo: 'mjpeg', online: true },
+  { id: 'c5', nombre: 'Área de Pintura',    area: 'Producción',  url: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4', tipo: 'mjpeg', online: true  },
+  { id: 'c6', nombre: 'Estacionamiento',    area: 'Exterior',    url: 'https://vjs.zencdn.net/v/oceans.mp4', tipo: 'mjpeg', online: true  },
 ];
 
 const DEMO_INCIDENTS: Incidente[] = [
