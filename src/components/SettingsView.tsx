@@ -53,6 +53,7 @@ import { shiftService, type WorkShift } from '../services/shiftService';
 import { ShiftFormModal } from './ShiftFormModal';
 import { plantService, type Planta } from '../services/plantService';
 import { PlantFormModal } from './PlantFormModal';
+import { formatMoneyInput, parseFormattedNumber } from '../utils/inputFormatters';
 
 interface UserConfig {
   id: string;
@@ -209,7 +210,7 @@ const PoliticasTab: React.FC = () => {
   const { config, updateConfig } = useConfig();
   
   // Políticas y Variables Operativas
-  const [salario, setSalario] = useState(config.salarioBaseDefault ?? 4500);
+  const [salarioStr, setSalarioStr] = useState(formatMoneyInput(config.salarioBaseDefault ?? 4500));
   const [prodBajo, setProdBajo] = useState(config.productividadPctBajo ?? 5.0);
   const [prodAlto, setProdAlto] = useState(config.productividadPctAlto ?? 10.0);
   const [calidad, setCalidad] = useState(config.calidadPct ?? 5.0);
@@ -218,7 +219,7 @@ const PoliticasTab: React.FC = () => {
   const [industryType, setIndustryType] = useState<any>(config.industryType ?? 'metal_mechanical');
 
   // Nuevas Fórmulas del Manual
-  const [umaValue, setUmaValue] = useState(config.uma_value ?? 108.57);
+  const [umaValueStr, setUmaValueStr] = useState(formatMoneyInput(config.uma_value ?? 108.57));
   const [imssIv, setImssIv] = useState(config.imss_iv ?? 0.625);
   const [imssCv, setImssCv] = useState(config.imss_cv ?? 1.125);
   const [imssEm, setImssEm] = useState(config.imss_em ?? 0.40);
@@ -233,17 +234,36 @@ const PoliticasTab: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
+  useEffect(() => {
+    setSalarioStr(formatMoneyInput(config.salarioBaseDefault ?? 4500));
+    setUmaValueStr(formatMoneyInput(config.uma_value ?? 108.57));
+    setProdBajo(config.productividadPctBajo ?? 5.0);
+    setProdAlto(config.productividadPctAlto ?? 10.0);
+    setCalidad(config.calidadPct ?? 5.0);
+    setSeguridad(config.seguridadPct ?? 5.0);
+    setFiveS(config.fiveSPct ?? 5.0);
+    setIndustryType(config.industryType ?? 'metal_mechanical');
+    setImssIv(config.imss_iv ?? 0.625);
+    setImssCv(config.imss_cv ?? 1.125);
+    setImssEm(config.imss_em ?? 0.40);
+    setOeeBonoUmbral(config.oee_bono_umbral ?? 85);
+    setOeeBonoMonto(config.oee_bono_monto ?? 5.0);
+    setScrapFactor(config.scrap_factor ?? 12.0);
+    setMargenUtilidad(config.margen_utilidad ?? 35.0);
+    setOverheadOperativo(config.overhead_operativo ?? 15.0);
+  }, [config]);
+
   const handleSave = async () => {
     setSaving(true);
     await updateConfig({
-      salarioBaseDefault: Number(salario),
+      salarioBaseDefault: parseFormattedNumber(salarioStr),
       productividadPctBajo: Number(prodBajo),
       productividadPctAlto: Number(prodAlto),
       calidadPct: Number(calidad),
       seguridadPct: Number(seguridad),
       fiveSPct: Number(fiveS),
       industryType: industryType,
-      uma_value: Number(umaValue),
+      uma_value: parseFormattedNumber(umaValueStr),
       imss_iv: Number(imssIv),
       imss_cv: Number(imssCv),
       imss_em: Number(imssEm),
@@ -315,9 +335,9 @@ const PoliticasTab: React.FC = () => {
             <div className="relative">
               <span className="absolute left-3 top-2.5 text-slate-500 font-mono text-[11px]">$</span>
               <input 
-                type="number" 
-                value={salario} 
-                onChange={(e) => setSalario(parseFloat(e.target.value) || 0)} 
+                type="text" 
+                value={salarioStr} 
+                onChange={(e) => setSalarioStr(formatMoneyInput(e.target.value))} 
                 className={clsx(inputCls, 'pl-6')} 
               />
             </div>
@@ -420,7 +440,12 @@ const PoliticasTab: React.FC = () => {
               <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Valor UMA (MXN)</label>
               <div className="relative">
                 <span className="absolute left-3 top-2.5 text-slate-500 font-mono text-[11px]">$</span>
-                <input type="number" step="0.01" value={umaValue} onChange={e => setUmaValue(parseFloat(e.target.value) || 0)} className={clsx(inputCls, 'pl-6')} />
+                <input 
+                  type="text" 
+                  value={umaValueStr} 
+                  onChange={e => setUmaValueStr(formatMoneyInput(e.target.value))} 
+                  className={clsx(inputCls, 'pl-6')} 
+                />
               </div>
             </div>
             <div className="space-y-1.5">
