@@ -16,6 +16,7 @@ import { appConfirm } from '../lib/dialogs';
 import { reportUtils } from '../utils/reportUtils';
 import { Toast } from './common/Toast';
 import { FormulaPanel, FORMULAS } from './common/FormulaPanel';
+import { formatMoneyInput, parseFormattedNumber } from '../utils/inputFormatters';
 
 type Tab = 'dashboard' | 'cxc' | 'cxp' | 'flujo';
 
@@ -59,12 +60,17 @@ export const FinanceView: React.FC = () => {
   const [showCxCModal, setShowCxCModal] = useState(false);
   const [editingCxC, setEditingCxC] = useState<CuentaCobrar | null>(null);
   const [cxcForm, setCxcForm] = useState({ ...emptyCxCForm });
+  const [cxcMontoStr, setCxcMontoStr] = useState('0');
+  const [cxcMontoCobradoStr, setCxcMontoCobradoStr] = useState('0');
 
   // CxP
   const [cxpList, setCxpList] = useState<CuentaPagar[]>([]);
   const [showCxPModal, setShowCxPModal] = useState(false);
   const [editingCxP, setEditingCxP] = useState<CuentaPagar | null>(null);
   const [cxpForm, setCxpForm] = useState({ ...emptyCxPForm });
+  const [cxpMontoStr, setCxpMontoStr] = useState('0');
+  const [cxpMontoPagadoStr, setCxpMontoPagadoStr] = useState('0');
+
 
   // Flujo de caja
   const [flujo, setFlujo] = useState<any[]>([]);
@@ -96,8 +102,18 @@ export const FinanceView: React.FC = () => {
 
   // ── CxC handlers ─────────────────────────────────────────────────────────────
   const openCxCModal = (item?: CuentaCobrar) => {
-    if (item) { setEditingCxC(item); setCxcForm({ ...emptyCxCForm, ...item }); }
-    else { setEditingCxC(null); setCxcForm({ ...emptyCxCForm }); }
+    if (item) { 
+      setEditingCxC(item); 
+      setCxcForm({ ...emptyCxCForm, ...item }); 
+      setCxcMontoStr(formatMoneyInput(item.monto));
+      setCxcMontoCobradoStr(formatMoneyInput(item.monto_cobrado));
+    }
+    else { 
+      setEditingCxC(null); 
+      setCxcForm({ ...emptyCxCForm }); 
+      setCxcMontoStr('0');
+      setCxcMontoCobradoStr('0');
+    }
     setShowCxCModal(true);
   };
   const handleSaveCxC = async (e: React.FormEvent) => {
@@ -117,8 +133,18 @@ export const FinanceView: React.FC = () => {
 
   // ── CxP handlers ─────────────────────────────────────────────────────────────
   const openCxPModal = (item?: CuentaPagar) => {
-    if (item) { setEditingCxP(item); setCxpForm({ ...emptyCxPForm, ...item }); }
-    else { setEditingCxP(null); setCxpForm({ ...emptyCxPForm }); }
+    if (item) { 
+      setEditingCxP(item); 
+      setCxpForm({ ...emptyCxPForm, ...item }); 
+      setCxpMontoStr(formatMoneyInput(item.monto));
+      setCxpMontoPagadoStr(formatMoneyInput(item.monto_pagado));
+    }
+    else { 
+      setEditingCxP(null); 
+      setCxpForm({ ...emptyCxPForm }); 
+      setCxpMontoStr('0');
+      setCxpMontoPagadoStr('0');
+    }
     setShowCxPModal(true);
   };
   const handleSaveCxP = async (e: React.FormEvent) => {
@@ -639,9 +665,17 @@ export const FinanceView: React.FC = () => {
                 <input id="cxc-concepto" className="cyber-input w-full" placeholder="DESCRIPCIÓN DEL SERVICIO/PRODUCTO" value={cxcForm.concepto} onChange={e => setCxcForm({ ...cxcForm, concepto: e.target.value })} /></div>
               <div className="grid grid-cols-3 gap-4">
                 <div><label htmlFor="cxc-monto" className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 block">Monto *</label>
-                  <input id="cxc-monto" required type="number" min="0" step="0.01" className="cyber-input w-full" value={cxcForm.monto} onChange={e => setCxcForm({ ...cxcForm, monto: parseFloat(e.target.value) || 0 })} /></div>
+                  <input id="cxc-monto" required type="text" className="cyber-input w-full font-mono text-right" value={cxcMontoStr} onChange={e => {
+                    const formatted = formatMoneyInput(e.target.value);
+                    setCxcMontoStr(formatted);
+                    setCxcForm({ ...cxcForm, monto: parseFormattedNumber(formatted) });
+                  }} /></div>
                 <div><label htmlFor="cxc-monto_cobrado" className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 block">Ya Cobrado</label>
-                  <input id="cxc-monto_cobrado" type="number" min="0" step="0.01" className="cyber-input w-full" value={cxcForm.monto_cobrado} onChange={e => setCxcForm({ ...cxcForm, monto_cobrado: parseFloat(e.target.value) || 0 })} /></div>
+                  <input id="cxc-monto_cobrado" type="text" className="cyber-input w-full font-mono text-right" value={cxcMontoCobradoStr} onChange={e => {
+                    const formatted = formatMoneyInput(e.target.value);
+                    setCxcMontoCobradoStr(formatted);
+                    setCxcForm({ ...cxcForm, monto_cobrado: parseFormattedNumber(formatted) });
+                  }} /></div>
                 <div><label htmlFor="cxc-moneda" className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 block">Moneda</label>
                   <select id="cxc-moneda" className="cyber-select w-full" value={cxcForm.moneda} onChange={e => setCxcForm({ ...cxcForm, moneda: e.target.value })}>
                     {['MXN', 'USD', 'EUR'].map(v => <option key={v} value={v}>{v}</option>)}</select></div>
@@ -694,9 +728,17 @@ export const FinanceView: React.FC = () => {
                 <input id="cxp-concepto" className="cyber-input w-full" placeholder="DESCRIPCIÓN DEL BIEN/SERVICIO" value={cxpForm.concepto} onChange={e => setCxpForm({ ...cxpForm, concepto: e.target.value })} /></div>
               <div className="grid grid-cols-3 gap-4">
                 <div><label htmlFor="cxp-monto" className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 block">Monto *</label>
-                  <input id="cxp-monto" required type="number" min="0" step="0.01" className="cyber-input w-full" value={cxpForm.monto} onChange={e => setCxpForm({ ...cxpForm, monto: parseFloat(e.target.value) || 0 })} /></div>
+                  <input id="cxp-monto" required type="text" className="cyber-input w-full font-mono text-right" value={cxpMontoStr} onChange={e => {
+                    const formatted = formatMoneyInput(e.target.value);
+                    setCxpMontoStr(formatted);
+                    setCxpForm({ ...cxpForm, monto: parseFormattedNumber(formatted) });
+                  }} /></div>
                 <div><label htmlFor="cxp-monto_pagado" className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 block">Ya Pagado</label>
-                  <input id="cxp-monto_pagado" type="number" min="0" step="0.01" className="cyber-input w-full" value={cxpForm.monto_pagado} onChange={e => setCxpForm({ ...cxpForm, monto_pagado: parseFloat(e.target.value) || 0 })} /></div>
+                  <input id="cxp-monto_pagado" type="text" className="cyber-input w-full font-mono text-right" value={cxpMontoPagadoStr} onChange={e => {
+                    const formatted = formatMoneyInput(e.target.value);
+                    setCxpMontoPagadoStr(formatted);
+                    setCxpForm({ ...cxpForm, monto_pagado: parseFormattedNumber(formatted) });
+                  }} /></div>
                 <div><label htmlFor="cxp-moneda" className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 block">Moneda</label>
                   <select id="cxp-moneda" className="cyber-select w-full" value={cxpForm.moneda} onChange={e => setCxpForm({ ...cxpForm, moneda: e.target.value })}>
                     {['MXN', 'USD', 'EUR'].map(v => <option key={v} value={v}>{v}</option>)}</select></div>

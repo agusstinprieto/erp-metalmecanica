@@ -19,6 +19,7 @@ import { productionService } from '../services/productionService';
 import { useConfig } from '../contexts/ConfigContext';
 import { CotizadorExpress } from './CotizadorExpress';
 import { FormulaPanel, FORMULAS } from './common/FormulaPanel';
+import { formatMoneyInput, parseFormattedNumber } from '../utils/inputFormatters';
 
 export const CostingView: React.FC = () => {
   const { isDarkMode } = useConfig();
@@ -30,9 +31,27 @@ export const CostingView: React.FC = () => {
   const [projectName, setProjectName] = useState('');
   const [matCost, setMatCost] = useState(0);
   const [labCost, setLabCost] = useState(0);
+  const [matCostStr, setMatCostStr] = useState('0');
+  const [labCostStr, setLabCostStr] = useState('0');
   const [overhead, setOverhead] = useState(15);
   const [margin, setMargin] = useState(30);
   const [editingId, setEditingId] = useState<string | null>(null);
+
+  // Sync string states with numeric states when they are updated programmatically
+  useEffect(() => {
+    const parsed = parseFormattedNumber(matCostStr);
+    if (parsed !== matCost) {
+      setMatCostStr(formatMoneyInput(matCost));
+    }
+  }, [matCost]);
+
+  useEffect(() => {
+    const parsed = parseFormattedNumber(labCostStr);
+    if (parsed !== labCost) {
+      setLabCostStr(formatMoneyInput(labCost));
+    }
+  }, [labCost]);
+
 
   const calculateTotals = () => {
     const subtotal = matCost + labCost;
@@ -252,7 +271,11 @@ export const CostingView: React.FC = () => {
                         <label htmlFor="costing-mat-cost" className="text-[8px] font-black text-slate-500 uppercase mb-1 block">Materiales ($)</label>
                         <input
                           id="costing-mat-cost"
-                          type="number" value={matCost} onChange={e => setMatCost(Number(e.target.value))}
+                          type="text" value={matCostStr} onChange={e => {
+                            const formatted = formatMoneyInput(e.target.value);
+                            setMatCostStr(formatted);
+                            setMatCost(parseFormattedNumber(formatted));
+                          }}
                           className="w-full bg-black/40 border border-white/5 rounded-lg h-8 px-3 text-[10px] text-white outline-none font-mono"
                         />
                       </div>
@@ -260,7 +283,11 @@ export const CostingView: React.FC = () => {
                         <label htmlFor="costing-lab-cost" className="text-[8px] font-black text-slate-500 uppercase mb-1 block">Mano de Obra ($)</label>
                         <input
                           id="costing-lab-cost"
-                          type="number" value={labCost} onChange={e => setLabCost(Number(e.target.value))}
+                          type="text" value={labCostStr} onChange={e => {
+                            const formatted = formatMoneyInput(e.target.value);
+                            setLabCostStr(formatted);
+                            setLabCost(parseFormattedNumber(formatted));
+                          }}
                           className="w-full bg-black/40 border border-white/5 rounded-lg h-8 px-3 text-[10px] text-white outline-none font-mono"
                         />
                       </div>

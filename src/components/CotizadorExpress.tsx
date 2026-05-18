@@ -4,10 +4,12 @@ import { supabase } from '../lib/supabase';
 import { useConfig } from '../contexts/ConfigContext';
 import clsx from 'clsx';
 import { toast } from '../lib/dialogs';
+import { stripLeadingZeros, parseFormattedNumber } from '../utils/inputFormatters';
 
 export const CotizadorExpress: React.FC = () => {
   const { isDarkMode } = useConfig();
   const [pesoNeto, setPesoNeto] = useState<number>(0);
+  const [pesoNetoStr, setPesoNetoStr] = useState('0');
   const [materiales, setMateriales] = useState<any[]>([]);
   const [selectedMaterialId, setSelectedMaterialId] = useState<string>('');
   const [loadingParams, setLoadingParams] = useState(true);
@@ -17,9 +19,50 @@ export const CotizadorExpress: React.FC = () => {
 
   // Variables Globales (desde Supabase)
   const [desperdicioPct, setDesperdicioPct] = useState(30);
+  const [desperdicioPctStr, setDesperdicioPctStr] = useState('30');
   const [exchangeRate, setExchangeRate] = useState(19.56);
+  const [exchangeRateStr, setExchangeRateStr] = useState('19.56');
   const [indirectosPct, setIndirectosPct] = useState(30);
+  const [indirectosPctStr, setIndirectosPctStr] = useState('30');
   const [utilidadPct, setUtilidadPct] = useState(18);
+  const [utilidadPctStr, setUtilidadPctStr] = useState('18');
+
+  // Synchronize string states with numeric states
+  useEffect(() => {
+    const parsed = parseFormattedNumber(pesoNetoStr);
+    if (parsed !== pesoNeto) {
+      setPesoNetoStr(stripLeadingZeros(pesoNeto.toString()));
+    }
+  }, [pesoNeto]);
+
+  useEffect(() => {
+    const parsed = parseFormattedNumber(exchangeRateStr);
+    if (parsed !== exchangeRate) {
+      setExchangeRateStr(stripLeadingZeros(exchangeRate.toString()));
+    }
+  }, [exchangeRate]);
+
+  useEffect(() => {
+    const parsed = parseFormattedNumber(desperdicioPctStr);
+    if (parsed !== desperdicioPct) {
+      setDesperdicioPctStr(stripLeadingZeros(desperdicioPct.toString()));
+    }
+  }, [desperdicioPct]);
+
+  useEffect(() => {
+    const parsed = parseFormattedNumber(indirectosPctStr);
+    if (parsed !== indirectosPct) {
+      setIndirectosPctStr(stripLeadingZeros(indirectosPct.toString()));
+    }
+  }, [indirectosPct]);
+
+  useEffect(() => {
+    const parsed = parseFormattedNumber(utilidadPctStr);
+    if (parsed !== utilidadPct) {
+      setUtilidadPctStr(stripLeadingZeros(utilidadPct.toString()));
+    }
+  }, [utilidadPct]);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -159,10 +202,14 @@ export const CotizadorExpress: React.FC = () => {
             <div className="relative group mb-4">
               <Scale className="absolute left-3 top-2.5 text-slate-600 group-focus-within:text-cyan-400 transition-colors" size={16} />
               <input 
-                type="number" 
-                value={pesoNeto || ''} 
-                onChange={(e) => setPesoNeto(Number(e.target.value))}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-10 pr-4 h-10 text-base font-black text-white focus:border-cyan-500/50 transition-all outline-none"
+                type="text" 
+                value={pesoNetoStr} 
+                onChange={(e) => {
+                  const clean = stripLeadingZeros(e.target.value);
+                  setPesoNetoStr(clean);
+                  setPesoNeto(parseFormattedNumber(clean));
+                }}
+                className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-10 pr-4 h-10 text-base font-black text-white focus-border-cyan-500/50 transition-all outline-none"
                 placeholder="0.00"
               />
             </div>
@@ -200,15 +247,42 @@ export const CotizadorExpress: React.FC = () => {
               </div>
               <div>
                 <label className="text-[8px] font-bold text-slate-400 uppercase">TC</label>
-                <input type="number" step="0.1" value={exchangeRate} onChange={e => setExchangeRate(Number(e.target.value))} className="w-full bg-slate-950 border border-slate-800 rounded px-2 py-0.5 text-[10px] text-white" />
+                <input 
+                  type="text" 
+                  value={exchangeRateStr} 
+                  onChange={e => {
+                    const clean = stripLeadingZeros(e.target.value);
+                    setExchangeRateStr(clean);
+                    setExchangeRate(parseFormattedNumber(clean));
+                  }} 
+                  className="w-full bg-slate-950 border border-slate-800 rounded px-2 py-0.5 text-[10px] text-white" 
+                />
               </div>
               <div>
                 <label className="text-[8px] font-bold text-slate-400 uppercase">% Desp</label>
-                <input type="number" value={desperdicioPct} onChange={e => setDesperdicioPct(Number(e.target.value))} className="w-full bg-slate-950 border border-slate-800 rounded px-2 py-0.5 text-[10px] text-white" />
+                <input 
+                  type="text" 
+                  value={desperdicioPctStr} 
+                  onChange={e => {
+                    const clean = stripLeadingZeros(e.target.value);
+                    setDesperdicioPctStr(clean);
+                    setDesperdicioPct(parseFormattedNumber(clean));
+                  }} 
+                  className="w-full bg-slate-950 border border-slate-800 rounded px-2 py-0.5 text-[10px] text-white" 
+                />
               </div>
               <div>
                 <label className="text-[8px] font-bold text-slate-400 uppercase">% Ind</label>
-                <input type="number" value={indirectosPct} onChange={e => setIndirectosPct(Number(e.target.value))} className="w-full bg-slate-950 border border-slate-800 rounded px-2 py-0.5 text-[10px] text-white" />
+                <input 
+                  type="text" 
+                  value={indirectosPctStr} 
+                  onChange={e => {
+                    const clean = stripLeadingZeros(e.target.value);
+                    setIndirectosPctStr(clean);
+                    setIndirectosPct(parseFormattedNumber(clean));
+                  }} 
+                  className="w-full bg-slate-950 border border-slate-800 rounded px-2 py-0.5 text-[10px] text-white" 
+                />
               </div>
             </div>
           </div>
@@ -246,7 +320,16 @@ export const CotizadorExpress: React.FC = () => {
                   <p className="text-[9px] text-emerald-500 font-black uppercase tracking-widest">Precio Sugerido</p>
                   <div className="flex items-center gap-1">
                     <span className="text-[8px] text-slate-500 font-bold uppercase">Util:</span>
-                    <input type="number" value={utilidadPct} onChange={e => setUtilidadPct(Number(e.target.value))} className="w-10 bg-slate-950 border border-emerald-900/50 text-emerald-400 rounded px-1 text-[10px] text-center font-bold outline-none" />
+                    <input 
+                      type="text" 
+                      value={utilidadPctStr} 
+                      onChange={e => {
+                        const clean = stripLeadingZeros(e.target.value);
+                        setUtilidadPctStr(clean);
+                        setUtilidadPct(parseFormattedNumber(clean));
+                      }} 
+                      className="w-10 bg-slate-950 border border-emerald-900/50 text-emerald-400 rounded px-1 text-[10px] text-center font-bold outline-none" 
+                    />
                     <span className="text-[10px] text-emerald-500 font-black">%</span>
                   </div>
                 </div>
