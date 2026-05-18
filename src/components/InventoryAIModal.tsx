@@ -133,7 +133,8 @@ export const InventoryAIModal: React.FC<InventoryAIModalProps> = ({ onClose, onI
       const rawSku = (parsed.sku || '').toUpperCase();
       const rawName = (parsed.name || '').toUpperCase();
       const rawCategory = (parsed.category || '').toUpperCase();
-      const rawQty = parsed.quantity || 1;
+      const extractedQty = parseInt(String(parsed.quantity).replace(/[^0-9]/g, ''), 10);
+      const rawQty = isNaN(extractedQty) ? 1 : extractedQty;
       const rawUnit = parsed.unit || 'pcs';
       const rawDesc = parsed.description || '';
 
