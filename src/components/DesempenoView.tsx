@@ -4,9 +4,11 @@ import clsx from 'clsx';
 import {
   Users, TrendingUp, Award, AlertTriangle, CheckCircle,
   ChevronUp, ChevronDown, Minus, Star, Shield, Zap,
-  DollarSign, BarChart2, Factory, RefreshCw, Plus, X, FileDown
+  DollarSign, BarChart2, Factory, RefreshCw, Plus, X, FileDown,
+  UserPlus, Pencil, ToggleLeft, ToggleRight
 } from 'lucide-react';
 import { reportUtils } from '../utils/reportUtils';
+import { toast } from '../lib/dialogs';
 import type {
   Operador, DesempenoKPI, Incentivo, CelulaDesempeno,
   TipoPeriodo, TipoIncentivo,
@@ -14,6 +16,7 @@ import type {
 import {
   fetchOperadores, fetchKPIs, fetchIncentivos, fetchCelulaDesempeno,
   upsertKPI, createIncentivo, aprobarIncentivo, calcularKPIs, calcularIncentivo,
+  createOperador, updateOperador,
   CELULAS, SALARIO_BASE_DEFAULT,
 } from '../services/desempenoService';
 
@@ -233,6 +236,160 @@ const IncentivoBadge: React.FC<{ tipo: TipoIncentivo }> = ({ tipo }) => {
   );
 };
 
+// ── Operador Form Modal ───────────────────────────────────────────────────────
+const TURNOS = ['matutino', 'vespertino', 'nocturno'] as const;
+
+const OperadorFormModal: React.FC<{
+  operador?: Operador;
+  onSave: (op: Operador) => void;
+  onClose: () => void;
+}> = ({ operador, onSave, onClose }) => {
+  const isEdit = !!operador;
+  const [form, setForm] = useState({
+    nombre:           operador?.nombre           ?? '',
+    numero_empleado:  operador?.numero_empleado  ?? '',
+    celula:           operador?.celula           ?? CELULAS[0],
+    turno:            operador?.turno            ?? 'matutino',
+    puesto:           operador?.puesto           ?? '',
+  });
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  const set = (k: keyof typeof form, v: string) => setForm(p => ({ ...p, [k]: v }));
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.nombre.trim() || !form.numero_empleado.trim() || !form.puesto.trim()) {
+      setErr('Nombre, número de empleado y puesto son obligatorios.');
+      return;
+    }
+    setSaving(true);
+    setErr(null);
+    try {
+      const saved = isEdit
+        ? await updateOperador(operador!.id, form)
+        : await createOperador(form as any);
+      toast(isEdit ? 'Operador actualizado.' : 'Operador dado de alta.', 'success');
+      onSave(saved);
+      onClose();
+    } catch (e: any) {
+      setErr(e.message ?? 'Error al guardar.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-md bg-mcvill-card border border-mcvill-accent/20 rounded-3xl shadow-2xl p-8 z-10">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-mcvill-accent/10 border border-mcvill-accent/20 flex items-center justify-center text-mcvill-accent">
+              <UserPlus size={18} />
+            </div>
+            <div>
+              <h3 className="text-sm font-black uppercase tracking-widest text-mcvill-text">
+                {isEdit ? 'Editar Operador' : 'Alta de Operador'}
+              </h3>
+              <p className="text-[10px] text-mcvill-text-muted mt-0.5">Módulo Desempeño + Incentivos</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="text-mcvill-text-muted hover:text-rose-400 transition-colors">
+            <X size={18} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Nombre */}
+          <div>
+            <label className="text-[10px] font-black uppercase tracking-widest text-mcvill-text-muted block mb-1.5">
+              Nombre completo *
+            </label>
+            <input
+              value={form.nombre}
+              onChange={e => set('nombre', e.target.value)}
+              placeholder="Ej. Juan Martínez López"
+              className="w-full bg-mcvill-bg border border-mcvill-accent/20 rounded-xl px-4 py-2.5 text-sm text-mcvill-text placeholder-mcvill-text-muted/40 focus:outline-none focus:border-mcvill-accent/50"
+            />
+          </div>
+
+          {/* Número de empleado */}
+          <div>
+            <label className="text-[10px] font-black uppercase tracking-widest text-mcvill-text-muted block mb-1.5">
+              Número de empleado *
+            </label>
+            <input
+              value={form.numero_empleado}
+              onChange={e => set('numero_empleado', e.target.value.toUpperCase())}
+              placeholder="Ej. EMP-001"
+              className="w-full bg-mcvill-bg border border-mcvill-accent/20 rounded-xl px-4 py-2.5 text-sm text-mcvill-text font-mono placeholder-mcvill-text-muted/40 focus:outline-none focus:border-mcvill-accent/50"
+            />
+          </div>
+
+          {/* Puesto */}
+          <div>
+            <label className="text-[10px] font-black uppercase tracking-widest text-mcvill-text-muted block mb-1.5">
+              Puesto *
+            </label>
+            <input
+              value={form.puesto}
+              onChange={e => set('puesto', e.target.value)}
+              placeholder="Ej. Soldador Senior, Operador CNC…"
+              className="w-full bg-mcvill-bg border border-mcvill-accent/20 rounded-xl px-4 py-2.5 text-sm text-mcvill-text placeholder-mcvill-text-muted/40 focus:outline-none focus:border-mcvill-accent/50"
+            />
+          </div>
+
+          {/* Célula + Turno */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-[10px] font-black uppercase tracking-widest text-mcvill-text-muted block mb-1.5">
+                Célula
+              </label>
+              <select
+                value={form.celula}
+                onChange={e => set('celula', e.target.value)}
+                className="w-full bg-mcvill-bg border border-mcvill-accent/20 rounded-xl px-3 py-2.5 text-sm text-mcvill-text focus:outline-none focus:border-mcvill-accent/50"
+              >
+                {CELULAS.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="text-[10px] font-black uppercase tracking-widest text-mcvill-text-muted block mb-1.5">
+                Turno
+              </label>
+              <select
+                value={form.turno}
+                onChange={e => set('turno', e.target.value)}
+                className="w-full bg-mcvill-bg border border-mcvill-accent/20 rounded-xl px-3 py-2.5 text-sm text-mcvill-text focus:outline-none focus:border-mcvill-accent/50"
+              >
+                {TURNOS.map(t => <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
+              </select>
+            </div>
+          </div>
+
+          {err && (
+            <p className="text-xs text-rose-400 font-bold bg-rose-500/10 border border-rose-500/20 rounded-xl px-4 py-2">
+              {err}
+            </p>
+          )}
+
+          <div className="flex gap-3 pt-2">
+            <button type="button" onClick={onClose}
+              className="flex-1 py-3 bg-mcvill-bg border border-mcvill-accent/10 text-mcvill-text-muted rounded-xl text-xs font-black uppercase tracking-widest hover:text-mcvill-text transition-all">
+              Cancelar
+            </button>
+            <button type="submit" disabled={saving}
+              className="flex-1 py-3 bg-mcvill-accent/20 border border-mcvill-accent/40 text-mcvill-accent rounded-xl text-xs font-black uppercase tracking-widest hover:bg-mcvill-accent/30 transition-all disabled:opacity-50">
+              {saving ? 'Guardando…' : isEdit ? 'Actualizar' : 'Dar de Alta'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 // ── Main View ─────────────────────────────────────────────────────────────────
 export const DesempenoView: React.FC = () => {
   const { config } = useConfig();
@@ -241,11 +398,12 @@ export const DesempenoView: React.FC = () => {
   const [incentivos, setIncentivos] = useState<Incentivo[]>([]);
   const [celulas, setCelulas] = useState<CelulaDesempeno[]>([]);
   const [selectedOp, setSelectedOp] = useState<Operador | null>(null);
-  const [activeTab, setActiveTab] = useState<'tablero' | 'celulas' | 'incentivos'>('tablero');
+  const [activeTab, setActiveTab] = useState<'tablero' | 'celulas' | 'incentivos' | 'operadores'>('tablero');
   const [filterCelula, setFilterCelula] = useState<string>('TODAS');
   const [showKPIForm, setShowKPIForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [opModal, setOpModal] = useState<{ open: boolean; editing?: Operador }>({ open: false });
   const periodo = getThisWeek();
 
   useEffect(() => {
@@ -373,7 +531,7 @@ export const DesempenoView: React.FC = () => {
 
       {/* Tabs */}
       <div className="flex items-center gap-1 bg-mcvill-card border border-mcvill-accent/10 rounded-xl p-1 w-fit">
-        {(['tablero', 'celulas', 'incentivos'] as const).map(t => (
+        {(['tablero', 'celulas', 'incentivos', 'operadores'] as const).map(t => (
           <button key={t} onClick={() => setActiveTab(t)}
             className={clsx(
               'px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition-all',
@@ -381,7 +539,7 @@ export const DesempenoView: React.FC = () => {
                 ? 'bg-mcvill-accent/20 text-mcvill-accent border border-mcvill-accent/30'
                 : 'text-mcvill-text-muted hover:text-mcvill-text'
             )}>
-            {t === 'tablero' ? 'Tablero Operadores' : t === 'celulas' ? 'Por Célula' : 'Incentivos'}
+            {t === 'tablero' ? 'Tablero' : t === 'celulas' ? 'Por Célula' : t === 'incentivos' ? 'Incentivos' : 'Operadores'}
           </button>
         ))}
       </div>
@@ -571,6 +729,141 @@ export const DesempenoView: React.FC = () => {
             </table>
           </div>
         </div>
+      )}
+
+      {/* ── OPERADORES tab ────────────────────────────────────────────────────── */}
+      {activeTab === 'operadores' && (
+        <div className="space-y-4">
+          {/* Header del tab */}
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-widest text-mcvill-text-muted">
+                {operadores.length} operador{operadores.length !== 1 ? 'es' : ''} registrado{operadores.length !== 1 ? 's' : ''}
+              </p>
+            </div>
+            <button
+              onClick={() => setOpModal({ open: true })}
+              className="flex items-center gap-2 px-4 py-2 bg-mcvill-accent/10 border border-mcvill-accent/30 rounded-xl text-mcvill-accent text-xs font-black uppercase tracking-wider hover:bg-mcvill-accent/20 transition-all"
+            >
+              <UserPlus size={14} /> Nuevo Operador
+            </button>
+          </div>
+
+          {/* Filtro célula */}
+          <div className="flex gap-2 flex-wrap">
+            {['TODAS', ...CELULAS].map(c => (
+              <button key={c} onClick={() => setFilterCelula(c)}
+                className={clsx(
+                  'px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all border',
+                  filterCelula === c
+                    ? 'bg-mcvill-accent/20 text-mcvill-accent border-mcvill-accent/30'
+                    : 'bg-mcvill-card text-mcvill-text-muted border-mcvill-accent/10 hover:text-mcvill-text'
+                )}>
+                {c}
+              </button>
+            ))}
+          </div>
+
+          {/* Tabla de operadores */}
+          <div className="bg-mcvill-card border border-mcvill-accent/10 rounded-2xl overflow-hidden">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="border-b border-mcvill-accent/10">
+                  {['#', 'Nombre', 'N° Empleado', 'Puesto', 'Célula', 'Turno', 'Estado', 'Acciones'].map(h => (
+                    <th key={h} className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-mcvill-text-muted">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {filteredOps.map((op, idx) => (
+                  <tr key={op.id} className="border-b border-mcvill-accent/5 hover:bg-mcvill-accent/5 transition-colors">
+                    <td className="px-4 py-3 text-mcvill-text-muted font-mono">{idx + 1}</td>
+                    <td className="px-4 py-3 font-black text-mcvill-text">{op.nombre}</td>
+                    <td className="px-4 py-3 font-mono text-mcvill-accent">{op.numero_empleado ?? '—'}</td>
+                    <td className="px-4 py-3 text-mcvill-text-muted">{op.puesto ?? '—'}</td>
+                    <td className="px-4 py-3">
+                      <span className="px-2 py-0.5 bg-mcvill-accent/10 text-mcvill-accent border border-mcvill-accent/20 rounded-full text-[9px] font-black uppercase">
+                        {op.celula ?? '—'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-mcvill-text-muted capitalize">{op.turno ?? '—'}</td>
+                    <td className="px-4 py-3">
+                      {op.activo ? (
+                        <span className="flex items-center gap-1 text-emerald-400 text-[10px] font-black uppercase">
+                          <ToggleRight size={14} /> Activo
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1 text-mcvill-text-muted text-[10px] font-black uppercase">
+                          <ToggleLeft size={14} /> Inactivo
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setOpModal({ open: true, editing: op })}
+                          className="p-1.5 rounded-lg bg-mcvill-accent/10 text-mcvill-accent hover:bg-mcvill-accent/20 transition-all"
+                          title="Editar"
+                        >
+                          <Pencil size={12} />
+                        </button>
+                        <button
+                          onClick={async () => {
+                            try {
+                              const updated = await updateOperador(op.id, { activo: !op.activo });
+                              setOperadores(prev => prev.map(o => o.id === op.id ? updated : o));
+                              toast(`Operador ${updated.activo ? 'activado' : 'desactivado'}.`, 'success');
+                            } catch { toast('Error al cambiar estado.', 'error'); }
+                          }}
+                          className={clsx(
+                            'p-1.5 rounded-lg transition-all text-[10px] font-black uppercase flex items-center gap-1',
+                            op.activo
+                              ? 'bg-rose-500/10 text-rose-400 hover:bg-rose-500/20'
+                              : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'
+                          )}
+                          title={op.activo ? 'Desactivar' : 'Activar'}
+                        >
+                          {op.activo ? <ToggleLeft size={12} /> : <ToggleRight size={12} />}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {filteredOps.length === 0 && (
+                  <tr>
+                    <td colSpan={8} className="px-4 py-12 text-center">
+                      <div className="flex flex-col items-center gap-3 text-mcvill-text-muted">
+                        <Users size={32} className="opacity-30" />
+                        <p className="text-xs font-bold">No hay operadores registrados en esta célula.</p>
+                        <button
+                          onClick={() => setOpModal({ open: true })}
+                          className="mt-1 text-mcvill-accent text-xs font-black uppercase tracking-wider hover:underline flex items-center gap-1"
+                        >
+                          <UserPlus size={12} /> Dar de alta el primero →
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* ── Modal Alta / Edición de Operador ─────────────────────────────────── */}
+      {opModal.open && (
+        <OperadorFormModal
+          operador={opModal.editing}
+          onSave={saved => {
+            setOperadores(prev => {
+              const idx = prev.findIndex(o => o.id === saved.id);
+              if (idx >= 0) { const a = [...prev]; a[idx] = saved; return a; }
+              return [...prev, saved];
+            });
+          }}
+          onClose={() => setOpModal({ open: false })}
+        />
       )}
     </div>
   );

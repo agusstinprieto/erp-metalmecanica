@@ -179,6 +179,27 @@ const DEMO_KPIS: DesempenoKPI[] = DEMO_OPERADORES.map((op, i) => {
 });
 
 // ── Supabase CRUD ─────────────────────────────────────────────────────────────
+export async function createOperador(
+  input: Pick<Operador, 'nombre' | 'numero_empleado' | 'celula' | 'turno' | 'puesto'>
+): Promise<Operador> {
+  const tenant = await getTenant();
+  const row = { ...input, activo: true, tenant_id: tenant };
+  const { data, error } = await supabase.from('operadores').insert(row).select().single();
+  if (error || !data) throw new Error(error?.message ?? 'No se pudo crear el operador');
+  return data as Operador;
+}
+
+export async function updateOperador(
+  id: string,
+  input: Partial<Pick<Operador, 'nombre' | 'numero_empleado' | 'celula' | 'turno' | 'puesto' | 'activo'>>
+): Promise<Operador> {
+  const tenant = await getTenant();
+  const { data, error } = await supabase
+    .from('operadores').update(input).eq('id', id).eq('tenant_id', tenant).select().single();
+  if (error || !data) throw new Error(error?.message ?? 'No se pudo actualizar el operador');
+  return data as Operador;
+}
+
 export async function fetchOperadores(celula?: string): Promise<Operador[]> {
   const tenant = await getTenant();
   let q = supabase.from('operadores').select('*').eq('tenant_id', tenant).eq('activo', true).order('nombre');
