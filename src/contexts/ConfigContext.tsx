@@ -19,6 +19,7 @@ interface BrandConfig {
   software_accelerator_url?: string;
   logo?: string;
   logoDark?: string;
+  quotationLogo?: string;
   loginBackground?: string;
   themeColor?: string;
   themeColorLight?: string;
@@ -185,6 +186,7 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               themeName: (supabaseConfig.themeName as ThemeName) || prev.themeName,
               logo: supabaseConfig.logo_url || prev.logo,
               logoDark: supabaseConfig.logo_url || prev.logoDark,
+              quotationLogo: supabaseConfig.quotation_logo_url || prev.quotationLogo,
               companyName: supabaseConfig.company_name || prev.companyName,
               companyCity: supabaseConfig.company_city || prev.companyCity,
               developerName: supabaseConfig.developer_name || prev.developerName,
@@ -241,6 +243,7 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               themeColorLight: updated.themeColorLight,
               themeName: updated.themeName,
               ...(updated.logo ? { logo_url: updated.logo } : {}),
+              ...(updated.quotationLogo !== undefined ? { quotation_logo_url: updated.quotationLogo } : {}),
               company_name: updated.companyName,
               company_city: updated.companyCity,
               developer_name: updated.developerName,
@@ -278,10 +281,11 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     updateConfig({ themeName: name });
   };
 
-  // Derived logo based on theme
+  // Derived logo based on theme; quotationLogo falls back to company logo
   const currentConfig = {
     ...config,
-    logo: isDarkMode ? (config.logoDark || defaultConfig.logoDark) : (config.logo || defaultConfig.logo)
+    logo: isDarkMode ? (config.logoDark || defaultConfig.logoDark) : (config.logo || defaultConfig.logo),
+    quotationLogo: config.quotationLogo || (isDarkMode ? (config.logoDark || defaultConfig.logoDark) : (config.logo || defaultConfig.logo)),
   };
 
   return (

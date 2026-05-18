@@ -870,13 +870,26 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ userRole }) => {
     brand_name: '',
     system_name: '',
     slogan: '',
-    selected_api: 'gemini-2.5-flash-lite'
+    selected_api: 'gemini-2.5-flash-lite',
+    whatsapp_api_key: '',
+    whatsapp_phone_id: '',
+    facebook_page_token: '',
+    facebook_page_id: '',
+    linkedin_org_id: '',
+    linkedin_access_token: '',
+    instagram_business_id: '',
+    instagram_access_token: '',
+    tiktok_access_token: '',
+    tiktok_client_key: '',
   });
   const [savingKeys, setSavingKeys] = useState(false);
   const [showKeys, setShowKeys] = useState(false);
   const [logoUploading, setLogoUploading] = useState(false);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const logoFileRef = React.useRef<HTMLInputElement>(null);
+  const [quotationLogoUploading, setQuotationLogoUploading] = useState(false);
+  const [quotationLogoPreview, setQuotationLogoPreview] = useState<string | null>(null);
+  const quotationLogoFileRef = React.useRef<HTMLInputElement>(null);
 
   const handleLogoUpload = async (file: File) => {
     if (!file || !file.type.startsWith('image/')) {
@@ -921,6 +934,43 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ userRole }) => {
       setLogoPreview(null);
     } finally {
       setLogoUploading(false);
+    }
+  };
+
+  const handleQuotationLogoUpload = async (file: File) => {
+    if (!file || !file.type.startsWith('image/')) {
+      setNotification({ message: 'Solo se permiten archivos de imagen (PNG, JPG, SVG)', type: 'error' });
+      return;
+    }
+    const localUrl = URL.createObjectURL(file);
+    setQuotationLogoPreview(localUrl);
+    setQuotationLogoUploading(true);
+    try {
+      const ext = file.name.split('.').pop();
+      const path = `tenant-${tenantId || 'default'}/quotation-logo.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from('logos')
+        .upload(path, file, { upsert: true, contentType: file.type });
+      if (upErr) {
+        if (upErr.message?.includes('Bucket not found') || (upErr as any).statusCode === 400) {
+          throw new Error('El bucket de logos no existe en Supabase. Ejecuta la migración 20260517000003_create_logos_bucket.sql en el dashboard.');
+        }
+        throw upErr;
+      }
+      const { data: { publicUrl } } = supabase.storage.from('logos').getPublicUrl(path);
+      updateConfig({ quotationLogo: publicUrl });
+      const { data: tenant } = await supabase.from('tenants').select('id, config').single();
+      if (tenant) {
+        await supabase.from('tenants').update({
+          config: { ...(tenant.config || {}), quotation_logo_url: publicUrl }
+        }).eq('id', tenant.id);
+      }
+      setNotification({ message: 'Logo de cotizaciones actualizado correctamente', type: 'success' });
+    } catch (e: any) {
+      setNotification({ message: `Error al subir logo: ${e.message}`, type: 'error' });
+      setQuotationLogoPreview(null);
+    } finally {
+      setQuotationLogoUploading(false);
     }
   };
 
@@ -1389,6 +1439,25 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ userRole }) => {
                 <input ref={logoFileRef} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) handleLogoUpload(f); e.target.value = ''; }} />
               </div>
 
+              <div className="space-y-1.5">
+                <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Logo para Cotizaciones</label>
+                <div onClick={() => quotationLogoFileRef.current?.click()} className="p-3 bg-black/40 border border-white/5 border-dashed rounded-lg hover:border-mcvill-accent/40 cursor-pointer flex items-center gap-3 transition-all group">
+                  <div className="w-10 h-10 rounded bg-slate-900 border border-white/10 flex items-center justify-center shrink-0 overflow-hidden">
+                    {(quotationLogoPreview || config.quotationLogo) ? (
+                      <img src={quotationLogoPreview || config.quotationLogo} className="w-full h-full object-contain p-1" />
+                    ) : (
+                      <span className="text-mcvill-accent font-black text-sm">{config.brandName.charAt(0)}</span>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-bold text-slate-400 group-hover:text-white transition-colors">{quotationLogoUploading ? 'PROCESANDO...' : 'SUBIR LOGO COTIZACIONES'}</p>
+                    <p className="text-[8px] text-slate-600 truncate uppercase">Si se omite, usa el logotipo principal</p>
+                  </div>
+                  <Upload size={14} className="text-slate-600 group-hover:text-mcvill-accent transition-all" />
+                </div>
+                <input ref={quotationLogoFileRef} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) handleQuotationLogoUpload(f); e.target.value = ''; }} />
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Versión</label>
@@ -1508,6 +1577,51 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ userRole }) => {
                 <button onClick={() => handleUpdateConfig(tenantConfig)} disabled={savingKeys} className="h-9 px-6 rounded-lg bg-mcvill-accent text-slate-950 text-[9px] font-black uppercase tracking-widest hover:opacity-90 transition-all flex items-center gap-2 shadow-lg shadow-mcvill-accent/20">
                   {savingKeys ? <Loader2 size={14} className="animate-spin" /> : <Database size={14} />}
                   Guardar Bóveda
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-slate-900/40 p-5 rounded-xl border border-white/5 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Globe size={14} className="text-mcvill-accent" />
+                  <h4 className="text-[10px] font-black text-white uppercase tracking-widest">Integraciones, WhatsApp y Redes Sociales</h4>
+                </div>
+                <button onClick={() => setShowKeys(!showKeys)} className="text-slate-500 hover:text-white transition-colors">
+                  {showKeys ? <EyeOff size={14} /> : <Eye size={14} />}
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {[
+                  { id: 'whatsapp_api_key', label: 'WhatsApp Token / API Key', key: 'whatsapp_api_key' },
+                  { id: 'whatsapp_phone_id', label: 'WhatsApp Phone Number ID', key: 'whatsapp_phone_id' },
+                  { id: 'resend_api_key', label: 'Resend Email API Key', key: 'resend_api_key' },
+                  { id: 'facebook_page_token', label: 'Facebook Page Token', key: 'facebook_page_token' },
+                  { id: 'facebook_page_id', label: 'Facebook Page ID', key: 'facebook_page_id' },
+                  { id: 'linkedin_org_id', label: 'LinkedIn Org / Company ID', key: 'linkedin_org_id' },
+                  { id: 'linkedin_access_token', label: 'LinkedIn Access Token', key: 'linkedin_access_token' },
+                  { id: 'instagram_business_id', label: 'Instagram Business ID', key: 'instagram_business_id' },
+                  { id: 'instagram_access_token', label: 'Instagram Graph Token', key: 'instagram_access_token' },
+                  { id: 'tiktok_access_token', label: 'TikTok Access Token', key: 'tiktok_access_token' },
+                  { id: 'tiktok_client_key', label: 'TikTok Client Key', key: 'tiktok_client_key' },
+                ].map(k => (
+                  <div key={k.id} className="space-y-1">
+                    <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest ml-1">{k.label}</label>
+                    <input 
+                      type={showKeys ? "text" : "password"}
+                      value={(tenantConfig as any)[k.key] || ''}
+                      onChange={(e) => setTenantConfig({ ...tenantConfig, [k.key]: e.target.value })}
+                      className="bg-black/60 border border-white/5 rounded-lg w-full px-3 h-8 font-mono text-[10px] text-white focus:border-blue-500/50 transition-all"
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div className="pt-2 flex justify-end">
+                <button onClick={() => handleUpdateConfig(tenantConfig)} disabled={savingKeys} className="h-9 px-6 rounded-lg bg-mcvill-accent text-slate-950 text-[9px] font-black uppercase tracking-widest hover:opacity-90 transition-all flex items-center gap-2 shadow-lg shadow-mcvill-accent/20">
+                  {savingKeys ? <Loader2 size={14} className="animate-spin" /> : <Database size={14} />}
+                  Sincronizar Integraciones
                 </button>
               </div>
             </div>

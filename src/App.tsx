@@ -69,6 +69,9 @@ const EnergyMonitorView      = lz(() => import('./components/EnergyMonitorView')
 const PreventiveMaintenanceIAView = lz(() => import('./components/PreventiveMaintenanceIAView'), 'PreventiveMaintenanceIAView');
 const CeoMobileSim = lz(() => import('./components/CeoMobileSim'), 'CeoMobileSim');
 const PortadaView = lz(() => import('./components/PortadaView'), 'PortadaView');
+const DeliveryTrackerView = lz(() => import('./components/DeliveryTrackerView'), 'DeliveryTrackerView');
+const LeadTimePredictorView = lz(() => import('./components/LeadTimePredictorView'), 'LeadTimePredictorView');
+const BrandingStudioView = lz(() => import('./components/BrandingStudioView'), 'BrandingStudioView');
 
 type UserRole = 'ceo' | 'gerencia' | 'sistemas' | 'empleado' | 'rh' | 'finanzas' | 'contabilidad' | 'supervisor' | 'ingenieria' | 'calidad' | 'operaciones' | 'ventas' | 'compras' | 'almacen' | 'auditoria' | 'soporte' | 'marketing' | 'seguridad';
 
@@ -593,6 +596,9 @@ function App() {
             {activeView === 'energy_monitor' && <EnergyMonitorView />}
             {activeView === 'preventive_maintenance_ia' && <PreventiveMaintenanceIAView />}
             {activeView === 'ceo_mobile_sim' && <CeoMobileSim />}
+            {activeView === 'logistica' && <DeliveryTrackerView />}
+            {activeView === 'lead_time_predictor' && <LeadTimePredictorView />}
+            {activeView === 'branding_studio' && <BrandingStudioView />}
           </Suspense>
           </div>
         </div>

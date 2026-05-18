@@ -3,10 +3,10 @@ import {
   X, BookOpen, Zap, Users, Box, Hammer, Cpu, Mic,
   LayoutDashboard, ShieldCheck, Target, CircleDollarSign, TrendingUp,
   Wrench, Camera, BrainCircuit, Puzzle,
-  ClipboardCheck, BarChart3, Trophy, Shield
+  ClipboardCheck, BarChart3, Trophy, Shield, Palette
 } from 'lucide-react';
 import { useConfig } from '../contexts/ConfigContext';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 
 interface ERPGuideModalProps {
   isOpen: boolean;
@@ -236,6 +236,20 @@ function getDepartments(brandName: string) { return [
       'Ejecuta acciones del ERP por voz: crear órdenes, registrar incidencias.',
       'Cambia entre personalidades IA: Técnica, Ejecutiva o Soporte.',
       'Análisis de datos avanzado mediante preguntas en español.',
+    ],
+  },
+  {
+    id: 'branding_studio',
+    name: 'Branding & Redes IA',
+    icon: Palette,
+    color: 'text-mcvill-accent',
+    badge: 'NUEVO',
+    description: 'Estudio de mercadotecnia, branding y redes sociales por IA.',
+    features: [
+      'Diseño inteligente: prompts optimizados para logos, uniformes y EPP.',
+      'Vacantes automáticas: redacta copias persuasivas y banners en segundos.',
+      'Felicitaciones y aniversarios: postales conmemorativas para el personal.',
+      'Gestión de redes: publica y planifica en Facebook, LinkedIn, Instagram y TikTok.',
     ],
   },
 ]; }

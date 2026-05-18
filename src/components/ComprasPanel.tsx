@@ -2,20 +2,22 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Truck, Package, Wrench, Plus, Pencil, Trash2, Save, X,
-  Loader2, AlertCircle, Search, ChevronRight, FileText, ShoppingCart, FileDown
+  Loader2, AlertCircle, Search, ChevronRight, FileText, ShoppingCart, FileDown, Bot
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { OCProveedorManagerModal } from './OCProveedorManagerModal';
 import { useTenant } from '../hooks/useTenant';
 import { reportUtils } from '../utils/reportUtils';
+import { PurchasingAgentTab } from './PurchasingAgentTab';
 
-type TabId = 'proveedores' | 'materiales' | 'operaciones' | 'ordenes_compra';
+type TabId = 'proveedores' | 'materiales' | 'operaciones' | 'ordenes_compra' | 'agente_ia';
 
 const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
   { id: 'proveedores',   label: 'Proveedores',      icon: Truck         },
   { id: 'materiales',   label: 'Materiales',        icon: Package       },
   { id: 'operaciones',  label: 'Operaciones',       icon: Wrench        },
   { id: 'ordenes_compra', label: 'Órdenes de Compra', icon: ShoppingCart },
+  { id: 'agente_ia',    label: 'Agente IA',          icon: Bot           },
 ];
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -649,6 +651,7 @@ export const ComprasPanel: React.FC = () => {
     materiales:    'text-blue-400',
     operaciones:   'text-blue-400',
     ordenes_compra: 'text-amber-400',
+    agente_ia:     'text-purple-400',
   };
 
   return (
@@ -703,6 +706,7 @@ export const ComprasPanel: React.FC = () => {
             {tab === 'ordenes_compra' && (
               <OCProveedorManagerModal isOpen={true} onClose={() => {}} isInline={true} />
             )}
+            {tab === 'agente_ia'      && <PurchasingAgentTab />}
           </motion.div>
         </AnimatePresence>
       </div>

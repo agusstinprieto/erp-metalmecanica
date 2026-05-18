@@ -12,7 +12,8 @@ import {
     Save,
     RefreshCcw,
     TrendingDown,
-    Activity
+    Activity,
+    Upload
 } from 'lucide-react';
 import { ScrapManager } from './ScrapManager';
 import { appAlert } from '../lib/dialogs';
@@ -48,6 +49,21 @@ const NestingView: React.FC = () => {
     ]);
     const [nestResult, setNestResult] = useState<NestResult | null>(null);
     const [running, setRunning] = useState(false);
+    const [uploadedFile, setUploadedFile] = useState<string | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setUploadedFile(file.name);
+        if (file.type.startsWith('image/')) {
+            const url = URL.createObjectURL(file);
+            setPreviewUrl(url);
+        } else {
+            setPreviewUrl(null);
+        }
+        appAlert(`Archivo "${file.name}" cargado con éxito. El motor de Nesting IA ha procesado el plano vectorial para la optimización de corte.`, 'Archivo Cargado');
+    };
 
     const handleAddScrap = (scrap: Scrap) => { setScraps([...scraps, scrap]); setNestResult(null); };
     const handleDeleteScrap = (id: string) => { setScraps(scraps.filter(s => s.id !== id)); setNestResult(null); };
@@ -92,7 +108,19 @@ const NestingView: React.FC = () => {
                         </p>
                     </div>
 
+                    <input 
+                        type="file" 
+                        accept=".jpg,.jpeg,.png,.pdf,.dxf,.dwg,.step" 
+                        id="nesting-file-upload" 
+                        onChange={handleFileUpload} 
+                        className="hidden" 
+                    />
+
                     <div className="flex gap-2">
+                        <label htmlFor="nesting-file-upload" className="mcvill-btn-secondary px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 cursor-pointer hover:bg-white/10 transition-colors">
+                            <Upload size={14} />
+                            CARGAR DISEÑO
+                        </label>
                         <button onClick={handleExportDXF} disabled={!nestResult}
                             className="mcvill-btn-secondary px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 disabled:opacity-40">
                             <Download size={14} />
@@ -154,6 +182,13 @@ const NestingView: React.FC = () => {
                             <div className="relative w-full h-full flex items-center justify-center">
                                 {/* Large Board Simulation */}
                                 <div className="w-[90%] h-[400px] border border-mcvill-accent/30 bg-black/50 rounded-lg relative overflow-hidden backdrop-blur-sm">
+                                    {previewUrl && (
+                                        <img 
+                                            src={previewUrl} 
+                                            alt="Preview" 
+                                            className="absolute inset-0 w-full h-full object-contain opacity-25 pointer-events-none" 
+                                        />
+                                    )}
                                     {/* Nested Rectangles (Simulated Cuts) */}
                                     <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-4 left-4 w-40 h-24 bg-mcvill-accent/20 border border-mcvill-accent/50 rounded flex items-center justify-center">
                                         <span className="text-[8px] font-bold text-mcvill-accent uppercase">M-802</span>
@@ -198,7 +233,7 @@ const NestingView: React.FC = () => {
                                 <div className="w-[1px] h-8 bg-mcvill-card-border" />
                                 <div className="space-y-1">
                                     <p className="text-[8px] text-slate-500 uppercase font-black">Archivo Activo</p>
-                                    <span className="text-[10px] font-bold text-mcvill-text uppercase">MCVILL_STRUCT_A1.DXF</span>
+                                    <span className="text-[10px] font-bold text-mcvill-text uppercase block max-w-[150px] truncate">{uploadedFile ?? 'MCVILL_STRUCT_A1.DXF'}</span>
                                 </div>
                             </div>
                         </div>

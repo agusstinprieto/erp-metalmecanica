@@ -117,9 +117,50 @@ mark{background:rgba(251,191,36,.35);color:var(--text);border-radius:2px;padding
 
 /* ── PRINT ────────────────────────────────────────────── */
 @media print{
-  #topbar,#sidebar{display:none}
-  #content{margin:0;max-width:none;padding:1rem}
-  section{page-break-inside:avoid}
+  :root, [data-theme="dark"], [data-theme="light"] {
+    --bg: #ffffff !important;
+    --card: #ffffff !important;
+    --border: #cccccc !important;
+    --accent: #1d4ed8 !important;
+    --text: #000000 !important;
+    --muted: #475569 !important;
+  }
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  #topbar, #sidebar, #theme-btn, button {
+    display: none !important;
+  }
+  #content {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+  .card, .tip, .warn, .danger-box, pre {
+    background: #f8fafc !important;
+    color: #000000 !important;
+    border: 1px solid #cbd5e1 !important;
+    page-break-inside: avoid;
+  }
+  pre, code {
+    background: #f1f5f9 !important;
+    color: #0f172a !important;
+  }
+  section {
+    page-break-inside: avoid;
+    page-break-after: always;
+  }
+  h1, h2, h3, h4 {
+    color: #000000 !important;
+  }
+  tr:hover td {
+    background: none !important;
+  }
+  th {
+    background: #e2e8f0 !important;
+    color: #000000 !important;
+  }
   pre{white-space:pre-wrap}
 }
 </style>
@@ -141,6 +182,7 @@ mark{background:rgba(251,191,36,.35);color:var(--text);border-radius:2px;padding
   <a class="nav-link" href="#arquitectura">Arquitectura</a>
   <a class="nav-link" href="#roles">Roles y Permisos</a>
   <a class="nav-link" href="#temas">Temas de Color</a>
+  <a class="nav-link" href="#flujo-sistema">Flujo Quote-to-Cash</a>
 
   <div class="nav-section">Módulos Operativos</div>
   <a class="nav-link" href="#dashboard">Dashboard</a>
@@ -230,7 +272,7 @@ mark{background:rgba(251,191,36,.35);color:var(--text);border-radius:2px;padding
 <div class="card">
   <h3>Capacidades principales</h3>
   <ul>
-    <li><strong>+35 módulos</strong> integrados — desde dashboard hasta PPAP</li>
+    <li><strong>+49 módulos</strong> integrados — desde dashboard hasta PPAP</li>
     <li><strong>IA Gemini</strong> en producción, calidad, cotizaciones, inspección visual y voz</li>
     <li><strong>Multi-tenant</strong> — cada empresa tiene sus datos completamente aislados</li>
     <li><strong>Tiempo real</strong> — Supabase Realtime sincroniza estados al instante</li>
@@ -314,6 +356,164 @@ mark{background:rgba(251,191,36,.35);color:var(--text);border-radius:2px;padding
 </section>
 
 <!-- ═══════════════════════════════════════════════════ -->
+<section id="flujo-sistema">
+<h1>Flujo del Sistema <span class="badge">Quote-to-Cash</span></h1>
+<p>Diagrama completo de extremo a extremo: desde la solicitud del cliente hasta el cobro. Incluye todos los flujos secundarios — rechazo de factibilidad, re-cotización, compras de emergencia, retrabajo por calidad y monitoreo EPP paralelo.</p>
+<div class="tip">Las líneas punteadas representan flujos de retorno o rutas alternativas que el sistema gestiona automáticamente.</div>
+
+<div style="overflow-x:auto;margin:1.5rem 0">
+<svg viewBox="0 0 820 1215" xmlns="http://www.w3.org/2000/svg"
+     style="width:100%;height:auto;display:block;background:#020617;border-radius:12px;border:1px solid rgba(79,165,255,.2);font-family:'Segoe UI',system-ui,sans-serif">
+<defs>
+  <marker id="fl-b" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#4FA5FF"/></marker>
+  <marker id="fl-g" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#34d399"/></marker>
+  <marker id="fl-r" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#f87171"/></marker>
+  <marker id="fl-a" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#fbbf24"/></marker>
+  <marker id="fl-p" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#a78bfa"/></marker>
+</defs>
+<text x="410" y="28" text-anchor="middle" fill="#4FA5FF" font-size="13" font-weight="800" letter-spacing="1.5">FLUJO COMPLETO DEL SISTEMA ERP McVill</text>
+<text x="410" y="46" text-anchor="middle" fill="#64748b" font-size="9.5">Solicitud → Factibilidad → Cotización → Producción → Calidad → Cobro · Todos los flujos secundarios</text>
+<!-- 1. SOLICITUD -->
+<rect x="295" y="60" width="230" height="52" rx="26" fill="rgba(79,165,255,.18)" stroke="#4FA5FF" stroke-width="2"/>
+<text x="410" y="82" text-anchor="middle" fill="#4FA5FF" font-size="11" font-weight="800">SOLICITUD DEL CLIENTE</text>
+<text x="410" y="98" text-anchor="middle" fill="#64748b" font-size="9">Petición de cotización · RFQ entrante</text>
+<line x1="410" y1="112" x2="410" y2="132" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#fl-b)"/>
+<!-- 2. RFQ KANBAN -->
+<rect x="295" y="134" width="230" height="52" rx="8" fill="rgba(79,165,255,.08)" stroke="rgba(79,165,255,.4)" stroke-width="1.5"/>
+<text x="410" y="156" text-anchor="middle" fill="#f1f5f9" font-size="11" font-weight="700">RFQ Kanban</text>
+<text x="410" y="173" text-anchor="middle" fill="#64748b" font-size="9">Clasificar · Asignar · Priorizar solicitudes</text>
+<line x1="410" y1="186" x2="410" y2="212" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#fl-b)"/>
+<!-- 3. FACTIBILIDAD IA (diamond) -->
+<polygon points="410,214 540,252 410,290 280,252" fill="rgba(167,139,250,.15)" stroke="#a78bfa" stroke-width="1.5"/>
+<text x="410" y="246" text-anchor="middle" fill="#a78bfa" font-size="11" font-weight="800">FACTIBILIDAD IA</text>
+<text x="410" y="263" text-anchor="middle" fill="#64748b" font-size="9">¿Es viable el proyecto?</text>
+<line x1="410" y1="290" x2="410" y2="311" stroke="#34d399" stroke-width="1.5" marker-end="url(#fl-g)"/>
+<text x="422" y="304" fill="#34d399" font-size="9" font-weight="700">SÍ</text>
+<line x1="540" y1="252" x2="601" y2="252" stroke="#f87171" stroke-width="1.5" marker-end="url(#fl-r)"/>
+<text x="569" y="246" text-anchor="middle" fill="#f87171" font-size="9" font-weight="700">NO</text>
+<rect x="603" y="226" width="158" height="52" rx="8" fill="rgba(248,113,113,.12)" stroke="rgba(248,113,113,.4)" stroke-width="1.5"/>
+<text x="682" y="248" text-anchor="middle" fill="#f87171" font-size="10" font-weight="800">RECHAZADA</text>
+<text x="682" y="262" text-anchor="middle" fill="#94a3b8" font-size="8.5">Notificar cliente · Cerrar RFQ</text>
+<text x="682" y="274" text-anchor="middle" fill="#f87171" font-size="8">&#x25A0; Fin de flujo</text>
+<!-- 4. COTIZACIÓN -->
+<rect x="295" y="313" width="230" height="52" rx="8" fill="rgba(52,211,153,.08)" stroke="rgba(52,211,153,.4)" stroke-width="1.5"/>
+<text x="410" y="335" text-anchor="middle" fill="#f1f5f9" font-size="11" font-weight="700">Cotización &amp; CRM</text>
+<text x="410" y="351" text-anchor="middle" fill="#64748b" font-size="9">Metal Quoter · Costos · Enviar propuesta al cliente</text>
+<line x1="410" y1="365" x2="410" y2="391" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#fl-b)"/>
+<!-- 5. ¿CLIENTE ACEPTA? (diamond) -->
+<polygon points="410,393 540,431 410,469 280,431" fill="rgba(79,165,255,.1)" stroke="rgba(79,165,255,.5)" stroke-width="1.5"/>
+<text x="410" y="424" text-anchor="middle" fill="#4FA5FF" font-size="11" font-weight="800">¿CLIENTE ACEPTA?</text>
+<text x="410" y="441" text-anchor="middle" fill="#64748b" font-size="9">Revisión y aprobación de propuesta</text>
+<line x1="410" y1="469" x2="410" y2="491" stroke="#34d399" stroke-width="1.5" marker-end="url(#fl-g)"/>
+<text x="422" y="484" fill="#34d399" font-size="9" font-weight="700">SÍ</text>
+<line x1="280" y1="431" x2="222" y2="431" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#fl-a)"/>
+<text x="249" y="425" text-anchor="middle" fill="#fbbf24" font-size="9" font-weight="700">NO</text>
+<rect x="62" y="405" width="158" height="52" rx="8" fill="rgba(251,191,36,.1)" stroke="rgba(251,191,36,.35)" stroke-width="1.5"/>
+<text x="141" y="427" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="800">MODIFICAR OFERTA</text>
+<text x="141" y="441" text-anchor="middle" fill="#94a3b8" font-size="8.5">Ajustar precio · Alcance</text>
+<text x="141" y="453" text-anchor="middle" fill="#94a3b8" font-size="8.5">Re-enviar cotización</text>
+<path d="M62,431 L42,431 L42,339 L293,339" stroke="#fbbf24" stroke-width="1" fill="none" stroke-dasharray="5,3" opacity=".65" marker-end="url(#fl-a)"/>
+<text x="32" y="385" fill="#fbbf24" font-size="8.5" text-anchor="middle" transform="rotate(-90,32,385)" opacity=".7">re-cotizar</text>
+<!-- 6. OC CLIENTE -->
+<rect x="295" y="493" width="230" height="52" rx="8" fill="rgba(79,165,255,.08)" stroke="rgba(79,165,255,.4)" stroke-width="1.5"/>
+<text x="410" y="515" text-anchor="middle" fill="#f1f5f9" font-size="11" font-weight="700">OC Cliente · Orden Interna</text>
+<text x="410" y="531" text-anchor="middle" fill="#64748b" font-size="9">Crear OI · Asignar recursos · Programar planta</text>
+<line x1="410" y1="545" x2="410" y2="571" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#fl-b)"/>
+<!-- 7. AGENTE IA COMPRAS (diamond) -->
+<polygon points="410,573 540,611 410,649 280,611" fill="rgba(167,139,250,.15)" stroke="#a78bfa" stroke-width="1.5"/>
+<text x="410" y="604" text-anchor="middle" fill="#a78bfa" font-size="11" font-weight="800">AGENTE IA COMPRAS</text>
+<text x="410" y="621" text-anchor="middle" fill="#64748b" font-size="9">¿Stock suficiente? (días hasta ruptura)</text>
+<line x1="410" y1="649" x2="410" y2="662" stroke="#34d399" stroke-width="1.5" marker-end="url(#fl-g)"/>
+<text x="422" y="659" fill="#34d399" font-size="9" font-weight="700">OK</text>
+<line x1="540" y1="611" x2="601" y2="611" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#fl-a)"/>
+<text x="569" y="605" text-anchor="middle" fill="#fbbf24" font-size="9" font-weight="700">CRÍTICO</text>
+<rect x="603" y="585" width="155" height="52" rx="8" fill="rgba(251,191,36,.1)" stroke="rgba(251,191,36,.4)" stroke-width="1.5"/>
+<text x="680" y="607" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="800">OC A PROVEEDOR</text>
+<text x="680" y="621" text-anchor="middle" fill="#94a3b8" font-size="8.5">Auto-generada por IA</text>
+<text x="680" y="633" text-anchor="middle" fill="#94a3b8" font-size="8.5">Aprobación · Envío</text>
+<line x1="680" y1="637" x2="680" y2="649" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#fl-a)"/>
+<rect x="603" y="651" width="155" height="36" rx="6" fill="rgba(79,165,255,.07)" stroke="rgba(79,165,255,.25)" stroke-width="1"/>
+<text x="680" y="665" text-anchor="middle" fill="#94a3b8" font-size="9.5" font-weight="700">Recepción de Material</text>
+<text x="680" y="679" text-anchor="middle" fill="#64748b" font-size="8.5">Actualizar stock inventario</text>
+<line x1="603" y1="669" x2="418" y2="669" stroke="#fbbf24" stroke-width="1" stroke-dasharray="5,3" opacity=".65" marker-end="url(#fl-a)"/>
+<circle cx="410" cy="668" r="6" fill="rgba(79,165,255,.35)" stroke="#4FA5FF" stroke-width="1.5"/>
+<line x1="410" y1="674" x2="410" y2="684" stroke="#4FA5FF" stroke-width="1.5" opacity=".8" marker-end="url(#fl-b)"/>
+<!-- 8. PRODUCCIÓN / VIAJERO -->
+<rect x="285" y="686" width="250" height="56" rx="8" fill="rgba(79,165,255,.14)" stroke="#4FA5FF" stroke-width="2"/>
+<text x="410" y="708" text-anchor="middle" fill="#f1f5f9" font-size="11" font-weight="800">Producción · Viajero Industrial</text>
+<text x="410" y="724" text-anchor="middle" fill="#64748b" font-size="9">Etapas · Horas · Firmas · Avance en tiempo real</text>
+<line x1="410" y1="742" x2="410" y2="764" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#fl-b)"/>
+<!-- 9. CALIDAD IA (diamond) -->
+<polygon points="410,766 540,804 410,842 280,804" fill="rgba(52,211,153,.12)" stroke="#34d399" stroke-width="1.5"/>
+<text x="410" y="797" text-anchor="middle" fill="#34d399" font-size="11" font-weight="800">INSPECCIÓN CALIDAD IA</text>
+<text x="410" y="814" text-anchor="middle" fill="#64748b" font-size="9">Visión IA · SGC · SPC · Aprobación</text>
+<line x1="410" y1="842" x2="410" y2="872" stroke="#34d399" stroke-width="1.5" marker-end="url(#fl-g)"/>
+<text x="422" y="861" fill="#34d399" font-size="9" font-weight="700">OK</text>
+<line x1="280" y1="804" x2="220" y2="804" stroke="#f87171" stroke-width="1.5" marker-end="url(#fl-r)"/>
+<text x="249" y="798" text-anchor="middle" fill="#f87171" font-size="9" font-weight="700">NOC</text>
+<rect x="62" y="778" width="156" height="52" rx="8" fill="rgba(248,113,113,.1)" stroke="rgba(248,113,113,.4)" stroke-width="1.5"/>
+<text x="140" y="800" text-anchor="middle" fill="#f87171" font-size="10" font-weight="800">RETRABAJO / NC</text>
+<text x="140" y="814" text-anchor="middle" fill="#94a3b8" font-size="8.5">NC registrada en SGC</text>
+<text x="140" y="826" text-anchor="middle" fill="#94a3b8" font-size="8.5">Re-inspección obligatoria</text>
+<path d="M62,804 L42,804 L42,714 L283,714" stroke="#f87171" stroke-width="1" fill="none" stroke-dasharray="5,3" opacity=".65" marker-end="url(#fl-r)"/>
+<text x="32" y="759" fill="#f87171" font-size="8.5" text-anchor="middle" transform="rotate(-90,32,759)" opacity=".7">retrabajo</text>
+<rect x="603" y="778" width="155" height="52" rx="8" fill="rgba(167,139,250,.08)" stroke="rgba(167,139,250,.35)" stroke-width="1" stroke-dasharray="5,3"/>
+<text x="680" y="800" text-anchor="middle" fill="#a78bfa" font-size="10" font-weight="800">EPP NEURAL</text>
+<text x="680" y="814" text-anchor="middle" fill="#94a3b8" font-size="8.5">Cámaras: casco · lentes</text>
+<text x="680" y="826" text-anchor="middle" fill="#94a3b8" font-size="8.5">guantes · chaleco</text>
+<line x1="540" y1="804" x2="601" y2="804" stroke="#a78bfa" stroke-width="1" stroke-dasharray="4,3" opacity=".55" marker-end="url(#fl-p)"/>
+<text x="569" y="798" text-anchor="middle" fill="#a78bfa" font-size="8" opacity=".7">paralelo</text>
+<!-- 10. TRAZABILIDAD QR -->
+<rect x="295" y="874" width="230" height="52" rx="8" fill="rgba(79,165,255,.08)" stroke="rgba(79,165,255,.35)" stroke-width="1.5"/>
+<text x="410" y="895" text-anchor="middle" fill="#f1f5f9" font-size="11" font-weight="700">Trazabilidad QR</text>
+<text x="410" y="913" text-anchor="middle" fill="#64748b" font-size="9">Escaneo · Lote · Historial · Documentos adjuntos</text>
+<line x1="410" y1="926" x2="410" y2="946" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#fl-b)"/>
+<!-- 11. FACTURACIÓN -->
+<rect x="295" y="948" width="230" height="52" rx="8" fill="rgba(52,211,153,.08)" stroke="rgba(52,211,153,.4)" stroke-width="1.5"/>
+<text x="410" y="970" text-anchor="middle" fill="#f1f5f9" font-size="11" font-weight="700">Facturación · CxC</text>
+<text x="410" y="986" text-anchor="middle" fill="#64748b" font-size="9">Generar factura CFDI · Envío al cliente</text>
+<line x1="410" y1="1000" x2="410" y2="1020" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#fl-b)"/>
+<!-- 12. COBRO -->
+<rect x="295" y="1022" width="230" height="52" rx="8" fill="rgba(52,211,153,.12)" stroke="#34d399" stroke-width="1.5"/>
+<text x="410" y="1044" text-anchor="middle" fill="#f1f5f9" font-size="11" font-weight="700">Cobro · Conciliación Bancaria</text>
+<text x="410" y="1060" text-anchor="middle" fill="#64748b" font-size="9">Seguimiento · Vencimientos · Banco</text>
+<line x1="410" y1="1074" x2="410" y2="1092" stroke="#34d399" stroke-width="1.5" marker-end="url(#fl-g)"/>
+<!-- 13. CERRADO -->
+<rect x="305" y="1094" width="210" height="52" rx="26" fill="rgba(52,211,153,.2)" stroke="#34d399" stroke-width="2"/>
+<text x="410" y="1116" text-anchor="middle" fill="#34d399" font-size="13" font-weight="900">&#x2713; PROYECTO CERRADO</text>
+<text x="410" y="1132" text-anchor="middle" fill="#94a3b8" font-size="9">KPIs · OEE · Rentabilidad · Cierre contable</text>
+<!-- LEYENDA -->
+<rect x="20" y="1158" width="780" height="46" rx="8" fill="rgba(255,255,255,.02)" stroke="rgba(79,165,255,.15)" stroke-width="1"/>
+<text x="410" y="1172" text-anchor="middle" fill="#475569" font-size="8.5" font-weight="700" letter-spacing="1.5">LEYENDA</text>
+<rect x="40" y="1178" width="10" height="10" rx="2" fill="rgba(79,165,255,.4)" stroke="#4FA5FF" stroke-width="1"/>
+<text x="56" y="1187" fill="#94a3b8" font-size="8.5">Flujo principal</text>
+<rect x="150" y="1178" width="10" height="10" rx="2" fill="rgba(167,139,250,.4)" stroke="#a78bfa" stroke-width="1"/>
+<text x="166" y="1187" fill="#94a3b8" font-size="8.5">Paso con IA</text>
+<rect x="255" y="1178" width="10" height="10" rx="2" fill="rgba(52,211,153,.4)" stroke="#34d399" stroke-width="1"/>
+<text x="271" y="1187" fill="#94a3b8" font-size="8.5">Aprobado / OK</text>
+<rect x="375" y="1178" width="10" height="10" rx="2" fill="rgba(251,191,36,.4)" stroke="#fbbf24" stroke-width="1"/>
+<text x="391" y="1187" fill="#94a3b8" font-size="8.5">Alerta / Modificar</text>
+<rect x="495" y="1178" width="10" height="10" rx="2" fill="rgba(248,113,113,.4)" stroke="#f87171" stroke-width="1"/>
+<text x="511" y="1187" fill="#94a3b8" font-size="8.5">Rechazo / NC</text>
+<line x1="610" y1="1183" x2="640" y2="1183" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,3"/>
+<text x="648" y="1187" fill="#94a3b8" font-size="8.5">Flujo retorno</text>
+<line x1="718" y1="1183" x2="748" y2="1183" stroke="#a78bfa" stroke-width="1" stroke-dasharray="4,3"/>
+<text x="756" y="1187" fill="#94a3b8" font-size="8.5">Paralelo</text>
+</svg>
+</div>
+
+<h3>Descripción de los flujos secundarios</h3>
+<div class="table-wrap"><table>
+<tr><th>Flujo secundario</th><th>Disparador</th><th>Acción del sistema</th></tr>
+<tr><td><span class="pill pill-red">Rechazo Factibilidad</span></td><td>IA determina proyecto inviable</td><td>Notificación al cliente, cierre automático del RFQ</td></tr>
+<tr><td><span class="pill pill-amber">Re-cotización</span></td><td>Cliente no acepta propuesta</td><td>Regresa al módulo de Cotización para ajuste; historial conservado</td></tr>
+<tr><td><span class="pill pill-amber">Compra emergencia</span></td><td>Agente IA detecta stock CRÍTICO</td><td>OC auto-generada al proveedor, recepción actualiza inventario antes de producción</td></tr>
+<tr><td><span class="pill pill-red">Retrabajo / NC</span></td><td>Calidad IA rechaza inspección</td><td>No conformidad registrada en SGC, pieza regresa a producción, re-inspección obligatoria</td></tr>
+<tr><td><span class="pill pill-purple">EPP Neural</span></td><td>Siempre activo en producción</td><td>Cámaras IP monitorean casco, lentes y guantes en paralelo; alerta si detecta incumplimiento</td></tr>
+</table></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
 <section id="dashboard">
 <h2>Dashboard — Tablero Principal</h2>
 <p>Vista central del ERP. Muestra el estado del negocio en tiempo real con KPIs, alertas y accesos rápidos.</p>
@@ -337,6 +537,56 @@ mark{background:rgba(251,191,36,.35);color:var(--text);border-radius:2px;padding
 <section id="produccion">
 <h2>Control de Planta</h2>
 <p>Gestión completa de Órdenes de Trabajo (OT) desde creación hasta entrega, con rastreo por etapa de manufactura.</p>
+<div style="overflow-x:auto;margin:1.2rem 0">
+<svg viewBox="0 0 660 580" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#020617;border-radius:12px;border:1px solid rgba(79,165,255,.3);font-family:'Segoe UI',system-ui,sans-serif">
+<defs>
+  <marker id="prd-b" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#4FA5FF"/></marker>
+  <marker id="prd-g" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#34d399"/></marker>
+  <marker id="prd-r" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#f87171"/></marker>
+  <marker id="prd-a" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#fbbf24"/></marker>
+</defs>
+<text x="330" y="24" text-anchor="middle" fill="#4FA5FF" font-size="11" font-weight="800" letter-spacing="1">FLUJO PRODUCCIÓN · OT &amp; VIAJERO INDUSTRIAL</text>
+<text x="330" y="40" text-anchor="middle" fill="#475569" font-size="9">Orden Interna → Planeación → Etapas → Calidad → Entrega</text>
+<rect x="235" y="54" width="190" height="44" rx="22" fill="rgba(79,165,255,.18)" stroke="#4FA5FF" stroke-width="2"/>
+<text x="330" y="73" text-anchor="middle" fill="#4FA5FF" font-size="10" font-weight="800">ORDEN INTERNA RECIBIDA</text>
+<text x="330" y="87" text-anchor="middle" fill="#475569" font-size="8.5">Desde ventas · Fecha compromiso</text>
+<line x1="330" y1="98" x2="330" y2="116" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#prd-b)"/>
+<rect x="235" y="118" width="190" height="44" rx="8" fill="rgba(79,165,255,.08)" stroke="rgba(79,165,255,.4)" stroke-width="1.5"/>
+<text x="330" y="137" text-anchor="middle" fill="#f1f5f9" font-size="10" font-weight="700">Planeación de Producción</text>
+<text x="330" y="151" text-anchor="middle" fill="#475569" font-size="8.5">Recursos · Tiempos · Maquinaria</text>
+<line x1="330" y1="162" x2="330" y2="180" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#prd-b)"/>
+<rect x="235" y="182" width="190" height="44" rx="8" fill="rgba(79,165,255,.08)" stroke="rgba(79,165,255,.4)" stroke-width="1.5"/>
+<text x="330" y="201" text-anchor="middle" fill="#f1f5f9" font-size="10" font-weight="700">Programación de Turnos</text>
+<text x="330" y="215" text-anchor="middle" fill="#475569" font-size="8.5">Secuencia · Asignar operadores</text>
+<line x1="330" y1="226" x2="330" y2="244" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#prd-b)"/>
+<rect x="235" y="246" width="190" height="44" rx="8" fill="rgba(167,139,250,.12)" stroke="#a78bfa" stroke-width="2"/>
+<text x="330" y="265" text-anchor="middle" fill="#a78bfa" font-size="10" font-weight="800">Viajero Industrial Abierto</text>
+<text x="330" y="279" text-anchor="middle" fill="#475569" font-size="8.5">Digital · Firmas por etapa · Trazabilidad</text>
+<line x1="330" y1="290" x2="330" y2="308" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#prd-b)"/>
+<rect x="235" y="310" width="190" height="44" rx="8" fill="rgba(79,165,255,.14)" stroke="#4FA5FF" stroke-width="2"/>
+<text x="330" y="329" text-anchor="middle" fill="#f1f5f9" font-size="10" font-weight="800">Etapas de Proceso</text>
+<text x="330" y="343" text-anchor="middle" fill="#475569" font-size="8.5">Corte·Doblez·Soldadura·CNC·Pintura</text>
+<line x1="330" y1="354" x2="330" y2="372" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#prd-b)"/>
+<polygon points="330,374 435,408 330,442 225,408" fill="rgba(52,211,153,.08)" stroke="rgba(52,211,153,.45)" stroke-width="1.5"/>
+<text x="330" y="402" text-anchor="middle" fill="#34d399" font-size="10" font-weight="800">¿TODAS LAS ETAPAS OK?</text>
+<text x="330" y="418" text-anchor="middle" fill="#475569" font-size="8">Operador firma · Tiempo registrado</text>
+<line x1="330" y1="442" x2="330" y2="460" stroke="#34d399" stroke-width="1.5" marker-end="url(#prd-g)"/>
+<text x="342" y="456" fill="#34d399" font-size="9" font-weight="700">SÍ</text>
+<line x1="435" y1="408" x2="448" y2="408" stroke="#f87171" stroke-width="1.5" marker-end="url(#prd-r)"/>
+<text x="442" y="402" fill="#f87171" font-size="9" font-weight="700">NC</text>
+<rect x="235" y="462" width="190" height="44" rx="8" fill="rgba(52,211,153,.1)" stroke="rgba(52,211,153,.4)" stroke-width="1.5"/>
+<text x="330" y="481" text-anchor="middle" fill="#f1f5f9" font-size="10" font-weight="700">Inspección Final Calidad</text>
+<text x="330" y="495" text-anchor="middle" fill="#475569" font-size="8.5">Visual IA · SGC · SPC · Firma final</text>
+<line x1="330" y1="506" x2="330" y2="524" stroke="#34d399" stroke-width="1.5" marker-end="url(#prd-g)"/>
+<rect x="238" y="526" width="184" height="44" rx="22" fill="rgba(52,211,153,.2)" stroke="#34d399" stroke-width="2"/>
+<text x="330" y="545" text-anchor="middle" fill="#34d399" font-size="11" font-weight="900">&#x2713; ENTREGA A ALMACÉN</text>
+<text x="330" y="559" text-anchor="middle" fill="#94a3b8" font-size="8.5">PT actualizado · Viajero cerrado</text>
+<rect x="448" y="386" width="148" height="44" rx="8" fill="rgba(248,113,113,.1)" stroke="rgba(248,113,113,.35)" stroke-width="1.5"/>
+<text x="522" y="405" text-anchor="middle" fill="#f87171" font-size="10" font-weight="700">NC / Retrabajo Etapa</text>
+<text x="522" y="419" text-anchor="middle" fill="#94a3b8" font-size="8.5">Registrar · Reparar · Re-inspección</text>
+<path d="M448,408 L440,408 L440,332 L427,332" stroke="#f87171" stroke-width="1" fill="none" stroke-dasharray="5,3" opacity=".6" marker-end="url(#prd-r)"/>
+<text x="436" y="370" fill="#f87171" font-size="8" text-anchor="middle" transform="rotate(-90,436,370)" opacity=".65">retrabajo</text>
+</svg></div>
 <h3>Ciclo de vida de una OT</h3>
 <ol class="steps">
   <li>Se crea la OT con número de parte, cliente, cantidad y fecha de entrega</li>
@@ -407,8 +657,29 @@ BOM — Componentes:
   Si va dentro de tiempo → <span style="color:#34d399">OK</span>
 </div>
 
-<h3>Código QR del Viajero</h3>
-<p>Cada viajero genera un QR que codifica su ID único. Al escanear con tablet o celular en el piso de planta, abre directamente el estado actual del viajero en ShopFloor Tracking. Se puede imprimir en etiqueta con impresora Zebra o en el PDF del viajero.</p>
+<h3>Código QR del Viajero y Generación Técnica</h3>
+<p>Cada vez que una Orden de Trabajo (OT) o Viajero es liberada en el sistema, el backend genera de forma instantánea y automática un identificador único global (UUID) encriptado en un código QR de alta densidad.</p>
+<div class="tip">
+  <strong>¿Cómo funciona el escaneo técnico?</strong> El código QR encripta el endpoint REST seguro de la base de datos (ej: <code>https://erp-mcvill.vercel.app/viajero/vj-uuid</code>). Al ser escaneado con cualquier dispositivo móvil (cámara del smartphone, tablet o pistola lectora USB HID), el sistema descifra el token, valida la sesión del operador y abre de forma instantánea la pantalla del <strong>ShopFloor Tracking</strong> con los planos 3D y especificaciones sin necesidad de papel.
+</div>
+
+<h3>Transformación "Paperless" — Erradicación del Papel en Piso</h3>
+<p>El ERP McVill está diseñado bajo el estándar <strong>Agus Pro</strong> para lograr una operación de manufactura 100% digital y sustentable. Tradicionalmente, un viajero en papel representaba un folleto de 5 a 10 páginas impresas que viajaba físicamente por la planta.</p>
+
+<div class="card">
+  <h3>Impacto Financiero de la Erradicación de Papel:</h3>
+  <ul>
+    <li><strong>Volumen promedio diario de impresión:</strong> 1,500 hojas al día (viajeros, planos, revisiones, reportes de control).</li>
+    <li><strong>Costo directo estimado por hoja:</strong> $0.80 MXN (papel físico + tóner industrial + mantenimiento e insumos de impresión).</li>
+    <li><strong>Fuga mensual de capital (24 días laborables):</strong> 1,500 hojas × $0.80 MXN × 24 = <strong>$28,800.00 MXN mensuales</strong> tirados a la basura.</li>
+    <li><strong>Fuga anualizada (Impacto directo en OpEx):</strong> <strong>$345,600.00 MXN anuales</strong> en consumibles directos.</li>
+    <li><strong>Ahorro en tiempos muertos (Costo invisible):</strong> +200 horas-hombre mensuales dedicadas a archivar, buscar viajeros perdidos, transcribir firmas a mano o re-imprimir planos manchados de grasa.</li>
+  </ul>
+</div>
+
+<div class="tip">
+  <strong>Recomendación Operativa:</strong> En lugar de imprimir el "librito" de viajeros de papel, la planta solo requiere imprimir una <strong>pequeña etiqueta autoadherible de 5×5 cm</strong> con el código QR usando impresoras térmicas directas Zebra (cero costo de tinta), o bien grabar el QR con láser directo sobre la placa base del material. El viajero digital está respaldado en la nube en tiempo real, garantizando la trazabilidad perfecta e indestructible.
+</div>
 </section>
 
 <!-- ═══════════════════════════════════════════════════ -->
@@ -447,6 +718,70 @@ BOM — Componentes:
 <h2>Calidad SGC</h2>
 <h3>Inspección Visual con IA</h3>
 <p>6 tipos de inspección especializados, cada uno con un modelo de prompt entrenado en normas industriales:</p>
+<div style="overflow-x:auto;margin:1.2rem 0">
+<svg viewBox="0 0 660 560" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#020617;border-radius:12px;border:1px solid rgba(52,211,153,.25);font-family:'Segoe UI',system-ui,sans-serif">
+<defs>
+  <marker id="cal-b" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#4FA5FF"/></marker>
+  <marker id="cal-g" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#34d399"/></marker>
+  <marker id="cal-r" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#f87171"/></marker>
+  <marker id="cal-a" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#fbbf24"/></marker>
+</defs>
+<text x="330" y="24" text-anchor="middle" fill="#34d399" font-size="11" font-weight="800" letter-spacing="1">FLUJO CALIDAD · INSPECCIÓN &amp; SGC</text>
+<text x="330" y="40" text-anchor="middle" fill="#475569" font-size="9">Pieza → Inspección IA → SPC → Liberación / NC → Retrabajo</text>
+<rect x="235" y="54" width="190" height="44" rx="22" fill="rgba(52,211,153,.18)" stroke="#34d399" stroke-width="2"/>
+<text x="330" y="73" text-anchor="middle" fill="#34d399" font-size="10" font-weight="800">PIEZA A INSPECCIÓN</text>
+<text x="330" y="87" text-anchor="middle" fill="#475569" font-size="8.5">Desde producción o proveedor</text>
+<line x1="330" y1="98" x2="330" y2="116" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#cal-b)"/>
+<rect x="235" y="118" width="190" height="44" rx="8" fill="rgba(79,165,255,.08)" stroke="rgba(79,165,255,.4)" stroke-width="1.5"/>
+<text x="330" y="137" text-anchor="middle" fill="#f1f5f9" font-size="10" font-weight="700">Inspección Dimensional</text>
+<text x="330" y="151" text-anchor="middle" fill="#475569" font-size="8.5">Calibres · CMM · Tolerancias GD&amp;T</text>
+<line x1="330" y1="162" x2="330" y2="180" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#cal-b)"/>
+<rect x="235" y="182" width="190" height="44" rx="8" fill="rgba(167,139,250,.12)" stroke="#a78bfa" stroke-width="2"/>
+<text x="330" y="201" text-anchor="middle" fill="#a78bfa" font-size="10" font-weight="800">Inspección Visual IA</text>
+<text x="330" y="215" text-anchor="middle" fill="#475569" font-size="8.5">Gemini Vision · Foto/Cámara · Defectos</text>
+<line x1="330" y1="226" x2="330" y2="242" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#cal-b)"/>
+<polygon points="330,244 435,278 330,312 225,278" fill="rgba(79,165,255,.08)" stroke="rgba(79,165,255,.5)" stroke-width="1.5"/>
+<text x="330" y="272" text-anchor="middle" fill="#4FA5FF" font-size="10" font-weight="800">¿DEFECTO?</text>
+<text x="330" y="288" text-anchor="middle" fill="#475569" font-size="8">Detectado por IA o inspector</text>
+<line x1="330" y1="312" x2="330" y2="330" stroke="#34d399" stroke-width="1.5" marker-end="url(#cal-g)"/>
+<text x="342" y="325" fill="#34d399" font-size="9" font-weight="700">NO</text>
+<line x1="435" y1="278" x2="448" y2="278" stroke="#f87171" stroke-width="1.5" marker-end="url(#cal-r)"/>
+<text x="440" y="272" fill="#f87171" font-size="9" font-weight="700">SÍ</text>
+<rect x="235" y="332" width="190" height="44" rx="8" fill="rgba(167,139,250,.1)" stroke="rgba(167,139,250,.4)" stroke-width="1.5"/>
+<text x="330" y="351" text-anchor="middle" fill="#a78bfa" font-size="10" font-weight="700">SPC — Carta de Control</text>
+<text x="330" y="365" text-anchor="middle" fill="#475569" font-size="8.5">Xbar·R · Cp · Cpk · Análisis tendencia</text>
+<line x1="330" y1="376" x2="330" y2="394" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#cal-b)"/>
+<polygon points="330,396 435,430 330,464 225,430" fill="rgba(52,211,153,.08)" stroke="rgba(52,211,153,.45)" stroke-width="1.5"/>
+<text x="330" y="424" text-anchor="middle" fill="#34d399" font-size="10" font-weight="800">¿DENTRO DE LÍMITES?</text>
+<text x="330" y="440" text-anchor="middle" fill="#475569" font-size="8">Cp &gt; 1.33 · Proceso estable</text>
+<line x1="330" y1="464" x2="330" y2="482" stroke="#34d399" stroke-width="1.5" marker-end="url(#cal-g)"/>
+<text x="342" y="477" fill="#34d399" font-size="9" font-weight="700">SÍ</text>
+<line x1="225" y1="430" x2="208" y2="430" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#cal-a)"/>
+<text x="215" y="424" text-anchor="middle" fill="#fbbf24" font-size="9" font-weight="700">NO</text>
+<rect x="238" y="484" width="184" height="44" rx="22" fill="rgba(52,211,153,.2)" stroke="#34d399" stroke-width="2"/>
+<text x="330" y="503" text-anchor="middle" fill="#34d399" font-size="11" font-weight="900">&#x2713; PIEZA LIBERADA</text>
+<text x="330" y="517" text-anchor="middle" fill="#94a3b8" font-size="8.5">Documentar · Firmar · SGC</text>
+<rect x="448" y="256" width="148" height="44" rx="8" fill="rgba(248,113,113,.12)" stroke="rgba(248,113,113,.4)" stroke-width="1.5"/>
+<text x="522" y="275" text-anchor="middle" fill="#f87171" font-size="10" font-weight="800">NC en SGC</text>
+<text x="522" y="289" text-anchor="middle" fill="#94a3b8" font-size="8.5">No conformidad registrada</text>
+<line x1="522" y1="300" x2="522" y2="314" stroke="#f87171" stroke-width="1.5" marker-end="url(#cal-r)"/>
+<polygon points="522,316 592,348 522,380 452,348" fill="rgba(248,113,113,.08)" stroke="rgba(248,113,113,.4)" stroke-width="1.5"/>
+<text x="522" y="342" text-anchor="middle" fill="#f87171" font-size="9.5" font-weight="800">¿REPARABLE?</text>
+<text x="522" y="357" text-anchor="middle" fill="#475569" font-size="8">Decisión ingeniería</text>
+<line x1="522" y1="380" x2="522" y2="396" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#cal-a)"/>
+<text x="534" y="393" fill="#fbbf24" font-size="9" font-weight="700">SÍ</text>
+<rect x="448" y="398" width="148" height="44" rx="8" fill="rgba(251,191,36,.1)" stroke="rgba(251,191,36,.4)" stroke-width="1.5"/>
+<text x="522" y="417" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="800">RETRABAJO</text>
+<text x="522" y="431" text-anchor="middle" fill="#94a3b8" font-size="8.5">Reparar · Re-procesar</text>
+<path d="M448,420 L440,420 L440,204 L427,204" stroke="#fbbf24" stroke-width="1" fill="none" stroke-dasharray="5,3" opacity=".6" marker-end="url(#cal-a)"/>
+<text x="436" y="312" fill="#fbbf24" font-size="8" text-anchor="middle" transform="rotate(-90,436,312)" opacity=".65">re-inspección</text>
+<line x1="592" y1="348" x2="610" y2="348" stroke="#f87171" stroke-width="1.5" marker-end="url(#cal-r)"/>
+<text x="614" y="345" fill="#f87171" font-size="9" font-weight="700">NO</text>
+<text x="614" y="358" fill="#f87171" font-size="8.5">SCRAP</text>
+<rect x="62" y="408" width="144" height="44" rx="8" fill="rgba(251,191,36,.1)" stroke="rgba(251,191,36,.35)" stroke-width="1.5"/>
+<text x="134" y="427" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="800">ALERTA PROCESO</text>
+<text x="134" y="441" text-anchor="middle" fill="#94a3b8" font-size="8.5">Ajuste máquina · Notificar sup.</text>
+</svg></div>
 <div class="table-wrap"><table>
 <tr><th>Tipo</th><th>Norma</th><th>Defectos detectados</th></tr>
 <tr><td>Soldadura</td><td>AWS D1.1 / ISO 5817</td><td>Porosidades, fisuras, socavación, salpicaduras, penetración</td></tr>
@@ -775,6 +1110,60 @@ Bruto                    $11,575.25   Total deducciones $539.93
 <h2>Recursos Humanos</h2>
 <h3>Directorio de Empleados</h3>
 <p>Cada empleado tiene expediente digital con: foto, documentos escaneados, certificaciones, número IMSS, contrato, fecha de ingreso, puesto y área.</p>
+<div style="overflow-x:auto;margin:1.2rem 0">
+<svg viewBox="0 0 660 600" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#020617;border-radius:12px;border:1px solid rgba(79,165,255,.25);font-family:'Segoe UI',system-ui,sans-serif">
+<defs>
+  <marker id="rh-b" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#4FA5FF"/></marker>
+  <marker id="rh-g" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#34d399"/></marker>
+  <marker id="rh-r" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#f87171"/></marker>
+  <marker id="rh-a" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#fbbf24"/></marker>
+</defs>
+<text x="330" y="24" text-anchor="middle" fill="#4FA5FF" font-size="11" font-weight="800" letter-spacing="1">FLUJO CAPITAL HUMANO · CICLO EMPLEADO</text>
+<text x="330" y="40" text-anchor="middle" fill="#475569" font-size="9">Vacante → Reclutamiento IA → Alta → Nómina → Evaluación</text>
+<rect x="235" y="54" width="190" height="44" rx="22" fill="rgba(79,165,255,.18)" stroke="#4FA5FF" stroke-width="2"/>
+<text x="330" y="73" text-anchor="middle" fill="#4FA5FF" font-size="10" font-weight="800">VACANTE IDENTIFICADA</text>
+<text x="330" y="87" text-anchor="middle" fill="#475569" font-size="8.5">Nueva posición · Reemplazo</text>
+<line x1="330" y1="98" x2="330" y2="116" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#rh-b)"/>
+<rect x="235" y="118" width="190" height="44" rx="8" fill="rgba(167,139,250,.12)" stroke="#a78bfa" stroke-width="2"/>
+<text x="330" y="137" text-anchor="middle" fill="#a78bfa" font-size="10" font-weight="800">Reclutamiento IA</text>
+<text x="330" y="151" text-anchor="middle" fill="#475569" font-size="8.5">Perfil · Filtrado CV · Publicación</text>
+<line x1="330" y1="162" x2="330" y2="180" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#rh-b)"/>
+<polygon points="330,182 435,216 330,250 225,216" fill="rgba(79,165,255,.08)" stroke="rgba(79,165,255,.5)" stroke-width="1.5"/>
+<text x="330" y="210" text-anchor="middle" fill="#4FA5FF" font-size="10" font-weight="800">¿CANDIDATO APROBADO?</text>
+<text x="330" y="226" text-anchor="middle" fill="#475569" font-size="8">Entrevista · Evaluación</text>
+<line x1="330" y1="250" x2="330" y2="268" stroke="#34d399" stroke-width="1.5" marker-end="url(#rh-g)"/>
+<text x="342" y="264" fill="#34d399" font-size="9" font-weight="700">SÍ</text>
+<line x1="435" y1="216" x2="448" y2="216" stroke="#f87171" stroke-width="1.5" marker-end="url(#rh-r)"/>
+<text x="442" y="210" fill="#f87171" font-size="9" font-weight="700">NO</text>
+<rect x="235" y="270" width="190" height="44" rx="8" fill="rgba(79,165,255,.08)" stroke="rgba(79,165,255,.4)" stroke-width="1.5"/>
+<text x="330" y="289" text-anchor="middle" fill="#f1f5f9" font-size="10" font-weight="700">Alta en Sistema</text>
+<text x="330" y="303" text-anchor="middle" fill="#475569" font-size="8.5">Expediente · IMSS · Credenciales</text>
+<line x1="330" y1="314" x2="330" y2="332" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#rh-b)"/>
+<rect x="235" y="334" width="190" height="44" rx="8" fill="rgba(79,165,255,.08)" stroke="rgba(79,165,255,.4)" stroke-width="1.5"/>
+<text x="330" y="353" text-anchor="middle" fill="#f1f5f9" font-size="10" font-weight="700">Asistencia Diaria</text>
+<text x="330" y="367" text-anchor="middle" fill="#475569" font-size="8.5">Fichaje · Biométrico · Incidencias</text>
+<line x1="330" y1="378" x2="330" y2="396" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#rh-b)"/>
+<rect x="235" y="398" width="190" height="44" rx="8" fill="rgba(52,211,153,.08)" stroke="rgba(52,211,153,.4)" stroke-width="1.5"/>
+<text x="330" y="417" text-anchor="middle" fill="#f1f5f9" font-size="10" font-weight="700">Cálculo Nómina ISR 2026</text>
+<text x="330" y="431" text-anchor="middle" fill="#475569" font-size="8.5">IMSS · INFONAVIT · ISR · Dispersión</text>
+<line x1="330" y1="442" x2="330" y2="460" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#rh-b)"/>
+<polygon points="330,462 435,496 330,530 225,496" fill="rgba(52,211,153,.08)" stroke="rgba(52,211,153,.45)" stroke-width="1.5"/>
+<text x="330" y="490" text-anchor="middle" fill="#34d399" font-size="10" font-weight="800">¿EVALUACIÓN POSITIVA?</text>
+<text x="330" y="506" text-anchor="middle" fill="#475569" font-size="8">Desempeño periódico</text>
+<line x1="330" y1="530" x2="330" y2="548" stroke="#34d399" stroke-width="1.5" marker-end="url(#rh-g)"/>
+<text x="342" y="544" fill="#34d399" font-size="9" font-weight="700">SÍ</text>
+<line x1="225" y1="496" x2="208" y2="496" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#rh-a)"/>
+<text x="215" y="490" text-anchor="middle" fill="#fbbf24" font-size="9" font-weight="700">NO</text>
+<rect x="238" y="550" width="184" height="44" rx="22" fill="rgba(52,211,153,.2)" stroke="#34d399" stroke-width="2"/>
+<text x="330" y="569" text-anchor="middle" fill="#34d399" font-size="11" font-weight="900">&#x2713; INCENTIVO / PROMOCIÓN</text>
+<text x="330" y="583" text-anchor="middle" fill="#94a3b8" font-size="8.5">Bonus · Ajuste salarial · Ascenso</text>
+<rect x="448" y="194" width="148" height="44" rx="8" fill="rgba(248,113,113,.1)" stroke="rgba(248,113,113,.35)" stroke-width="1.5"/>
+<text x="522" y="213" text-anchor="middle" fill="#f87171" font-size="10" font-weight="700">Banco de Candidatos</text>
+<text x="522" y="227" text-anchor="middle" fill="#94a3b8" font-size="8.5">Archivar · Próxima vacante</text>
+<rect x="62" y="474" width="144" height="44" rx="8" fill="rgba(251,191,36,.1)" stroke="rgba(251,191,36,.35)" stroke-width="1.5"/>
+<text x="134" y="493" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="700">Plan de Mejora</text>
+<text x="134" y="507" text-anchor="middle" fill="#94a3b8" font-size="8.5">Capacitación · Retroalimentación</text>
+</svg></div>
 
 <h3>Alta de Empleados — Categoría y Vínculo con Producción</h3>
 <p>Al registrar un nuevo colaborador, RH selecciona su <strong>Categoría de Empleado</strong>, lo que auto-llena el departamento y habilita los campos correspondientes:</p>
@@ -850,6 +1239,66 @@ Bruto                    $11,575.25   Total deducciones $539.93
 <section id="ventas">
 <h2>Ventas y CRM</h2>
 <p>Gestión de clientes con historial de órdenes, RFC, crédito disponible y days-to-pay promedio. Pipeline de cotizaciones con valor total visible en tiempo real.</p>
+<div style="overflow-x:auto;margin:1.2rem 0">
+<svg viewBox="0 0 660 660" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#020617;border-radius:12px;border:1px solid rgba(79,165,255,.25);font-family:'Segoe UI',system-ui,sans-serif">
+<defs>
+  <marker id="vnt-b" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#4FA5FF"/></marker>
+  <marker id="vnt-g" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#34d399"/></marker>
+  <marker id="vnt-r" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#f87171"/></marker>
+  <marker id="vnt-a" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#fbbf24"/></marker>
+</defs>
+<text x="330" y="24" text-anchor="middle" fill="#4FA5FF" font-size="11" font-weight="800" letter-spacing="1">FLUJO VENTAS &amp; CRM · CICLO COMERCIAL</text>
+<text x="330" y="40" text-anchor="middle" fill="#475569" font-size="9">Lead → Cotización → Acuerdo → OC → Entrega → Cobro</text>
+<rect x="235" y="54" width="190" height="44" rx="22" fill="rgba(79,165,255,.18)" stroke="#4FA5FF" stroke-width="2"/>
+<text x="330" y="73" text-anchor="middle" fill="#4FA5FF" font-size="10" font-weight="800">LEAD / PROSPECTO</text>
+<text x="330" y="87" text-anchor="middle" fill="#475569" font-size="8.5">Contacto inicial · Demo · Visita</text>
+<line x1="330" y1="98" x2="330" y2="116" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#vnt-b)"/>
+<rect x="235" y="118" width="190" height="44" rx="8" fill="rgba(79,165,255,.08)" stroke="rgba(79,165,255,.4)" stroke-width="1.5"/>
+<text x="330" y="137" text-anchor="middle" fill="#f1f5f9" font-size="10" font-weight="700">RFQ Creado</text>
+<text x="330" y="151" text-anchor="middle" fill="#475569" font-size="8.5">Kanban · Asignar vendedor · Prioridad</text>
+<line x1="330" y1="162" x2="330" y2="180" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#vnt-b)"/>
+<rect x="235" y="182" width="190" height="44" rx="8" fill="rgba(167,139,250,.12)" stroke="#a78bfa" stroke-width="2"/>
+<text x="330" y="201" text-anchor="middle" fill="#a78bfa" font-size="10" font-weight="800">Factibilidad IA</text>
+<text x="330" y="215" text-anchor="middle" fill="#475569" font-size="8.5">Evalúa viabilidad técnica y financiera</text>
+<line x1="330" y1="226" x2="330" y2="242" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#vnt-b)"/>
+<polygon points="330,244 435,278 330,312 225,278" fill="rgba(167,139,250,.1)" stroke="rgba(167,139,250,.5)" stroke-width="1.5"/>
+<text x="330" y="272" text-anchor="middle" fill="#a78bfa" font-size="10" font-weight="800">¿VIABLE?</text>
+<text x="330" y="288" text-anchor="middle" fill="#475569" font-size="8">Factibilidad técnica y comercial</text>
+<line x1="330" y1="312" x2="330" y2="330" stroke="#34d399" stroke-width="1.5" marker-end="url(#vnt-g)"/>
+<text x="342" y="326" fill="#34d399" font-size="9" font-weight="700">SÍ</text>
+<line x1="435" y1="278" x2="448" y2="278" stroke="#f87171" stroke-width="1.5" marker-end="url(#vnt-r)"/>
+<text x="440" y="272" fill="#f87171" font-size="9" font-weight="700">NO</text>
+<rect x="235" y="332" width="190" height="44" rx="8" fill="rgba(52,211,153,.08)" stroke="rgba(52,211,153,.4)" stroke-width="1.5"/>
+<text x="330" y="351" text-anchor="middle" fill="#f1f5f9" font-size="10" font-weight="700">Cotización — Metal Quoter</text>
+<text x="330" y="365" text-anchor="middle" fill="#475569" font-size="8.5">Precio · Plazo · Condiciones · Envío</text>
+<line x1="330" y1="376" x2="330" y2="394" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#vnt-b)"/>
+<polygon points="330,396 435,430 330,464 225,430" fill="rgba(79,165,255,.1)" stroke="rgba(79,165,255,.5)" stroke-width="1.5"/>
+<text x="330" y="424" text-anchor="middle" fill="#4FA5FF" font-size="10" font-weight="800">¿CLIENTE ACEPTA?</text>
+<text x="330" y="440" text-anchor="middle" fill="#475569" font-size="8">Revisión · Negociación</text>
+<line x1="330" y1="464" x2="330" y2="482" stroke="#34d399" stroke-width="1.5" marker-end="url(#vnt-g)"/>
+<text x="342" y="478" fill="#34d399" font-size="9" font-weight="700">SÍ</text>
+<line x1="225" y1="430" x2="208" y2="430" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#vnt-a)"/>
+<text x="215" y="424" text-anchor="middle" fill="#fbbf24" font-size="9" font-weight="700">NO</text>
+<rect x="235" y="484" width="190" height="44" rx="8" fill="rgba(79,165,255,.1)" stroke="rgba(79,165,255,.4)" stroke-width="1.5"/>
+<text x="330" y="503" text-anchor="middle" fill="#f1f5f9" font-size="10" font-weight="700">OC Cliente → Orden Interna</text>
+<text x="330" y="517" text-anchor="middle" fill="#475569" font-size="8.5">Confirmar · Programar producción</text>
+<line x1="330" y1="528" x2="330" y2="546" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#vnt-b)"/>
+<rect x="235" y="548" width="190" height="44" rx="8" fill="rgba(52,211,153,.08)" stroke="rgba(52,211,153,.4)" stroke-width="1.5"/>
+<text x="330" y="567" text-anchor="middle" fill="#f1f5f9" font-size="10" font-weight="700">Producción → Entrega</text>
+<text x="330" y="581" text-anchor="middle" fill="#475569" font-size="8.5">Viajero · Calidad · Trazabilidad</text>
+<line x1="330" y1="592" x2="330" y2="610" stroke="#34d399" stroke-width="1.5" marker-end="url(#vnt-g)"/>
+<rect x="238" y="612" width="184" height="44" rx="22" fill="rgba(52,211,153,.2)" stroke="#34d399" stroke-width="2"/>
+<text x="330" y="631" text-anchor="middle" fill="#34d399" font-size="11" font-weight="900">&#x2713; FACTURA → COBRO</text>
+<text x="330" y="645" text-anchor="middle" fill="#94a3b8" font-size="8.5">CxC · Banco · VOC · Cierre</text>
+<rect x="448" y="256" width="148" height="44" rx="8" fill="rgba(248,113,113,.1)" stroke="rgba(248,113,113,.35)" stroke-width="1.5"/>
+<text x="522" y="275" text-anchor="middle" fill="#f87171" font-size="10" font-weight="700">Declinar / Archivar</text>
+<text x="522" y="289" text-anchor="middle" fill="#94a3b8" font-size="8.5">No es viable · Notificar</text>
+<rect x="62" y="408" width="148" height="44" rx="8" fill="rgba(251,191,36,.1)" stroke="rgba(251,191,36,.35)" stroke-width="1.5"/>
+<text x="136" y="427" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="700">Ajustar Oferta</text>
+<text x="136" y="441" text-anchor="middle" fill="#94a3b8" font-size="8.5">Precio · Alcance · Plazos</text>
+<path d="M62,430 L44,430 L44,351 L233,351" stroke="#fbbf24" stroke-width="1" fill="none" stroke-dasharray="5,3" opacity=".6" marker-end="url(#vnt-a)"/>
+<text x="34" y="390" fill="#fbbf24" font-size="8" text-anchor="middle" transform="rotate(-90,34,390)" opacity=".65">re-cotizar</text>
+</svg></div>
 <h3>Flujo de Cotización</h3>
 <p><strong>Borrador → Enviada → Aprobada → Convertida a OT</strong></p>
 </section>
@@ -858,8 +1307,94 @@ Bruto                    $11,575.25   Total deducciones $539.93
 <section id="compras">
 <h2>Compras</h2>
 <p>Gestión de Órdenes de Compra con flujo: <strong>Borrador → Aprobada → Enviada → Recibida → Cerrada</strong>. Al recibir, el inventario se actualiza automáticamente.</p>
+<div style="overflow-x:auto;margin:1.2rem 0">
+<svg viewBox="0 0 660 640" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#020617;border-radius:12px;border:1px solid rgba(167,139,250,.25);font-family:'Segoe UI',system-ui,sans-serif">
+<defs>
+  <marker id="cmp-b" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#4FA5FF"/></marker>
+  <marker id="cmp-g" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#34d399"/></marker>
+  <marker id="cmp-r" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#f87171"/></marker>
+  <marker id="cmp-a" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#fbbf24"/></marker>
+</defs>
+<text x="330" y="24" text-anchor="middle" fill="#a78bfa" font-size="11" font-weight="800" letter-spacing="1">FLUJO COMPRAS · AGENTE IA PREDICTIVO</text>
+<text x="330" y="40" text-anchor="middle" fill="#475569" font-size="9">Necesidad → Análisis IA → OC → Recepción → Inventario</text>
+<rect x="235" y="54" width="190" height="44" rx="22" fill="rgba(79,165,255,.18)" stroke="#4FA5FF" stroke-width="2"/>
+<text x="330" y="73" text-anchor="middle" fill="#4FA5FF" font-size="10" font-weight="800">NECESIDAD / REQUISICIÓN</text>
+<text x="330" y="87" text-anchor="middle" fill="#475569" font-size="8.5">Stock bajo · Nuevo proyecto · Manual</text>
+<line x1="330" y1="98" x2="330" y2="116" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#cmp-b)"/>
+<rect x="235" y="118" width="190" height="44" rx="8" fill="rgba(167,139,250,.12)" stroke="#a78bfa" stroke-width="2"/>
+<text x="330" y="137" text-anchor="middle" fill="#a78bfa" font-size="10" font-weight="800">Agente IA Compras</text>
+<text x="330" y="151" text-anchor="middle" fill="#475569" font-size="8.5">Analiza días hasta ruptura de stock</text>
+<line x1="330" y1="162" x2="330" y2="178" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#cmp-b)"/>
+<polygon points="330,180 435,214 330,248 225,214" fill="rgba(251,191,36,.08)" stroke="rgba(251,191,36,.5)" stroke-width="1.5"/>
+<text x="330" y="208" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="800">¿URGENCIA?</text>
+<text x="330" y="224" text-anchor="middle" fill="#475569" font-size="8">CRÍTICO / ALERTA / OK</text>
+<line x1="330" y1="248" x2="330" y2="266" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#cmp-a)"/>
+<text x="345" y="262" fill="#fbbf24" font-size="9" font-weight="700">CRÍTICO</text>
+<line x1="435" y1="214" x2="448" y2="214" stroke="#34d399" stroke-width="1.5" marker-end="url(#cmp-g)"/>
+<text x="442" y="208" fill="#34d399" font-size="9" font-weight="700">OK</text>
+<rect x="235" y="268" width="190" height="44" rx="8" fill="rgba(79,165,255,.08)" stroke="rgba(79,165,255,.4)" stroke-width="1.5"/>
+<text x="330" y="287" text-anchor="middle" fill="#f1f5f9" font-size="10" font-weight="700">Solicitar Cotiz. Proveedor</text>
+<text x="330" y="301" text-anchor="middle" fill="#475569" font-size="8.5">Comparar precio · plazo · calidad</text>
+<line x1="330" y1="312" x2="330" y2="330" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#cmp-b)"/>
+<polygon points="330,332 435,366 330,400 225,366" fill="rgba(79,165,255,.08)" stroke="rgba(79,165,255,.5)" stroke-width="1.5"/>
+<text x="330" y="360" text-anchor="middle" fill="#4FA5FF" font-size="10" font-weight="800">¿APROBADO GERENCIA?</text>
+<text x="330" y="376" text-anchor="middle" fill="#475569" font-size="8">Verificar presupuesto</text>
+<line x1="330" y1="400" x2="330" y2="418" stroke="#34d399" stroke-width="1.5" marker-end="url(#cmp-g)"/>
+<text x="342" y="414" fill="#34d399" font-size="9" font-weight="700">SÍ</text>
+<line x1="435" y1="366" x2="448" y2="366" stroke="#f87171" stroke-width="1.5" marker-end="url(#cmp-r)"/>
+<text x="442" y="360" fill="#f87171" font-size="9" font-weight="700">NO</text>
+<rect x="235" y="420" width="190" height="44" rx="8" fill="rgba(79,165,255,.08)" stroke="rgba(79,165,255,.4)" stroke-width="1.5"/>
+<text x="330" y="439" text-anchor="middle" fill="#f1f5f9" font-size="10" font-weight="700">OC Enviada al Proveedor</text>
+<text x="330" y="453" text-anchor="middle" fill="#475569" font-size="8.5">Seguimiento plazo entrega</text>
+<line x1="330" y1="464" x2="330" y2="482" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#cmp-b)"/>
+<polygon points="330,484 435,518 330,552 225,518" fill="rgba(52,211,153,.08)" stroke="rgba(52,211,153,.45)" stroke-width="1.5"/>
+<text x="330" y="512" text-anchor="middle" fill="#34d399" font-size="10" font-weight="800">¿RECEPCIÓN CONFORME?</text>
+<text x="330" y="528" text-anchor="middle" fill="#475569" font-size="8">Cantidad · Calidad · Documentos</text>
+<line x1="330" y1="552" x2="330" y2="570" stroke="#34d399" stroke-width="1.5" marker-end="url(#cmp-g)"/>
+<text x="342" y="566" fill="#34d399" font-size="9" font-weight="700">SÍ</text>
+<line x1="435" y1="518" x2="448" y2="518" stroke="#f87171" stroke-width="1.5" marker-end="url(#cmp-r)"/>
+<text x="442" y="512" fill="#f87171" font-size="9" font-weight="700">NO</text>
+<rect x="238" y="572" width="184" height="44" rx="22" fill="rgba(52,211,153,.2)" stroke="#34d399" stroke-width="2"/>
+<text x="330" y="591" text-anchor="middle" fill="#34d399" font-size="11" font-weight="900">&#x2713; INVENTARIO ACTUALIZADO</text>
+<text x="330" y="605" text-anchor="middle" fill="#94a3b8" font-size="8.5">Stock actualizado · Costo registrado</text>
+<rect x="448" y="192" width="148" height="44" rx="8" fill="rgba(52,211,153,.1)" stroke="rgba(52,211,153,.35)" stroke-width="1"/>
+<text x="522" y="211" text-anchor="middle" fill="#34d399" font-size="10" font-weight="700">Monitoreo Continuo</text>
+<text x="522" y="225" text-anchor="middle" fill="#94a3b8" font-size="8.5">Sin acción inmediata</text>
+<rect x="448" y="344" width="148" height="44" rx="8" fill="rgba(248,113,113,.1)" stroke="rgba(248,113,113,.35)" stroke-width="1.5"/>
+<text x="522" y="363" text-anchor="middle" fill="#f87171" font-size="10" font-weight="700">Rechazar / Modificar</text>
+<text x="522" y="377" text-anchor="middle" fill="#94a3b8" font-size="8.5">Ajustar requerimiento</text>
+<rect x="448" y="496" width="148" height="44" rx="8" fill="rgba(248,113,113,.1)" stroke="rgba(248,113,113,.35)" stroke-width="1.5"/>
+<text x="522" y="515" text-anchor="middle" fill="#f87171" font-size="10" font-weight="700">Reclamo Proveedor</text>
+<text x="522" y="529" text-anchor="middle" fill="#94a3b8" font-size="8.5">NC · Devolución · Penalización</text>
+</svg></div>
 <h3>Score de Proveedores</h3>
 <p>Cada proveedor acumula score basado en: cumplimiento de fecha (40%), calidad de materiales (40%), precio competitivo (20%). La IA sugiere el proveedor óptimo para cada recompra.</p>
+
+<h3>🤖 Agente IA de Compras Predictivo <span style="background:#7c3aed22;color:#a78bfa;border:1px solid #7c3aed55;border-radius:6px;padding:.15em .5em;font-size:.7em;font-weight:700;vertical-align:middle">NUEVO</span></h3>
+<p>El Agente de Compras es un bot autónomo que analiza el consumo histórico de materiales, calcula cuántos días quedan antes de que el stock caiga bajo el mínimo operativo y genera automáticamente Órdenes de Compra agrupadas por proveedor. Solo requiere un clic de "Aprobar" para enviarlas.</p>
+<div class="tip">Acceso: <strong>Módulo Compras → Tab "Agente IA"</strong> → botón "Ejecutar Agente".</div>
+<div class="card">
+<h4>Cómo funciona el motor de predicción</h4>
+<pre>Para cada material:
+  days_until_stockout = (stock_actual - stock_mínimo) / consumo_diario
+  qty_recomendada = (consumo × lead_time) + stock_seguridad_30d - stock_actual
+
+Nivel de urgencia:
+  CRÍTICO  → days_until_stockout ≤ lead_time_proveedor  (OC inmediata)
+  ALERTA   → days_until_stockout ≤ lead_time × 2
+  OK       → stock suficiente</pre>
+</div>
+<div class="table-wrap">
+<table>
+<tr><th>Campo</th><th>Descripción</th></tr>
+<tr><td><strong>Stock Actual</strong></td><td>Unidades disponibles en almacén ahora mismo</td></tr>
+<tr><td><strong>Días al Mínimo</strong></td><td>Tiempo antes de caer bajo el nivel mínimo de operación</td></tr>
+<tr><td><strong>Cantidad a Pedir</strong></td><td>OC recomendada: cubre lead time + 30 días de seguridad</td></tr>
+<tr><td><strong>Lead Time</strong></td><td>Días de entrega del proveedor para ese material</td></tr>
+<tr><td><strong>Justificación IA</strong></td><td>Texto en lenguaje natural explicando por qué se generó la OC</td></tr>
+</table>
+</div>
+<div class="warn">Las OCs generadas por el agente quedan en estado <strong>Pendiente de Aprobación</strong> hasta que el responsable de compras presione "Aprobar". Ninguna OC se envía automáticamente sin autorización humana.</div>
 </section>
 
 <!-- ═══════════════════════════════════════════════════ -->
@@ -925,6 +1460,65 @@ El agente calcula automáticamente:
 <h2>Ingeniería y Diseño</h2>
 <h3>Blueprint Analyzer IA</h3>
 <p>Sube plano técnico PDF o foto → la IA extrae en segundos:</p>
+<div style="overflow-x:auto;margin:1.2rem 0">
+<svg viewBox="0 0 660 600" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#020617;border-radius:12px;border:1px solid rgba(79,165,255,.25);font-family:'Segoe UI',system-ui,sans-serif">
+<defs>
+  <marker id="ing-b" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#4FA5FF"/></marker>
+  <marker id="ing-g" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#34d399"/></marker>
+  <marker id="ing-r" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#f87171"/></marker>
+  <marker id="ing-a" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#fbbf24"/></marker>
+</defs>
+<text x="330" y="24" text-anchor="middle" fill="#4FA5FF" font-size="11" font-weight="800" letter-spacing="1">FLUJO INGENIERÍA · DISEÑO A PRODUCCIÓN</text>
+<text x="330" y="40" text-anchor="middle" fill="#475569" font-size="9">Solicitud → CAD → Revisión → Nesting → Instrucciones → Liberar</text>
+<rect x="235" y="54" width="190" height="44" rx="22" fill="rgba(79,165,255,.18)" stroke="#4FA5FF" stroke-width="2"/>
+<text x="330" y="73" text-anchor="middle" fill="#4FA5FF" font-size="10" font-weight="800">SOLICITUD DE INGENIERÍA</text>
+<text x="330" y="87" text-anchor="middle" fill="#475569" font-size="8.5">Nueva pieza · Rediseño · Plano cliente</text>
+<line x1="330" y1="98" x2="330" y2="116" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#ing-b)"/>
+<polygon points="330,118 435,152 330,186 225,152" fill="rgba(79,165,255,.08)" stroke="rgba(79,165,255,.5)" stroke-width="1.5"/>
+<text x="330" y="146" text-anchor="middle" fill="#4FA5FF" font-size="10" font-weight="800">¿DISEÑO NUEVO?</text>
+<text x="330" y="162" text-anchor="middle" fill="#475569" font-size="8">¿O adaptar existente?</text>
+<line x1="330" y1="186" x2="330" y2="204" stroke="#34d399" stroke-width="1.5" marker-end="url(#ing-g)"/>
+<text x="342" y="200" fill="#34d399" font-size="9" font-weight="700">SÍ</text>
+<line x1="435" y1="152" x2="448" y2="152" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#ing-a)"/>
+<text x="442" y="146" fill="#fbbf24" font-size="9" font-weight="700">NO</text>
+<rect x="235" y="206" width="190" height="44" rx="8" fill="rgba(167,139,250,.12)" stroke="#a78bfa" stroke-width="2"/>
+<text x="330" y="225" text-anchor="middle" fill="#a78bfa" font-size="10" font-weight="800">Diseño CAD</text>
+<text x="330" y="239" text-anchor="middle" fill="#475569" font-size="8.5">2D/3D · Planos · Modelos · IA análisis</text>
+<line x1="330" y1="250" x2="330" y2="268" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#ing-b)"/>
+<rect x="235" y="270" width="190" height="44" rx="8" fill="rgba(79,165,255,.08)" stroke="rgba(79,165,255,.4)" stroke-width="1.5"/>
+<text x="330" y="289" text-anchor="middle" fill="#f1f5f9" font-size="10" font-weight="700">Revisión Técnica</text>
+<text x="330" y="303" text-anchor="middle" fill="#475569" font-size="8.5">Tolerancias · Materiales · Procesos</text>
+<line x1="330" y1="314" x2="330" y2="332" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#ing-b)"/>
+<polygon points="330,334 435,368 330,402 225,368" fill="rgba(52,211,153,.08)" stroke="rgba(52,211,153,.45)" stroke-width="1.5"/>
+<text x="330" y="362" text-anchor="middle" fill="#34d399" font-size="10" font-weight="800">¿APROBADO?</text>
+<text x="330" y="378" text-anchor="middle" fill="#475569" font-size="8">Por ing. jefe / cliente</text>
+<line x1="330" y1="402" x2="330" y2="420" stroke="#34d399" stroke-width="1.5" marker-end="url(#ing-g)"/>
+<text x="342" y="416" fill="#34d399" font-size="9" font-weight="700">SÍ</text>
+<line x1="225" y1="368" x2="208" y2="368" stroke="#f87171" stroke-width="1.5" marker-end="url(#ing-r)"/>
+<text x="215" y="362" text-anchor="middle" fill="#f87171" font-size="9" font-weight="700">NO</text>
+<rect x="235" y="422" width="190" height="44" rx="8" fill="rgba(79,165,255,.08)" stroke="rgba(79,165,255,.4)" stroke-width="1.5"/>
+<text x="330" y="441" text-anchor="middle" fill="#f1f5f9" font-size="10" font-weight="700">Nesting &amp; Optimización</text>
+<text x="330" y="455" text-anchor="middle" fill="#475569" font-size="8.5">Corte eficiente · Mín. desperdicio</text>
+<line x1="330" y1="466" x2="330" y2="484" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#ing-b)"/>
+<rect x="235" y="486" width="190" height="44" rx="8" fill="rgba(52,211,153,.08)" stroke="rgba(52,211,153,.4)" stroke-width="1.5"/>
+<text x="330" y="505" text-anchor="middle" fill="#f1f5f9" font-size="10" font-weight="700">Instrucciones Trabajo + BOM</text>
+<text x="330" y="519" text-anchor="middle" fill="#475569" font-size="8.5">Por operación · Herramientas · Material</text>
+<line x1="330" y1="530" x2="330" y2="548" stroke="#34d399" stroke-width="1.5" marker-end="url(#ing-g)"/>
+<rect x="238" y="550" width="184" height="44" rx="22" fill="rgba(52,211,153,.2)" stroke="#34d399" stroke-width="2"/>
+<text x="330" y="569" text-anchor="middle" fill="#34d399" font-size="11" font-weight="900">&#x2713; LIBERADO A PRODUCCIÓN</text>
+<text x="330" y="583" text-anchor="middle" fill="#94a3b8" font-size="8.5">Viajero generado · Programa activo</text>
+<rect x="448" y="130" width="148" height="44" rx="8" fill="rgba(251,191,36,.1)" stroke="rgba(251,191,36,.35)" stroke-width="1.5"/>
+<text x="522" y="149" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="700">Adaptar Diseño Existente</text>
+<text x="522" y="163" text-anchor="middle" fill="#94a3b8" font-size="8.5">Revisar plano · Actualizar rev.</text>
+<line x1="522" y1="174" x2="522" y2="200" stroke="#fbbf24" stroke-width="1" stroke-dasharray="4,3" opacity=".6" marker-end="url(#ing-a)"/>
+<line x1="522" y1="200" x2="427" y2="200" stroke="#fbbf24" stroke-width="1" stroke-dasharray="4,3" opacity=".6"/>
+<line x1="425" y1="200" x2="425" y2="270" stroke="#fbbf24" stroke-width="1" stroke-dasharray="4,3" opacity=".6" marker-end="url(#ing-a)"/>
+<rect x="62" y="346" width="144" height="44" rx="8" fill="rgba(248,113,113,.1)" stroke="rgba(248,113,113,.35)" stroke-width="1.5"/>
+<text x="134" y="365" text-anchor="middle" fill="#f87171" font-size="10" font-weight="700">Correcciones</text>
+<text x="134" y="379" text-anchor="middle" fill="#94a3b8" font-size="8.5">Ajustar · Revisar · Re-enviar</text>
+<path d="M62,368 L44,368 L44,289 L233,289" stroke="#f87171" stroke-width="1" fill="none" stroke-dasharray="5,3" opacity=".6" marker-end="url(#ing-r)"/>
+<text x="34" y="328" fill="#f87171" font-size="8" text-anchor="middle" transform="rotate(-90,34,328)" opacity=".65">revisión</text>
+</svg></div>
 <ul>
   <li>Cuadro de título (número parte, revisión, cliente)</li>
   <li>Dimensiones y tolerancias (GD&amp;T)</li>
@@ -1162,6 +1756,54 @@ El agente calcula automáticamente:
 <!-- ═══════════════════════════════════════════════════ -->
 <section id="finanzas">
 <h2>Finanzas y ROI</h2>
+<div style="overflow-x:auto;margin:1.2rem 0">
+<svg viewBox="0 0 660 540" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#020617;border-radius:12px;border:1px solid rgba(52,211,153,.25);font-family:'Segoe UI',system-ui,sans-serif">
+<defs>
+  <marker id="fin-b" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#4FA5FF"/></marker>
+  <marker id="fin-g" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#34d399"/></marker>
+  <marker id="fin-r" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#f87171"/></marker>
+  <marker id="fin-a" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#fbbf24"/></marker>
+</defs>
+<text x="330" y="24" text-anchor="middle" fill="#34d399" font-size="11" font-weight="800" letter-spacing="1">FLUJO FINANZAS · CxC → CIERRE CONTABLE</text>
+<text x="330" y="40" text-anchor="middle" fill="#475569" font-size="9">Factura → CxC → Cobro → Banco → Costos → KPIs → Cierre</text>
+<rect x="235" y="54" width="190" height="44" rx="22" fill="rgba(52,211,153,.18)" stroke="#34d399" stroke-width="2"/>
+<text x="330" y="73" text-anchor="middle" fill="#34d399" font-size="10" font-weight="800">FACTURA EMITIDA</text>
+<text x="330" y="87" text-anchor="middle" fill="#475569" font-size="8.5">CFDI generado · Enviado al cliente</text>
+<line x1="330" y1="98" x2="330" y2="116" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#fin-b)"/>
+<rect x="235" y="118" width="190" height="44" rx="8" fill="rgba(79,165,255,.08)" stroke="rgba(79,165,255,.4)" stroke-width="1.5"/>
+<text x="330" y="137" text-anchor="middle" fill="#f1f5f9" font-size="10" font-weight="700">Seguimiento CxC</text>
+<text x="330" y="151" text-anchor="middle" fill="#475569" font-size="8.5">Vencimientos · Días transcurridos</text>
+<line x1="330" y1="162" x2="330" y2="180" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#fin-b)"/>
+<polygon points="330,182 435,216 330,250 225,216" fill="rgba(52,211,153,.08)" stroke="rgba(52,211,153,.45)" stroke-width="1.5"/>
+<text x="330" y="210" text-anchor="middle" fill="#34d399" font-size="10" font-weight="800">¿PAGO RECIBIDO?</text>
+<text x="330" y="226" text-anchor="middle" fill="#475569" font-size="8">Dentro o fuera de fecha</text>
+<line x1="330" y1="250" x2="330" y2="268" stroke="#34d399" stroke-width="1.5" marker-end="url(#fin-g)"/>
+<text x="342" y="264" fill="#34d399" font-size="9" font-weight="700">SÍ</text>
+<line x1="435" y1="216" x2="448" y2="216" stroke="#f87171" stroke-width="1.5" marker-end="url(#fin-r)"/>
+<text x="442" y="210" fill="#f87171" font-size="9" font-weight="700">NO</text>
+<rect x="235" y="270" width="190" height="44" rx="8" fill="rgba(79,165,255,.08)" stroke="rgba(79,165,255,.4)" stroke-width="1.5"/>
+<text x="330" y="289" text-anchor="middle" fill="#f1f5f9" font-size="10" font-weight="700">Conciliación Bancaria</text>
+<text x="330" y="303" text-anchor="middle" fill="#475569" font-size="8.5">Cruzar pagos · Cerrar CxC</text>
+<line x1="330" y1="314" x2="330" y2="332" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#fin-b)"/>
+<rect x="235" y="334" width="190" height="44" rx="8" fill="rgba(79,165,255,.08)" stroke="rgba(79,165,255,.4)" stroke-width="1.5"/>
+<text x="330" y="353" text-anchor="middle" fill="#f1f5f9" font-size="10" font-weight="700">Control de Costos / Costeo Vivo</text>
+<text x="330" y="367" text-anchor="middle" fill="#475569" font-size="8.5">Costo real por OT · Margen real</text>
+<line x1="330" y1="378" x2="330" y2="396" stroke="#4FA5FF" stroke-width="1.5" opacity=".7" marker-end="url(#fin-b)"/>
+<rect x="235" y="398" width="190" height="44" rx="8" fill="rgba(167,139,250,.1)" stroke="rgba(167,139,250,.4)" stroke-width="1.5"/>
+<text x="330" y="417" text-anchor="middle" fill="#a78bfa" font-size="10" font-weight="700">Reportes KPI Financieros</text>
+<text x="330" y="431" text-anchor="middle" fill="#475569" font-size="8.5">Rentabilidad · Flujo caja · OEE$</text>
+<line x1="330" y1="442" x2="330" y2="460" stroke="#34d399" stroke-width="1.5" marker-end="url(#fin-g)"/>
+<rect x="238" y="462" width="184" height="44" rx="22" fill="rgba(52,211,153,.2)" stroke="#34d399" stroke-width="2"/>
+<text x="330" y="481" text-anchor="middle" fill="#34d399" font-size="11" font-weight="900">&#x2713; CIERRE CONTABLE</text>
+<text x="330" y="495" text-anchor="middle" fill="#94a3b8" font-size="8.5">Período cerrado · Balances</text>
+<rect x="448" y="194" width="148" height="44" rx="8" fill="rgba(251,191,36,.1)" stroke="rgba(251,191,36,.35)" stroke-width="1.5"/>
+<text x="522" y="213" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="700">Recordatorio Cliente</text>
+<text x="522" y="227" text-anchor="middle" fill="#94a3b8" font-size="8.5">Email · Llamada · Vencido</text>
+<line x1="522" y1="238" x2="522" y2="254" stroke="#f87171" stroke-width="1" stroke-dasharray="4,3" opacity=".6" marker-end="url(#fin-r)"/>
+<rect x="448" y="256" width="148" height="44" rx="8" fill="rgba(248,113,113,.1)" stroke="rgba(248,113,113,.35)" stroke-width="1.5"/>
+<text x="522" y="275" text-anchor="middle" fill="#f87171" font-size="10" font-weight="700">Gestión Cartera Vencida</text>
+<text x="522" y="289" text-anchor="middle" fill="#94a3b8" font-size="8.5">Cobranza formal · Jurídico</text>
+</svg></div>
 <h3>Módulos financieros</h3>
 <ul>
   <li><strong>Flujo de Caja:</strong> Cobros esperados vs pagos, proyección 8 semanas</li>

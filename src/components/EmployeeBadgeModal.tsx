@@ -1,8 +1,7 @@
-import React, { useRef } from 'react';
-import { X, Download, Printer, ShieldCheck, Mail, Phone, Cpu, User } from 'lucide-react';
+import React from 'react';
+import { X, Printer, ShieldCheck, User, Building2, Clock, Layers, Hash } from 'lucide-react';
 import type { Employee } from '../services/employeeService';
 import { useConfig } from '../contexts/ConfigContext';
-import clsx from 'clsx';
 import Barcode from 'react-barcode';
 
 interface EmployeeBadgeModalProps {
@@ -11,127 +10,201 @@ interface EmployeeBadgeModalProps {
   employee: Employee | null;
 }
 
+const TURNO_LABEL: Record<string, string> = {
+  matutino: 'Matutino',
+  vespertino: 'Vespertino',
+  nocturno: 'Nocturno',
+};
+
+const TURNO_COLOR: Record<string, string> = {
+  matutino: '#f59e0b',
+  vespertino: '#3b82f6',
+  nocturno: '#8b5cf6',
+};
+
+function InfoCell({
+  icon: Icon,
+  label,
+  value,
+  valueColor,
+  mono,
+}: {
+  icon: React.ElementType;
+  label: string;
+  value: string;
+  valueColor?: string;
+  mono?: boolean;
+}) {
+  return (
+    <div className="bg-slate-50 rounded-lg px-2 py-1.5 flex items-start gap-1.5">
+      <Icon size={9} className="text-slate-400 mt-0.5 shrink-0" />
+      <div className="min-w-0">
+        <p className="text-[7px] text-slate-400 uppercase tracking-wider font-semibold leading-none mb-0.5">{label}</p>
+        <p
+          className={`text-[9px] font-black truncate leading-none ${mono ? 'font-mono' : ''}`}
+          style={{ color: valueColor ?? '#1e293b' }}
+        >
+          {value}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export const EmployeeBadgeModal: React.FC<EmployeeBadgeModalProps> = ({ isOpen, onClose, employee }) => {
-  const { isDarkMode } = useConfig();
-  const badgeRef = useRef<HTMLDivElement>(null);
+  const { config } = useConfig();
 
   if (!isOpen || !employee) return null;
 
-  const handlePrint = () => {
-    window.print();
-  };
+  const handlePrint = () => window.print();
+
+  const turno = employee.turno_operador ?? '';
+  const turnoLabel = (TURNO_LABEL[turno] ?? turno) || '—';
+  const turnoColor = TURNO_COLOR[turno] ?? '#64748b';
+
+  const hireDate = employee.hire_date
+    ? new Date(employee.hire_date).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })
+    : '—';
+
+  const statusLabel = {
+    active: 'Activo',
+    inactive: 'Inactivo',
+    vacation: 'Vacaciones',
+    medical_leave: 'Incapacidad',
+  }[employee.status] ?? employee.status;
+
+  const statusColor = employee.status === 'active' ? '#10b981' : '#f59e0b';
 
   return (
     <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-300">
-      <div className="w-full max-w-lg bg-slate-900 border border-white/10 rounded-3xl shadow-2xl overflow-hidden relative flex flex-col">
-        <div className="flex items-center justify-between p-6 border-b border-white/5 bg-slate-950/40">
+      <div className="w-full max-w-md bg-slate-900 border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
           <div>
-            <h2 className="text-xl font-black text-white tracking-tight uppercase">
-              GENERADOR DE <span className="text-blue-500">GAFETE</span>
+            <h2 className="text-lg font-black text-white tracking-tight uppercase">
+              Gafete <span className="text-blue-500">Corporativo</span>
             </h2>
-            <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.3em] mt-0.5">IDENTIDAD CORPORATIVA MCVILL</p>
+            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-[0.25em] mt-0.5">
+              {config.brandName || 'MCVILL'} · Identidad Digital
+            </p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-xl text-slate-500 hover:text-white transition-all">
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-white/5 rounded-xl text-slate-500 hover:text-white transition-all"
+          >
             <X size={20} />
           </button>
         </div>
 
-        <div className="flex-1 p-8 flex flex-col items-center justify-center space-y-8 bg-slate-950/20">
-          {/* Badge Preview */}
-          <div 
-            ref={badgeRef}
-            className="w-[300px] h-[480px] bg-white rounded-[24px] shadow-2xl relative overflow-hidden flex flex-col items-center text-slate-900 print:shadow-none border-4 border-blue-600/20"
+        {/* Content */}
+        <div className="flex-1 p-8 flex flex-col items-center gap-6 bg-slate-950/20">
+
+          {/* ── BADGE CARD ── */}
+          <div
+            id="badge-print-area"
+            className="w-[280px] rounded-[20px] shadow-2xl overflow-hidden border border-slate-700/40 bg-white print:shadow-none"
           >
-            {/* Header / Brand */}
-            <div className="w-full h-[120px] bg-slate-900 flex flex-col items-center justify-center p-4 relative">
-              <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500 via-transparent to-transparent" />
-              <div className="flex items-center gap-2 mb-1 relative z-10">
-                <div className="w-6 h-6 rounded bg-blue-600 flex items-center justify-center shadow-[0_0_10px_rgba(37,99,235,0.5)]">
-                  <Cpu className="text-white" size={14} />
-                </div>
-                <span className="text-lg font-black tracking-tighter text-white">MCVILL</span>
-              </div>
-              <p className="text-[8px] font-black tracking-[0.4em] text-blue-400 relative z-10">CONTROL INDUSTRIAL</p>
-              
-              {/* Slit Hole */}
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-12 h-2.5 bg-slate-800 rounded-full border border-white/5" />
+            {/* Top brand bar */}
+            <div className="bg-slate-900 flex flex-col items-center justify-center pt-7 pb-5 px-4 relative">
+              {/* Lanyard hole */}
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-10 h-2 bg-slate-800 rounded-full border border-white/10" />
+
+              {/* Tenant logo from Supabase, fallback to brand text */}
+              {config.logo ? (
+                <img
+                  src={config.logo}
+                  alt={config.brandName}
+                  className="h-10 object-contain mb-1"
+                  onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+              ) : (
+                <span className="text-xl font-black tracking-tighter text-white mb-1">
+                  {config.brandName || 'MCVILL'}
+                </span>
+              )}
+              <p className="text-[7px] font-black tracking-[0.4em] text-blue-400 uppercase">
+                {config.slogan || 'Control Industrial'}
+              </p>
             </div>
 
-            {/* Photo Container */}
-            <div className="relative -mt-10 mb-4">
-              <div className="w-32 h-32 rounded-3xl bg-slate-100 border-4 border-white shadow-xl overflow-hidden flex items-center justify-center">
+            {/* Photo (overlapping) */}
+            <div className="flex justify-center -mt-9 mb-3 relative z-10">
+              <div className="w-[88px] h-[88px] rounded-2xl bg-slate-100 border-[3px] border-white shadow-lg overflow-hidden flex items-center justify-center">
                 {employee.photo_url ? (
                   <img src={employee.photo_url} alt="Foto" className="w-full h-full object-cover" />
                 ) : (
-                  <User size={64} className="text-slate-300" />
+                  <User size={44} className="text-slate-300" />
                 )}
               </div>
-              <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center shadow-lg">
-                <ShieldCheck size={16} className="text-white" />
+              <div className="absolute -bottom-1 right-[calc(50%-32px)] w-5 h-5 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center shadow">
+                <ShieldCheck size={10} className="text-white" />
               </div>
             </div>
 
-            {/* Name & Title */}
-            <div className="text-center px-6 mb-2">
-              <h3 className="text-xl font-black uppercase tracking-tight text-slate-900 leading-tight">
-                {employee.first_name}<br/>{employee.last_name}
+            {/* Name + job title */}
+            <div className="text-center px-5 mb-3">
+              <h3 className="text-[15px] font-black uppercase text-slate-900 leading-tight tracking-tight">
+                {employee.first_name} {employee.last_name}
               </h3>
-              <div className="mt-2 inline-block px-3 py-1 bg-blue-50 rounded-full border border-blue-100">
-                <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">{employee.job_title}</p>
-              </div>
+              <span className="inline-block mt-1.5 px-3 py-0.5 bg-blue-50 rounded-full border border-blue-100">
+                <p className="text-[9px] font-black text-blue-600 uppercase tracking-widest">{employee.job_title}</p>
+              </span>
             </div>
 
-            {/* Barcode Code */}
-            <div className="flex-1 flex flex-col items-center justify-center w-full bg-white px-4 py-4 border-t border-slate-100">
-              <div className="scale-75 origin-center">
-                <Barcode 
-                  value={employee.employee_number} 
+            {/* Info grid — 2×2 */}
+            <div className="mx-3 mb-3 grid grid-cols-2 gap-1.5">
+              <InfoCell icon={Building2}  label="Área / Depto"      value={employee.department ?? '—'} />
+              <InfoCell icon={Layers}     label="Planta / Célula"   value={employee.celula_operador ?? employee.tipo_empleado ?? '—'} />
+              <InfoCell icon={Clock}      label="Turno"             value={turnoLabel} valueColor={turnoColor} />
+              <InfoCell icon={Hash}       label="No. Empleado"      value={`#${employee.employee_number}`} mono />
+            </div>
+
+            {/* Barcode */}
+            <div className="border-t border-slate-100 flex justify-center py-2 px-2 bg-slate-50">
+              <div className="scale-[0.72] origin-center">
+                <Barcode
+                  value={employee.employee_number}
                   width={1.5}
-                  height={50}
-                  fontSize={12}
+                  height={38}
+                  fontSize={10}
                   background="transparent"
                 />
               </div>
             </div>
 
             {/* Footer */}
-            <div className="w-full py-3 bg-slate-900 flex items-center justify-center gap-4 text-[7px] font-bold text-slate-500 uppercase tracking-widest">
-              <span>EXP: {new Date(employee.hire_date).toLocaleDateString()}</span>
+            <div className="bg-slate-900 py-2 flex items-center justify-center gap-3 text-[7px] font-bold text-slate-500 uppercase tracking-widest">
+              <span>Ingreso: {hireDate}</span>
               <div className="w-1 h-1 rounded-full bg-slate-700" />
-              <span>SANGRE: N/A</span>
+              <span style={{ color: statusColor }}>● {statusLabel}</span>
             </div>
           </div>
 
-          <div className="flex gap-4 w-full">
-            <button 
-              onClick={handlePrint}
-              className="flex-1 py-4 bg-white/5 border border-white/10 rounded-2xl text-white text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all flex items-center justify-center gap-2"
-            >
-              <Printer size={16} /> IMPRIMIR GAFETE
-            </button>
-            <button 
-              className="flex-1 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2"
-            >
-              <Download size={16} /> DESCARGAR PDF
-            </button>
-          </div>
+          {/* Print button */}
+          <button
+            onClick={handlePrint}
+            className="w-full max-w-[280px] py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20"
+          >
+            <Printer size={15} /> Imprimir / Guardar PDF
+          </button>
         </div>
       </div>
 
+      {/* Print-only styles */}
       <style>{`
         @media print {
-          body * {
-            visibility: hidden;
-          }
-          #badge-print-area, #badge-print-area * {
-            visibility: visible;
-          }
+          body * { visibility: hidden !important; }
+          #badge-print-area,
+          #badge-print-area * { visibility: visible !important; }
           #badge-print-area {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
+            position: fixed !important;
+            top: 50% !important; left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            box-shadow: none !important;
+            border: none !important;
           }
+          @page { size: 85mm 135mm portrait; margin: 0; }
         }
       `}</style>
     </div>

@@ -49,6 +49,9 @@ import {
   Search,
   Camera,
   Smartphone,
+  Truck,
+  Clock,
+  Palette,
 } from 'lucide-react';
 import { useConfig } from '../contexts/ConfigContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -68,6 +71,9 @@ const sidebarSections: SidebarSection[] = [
       { id: 'inventory', label: 'Inventarios', icon: Package },
       { id: 'viajeros', label: 'Viajeros', icon: Route },
       { id: 'production', label: 'Planta', icon: Factory },
+      { id: 'logistica', label: 'Logística', icon: Truck },
+      { id: 'lead_time_predictor', label: 'Predicciones IA', icon: Clock },
+      { id: 'branding_studio', label: 'Estudio Branding', icon: Palette },
     ]
   },
   {
@@ -175,21 +181,21 @@ export const Sidebar = (props: {
     if (isGodmode) return true;
     if (['chat_ia', 'voice_link'].includes(module)) return true;
     const permissions: Record<string, string[]> = {
-      empleado:     ['portada', 'dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse'],
-      supervisor:   ['portada', 'dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse', 'engineering', 'maintenance'],
-      ingenieria:   ['portada', 'dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse', 'engineering', 'maintenance', 'work_instructions', 'layout_design', 'process_simulator', 'nesting', 'energy_monitor', 'preventive_maintenance_ia'],
-      calidad:      ['portada', 'dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse', 'spc', 'visual_ia', 'trazabilidad', 'defect_library', 'ppap', 'voc', 'seguridad', 'preventive_maintenance_ia'],
-      operaciones:  ['portada', 'dashboard', 'inventory', 'production', 'viajeros', 'shop_floor', 'compras', 'ventas', 'agente_cot', 'rfq_kanban', 'factibilidad', 'factibilidad_ia', 'metal_quoter', 'roi', 'maintenance'],
-      ventas:       ['portada', 'dashboard', 'ventas', 'agente_cot', 'rfq_kanban', 'factibilidad', 'factibilidad_ia', 'metal_quoter', 'roi'],
-      compras:      ['portada', 'dashboard', 'compras', 'inventory'],
-      almacen:      ['portada', 'dashboard', 'inventory', 'viajeros', 'hse'],
-      rh:           ['portada', 'dashboard', 'rh', 'payroll', 'attendance', 'recruitment', 'desempeno'],
-      finanzas:     ['portada', 'dashboard', 'finance', 'banco', 'costing', 'costeo', 'payroll'],
-      contabilidad: ['portada', 'dashboard', 'finance', 'banco', 'costing', 'payroll'],
-      auditoria:    ['portada', 'dashboard', 'reports', 'quality', 'spc', 'trazabilidad'],
-      soporte:      ['portada', 'dashboard', 'voc', 'quality'],
-      marketing:    ['portada', 'dashboard', 'ventas', 'voc'],
-      seguridad:    ['portada', 'dashboard', 'hse', 'seguridad'],
+      empleado:     ['portada', 'dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      supervisor:   ['portada', 'dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse', 'engineering', 'maintenance', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      ingenieria:   ['portada', 'dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse', 'engineering', 'maintenance', 'work_instructions', 'layout_design', 'process_simulator', 'nesting', 'energy_monitor', 'preventive_maintenance_ia', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      calidad:      ['portada', 'dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse', 'spc', 'visual_ia', 'trazabilidad', 'defect_library', 'ppap', 'voc', 'seguridad', 'preventive_maintenance_ia', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      operaciones:  ['portada', 'dashboard', 'inventory', 'production', 'viajeros', 'shop_floor', 'compras', 'ventas', 'agente_cot', 'rfq_kanban', 'factibilidad', 'factibilidad_ia', 'metal_quoter', 'roi', 'maintenance', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      ventas:       ['portada', 'dashboard', 'ventas', 'agente_cot', 'rfq_kanban', 'factibilidad', 'factibilidad_ia', 'metal_quoter', 'roi', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      compras:      ['portada', 'dashboard', 'compras', 'inventory', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      almacen:      ['portada', 'dashboard', 'inventory', 'viajeros', 'hse', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      rh:           ['portada', 'dashboard', 'rh', 'payroll', 'attendance', 'recruitment', 'desempeno', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      finanzas:     ['portada', 'dashboard', 'finance', 'banco', 'costing', 'costeo', 'payroll', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      contabilidad: ['portada', 'dashboard', 'finance', 'banco', 'costing', 'payroll', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      auditoria:    ['portada', 'dashboard', 'reports', 'quality', 'spc', 'trazabilidad', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      soporte:      ['portada', 'dashboard', 'voc', 'quality', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      marketing:    ['portada', 'dashboard', 'ventas', 'voc', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      seguridad:    ['portada', 'dashboard', 'hse', 'seguridad', 'logistica', 'lead_time_predictor', 'branding_studio'],
     };
     return permissions[role]?.includes(module) ?? false;
   };
@@ -209,6 +215,9 @@ export const Sidebar = (props: {
     { id: 'inventory',         label: 'Inventarios',      icon: Package },
     { id: 'viajeros',          label: 'Viajeros',         icon: Route },
     { id: 'production',        label: 'Planta',           icon: Factory },
+    { id: 'logistica',         label: 'Logística',        icon: Truck },
+    { id: 'lead_time_predictor', label: 'Predicciones IA', icon: Clock },
+    { id: 'branding_studio',   label: 'Estudio Branding', icon: Palette },
     { id: 'quality',           label: 'Calidad',          icon: ClipboardCheck },
     { id: 'hse',               label: 'HSE',              icon: ShieldAlert },
     { id: 'maintenance',       label: 'Mantenimiento',    icon: Wrench },

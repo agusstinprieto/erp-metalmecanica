@@ -814,7 +814,7 @@ export const MODULE_GUIDES_EN: Record<string, ModuleGuide> = {
     moduleId: 'compras',
     label: 'Purchasing',
     emoji: '🛒',
-    description: 'Manage Purchase Orders, suppliers, and incoming stock',
+    description: 'Manage Purchase Orders, suppliers, and the Predictive AI Purchasing Agent',
     steps: [
       {
         icon: 'ShoppingCart', color: 'text-mcvill-accent', bg: 'bg-mcvill-accent/10 border-mcvill-accent/30',
@@ -835,6 +835,18 @@ export const MODULE_GUIDES_EN: Record<string, ModuleGuide> = {
           '⭐ Each supplier is rated: delivery speed, defect rates, and pricing.',
           '🤖 AI points out optimal suppliers per material based on performance scores.',
           '📊 Compile and compare quotes from multiple vendors on one panel.',
+        ],
+      },
+      {
+        icon: 'Bot', color: 'text-purple-400', bg: 'bg-purple-400/10 border-purple-400/30',
+        title: 'AI Predictive Purchasing Agent',
+        subtitle: 'The bot that auto-generates your Purchase Orders',
+        tips: [
+          '🤖 Open the "Agente IA" tab inside the Purchasing module to launch it.',
+          '⚡ Click "Run Agent" — it analyzes historical consumption of all materials and calculates days to stockout.',
+          '🔴 CRITICAL materials have fewer days of stock remaining than the supplier lead time — immediate PO required.',
+          '✅ The agent groups orders by vendor with natural language justification — just click "Approve" or "Reject".',
+          '🔔 On execution, the system fires an automatic notification if critical materials are detected.',
         ],
       },
     ],

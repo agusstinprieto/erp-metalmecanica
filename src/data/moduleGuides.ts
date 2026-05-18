@@ -832,7 +832,7 @@ export const MODULE_GUIDES: Record<string, ModuleGuide> = {
     moduleId: 'compras',
     label: 'Gestión de Compras',
     emoji: '🛒',
-    description: 'Órdenes de compra, proveedores y seguimiento',
+    description: 'Órdenes de compra, proveedores, seguimiento y Agente Predictivo IA',
     steps: [
       {
         icon: 'ShoppingCart', color: 'text-mcvill-accent', bg: 'bg-mcvill-accent/10 border-mcvill-accent/30',
@@ -853,6 +853,18 @@ export const MODULE_GUIDES: Record<string, ModuleGuide> = {
           '⭐ Cada proveedor tiene score de desempeño: cumplimiento, calidad y precio.',
           '🤖 La IA sugiere el proveedor óptimo para cada material basado en historial.',
           '📊 Compara cotizaciones de varios proveedores en una sola pantalla.',
+        ],
+      },
+      {
+        icon: 'Bot', color: 'text-purple-400', bg: 'bg-purple-400/10 border-purple-400/30',
+        title: 'Agente IA de Compras Predictivo',
+        subtitle: 'El bot que genera tus OCs automáticamente',
+        tips: [
+          '🤖 Haz clic en la tab "Agente IA" dentro del módulo de Compras para activarlo.',
+          '⚡ Presiona "Ejecutar Agente" — analiza consumo histórico de todos los materiales y calcula cuántos días quedan antes de quedarse sin stock.',
+          '🔴 Los materiales en estado CRÍTICO tienen menos días de stock que el lead time del proveedor — requieren OC inmediata.',
+          '✅ El agente genera OCs agrupadas por proveedor con justificación en lenguaje natural. Solo debes presionar "Aprobar" o "Rechazar".',
+          '🔔 Al ejecutar, el sistema lanza una notificación automática si hay materiales críticos detectados.',
         ],
       },
     ],

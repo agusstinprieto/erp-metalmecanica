@@ -763,6 +763,32 @@ Gross Salary             $11,575.25   Total Deductions  $539.93
 <p>Purchase Order lifecycle: <strong>Draft → Approved → Sent to Supplier → Materials Received → Closed</strong>. Incoming stock updates warehouse quantities automatically.</p>
 <h3>Supplier Performance Rating</h3>
 <p>Calculates a performance score based on: delivery timeliness (40%), material quality (40%), and cost competitiveness (20%), assisting purchasing managers during restocking.</p>
+
+<h3>🤖 AI Predictive Purchasing Agent <span style="background:#7c3aed22;color:#a78bfa;border:1px solid #7c3aed55;border-radius:6px;padding:.15em .5em;font-size:.7em;font-weight:700;vertical-align:middle">NEW</span></h3>
+<p>The Purchasing Agent is an autonomous bot that analyzes historical material consumption, calculates how many days remain before stock falls below the operational minimum, and automatically generates Purchase Orders grouped by supplier — requiring only one "Approve" click to proceed.</p>
+<div class="tip">Access: <strong>Purchasing Module → "Agente IA" tab</strong> → click "Run Agent".</div>
+<div class="card">
+<h4>Prediction Engine Logic</h4>
+<pre>For each material:
+  days_until_stockout = (current_stock - min_stock) / daily_consumption
+  recommended_qty = (consumption × lead_time) + safety_stock_30d - current_stock
+
+Urgency level:
+  CRITICAL → days_until_stockout ≤ supplier_lead_time  (immediate PO required)
+  WARNING  → days_until_stockout ≤ lead_time × 2
+  OK       → stock is sufficient</pre>
+</div>
+<div class="table-wrap">
+<table>
+<tr><th>Field</th><th>Description</th></tr>
+<tr><td><strong>Current Stock</strong></td><td>Units available in warehouse right now</td></tr>
+<tr><td><strong>Days to Minimum</strong></td><td>Time before falling below operational minimum level</td></tr>
+<tr><td><strong>Quantity to Order</strong></td><td>Recommended PO: covers lead time + 30-day safety buffer</td></tr>
+<tr><td><strong>Lead Time</strong></td><td>Supplier delivery time for that material (days)</td></tr>
+<tr><td><strong>AI Justification</strong></td><td>Natural language explanation of why the PO was generated</td></tr>
+</table>
+</div>
+<div class="warn">Agent-generated POs remain in <strong>Pending Approval</strong> status until the purchasing manager clicks "Approve". No PO is dispatched automatically without human authorization.</div>
 </section>
 
 <!-- ═══════════════════════════════════════════════════ -->

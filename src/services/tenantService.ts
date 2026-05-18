@@ -17,6 +17,14 @@ export interface TenantConfig {
   whatsapp_api_key?: string;
   whatsapp_phone_id?: string;
   resend_api_key?: string;
+  facebook_page_token?: string;
+  facebook_page_id?: string;
+  linkedin_org_id?: string;
+  linkedin_access_token?: string;
+  instagram_business_id?: string;
+  instagram_access_token?: string;
+  tiktok_access_token?: string;
+  tiktok_client_key?: string;
   google_client_id?: string;
   teams_tenant_id?: string;
   teams_client_id?: string;
