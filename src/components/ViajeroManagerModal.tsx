@@ -366,58 +366,66 @@ export const ViajeroManagerModal: React.FC<ViajeroManagerModalProps> = ({
           );
         }
       } else {
-        const { data: newViajero, error: insertError } = await supabase
-          .from('viajeros').insert([payload]).select().single();
+        const { error: insertError } = await supabase
+          .from('viajeros').insert([payload]);
         if (insertError) throw insertError;
 
-        if (newViajero) {
-          // Insertar ops locales
-          const localOps = operaciones.filter(o => !o.id);
-          if (localOps.length > 0) {
-            await supabase.from('viajero_operaciones').insert(
-              localOps.map((op, idx) => ({
-                viajero_id:            newViajero.id,
-                centro_trabajo:        op.centro_trabajo || '',
-                nombre_operacion:      op.nombre_operacion || op.centro_trabajo || '',
-                clave_operacion:       `OP-${Date.now()}-${idx}`,
-                orden:                 op.orden ?? idx + 1,
-                estado:                op.estado || 'pending',
-                tiempo_estimado:       op.tiempo_estimado || 0,
-                tiempo_real_acumulado: 0,
-                costo_hora_mxn:        op.costo_hora_mxn || 0,
-                costo_hora_usd:        op.costo_hora_usd || 0,
-              }))
-            );
-          }
-          // Insertar mats locales
-          const localMats = materiales.filter(m => !m.id);
-          if (localMats.length > 0) {
-            await supabase.from('viajero_materiales').insert(
-              localMats.map(mat => ({
-                viajero_id:          newViajero.id,
-                descripcion:         mat.descripcion || '',
-                clave:               mat.clave || mat.material || '',
-                cantidad:            mat.cantidad ?? 1,
-                unidad:              mat.unidad || 'pza',
-                es_recogida:         mat.es_recogida ?? false,
-                ubicacion:           mat.ubicacion || '',
-                clave_requerimiento: mat.clave_requerimiento || '',
-                costo_unitario_mxn:  mat.costo_unitario_mxn || 0,
-                costo_unitario_usd:  mat.costo_unitario_usd || 0,
-              }))
-            );
-          }
-          // Insertar comentarios locales
-          const localComments = comentarios.filter(c => !c.id);
-          if (localComments.length > 0) {
-            await supabase.from('viajero_comentarios').insert(
-              localComments.map(c => ({
-                viajero_id: newViajero.id,
-                contenido:  c.contenido,
-                autor:      c.autor || 'Usuario',
-              }))
-            );
-          }
+        // Usar form.id directamente — siempre está en el payload insertado.
+        // No dependemos de newViajero porque el SELECT puede fallar por RLS
+        // aunque el INSERT haya sido exitoso, dejando newViajero como null.
+        const newId = form.id;
+
+        // Insertar ops locales (incluye sugerencias de IA)
+        const localOps = operaciones.filter(o => !o.id);
+        if (localOps.length > 0) {
+          const ts = Date.now();
+          const { error: opsError } = await supabase.from('viajero_operaciones').insert(
+            localOps.map((op, idx) => ({
+              viajero_id:            newId,
+              centro_trabajo:        op.centro_trabajo || '',
+              nombre_operacion:      op.nombre_operacion || op.centro_trabajo || '',
+              clave_operacion:       `OP-${ts}-${idx}`,
+              orden:                 op.orden ?? idx + 1,
+              estado:                op.estado || 'pending',
+              tiempo_estimado:       op.tiempo_estimado || 0,
+              tiempo_real_acumulado: 0,
+              costo_hora_mxn:        op.costo_hora_mxn || 0,
+              costo_hora_usd:        op.costo_hora_usd || 0,
+            }))
+          );
+          if (opsError) throw opsError;
+        }
+
+        // Insertar mats locales (incluye sugerencias de IA)
+        const localMats = materiales.filter(m => !m.id);
+        if (localMats.length > 0) {
+          const { error: matsError } = await supabase.from('viajero_materiales').insert(
+            localMats.map(mat => ({
+              viajero_id:          newId,
+              descripcion:         mat.descripcion || '',
+              clave:               mat.clave || mat.material || '',
+              cantidad:            mat.cantidad ?? 1,
+              unidad:              mat.unidad || 'pza',
+              es_recogida:         mat.es_recogida ?? false,
+              ubicacion:           mat.ubicacion || '',
+              clave_requerimiento: mat.clave_requerimiento || '',
+              costo_unitario_mxn:  mat.costo_unitario_mxn || 0,
+              costo_unitario_usd:  mat.costo_unitario_usd || 0,
+            }))
+          );
+          if (matsError) throw matsError;
+        }
+
+        // Insertar comentarios locales
+        const localComments = comentarios.filter(c => !c.id);
+        if (localComments.length > 0) {
+          await supabase.from('viajero_comentarios').insert(
+            localComments.map(c => ({
+              viajero_id: newId,
+              contenido:  c.contenido,
+              autor:      c.autor || 'Usuario',
+            }))
+          );
         }
       }
       onSave();

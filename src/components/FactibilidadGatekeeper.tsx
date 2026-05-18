@@ -158,7 +158,6 @@ export const FactibilidadGatekeeper: React.FC<FactibilidadGatekeeperProps> = ({ 
     const { data, error } = await supabase
       .from('evaluacion_factibilidad')
       .select('*')
-      .eq('tenant_id', tenantId)
       .order('created_at', { ascending: false });
     if (error) toast('Error al cargar historial: ' + error.message, 'error');
     else setEvaluaciones(data || []);
@@ -176,7 +175,6 @@ export const FactibilidadGatekeeper: React.FC<FactibilidadGatekeeperProps> = ({ 
       const payload = {
         cliente,
         numero_parte: numeroParte,
-        tenant_id: tenantId,
         revision_bom: { aprobado: state.bomCompleto },
         caracteristicas_especiales: { tolerancias_criticas: state.toleranciasCriticas },
         requisitos_soldadura: { especial: state.requiereSoldaduraEspecial, ndt: state.requierePruebasNDT },
