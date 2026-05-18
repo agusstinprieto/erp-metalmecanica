@@ -775,6 +775,30 @@ Bruto                    $11,575.25   Total deducciones $539.93
 <h2>Recursos Humanos</h2>
 <h3>Directorio de Empleados</h3>
 <p>Cada empleado tiene expediente digital con: foto, documentos escaneados, certificaciones, número IMSS, contrato, fecha de ingreso, puesto y área.</p>
+
+<h3>Alta de Empleados — Categoría y Vínculo con Producción</h3>
+<p>Al registrar un nuevo colaborador, RH selecciona su <strong>Categoría de Empleado</strong>, lo que auto-llena el departamento y habilita los campos correspondientes:</p>
+<div class="table-wrap"><table>
+<tr><th>Categoría</th><th>Departamento Auto-asignado</th><th>Sección adicional</th></tr>
+<tr><td>🏭 Operador de Producción</td><td>Producción</td><td>Datos de Piso de Producción</td></tr>
+<tr><td>👷 Supervisor / Jefe de Área</td><td>Producción</td><td>—</td></tr>
+<tr><td>📦 Almacenista / Logística</td><td>Logística</td><td>—</td></tr>
+<tr><td>💼 Administrativo / Oficinas</td><td>Administración</td><td>—</td></tr>
+<tr><td>⚙️ Ingeniero / Técnico</td><td>Ingeniería</td><td>—</td></tr>
+<tr><td>🔧 Mantenimiento</td><td>Producción</td><td>—</td></tr>
+<tr><td>🛡️ Vigilancia / Seguridad</td><td>Administración</td><td>—</td></tr>
+</table></div>
+
+<h3>Vínculo Automático RH → Desempeño</h3>
+<p>Cuando la categoría es <strong>Operador de Producción</strong>, aparece la sección <em>Datos de Piso de Producción</em> con tres campos obligatorios:</p>
+<ul>
+  <li><strong>Célula:</strong> SOLDADURA · CORTE · MAQUINADO · ENSAMBLE · PINTURA</li>
+  <li><strong>Turno:</strong> Matutino (06-14h) · Vespertino (14-22h) · Nocturno (22-06h)</li>
+  <li><strong>Puesto en Célula:</strong> lista inteligente que cambia según la célula seleccionada (ej. SOLDADURA → Soldador Senior, Soldador MIG/TIG…)</li>
+</ul>
+<p>Al guardar, el sistema <strong>crea automáticamente</strong> el registro en la tabla <code>operadores</code> del módulo de Desempeño. El operador queda disponible de inmediato para registro de KPIs semanales, cálculo de OEE y bonos de incentivos — sin doble captura.</p>
+<div class="tip">Si el número de empleado ya existe en <code>operadores</code> (reingreso), el sistema detecta el duplicado y no crea un registro extra.</div>
+
 <h3>Matriz de Habilidades</h3>
 <p>Define qué operador está certificado para qué proceso (Soldadura MIG, CNC, Láser, etc.). El sistema usa esta matriz para asignación de OTs y para detectar brechas de capacitación.</p>
 <h3>Onboarding</h3>

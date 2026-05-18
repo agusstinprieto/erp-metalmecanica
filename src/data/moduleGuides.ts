@@ -512,6 +512,18 @@ export const MODULE_GUIDES: Record<string, ModuleGuide> = {
         ],
       },
       {
+        icon: 'Factory', color: 'text-blue-400', bg: 'bg-blue-400/10 border-blue-400/30',
+        title: 'Alta de Operadores — Vínculo con Desempeño',
+        subtitle: 'Un solo registro en RH crea el operador en producción',
+        tips: [
+          '🏭 Al crear un empleado, elige la categoría "Operador de Producción" para habilitar la sección de Piso.',
+          '🔧 Selecciona Célula (SOLDADURA, CORTE, MAQUINADO, ENSAMBLE, PINTURA), Turno y Puesto específico.',
+          '⚡ Al guardar, el operador se registra automáticamente en el módulo de Desempeño + Incentivos.',
+          '📊 Desde ese momento puede recibir KPIs semanales, seguimiento de OEE y cálculo de bonos.',
+          '🔄 No hay doble captura — un solo formulario de RH alimenta ambos módulos.',
+        ],
+      },
+      {
         icon: 'CheckCircle2', color: 'text-green-400', bg: 'bg-green-400/10 border-green-400/30',
         title: 'Onboarding y Capacitación',
         subtitle: 'Integración acelerada de nuevos ingresos',

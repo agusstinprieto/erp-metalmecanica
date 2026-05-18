@@ -494,6 +494,18 @@ export const MODULE_GUIDES_EN: Record<string, ModuleGuide> = {
         ],
       },
       {
+        icon: 'Factory', color: 'text-blue-400', bg: 'bg-blue-400/10 border-blue-400/30',
+        title: 'Operator Registration — Performance Link',
+        subtitle: 'One HR form creates the operator record in production',
+        tips: [
+          '🏭 Set category to "Production Operator" to unlock the Shop Floor section.',
+          '🔧 Select Work Cell (WELDING, CUTTING, MACHINING, ASSEMBLY, PAINTING), Shift, and Position.',
+          '⚡ On save, the operator is auto-registered in the Performance & Incentives module.',
+          '📊 Immediately eligible for weekly KPI entry, OEE tracking, and bonus calculation.',
+          '🔄 No duplicate data entry — one HR form feeds both modules.',
+        ],
+      },
+      {
         icon: 'CheckCircle2', color: 'text-green-400', bg: 'bg-green-400/10 border-green-400/30',
         title: 'Onboarding & Training',
         subtitle: 'Accelerated paths for new plant hires',

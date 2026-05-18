@@ -688,6 +688,30 @@ Gross Salary             $11,575.25   Total Deductions  $539.93
 <h2>Human Resources</h2>
 <h3>Employee Expediente Digital</h3>
 <p>Each profile holds verified digital attachments: photo, certifications, ID, contract, hire date, salary history, department, and direct reports.</p>
+
+<h3>Employee Onboarding — Category &amp; Production Link</h3>
+<p>When registering a new employee, HR selects an <strong>Employee Category</strong> that auto-fills the department and unlocks role-specific fields:</p>
+<div class="table-wrap"><table>
+<tr><th>Category</th><th>Auto-assigned Dept.</th><th>Extra Section</th></tr>
+<tr><td>🏭 Production Operator</td><td>Production</td><td>Shop Floor Data</td></tr>
+<tr><td>👷 Supervisor / Area Lead</td><td>Production</td><td>—</td></tr>
+<tr><td>📦 Warehouse / Logistics</td><td>Logistics</td><td>—</td></tr>
+<tr><td>💼 Admin / Office</td><td>Administration</td><td>—</td></tr>
+<tr><td>⚙️ Engineer / Technician</td><td>Engineering</td><td>—</td></tr>
+<tr><td>🔧 Maintenance</td><td>Production</td><td>—</td></tr>
+<tr><td>🛡️ Security / Vigilance</td><td>Administration</td><td>—</td></tr>
+</table></div>
+
+<h3>Automatic HR → Performance Link</h3>
+<p>When <strong>Production Operator</strong> is selected, a <em>Shop Floor Data</em> section appears with three required fields:</p>
+<ul>
+  <li><strong>Work Cell:</strong> WELDING · CUTTING · MACHINING · ASSEMBLY · PAINTING</li>
+  <li><strong>Shift:</strong> Morning (06–14h) · Afternoon (14–22h) · Night (22–06h)</li>
+  <li><strong>Position in Cell:</strong> smart list that adapts by cell (e.g., WELDING → Senior Welder, MIG/TIG Welder…)</li>
+</ul>
+<p>On save, the system <strong>automatically creates</strong> an <code>operadores</code> record in the Performance module. The operator is immediately available for weekly KPI entry, OEE tracking, and incentive calculation — with no duplicate data entry.</p>
+<div class="tip">If the employee number already exists in <code>operadores</code> (re-hire scenario), the system detects the duplicate and skips the insert silently.</div>
+
 <h3>Skills Matrix</h3>
 <p>Defines which operators are certified for specific tasks (e.g., MIG welding, CNC lathe operation). The planning engine uses this matrix to prevent assigning unqualified operators to complex WOs.</p>
 </section>
