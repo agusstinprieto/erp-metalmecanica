@@ -88,6 +88,12 @@ export const inventoryService = {
       .insert({
         descripcion_mp: item.name,
         peso_mp: item.quantity,
+        sku: item.sku,
+        category: item.category,
+        unit: item.unit,
+        min_stock: item.min_stock,
+        location: item.location,
+        description: item.description,
         tenant_id: tenantData?.id
       })
       .select()
@@ -121,7 +127,13 @@ export const inventoryService = {
       .from('materiales')
       .update({
         descripcion_mp: updates.name,
-        peso_mp: updates.quantity
+        peso_mp: updates.quantity,
+        ...(updates.sku       !== undefined && { sku: updates.sku }),
+        ...(updates.category  !== undefined && { category: updates.category }),
+        ...(updates.unit      !== undefined && { unit: updates.unit }),
+        ...(updates.min_stock !== undefined && { min_stock: updates.min_stock }),
+        ...(updates.location  !== undefined && { location: updates.location }),
+        ...(updates.description !== undefined && { description: updates.description }),
       })
       .eq('id', id)
       .select()

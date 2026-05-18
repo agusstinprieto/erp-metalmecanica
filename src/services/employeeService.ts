@@ -17,7 +17,7 @@ export interface Employee {
   monthly_salary?: number;
   contract_type?: string;
   benefits?: string[];
-  status: 'active' | 'inactive' | 'vacation' | 'medical_leave';
+  status: 'active' | 'inactive' | 'vacation' | 'medical_leave' | 'on_leave';
   photo_url?: string;
   documents?: Record<string, string>;
   shift_id?: string;

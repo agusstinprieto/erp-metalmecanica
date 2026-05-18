@@ -386,7 +386,7 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({ isOpen, on
         </div>
 
         <div className="flex-1 overflow-y-auto custom-scrollbar">
-          <form onSubmit={handleSubmit} className="p-5">
+          <form id="employee-form" onSubmit={handleSubmit} className="p-5">
 
             {activeTab === 'general' && (
               <div className="grid grid-cols-1 md:grid-cols-12 gap-5 animate-in slide-in-from-left-4 duration-300">
@@ -959,8 +959,9 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({ isOpen, on
           >
             CANCELAR
           </button>
-          <button 
-            onClick={handleSubmit}
+          <button
+            type="submit"
+            form="employee-form"
             disabled={loading || uploadingPhoto}
             className="flex-[2] h-14 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 group"
           >
