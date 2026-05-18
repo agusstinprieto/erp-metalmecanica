@@ -83,7 +83,17 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({ isOpen, on
   const webcamRef = useRef<Webcam>(null);
 
   useEffect(() => {
-    shiftService.listShifts().then(setShifts).catch(console.error);
+    shiftService.listShifts()
+      .then(setShifts)
+      .catch(err => {
+        console.error('Error cargando turnos:', err);
+        // Fallback local para que el dropdown siempre muestre opciones
+        setShifts([
+          { id: 'mat', name: 'Matutino',   start_time: '06:00:00', end_time: '14:00:00', grace_period_minutes: 10, is_active: true, tenant_id: '' },
+          { id: 'ves', name: 'Vespertino', start_time: '14:00:00', end_time: '22:00:00', grace_period_minutes: 10, is_active: true, tenant_id: '' },
+          { id: 'noc', name: 'Nocturno',   start_time: '22:00:00', end_time: '06:00:00', grace_period_minutes: 10, is_active: true, tenant_id: '' },
+        ]);
+      });
   }, []);
   
   const [formData, setFormData] = useState<Partial<Employee>>({
@@ -318,8 +328,8 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({ isOpen, on
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 lg:left-64 z-[999] flex items-center justify-center p-4 lg:p-8 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="w-full max-w-5xl bg-slate-900 border border-white/10 rounded-3xl shadow-2xl overflow-hidden relative flex flex-col h-[90vh] my-auto">
+    <div className="fixed inset-0 lg:left-64 top-14 z-[999] flex items-center justify-center p-3 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-300">
+      <div className="w-full max-w-2xl bg-slate-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden relative flex flex-col max-h-[calc(100vh-4rem)]">
         
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-white/5 bg-slate-950/40 shrink-0">
@@ -374,13 +384,13 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({ isOpen, on
         </div>
 
         <div className="flex-1 overflow-y-auto custom-scrollbar">
-          <form onSubmit={handleSubmit} className="p-8">
-            
+          <form onSubmit={handleSubmit} className="p-5">
+
             {activeTab === 'general' && (
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-10 animate-in slide-in-from-left-4 duration-300">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-5 animate-in slide-in-from-left-4 duration-300">
                 {/* Photo Section */}
-                <div className="md:col-span-4 flex flex-col items-center space-y-6">
-                  <div className="relative group w-full aspect-square max-w-[280px]">
+                <div className="md:col-span-3 flex flex-col items-center space-y-3">
+                  <div className="relative group w-full aspect-square max-w-[160px]">
                     <div className="w-full h-full rounded-[2.5rem] bg-slate-950 border-2 border-dashed border-slate-800 overflow-hidden flex items-center justify-center relative shadow-inner">
                       {uploadingPhoto ? (
                         <div className="flex flex-col items-center gap-3">
