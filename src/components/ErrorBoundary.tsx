@@ -15,7 +15,7 @@ export class ErrorBoundary extends React.Component<{ children: React.ReactNode }
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
-    console.error('[McVill ERP] Unhandled error:', error, info);
+    console.error('[ERP] Unhandled error:', error, info);
     
     // Auto-reload on chunk load failures to fetch new production assets seamlessly
     const isChunkError = error.message && (

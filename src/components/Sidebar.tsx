@@ -169,6 +169,30 @@ export const Sidebar = (props: {
   const isGodmode    = role === 'ceo' || role === 'sistemas' || role === 'gerencia';
   const isSuperAdmin = role === 'ceo' || role === 'sistemas';
 
+  const hasAccess = (module: string) => {
+    // Dynamic industry vertical module exclusions
+    if (isGodmode) return true;
+    if (['chat_ia', 'voice_link'].includes(module)) return true;
+    const permissions: Record<string, string[]> = {
+      empleado:     ['dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse'],
+      supervisor:   ['dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse', 'engineering', 'maintenance'],
+      ingenieria:   ['dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse', 'engineering', 'maintenance', 'work_instructions', 'layout_design', 'process_simulator', 'nesting', 'energy_monitor', 'preventive_maintenance_ia'],
+      calidad:      ['dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse', 'spc', 'visual_ia', 'trazabilidad', 'defect_library', 'ppap', 'voc', 'seguridad', 'preventive_maintenance_ia'],
+      operaciones:  ['dashboard', 'inventory', 'production', 'viajeros', 'shop_floor', 'compras', 'ventas', 'agente_cot', 'rfq_kanban', 'factibilidad', 'factibilidad_ia', 'metal_quoter', 'roi', 'maintenance'],
+      ventas:       ['dashboard', 'ventas', 'agente_cot', 'rfq_kanban', 'factibilidad', 'factibilidad_ia', 'metal_quoter', 'roi'],
+      compras:      ['dashboard', 'compras', 'inventory'],
+      almacen:      ['dashboard', 'inventory', 'viajeros', 'hse'],
+      rh:           ['dashboard', 'rh', 'payroll', 'attendance', 'recruitment', 'desempeno'],
+      finanzas:     ['dashboard', 'finance', 'banco', 'costing', 'costeo', 'payroll'],
+      contabilidad: ['dashboard', 'finance', 'banco', 'costing', 'payroll'],
+      auditoria:    ['dashboard', 'reports', 'quality', 'spc', 'trazabilidad'],
+      soporte:      ['dashboard', 'voc', 'quality'],
+      marketing:    ['dashboard', 'ventas', 'voc'],
+      seguridad:    ['dashboard', 'hse', 'seguridad'],
+    };
+    return permissions[role]?.includes(module) ?? false;
+  };
+
   const showQualitySection = isGodmode || ['calidad', 'auditoria', 'soporte', 'seguridad'].includes(role);
   const showCommercialSection = isGodmode || ['operaciones', 'ventas', 'compras', 'marketing'].includes(role);
   const showEngineeringSection = isGodmode || ['ingenieria', 'supervisor'].includes(role);
@@ -240,29 +264,7 @@ export const Sidebar = (props: {
     else navigate(item.id);
   };
 
-  const hasAccess = (module: string) => {
-    // Dynamic industry vertical module exclusions
-    if (isGodmode) return true;
-    if (['chat_ia', 'voice_link'].includes(module)) return true;
-    const permissions: Record<string, string[]> = {
-      empleado:     ['dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse'],
-      supervisor:   ['dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse', 'engineering', 'maintenance'],
-      ingenieria:   ['dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse', 'engineering', 'maintenance', 'work_instructions', 'layout_design', 'process_simulator', 'nesting', 'energy_monitor', 'preventive_maintenance_ia'],
-      calidad:      ['dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse', 'spc', 'visual_ia', 'trazabilidad', 'defect_library', 'ppap', 'voc', 'seguridad', 'preventive_maintenance_ia'],
-      operaciones:  ['dashboard', 'inventory', 'production', 'viajeros', 'shop_floor', 'compras', 'ventas', 'agente_cot', 'rfq_kanban', 'factibilidad', 'factibilidad_ia', 'metal_quoter', 'roi', 'maintenance'],
-      ventas:       ['dashboard', 'ventas', 'agente_cot', 'rfq_kanban', 'factibilidad', 'factibilidad_ia', 'metal_quoter', 'roi'],
-      compras:      ['dashboard', 'compras', 'inventory'],
-      almacen:      ['dashboard', 'inventory', 'viajeros', 'hse'],
-      rh:           ['dashboard', 'rh', 'payroll', 'attendance', 'recruitment', 'desempeno'],
-      finanzas:     ['dashboard', 'finance', 'banco', 'costing', 'costeo', 'payroll'],
-      contabilidad: ['dashboard', 'finance', 'banco', 'costing', 'payroll'],
-      auditoria:    ['dashboard', 'reports', 'quality', 'spc', 'trazabilidad'],
-      soporte:      ['dashboard', 'voc', 'quality'],
-      marketing:    ['dashboard', 'ventas', 'voc'],
-      seguridad:    ['dashboard', 'hse', 'seguridad'],
-    };
-    return permissions[role]?.includes(module) ?? false;
-  };
+
 
   return (
     <div className={clsx(

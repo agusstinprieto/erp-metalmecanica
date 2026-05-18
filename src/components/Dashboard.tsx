@@ -482,10 +482,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
         supabase.from('ordenes_mantenimiento').select('id', { count: 'exact', head: true }).in('estado', ['pendiente', 'en_proceso']),
       ]);
 
-      const { data: stockRows } = await supabase.from('materiales').select('cantidad, stock_minimo');
-      const stockCritico = (stockRows ?? []).filter(
-        (r: any) => r.cantidad != null && r.stock_minimo != null && Number(r.cantidad) <= Number(r.stock_minimo)
-      ).length;
+      let stockCritico = 0;
+      const { data: stockRows, error: stockErr } = await supabase.from('materiales').select('peso_mp, stock_minimo_mp');
+      if (!stockErr && stockRows && stockRows.length > 0) {
+        stockCritico = stockRows.filter(
+          (r: any) => r.peso_mp != null && r.stock_minimo_mp != null && Number(r.peso_mp) <= Number(r.stock_minimo_mp)
+        ).length;
+      } else {
+        const { data: altRows } = await supabase.from('suministros').select('stock_quantity, min_stock');
+        stockCritico = (altRows ?? []).filter(
+          (r: any) => r.stock_quantity != null && r.min_stock != null && Number(r.stock_quantity) <= Number(r.min_stock)
+        ).length;
+      }
 
       setDbStats({
         empleados: empRes.count ?? 0,
