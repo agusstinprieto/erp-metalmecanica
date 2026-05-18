@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   LayoutDashboard, Factory, Route, CalendarDays, Package, 
   Camera, Zap, Cpu, Sparkles, Shield, Clock, Terminal,
-  ExternalLink, ArrowRight, Play, Pause, Activity, ChevronRight
+  ExternalLink, ArrowRight, Play, Pause, Activity, ChevronRight, Settings, X
 } from 'lucide-react';
 import { useConfig } from '../contexts/ConfigContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -14,10 +14,12 @@ interface PortadaViewProps {
 }
 
 export const PortadaView: React.FC<PortadaViewProps> = ({ setView, onToggleChat, onOpenVoice }) => {
-  const { config } = useConfig();
+  const { config, updateConfig } = useConfig();
   const { t } = useLanguage();
   const [time, setTime] = useState(new Date());
   const [isMuted, setIsMuted] = useState(true);
+  const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
+  const [youtubeInput, setYoutubeInput] = useState('');
   const [systemLogs, setSystemLogs] = useState<string[]>([
     'Iniciando Orquestador Raíz McVill...',
     'Conexión con Supabase DB establecida [OK]',
@@ -56,6 +58,22 @@ export const PortadaView: React.FC<PortadaViewProps> = ({ setView, onToggleChat,
 
   const formatDate = (d: Date) => {
     return d.toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  };
+
+  const getYoutubeId = (url: string): string => {
+    if (!url) return 'wxx7A63LpSo';
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : url.replace('https://www.youtube.com/embed/', '').split('?')[0];
+  };
+
+  const videoId = getYoutubeId(config.cctvYoutubeUrl || 'wxx7A63LpSo');
+
+  const handleSaveYoutubeUrl = () => {
+    if (youtubeInput.trim()) {
+      updateConfig({ cctvYoutubeUrl: youtubeInput.trim() });
+    }
+    setIsConfigModalOpen(false);
   };
 
   return (
@@ -116,7 +134,7 @@ export const PortadaView: React.FC<PortadaViewProps> = ({ setView, onToggleChat,
           {/* YouTube Cinematic Live Loop */}
           <div className="absolute inset-0 w-full h-full pointer-events-none opacity-40 group-hover:opacity-60 transition-opacity duration-700">
             <iframe
-              src="https://www.youtube.com/embed/wxx7A63LpSo?autoplay=1&mute=1&controls=0&loop=1&playlist=wxx7A63LpSo&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3"
+              src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3`}
               title="Industrial Live Loop"
               className="w-full h-[300%] -translate-y-1/3 scale-[1.3] object-cover"
               frameBorder="0"
@@ -144,6 +162,15 @@ export const PortadaView: React.FC<PortadaViewProps> = ({ setView, onToggleChat,
                   className="px-3 py-1.5 rounded-xl bg-mcvill-accent text-[9px] font-black text-slate-950 uppercase tracking-widest hover:opacity-90 transition-all flex items-center gap-1 shadow-[0_0_12px_var(--theme-glow)]"
                 >
                   Ver Todas las Cámaras <ArrowRight size={10} />
+                </button>
+                <button 
+                  onClick={() => {
+                    setYoutubeInput(config.cctvYoutubeUrl || 'https://www.youtube.com/embed/wxx7A63LpSo');
+                    setIsConfigModalOpen(true);
+                  }}
+                  className="px-3 py-1.5 rounded-xl bg-slate-900 border border-white/10 text-[9px] font-black text-slate-400 uppercase tracking-widest hover:text-white hover:border-white/30 transition-all flex items-center gap-1"
+                >
+                  <Settings size={10} /> Configurar Feed
                 </button>
               </div>
             </div>
@@ -294,6 +321,48 @@ export const PortadaView: React.FC<PortadaViewProps> = ({ setView, onToggleChat,
 
         </div>
       </div>
+
+      {/* ── MODAL CONFIGURACIÓN YOUTUBE ── */}
+      {isConfigModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md bg-slate-950 border border-white/10 rounded-3xl p-6 shadow-2xl relative animate-in zoom-in-95 duration-200">
+            <button
+              onClick={() => setIsConfigModalOpen(false)}
+              className="absolute top-4 right-4 p-2 text-slate-500 hover:text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-colors"
+            >
+              <X size={16} />
+            </button>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-mcvill-accent/10 border border-mcvill-accent/30 flex items-center justify-center text-mcvill-accent">
+                <Camera size={20} />
+              </div>
+              <div>
+                <h3 className="text-sm font-black text-white uppercase tracking-widest">Configurar Feed CCTV</h3>
+                <p className="text-[10px] text-slate-400 mt-0.5">Ingresa la URL del video de YouTube</p>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">URL del Video o Enlace Copiado</label>
+                <input
+                  type="text"
+                  value={youtubeInput}
+                  onChange={(e) => setYoutubeInput(e.target.value)}
+                  placeholder="Ej: https://www.youtube.com/watch?v=..."
+                  className="w-full bg-slate-900 border border-white/10 text-sm text-white rounded-xl p-3 focus:outline-none focus:border-mcvill-accent/50 focus:bg-slate-900/80 transition-all"
+                />
+              </div>
+              <button
+                onClick={handleSaveYoutubeUrl}
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-mcvill-accent to-emerald-500 text-slate-950 font-black text-xs uppercase tracking-widest hover:opacity-90 transition-opacity shadow-[0_0_20px_var(--theme-glow)]"
+              >
+                Guardar Configuración
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

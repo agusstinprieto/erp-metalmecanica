@@ -30,6 +30,7 @@ interface BrandConfig {
   seguridadPct?: number;
   fiveSPct?: number;
   industryType?: 'metal_mechanical' | 'automotive' | 'aerospace' | 'textile' | 'pharmaceutical' | 'electronic' | 'mining';
+  cctvYoutubeUrl?: string;
 }
 
 interface ConfigContextType {
@@ -70,6 +71,7 @@ const defaultConfig: BrandConfig = {
   seguridadPct: 2,
   fiveSPct: 1,
   industryType: 'metal_mechanical',
+  cctvYoutubeUrl: 'https://www.youtube.com/embed/wxx7A63LpSo',
 };
 
 const THEME_PALETTES: Record<ThemeName, {
@@ -194,6 +196,7 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               seguridadPct: supabaseConfig.seguridadPct !== undefined ? supabaseConfig.seguridadPct : prev.seguridadPct,
               fiveSPct: supabaseConfig.fiveSPct !== undefined ? supabaseConfig.fiveSPct : prev.fiveSPct,
               industryType: supabaseConfig.industryType !== undefined ? supabaseConfig.industryType : prev.industryType,
+              cctvYoutubeUrl: supabaseConfig.cctvYoutubeUrl || prev.cctvYoutubeUrl,
             };
             localStorage.setItem('mcvill-config', JSON.stringify(merged));
             return merged;
@@ -249,6 +252,7 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               seguridadPct: updated.seguridadPct,
               fiveSPct: updated.fiveSPct,
               industryType: updated.industryType,
+              cctvYoutubeUrl: updated.cctvYoutubeUrl,
             }
           })
           .eq('id', tenant.id);
