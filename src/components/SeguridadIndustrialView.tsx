@@ -31,12 +31,12 @@ interface Incidente {
 }
 
 const DEFAULT_CAMERAS: SecurityCamera[] = [
-  { id: 'c1', nombre: 'Entrada Principal',  area: 'Acceso',      url: 'https://vjs.zencdn.net/v/oceans.mp4', tipo: 'mjpeg', online: true  },
-  { id: 'c2', nombre: 'Área de Soldadura',  area: 'Producción',  url: 'https://media.w3.org/2010/05/sintel/trailer_hd.mp4', tipo: 'mjpeg', online: true  },
-  { id: 'c3', nombre: 'Almacén General',    area: 'Almacén',     url: 'https://www.w3schools.com/html/mov_bbb.mp4', tipo: 'mjpeg', online: true  },
-  { id: 'c4', nombre: 'Taller CNC',         area: 'Producción',  url: 'https://www.w3schools.com/html/movie.mp4', tipo: 'mjpeg', online: true },
-  { id: 'c5', nombre: 'Área de Pintura',    area: 'Producción',  url: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4', tipo: 'mjpeg', online: true  },
-  { id: 'c6', nombre: 'Estacionamiento',    area: 'Exterior',    url: 'https://vjs.zencdn.net/v/oceans.mp4', tipo: 'mjpeg', online: true  },
+  { id: 'c1', nombre: 'Entrada Principal',  area: 'Acceso',      url: 'https://www.youtube.com/watch?v=F3zZ-2OspvI', tipo: 'mjpeg', online: true  },
+  { id: 'c2', nombre: 'Área de Soldadura',  area: 'Producción',  url: 'https://www.youtube.com/watch?v=7XGplK3yV-E', tipo: 'mjpeg', online: true  },
+  { id: 'c3', nombre: 'Almacén General',    area: 'Almacén',     url: 'https://www.youtube.com/watch?v=dAXdeqcftp4', tipo: 'mjpeg', online: true  },
+  { id: 'c4', nombre: 'Taller CNC',         area: 'Producción',  url: 'https://www.youtube.com/watch?v=s5eA30XW-tY', tipo: 'mjpeg', online: true },
+  { id: 'c5', nombre: 'Área de Pintura',    area: 'Producción',  url: 'https://www.youtube.com/watch?v=8_lfxPI5ObM', tipo: 'mjpeg', online: true  },
+  { id: 'c6', nombre: 'Estacionamiento',    area: 'Exterior',    url: 'https://www.youtube.com/watch?v=tF4DML7FIWk', tipo: 'mjpeg', online: true  },
 ];
 
 const DEMO_INCIDENTS: Incidente[] = [
@@ -505,14 +505,10 @@ export const SeguridadIndustrialView: React.FC = () => {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          // Robust initial self-heal to catch cached empty/YouTube/GoogleStorage links for all 6 channels
+          // Robust initial self-heal to catch cached empty/non-YouTube/GoogleStorage links for all 6 channels
           const hasLegacy = parsed.some(c => 
             !c.url || 
-            c.url.includes('youtube.com') || 
-            c.url.includes('youtu.be') || 
-            c.url.includes('assets.mixkit.co') ||
-            c.url.includes('7XGplK3yV-E') ||
-            c.url.includes('s5eA30XW-tY') ||
+            (c.url.includes('youtube.com') === false && c.url.includes('youtu.be') === false) ||
             c.url.includes('googleapis.com') ||
             c.url.includes('googleusercontent.com')
           );
@@ -542,11 +538,7 @@ export const SeguridadIndustrialView: React.FC = () => {
         if (Array.isArray(parsed) && parsed.length > 0) {
           const hasLegacy = parsed.some(c => 
             !c.url || 
-            c.url.includes('youtube.com') || 
-            c.url.includes('youtu.be') || 
-            c.url.includes('assets.mixkit.co') ||
-            c.url.includes('7XGplK3yV-E') ||
-            c.url.includes('s5eA30XW-tY') ||
+            (c.url.includes('youtube.com') === false && c.url.includes('youtu.be') === false) ||
             c.url.includes('googleapis.com') ||
             c.url.includes('googleusercontent.com')
           );
