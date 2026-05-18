@@ -31,12 +31,12 @@ interface Incidente {
 }
 
 const DEFAULT_CAMERAS: SecurityCamera[] = [
-  { id: 'c1', nombre: 'Entrada Principal',  area: 'Acceso',      url: '', tipo: 'mjpeg', online: true  },
+  { id: 'c1', nombre: 'Entrada Principal',  area: 'Acceso',      url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4', tipo: 'mjpeg', online: true  },
   { id: 'c2', nombre: 'Área de Soldadura',  area: 'Producción',  url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', tipo: 'mjpeg', online: true  },
-  { id: 'c3', nombre: 'Almacén General',    area: 'Almacén',     url: '', tipo: 'mjpeg', online: true  },
+  { id: 'c3', nombre: 'Almacén General',    area: 'Almacén',     url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', tipo: 'mjpeg', online: true  },
   { id: 'c4', nombre: 'Taller CNC',         area: 'Producción',  url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4', tipo: 'mjpeg', online: true },
-  { id: 'c5', nombre: 'Área de Pintura',    area: 'Producción',  url: '', tipo: 'mjpeg', online: true  },
-  { id: 'c6', nombre: 'Estacionamiento',    area: 'Exterior',    url: '', tipo: 'mjpeg', online: true  },
+  { id: 'c5', nombre: 'Área de Pintura',    area: 'Producción',  url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4', tipo: 'mjpeg', online: true  },
+  { id: 'c6', nombre: 'Estacionamiento',    area: 'Exterior',    url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4', tipo: 'mjpeg', online: true  },
 ];
 
 const DEMO_INCIDENTS: Incidente[] = [
@@ -462,17 +462,19 @@ export const SeguridadIndustrialView: React.FC = () => {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          // Robust initial self-heal to catch cached YouTube links
-          const migrated = parsed.map(c => {
-            if (c.id === 'c2' && (!c.url || c.url.includes('youtube.com') || c.url.includes('youtu.be') || c.url.includes('7XGplK3yV-E') || c.url.includes('assets.mixkit.co'))) {
-              return { ...c, url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', online: true };
-            }
-            if (c.id === 'c4' && (!c.url || c.url.includes('youtube.com') || c.url.includes('youtu.be') || c.url.includes('s5eA30XW-tY') || c.url.includes('assets.mixkit.co'))) {
-              return { ...c, url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4', online: true };
-            }
-            return c;
-          });
-          return migrated;
+          // Robust initial self-heal to catch cached empty/YouTube links for all 6 channels
+          const hasLegacy = parsed.some(c => 
+            !c.url || 
+            c.url.includes('youtube.com') || 
+            c.url.includes('youtu.be') || 
+            c.url.includes('assets.mixkit.co') ||
+            c.url.includes('7XGplK3yV-E') ||
+            c.url.includes('s5eA30XW-tY')
+          );
+          if (hasLegacy) {
+            return DEFAULT_CAMERAS;
+          }
+          return parsed;
         }
       }
       return DEFAULT_CAMERAS;
@@ -494,23 +496,20 @@ export const SeguridadIndustrialView: React.FC = () => {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
           const hasLegacy = parsed.some(c => 
-            (c.id === 'c2' && (!c.url || c.url.includes('youtube.com') || c.url.includes('youtu.be') || c.url.includes('7XGplK3yV-E') || c.url.includes('assets.mixkit.co'))) ||
-            (c.id === 'c4' && (!c.url || c.url.includes('youtube.com') || c.url.includes('youtu.be') || c.url.includes('s5eA30XW-tY') || c.url.includes('assets.mixkit.co')))
+            !c.url || 
+            c.url.includes('youtube.com') || 
+            c.url.includes('youtu.be') || 
+            c.url.includes('assets.mixkit.co') ||
+            c.url.includes('7XGplK3yV-E') ||
+            c.url.includes('s5eA30XW-tY')
           );
           if (hasLegacy) {
-            const upgraded = parsed.map(c => {
-              if (c.id === 'c2' && (!c.url || c.url.includes('youtube.com') || c.url.includes('youtu.be') || c.url.includes('7XGplK3yV-E') || c.url.includes('assets.mixkit.co'))) {
-                return { ...c, url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', online: true };
-              }
-              if (c.id === 'c4' && (!c.url || c.url.includes('youtube.com') || c.url.includes('youtu.be') || c.url.includes('s5eA30XW-tY') || c.url.includes('assets.mixkit.co'))) {
-                return { ...c, url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4', online: true };
-              }
-              return c;
-            });
-            setCameras(upgraded);
-            localStorage.setItem('mcvill_cameras', JSON.stringify(upgraded));
+            setCameras(DEFAULT_CAMERAS);
+            localStorage.setItem('mcvill_cameras', JSON.stringify(DEFAULT_CAMERAS));
           }
         }
+      } else {
+        localStorage.setItem('mcvill_cameras', JSON.stringify(DEFAULT_CAMERAS));
       }
     } catch (e) {
       console.warn("Error migrating security cameras:", e);
