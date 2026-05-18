@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   Sparkles, Download, FileText, Plus, Trash2, Loader2,
-  X, RefreshCw, Save, ChevronRight, Zap, Package
+  X, RefreshCw, Save, ChevronRight, Zap, Package, Link2, Tag, Truck
 } from 'lucide-react';
 import clsx from 'clsx';
 import { jsPDF } from 'jspdf';
@@ -27,6 +27,14 @@ interface CotizacionGenerada {
 
 const IVA = 0.16;
 const VIGENCIAS = ['24 horas', '48 horas', '72 horas', '7 días', '15 días', '30 días'];
+const ESTADOS = ['BORRADOR', 'ENVIADA', 'APROBADA', 'DECLINADA'] as const;
+type EstadoCot = typeof ESTADOS[number];
+const ESTADO_COLORS: Record<EstadoCot, string> = {
+  BORRADOR: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+  ENVIADA:  'bg-blue-500/20 text-blue-400 border-blue-500/30',
+  APROBADA: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+  DECLINADA:'bg-rose-500/20 text-rose-400 border-rose-500/30',
+};
 
 function getSystemPrompt(companyName: string): string { return `Eres el agente de cotizaciones de ${companyName}, empresa metalmecánica industrial especializada en fabricación de piezas industriales: corte láser/plasma, soldadura MIG/TIG, maquinado CNC, tratamientos superficiales y ensamble.
 
@@ -50,11 +58,14 @@ const fmt = (n: number) => `$${n.toLocaleString('es-MX', { minimumFractionDigits
 const pad = (n: number) => String(n).padStart(4, '0');
 const nextFolio = () => `COT-${new Date().getFullYear()}-${pad(Math.floor(Math.random() * 9000) + 1000)}`;
 
-function calcTotales(partidas: Partida[]) {
-  const subtotal = partidas.reduce((s, p) => s + p.subtotal, 0);
+function calcTotales(partidas: Partida[], overheadPct = 0, margenPct = 0) {
+  const baseSubtotal = partidas.reduce((s, p) => s + p.subtotal, 0);
+  const overhead = baseSubtotal * (overheadPct / 100);
+  const margen = baseSubtotal * (margenPct / 100);
+  const subtotal = baseSubtotal + overhead + margen;
   const iva = subtotal * IVA;
   const total = subtotal + iva;
-  return { subtotal, iva, total };
+  return { baseSubtotal, overhead, margen, subtotal, iva, total };
 }
 
 export const AgenteCotizacionesView: React.FC = () => {
@@ -64,7 +75,13 @@ export const AgenteCotizacionesView: React.FC = () => {
   const [cliente, setCliente] = useState('');
   const [numeroParte, setNumeroParte] = useState('');
   const [cantidad, setCantidad] = useState('');
-  const [vigencia, setVigencia] = useState('7 días');
+  const [vigencia, setVigencia] = useState('72 horas');
+  const [viajeroId, setViajeroId] = useState('');
+  const [estado, setEstado] = useState<EstadoCot>('BORRADOR');
+  const [overheadPct, setOverheadPct] = useState(12);
+  const [margenPct, setMargenPct] = useState(18);
+  const [condicionPago, setCondicionPago] = useState('50% anticipo, 50% contra entrega');
+  const [plazoEntrega, setPlazoEntrega] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [cotizacion, setCotizacion] = useState<CotizacionGenerada | null>(null);
@@ -139,18 +156,23 @@ Genera la cotización industrial completa.`;
     if (!cotizacion) { notify('Genera una cotización primero', 'error'); return; }
     setIsSaving(true);
     try {
-      const { total } = calcTotales(cotizacion.partidas);
+      const { total } = calcTotales(cotizacion.partidas, overheadPct, margenPct);
       const { error } = await supabase.from('cotizaciones').insert({
         numero_cotizacion: folio,
         cliente_nombre: cliente || 'Sin especificar',
         numero_parte: numeroParte || null,
         descripcion: descripcion,
-        estado: 'pendiente',
+        estado: estado.toLowerCase(),
         vigencia_horas: parseViajeroHours(vigencia),
         precio_total: total,
         texto_propuesta: cotizacion.texto_propuesta,
         partidas: cotizacion.partidas,
         notas: cotizacion.notas,
+        viajero_id: viajeroId || null,
+        overhead_pct: overheadPct,
+        margen_pct: margenPct,
+        condicion_pago: condicionPago || null,
+        plazo_entrega: plazoEntrega || null,
       });
       if (error) throw error;
       notify(`Cotización ${folio} guardada`);
@@ -164,7 +186,7 @@ Genera la cotización industrial completa.`;
   // ── PDF Export ────────────────────────────────────────────────────────────
   const handlePDF = async () => {
     if (!cotizacion) { notify('Genera una cotización primero', 'error'); return; }
-    const { subtotal, iva, total } = calcTotales(cotizacion.partidas);
+    const { baseSubtotal, overhead, margen, subtotal, iva, total } = calcTotales(cotizacion.partidas, overheadPct, margenPct);
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'letter' });
     const W = doc.internal.pageSize.getWidth();
     const H = doc.internal.pageSize.getHeight();
@@ -310,20 +332,33 @@ Genera la cotización industrial completa.`;
     doc.setTextColor(180, 180, 180);
     doc.text('Torreón, México', 15, y + 19);
 
+    // Reference block (right side)
+    doc.setTextColor(100, 160, 220);
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'bold');
+    doc.text('REFERENCIA', W / 2 + 5, y + 6);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(200, 200, 200);
     if (numeroParte) {
-      doc.setTextColor(100, 160, 220);
-      doc.setFontSize(7);
-      doc.setFont('helvetica', 'bold');
-      doc.text('NO. PARTE / PROYECTO', W / 2 + 5, y + 6);
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(11);
-      doc.text(numeroParte, W / 2 + 5, y + 13);
-      if (cantidad) {
-        doc.setFontSize(8);
-        doc.setTextColor(180, 180, 180);
-        doc.text(`Cantidad: ${cantidad}`, W / 2 + 5, y + 19);
-      }
+      doc.text(`N° Parte: ${numeroParte}`, W / 2 + 5, y + 13);
     }
+    if (viajeroId) {
+      doc.text(`Viajero: ${viajeroId}`, W / 2 + 5, y + (numeroParte ? 19 : 13));
+    }
+    // Estado badge
+    const estadoColors: Record<EstadoCot, [number, number, number]> = {
+      BORRADOR: [200, 150, 20], ENVIADA: [30, 120, 210],
+      APROBADA: [20, 160, 80], DECLINADA: [200, 40, 40],
+    };
+    const [er, eg, eb] = estadoColors[estado];
+    const estY = y + (numeroParte || viajeroId ? 23 : 13);
+    doc.setFillColor(er, eg, eb);
+    doc.roundedRect(W / 2 + 5, estY - 4, 28, 6, 1, 1, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(6);
+    doc.setFont('helvetica', 'bold');
+    doc.text(estado, W / 2 + 19, estY, { align: 'center' });
 
     // ── Description ──
     y += 34;
@@ -340,17 +375,17 @@ Genera la cotización industrial completa.`;
     y += descLines.slice(0, 3).length * 4 + 4;
 
     // ── Partidas table ──
+    const bodyRows: (string | number)[][] = cotizacion.partidas.map((p, i) => [
+      i + 1, p.concepto, p.cantidad, p.unidad.toUpperCase(), fmt(p.precio_unitario), fmt(p.subtotal),
+    ]);
+    const n = cotizacion.partidas.length;
+    if (overheadPct > 0) bodyRows.push([n + 1, `Overhead fabril (${overheadPct}%)`, 1, 'global', fmt(overhead), fmt(overhead)]);
+    if (margenPct > 0) bodyRows.push([n + (overheadPct > 0 ? 2 : 1), `Margen comercial (${margenPct}%)`, 1, 'global', fmt(margen), fmt(margen)]);
+
     autoTable(doc, {
       startY: y,
       head: [['#', 'Concepto / Descripción', 'Cant.', 'U.M.', 'P. Unit.', 'Subtotal']],
-      body: cotizacion.partidas.map((p, i) => [
-        i + 1,
-        p.concepto,
-        p.cantidad,
-        p.unidad.toUpperCase(),
-        fmt(p.precio_unitario),
-        fmt(p.subtotal),
-      ]),
+      body: bodyRows,
       styles: { fontSize: 8, cellPadding: 3 },
       headStyles: { fillColor: [10, 18, 35], textColor: [255, 255, 255], fontStyle: 'bold' },
       alternateRowStyles: { fillColor: [245, 248, 252] },
@@ -367,14 +402,14 @@ Genera la cotización industrial completa.`;
     // ── Totals ──
     const afterTable = (doc as any).lastAutoTable.finalY + 4;
     const totY = afterTable;
-    const boxW = 75;
+    const boxW = 80;
     const boxX = W - boxW - 10;
 
-    const rows = [
-      ['Subtotal', fmt(subtotal)],
-      [`IVA (16%)`, fmt(iva)],
+    const totRows: [string, string][] = [
+      ['Subtotal:', fmt(subtotal)],
+      ['IVA (16%):', fmt(iva)],
     ];
-    rows.forEach(([label, value], i) => {
+    totRows.forEach(([label, value], i) => {
       doc.setFillColor(240, 244, 250);
       doc.rect(boxX, totY + i * 8, boxW, 8, 'F');
       doc.setTextColor(60, 60, 60);
@@ -407,9 +442,16 @@ Genera la cotización industrial completa.`;
       propY += propLines.length * 4.5 + 14;
     }
 
-    // ── Notes ──
-    if (cotizacion.notas) {
-      const noteLines = doc.splitTextToSize(cotizacion.notas, W - 24);
+    // ── Conditions footer line ──
+    const condParts = [];
+    if (condicionPago) condParts.push(`Pago: ${condicionPago}`);
+    if (plazoEntrega) condParts.push(`Entrega: ${plazoEntrega}`);
+    condParts.push(`Vigencia: ${vigencia}`);
+    const condText = condParts.join('   ·   ');
+
+    if (cotizacion.notas || condText) {
+      const noteText = [condText, cotizacion.notas].filter(Boolean).join('\n');
+      const noteLines = doc.splitTextToSize(noteText, W - 24);
       doc.setTextColor(100, 100, 100);
       doc.setFontSize(7);
       doc.setFont('helvetica', 'normal');
@@ -438,9 +480,9 @@ Genera la cotización industrial completa.`;
     notify('PDF descargado');
   };
 
-  const { subtotal, iva, total } = cotizacion
-    ? calcTotales(cotizacion.partidas)
-    : { subtotal: 0, iva: 0, total: 0 };
+  const { baseSubtotal, overhead, margen, subtotal, iva, total } = cotizacion
+    ? calcTotales(cotizacion.partidas, overheadPct, margenPct)
+    : { baseSubtotal: 0, overhead: 0, margen: 0, subtotal: 0, iva: 0, total: 0 };
 
   return (
     <div className="h-full flex flex-col bg-slate-950 overflow-hidden -m-8">
@@ -527,6 +569,47 @@ Necesito cotizar 200 piezas de brida ciega DN100, material acero al carbono A36,
               </div>
             </div>
 
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 block flex items-center gap-1"><Link2 size={9} /> Viajero / Job ID</label>
+                <input className="cyber-input w-full text-[11px]" placeholder="JOB-4268" value={viajeroId} onChange={e => setViajeroId(e.target.value)} />
+              </div>
+              <div>
+                <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 block flex items-center gap-1"><Tag size={9} /> Estado</label>
+                <select className="cyber-select w-full text-[11px]" value={estado} onChange={e => setEstado(e.target.value as EstadoCot)}>
+                  {ESTADOS.map(e => <option key={e} value={e}>{e}</option>)}
+                </select>
+              </div>
+            </div>
+
+            <div className="bg-slate-900/60 rounded-xl border border-white/5 p-3 space-y-2">
+              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Overhead + Margen (como en COT real)</p>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-[8px] font-bold text-slate-600 uppercase mb-1 block">Overhead fabril %</label>
+                  <input type="number" min="0" max="100" step="1" className="cyber-input w-full text-[11px]"
+                    value={overheadPct} onChange={e => setOverheadPct(Number(e.target.value))} />
+                </div>
+                <div>
+                  <label className="text-[8px] font-bold text-slate-600 uppercase mb-1 block">Margen comercial %</label>
+                  <input type="number" min="0" max="100" step="1" className="cyber-input w-full text-[11px]"
+                    value={margenPct} onChange={e => setMargenPct(Number(e.target.value))} />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 block flex items-center gap-1"><Truck size={9} /> Condición de pago</label>
+              <input className="cyber-input w-full text-[11px]" placeholder="50% anticipo, 50% contra entrega"
+                value={condicionPago} onChange={e => setCondicionPago(e.target.value)} />
+            </div>
+
+            <div>
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 block">Plazo de entrega</label>
+              <input className="cyber-input w-full text-[11px]" placeholder="Ej: 8-10 semanas"
+                value={plazoEntrega} onChange={e => setPlazoEntrega(e.target.value)} />
+            </div>
+
             <button onClick={handleGenerate} disabled={isGenerating || !descripcion.trim()}
               className="w-full h-12 btn-ai font-black uppercase tracking-widest rounded-xl text-[10px] flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50">
               {isGenerating
@@ -535,7 +618,7 @@ Necesito cotizar 200 piezas de brida ciega DN100, material acero al carbono A36,
             </button>
 
             {cotizacion && (
-              <button onClick={() => { setCotizacion(null); setDescripcion(''); setCliente(''); setNumeroParte(''); setCantidad(''); }}
+              <button onClick={() => { setCotizacion(null); setDescripcion(''); setCliente(''); setNumeroParte(''); setCantidad(''); setViajeroId(''); setEstado('BORRADOR'); }}
                 className="w-full h-9 bg-white/5 border border-white/10 text-slate-500 hover:text-white font-black uppercase tracking-widest rounded-xl text-[9px] flex items-center justify-center gap-2 transition-all">
                 <RefreshCw size={12} /> Nueva Cotización
               </button>
@@ -594,9 +677,13 @@ Necesito cotizar 200 piezas de brida ciega DN100, material acero al carbono A36,
                   <div className="flex items-center gap-2 mb-1">
                     <FileText size={14} className="text-amber-400" />
                     <p className="text-[10px] font-black text-amber-400 uppercase tracking-widest">{folio}</p>
+                    <span className={`text-[8px] font-black px-2 py-0.5 rounded-full border uppercase tracking-widest ${ESTADO_COLORS[estado]}`}>{estado}</span>
                   </div>
                   <p className="text-xl font-black text-white">{cliente || 'Sin cliente'}</p>
-                  {numeroParte && <p className="text-[10px] text-slate-500 uppercase mt-0.5">P/N: {numeroParte}{cantidad ? ` · Cant: ${cantidad}` : ''}</p>}
+                  <div className="flex items-center gap-3 mt-0.5 flex-wrap">
+                    {numeroParte && <p className="text-[10px] text-slate-500 uppercase">P/N: {numeroParte}{cantidad ? ` · Cant: ${cantidad}` : ''}</p>}
+                    {viajeroId && <p className="text-[10px] text-violet-400 font-black uppercase flex items-center gap-1"><Link2 size={9} />{viajeroId}</p>}
+                  </div>
                 </div>
                 <div className="flex gap-3">
                   <div className="text-right px-4 py-2 bg-white/[0.02] border border-white/5 rounded-xl">
@@ -683,8 +770,26 @@ Necesito cotizar 200 piezas de brida ciega DN100, material acero al carbono A36,
 
                 {/* Totals footer */}
                 <div className="border-t border-white/5 px-4 py-3 flex justify-end">
-                  <div className="space-y-1 min-w-[220px]">
-                    <div className="flex justify-between text-[10px]">
+                  <div className="space-y-1 min-w-[260px]">
+                    {(overheadPct > 0 || margenPct > 0) && (
+                      <div className="flex justify-between text-[10px]">
+                        <span className="text-slate-600 font-black uppercase tracking-widest">Base partidas</span>
+                        <span className="text-slate-500 font-black">{fmt(baseSubtotal)}</span>
+                      </div>
+                    )}
+                    {overheadPct > 0 && (
+                      <div className="flex justify-between text-[10px]">
+                        <span className="text-slate-500 uppercase tracking-widest">Overhead fabril ({overheadPct}%)</span>
+                        <span className="text-slate-400 font-black">{fmt(overhead)}</span>
+                      </div>
+                    )}
+                    {margenPct > 0 && (
+                      <div className="flex justify-between text-[10px]">
+                        <span className="text-slate-500 uppercase tracking-widest">Margen comercial ({margenPct}%)</span>
+                        <span className="text-slate-400 font-black">{fmt(margen)}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between text-[10px] pt-1 border-t border-white/5">
                       <span className="text-slate-500 font-black uppercase tracking-widest">Subtotal</span>
                       <span className="text-white font-black">{fmt(subtotal)}</span>
                     </div>

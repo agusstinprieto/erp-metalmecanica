@@ -217,7 +217,7 @@ export const InventoryAIModal: React.FC<InventoryAIModalProps> = ({ onClose, onI
 
   return (
     <div className={clsx(
-      "fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 backdrop-blur-2xl animate-in fade-in duration-500",
+      "fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-6 lg:pl-[280px] backdrop-blur-2xl animate-in fade-in duration-500",
       isDarkMode ? "bg-slate-950/95" : "bg-slate-900/40"
     )}>
       <div className={clsx(
