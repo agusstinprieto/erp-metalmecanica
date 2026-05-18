@@ -10,6 +10,7 @@ import clsx from 'clsx';
 import { aiService } from '../services/aiService';
 import { eventBus } from '../utils/eventBus';
 import { reportUtils } from '../utils/reportUtils';
+import { supabase } from '../lib/supabase';
 
 interface SecurityCamera {
   id: string;
@@ -527,7 +528,8 @@ export const SeguridadIndustrialView: React.FC = () => {
     }
     catch { return DEFAULT_CAMERAS; }
   });
-  const [incidents, setIncidents] = useState<Incidente[]>(DEMO_INCIDENTS);
+  const [incidents, setIncidents] = useState<Incidente[]>([]);
+  const [dbStats, setDbStats] = useState({ empleados: 0, safetyDays: 0 });
   const [fullscreenCam, setFullscreenCam] = useState<SecurityCamera | null>(null);
   const [editCam, setEditCam]     = useState<SecurityCamera | null>(null);
   const [showAdd, setShowAdd]     = useState(false);
@@ -563,6 +565,41 @@ export const SeguridadIndustrialView: React.FC = () => {
     } catch (e) {
       console.warn("Error migrating security cameras:", e);
     }
+  }, []);
+
+  const loadData = async () => {
+    try {
+      const [empRes, safetyRes, incRes] = await Promise.all([
+        supabase.from('employees').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+        supabase.from('seguridad_metricas').select('dias_sin_accidente').limit(1),
+        supabase.from('seguridad_incidentes').select('*').order('created_at', { ascending: false })
+      ]);
+      
+      setDbStats({
+        empleados: empRes.count ?? 18,
+        safetyDays: safetyRes.data && safetyRes.data.length > 0 ? safetyRes.data[0].dias_sin_accidente : 127
+      });
+
+      if (incRes.data && incRes.data.length > 0) {
+        setIncidents(incRes.data.map((r: any) => ({
+          id: r.id,
+          tipo: r.tipo,
+          descripcion: r.descripcion,
+          area: r.area,
+          hora: new Date(r.created_at).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }),
+          severidad: r.severidad,
+          resuelto: r.resuelto
+        })));
+      } else {
+        setIncidents(DEMO_INCIDENTS);
+      }
+    } catch (err) {
+      console.error('Error loading security data:', err);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
   }, []);
 
   // EPP Scan State
@@ -613,8 +650,22 @@ export const SeguridadIndustrialView: React.FC = () => {
     if (editCam?.id === id) setEditCam(null);
   };
 
-  const toggleIncident = (id: string) =>
-    setIncidents(prev => prev.map(i => i.id === id ? { ...i, resuelto: !i.resuelto } : i));
+  const toggleIncident = async (id: string) => {
+    const inc = incidents.find(i => i.id === id);
+    if (!inc) return;
+
+    const newStatus = !inc.resuelto;
+    setIncidents(prev => prev.map(i => i.id === id ? { ...i, resuelto: newStatus } : i));
+    
+    // Si no es un mock ID (los mocks empiezan con 'i1', 'i2', etc), actualizar en BD
+    if (!id.startsWith('i') || id.length > 5) {
+      try {
+        await supabase.from('seguridad_incidentes').update({ resuelto: newStatus }).eq('id', id);
+      } catch (err) {
+        console.error("Error toggling incident:", err);
+      }
+    }
+  };
 
   // Safety incident warning alarm synth sound
   const playBuzzerSound = () => {
@@ -757,7 +808,7 @@ export const SeguridadIndustrialView: React.FC = () => {
         };
 
         const newInc: Incidente = {
-          id: `i-${Date.now()}`,
+          id: `temp-${Date.now()}`, // Temporary ID
           tipo: typeMap[cam.id] || 'EPP',
           descripcion: parsed.defects[0] || 'Infracción de EPP detectada',
           area: cam.area,
@@ -765,6 +816,26 @@ export const SeguridadIndustrialView: React.FC = () => {
           severidad: severityMap[cam.id] || 'media',
           resuelto: false
         };
+
+        // Insert into DB
+        try {
+          const { data: inserted, error: insertError } = await supabase
+            .from('seguridad_incidentes')
+            .insert({
+              tipo: newInc.tipo,
+              descripcion: newInc.descripcion,
+              area: newInc.area,
+              severidad: newInc.severidad,
+              resuelto: false
+            })
+            .select();
+            
+          if (!insertError && inserted && inserted.length > 0) {
+            newInc.id = inserted[0].id;
+          }
+        } catch (dbErr) {
+          console.error("Failed to insert incident to DB:", dbErr);
+        }
 
         setIncidents(prev => [newInc, ...prev]);
         playBuzzerSound();
@@ -831,10 +902,10 @@ export const SeguridadIndustrialView: React.FC = () => {
         {/* KPI strip */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mt-3">
           {[
-            { label: 'Días sin accidente', value: '127', color: 'text-emerald-400', sub: '✓ Récord planta' },
+            { label: 'Días sin accidente', value: String(dbStats.safetyDays), color: 'text-emerald-400', sub: '✓ Récord planta' },
             { label: 'Cámaras en línea',   value: `${onlineCnt}/${cameras.length}`, color: onlineCnt < cameras.length ? 'text-amber-400' : 'text-emerald-400', sub: `${cameras.length - onlineCnt} offline` },
             { label: 'Alertas activas',    value: String(pendingInc),  color: pendingInc > 0 ? 'text-rose-400' : 'text-emerald-400', sub: `${criticalInc} críticas` },
-            { label: 'Empleados planta',   value: '18', color: 'text-sky-400', sub: 'Turno matutino' },
+            { label: 'Empleados activos',   value: String(dbStats.empleados), color: 'text-sky-400', sub: 'En piso (total)' },
           ].map((k, i) => (
             <div key={i} className="bg-slate-900/50 border border-white/5 rounded-xl px-3 py-2.5">
               <p className="text-[8px] text-slate-500 uppercase tracking-widest leading-tight">{k.label}</p>

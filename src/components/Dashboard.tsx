@@ -423,6 +423,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
     presentes: 0,
     ordenes: 0,
     stockCritico: 0,
+    safetyDays: 0,
   });
 
   const [primaData, setPrimaData] = useState<{
@@ -483,10 +484,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
   const loadDbStats = async () => {
     try {
       const todayISO = new Date().toISOString().split('T')[0];
-      const [empRes, presentRes, ordenRes] = await Promise.all([
+      const [empRes, presentRes, ordenRes, safetyRes] = await Promise.all([
         supabase.from('employees').select('id', { count: 'exact', head: true }).eq('status', 'active'),
         supabase.from('attendance_records').select('id', { count: 'exact', head: true }).eq('date', todayISO),
         supabase.from('ordenes_mantenimiento').select('id', { count: 'exact', head: true }).in('estado', ['pendiente', 'en_proceso']),
+        supabase.from('seguridad_metricas').select('dias_sin_accidente').limit(1),
       ]);
 
       let stockCritico = 0;
@@ -507,6 +509,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
         presentes: presentRes.count ?? 0,
         ordenes: ordenRes.count ?? 0,
         stockCritico,
+        safetyDays: safetyRes.data && safetyRes.data.length > 0 ? safetyRes.data[0].dias_sin_accidente : 0,
       });
     } catch (error) {
       console.error('Error loading stats:', error);
@@ -560,58 +563,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
   const getFilteredMetrics = () => {
     const lastRecord = telemetryData.length > 0 ? telemetryData[telemetryData.length - 1] : null;
 
-    // Base standard values
-    let baseEmpleados = dbStats.empleados > 0 ? dbStats.empleados : 45;
-    let basePresentes = dbStats.presentes > 0 ? dbStats.presentes : 42;
-    let baseOEE = lastRecord ? Number(lastRecord.oee_pct) : 84.6;
-    let baseScrap = lastRecord ? Number(lastRecord.scrap_pct) : 1.62;
-    let baseSafetyDays = 412;
-    let baseEnergyKWh = lastRecord ? Number(lastRecord.consumo_kwh) : 185; // KWh por tonelada procesada
+    let baseEmpleados = dbStats.empleados;
+    let basePresentes = dbStats.presentes;
+    let baseOEE = lastRecord ? Number(lastRecord.oee_pct) : 0;
+    let baseScrap = lastRecord ? Number(lastRecord.scrap_pct) : 0;
+    let baseEnergyKWh = lastRecord ? Number(lastRecord.consumo_kwh) : 0;
 
-    // Apply Plant Modifiers only if there is no real telemetry in DB (Fallback)
-    if (!lastRecord) {
-      if (selectedPlanta === 'torreon_laser') {
-        baseEmpleados = Math.round(baseEmpleados * 0.35);
-        basePresentes = Math.round(basePresentes * 0.33);
-        baseOEE = 86.8;
-        baseScrap = 1.15; // Láser es más preciso
-        baseSafetyDays = 230;
-        baseEnergyKWh = 295; // Láser consume mucha más electricidad
-      } else if (selectedPlanta === 'torreon_mecanizado') {
-        baseEmpleados = Math.round(baseEmpleados * 0.45);
-        basePresentes = Math.round(basePresentes * 0.42);
-        baseOEE = 81.2;
-        baseScrap = 1.95; // Virutas y retrabajos
-        baseSafetyDays = 182;
-        baseEnergyKWh = 120;
-      } else if (selectedPlanta === 'torreon_forja') {
-        baseEmpleados = Math.round(baseEmpleados * 0.20);
-        basePresentes = Math.round(basePresentes * 0.18);
-        baseOEE = 89.1;
-        baseScrap = 1.75;
-        baseSafetyDays = 412;
-        baseEnergyKWh = 380; // Forja pesada gasta energía extrema
-      }
-
-      // Apply Shift Modifiers
-      if (selectedTurno === 'matutino') {
-        baseOEE += 2.1;
-        baseScrap -= 0.15;
-        baseEnergyKWh -= 15;
-      } else if (selectedTurno === 'vespertino') {
-        basePresentes = Math.round(basePresentes * 0.94);
-        baseOEE -= 1.4;
-        baseScrap += 0.25;
-        baseSafetyDays = Math.max(12, baseSafetyDays - 4);
-      } else if (selectedTurno === 'nocturno') {
-        basePresentes = Math.round(basePresentes * 0.81);
-        baseOEE -= 5.8;
-        baseScrap += 0.65;
-        baseSafetyDays = Math.max(8, baseSafetyDays - 15);
-        baseEnergyKWh += 25;
-      }
-    } else {
-      // If we have database stats, we still want to apply active headcount limits
+    if (dbStats.empleados > 0) {
+      // If we have database stats, apply active headcount limit modifiers
       if (selectedPlanta === 'torreon_laser') {
         baseEmpleados = Math.round(baseEmpleados * 0.35);
         basePresentes = Math.min(basePresentes, baseEmpleados);
@@ -629,10 +588,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
       presentes: Math.min(basePresentes, baseEmpleados),
       oee: Number(baseOEE.toFixed(1)),
       scrap: Number(baseScrap.toFixed(2)),
-      safetyDays: baseSafetyDays,
+      safetyDays: dbStats.safetyDays,
       energy: Math.round(baseEnergyKWh),
-      ordenes: dbStats.ordenes > 0 ? dbStats.ordenes : 3,
-      stockCritico: dbStats.stockCritico > 0 ? dbStats.stockCritico : 2,
+      ordenes: dbStats.ordenes,
+      stockCritico: dbStats.stockCritico,
+      calidad: Number((100 - baseScrap).toFixed(1)),
     };
   };
 
@@ -707,15 +667,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
 
     return Array.from({ length: pts }, (_, i) => {
       const label = getLabel(i);
-      const baseTons = selectedPlanta === 'torreon_forja' ? 45 : selectedPlanta === 'torreon_laser' ? 24 : 18;
-      const shiftFactor = selectedTurno === 'nocturno' ? 0.78 : selectedTurno === 'vespertino' ? 0.92 : 1.0;
       return {
         name: label,
-        oee: Number(Math.max(70, metrics.oee + seed(i, 6) - 3).toFixed(1)),
-        asistencia: Math.max(1, Math.round(metrics.presentes + seed(i, 4) - 2)),
-        scrap: Number(Math.max(0.3, metrics.scrap + seed(i, 0.8) - 0.4).toFixed(2)),
-        produccion: Number(Math.max(4, baseTons * shiftFactor + seed(i, 6) - 3).toFixed(1)),
-        energia: Math.round(Math.max(60, metrics.energy + seed(i, 30) - 15)),
+        oee: 0,
+        asistencia: 0,
+        scrap: 0,
+        produccion: 0,
+        energia: 0,
+        calidad: 0,
       };
     });
   };
@@ -978,15 +937,16 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
         {/* ── MULTI-CHART GRID + AI PANEL ─────────────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
-          {/* 5 KPI Mini Line Charts — 2 cols wide */}
-          <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* 6 KPI Mini Charts (5 Line, 1 Bar) — 2 cols wide container */}
+          <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {([
-              { key: 'oee',        label: 'OEE Producción', unit: '%',    color: 'var(--mcvill-accent)',  colorRgb: 'var(--mcvill-accent-rgb)', icon: '⚙️', good: (v: number) => v >= 85 },
-              { key: 'asistencia', label: 'Asistencia',     unit: ' op',  color: '#60a5fa',              colorRgb: '96,165,250',              icon: '👥', good: (v: number) => v >= metrics.empleados * 0.9 },
-              { key: 'scrap',      label: 'Scrap %',        unit: '%',    color: '#34d399',              colorRgb: '52,211,153',              icon: '✅', good: (v: number) => v <= 2 },
-              { key: 'produccion', label: 'Producción',     unit: ' ton', color: '#f59e0b',              colorRgb: '245,158,11',              icon: '🏭', good: () => true },
-              { key: 'energia',    label: 'Energía',        unit: ' KWh', color: '#f87171',              colorRgb: '248,113,113',             icon: '⚡', good: (v: number) => v <= metrics.energy },
-            ] as const).map(({ key, label, unit, color, colorRgb, icon, good }) => {
+              { key: 'oee',        label: 'OEE Producción', unit: '%',    color: 'var(--mcvill-accent)',  colorRgb: 'var(--mcvill-accent-rgb)', icon: '⚙️', good: (v: number) => v >= 85, type: 'line' },
+              { key: 'asistencia', label: 'Asistencia',     unit: ' op',  color: '#60a5fa',              colorRgb: '96,165,250',              icon: '👥', good: (v: number) => v >= metrics.empleados * 0.9, type: 'line' },
+              { key: 'scrap',      label: 'Scrap %',        unit: '%',    color: '#34d399',              colorRgb: '52,211,153',              icon: '✅', good: (v: number) => v <= 2, type: 'line' },
+              { key: 'produccion', label: 'Producción',     unit: ' ton', color: '#f59e0b',              colorRgb: '245,158,11',              icon: '🏭', good: () => true, type: 'line' },
+              { key: 'energia',    label: 'Energía',        unit: ' KWh', color: '#f87171',              colorRgb: '248,113,113',             icon: '⚡', good: (v: number) => v <= metrics.energy, type: 'line' },
+              { key: 'calidad',    label: 'Calidad FPY',    unit: '%',    color: '#a855f7',              colorRgb: '168,85,247',              icon: '🎯', good: (v: number) => v >= 98, type: 'bar' },
+            ] as const).map(({ key, label, unit, color, colorRgb, icon, good, type }) => {
               const vals = allCharts.map(d => d[key] as number);
               const min = Math.min(...vals); const max = Math.max(...vals);
               const range = max - min || 1;
@@ -1014,17 +974,43 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
                   <svg viewBox="0 0 100 100" className="w-full h-14" preserveAspectRatio="none">
                     <defs>
                       <linearGradient id={`g-${key}`} x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor={color} stopOpacity="0.3" />
-                        <stop offset="100%" stopColor={color} stopOpacity="0" />
+                        <stop offset="0%" stopColor={color} stopOpacity="0.4" />
+                        <stop offset="100%" stopColor={color} stopOpacity="0.05" />
                       </linearGradient>
                     </defs>
-                    <polygon points={`0,100 ${pts} 100,100`} fill={`url(#g-${key})`} />
-                    <polyline points={pts} fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                    {vals.map((v, i) => {
-                      const x = (i / (vals.length - 1)) * 100;
-                      const y = 100 - ((v - min) / range) * 80 - 10;
-                      return <circle key={i} cx={x} cy={y} r="2" fill={color} opacity={i === vals.length - 1 ? 1 : 0.5} />;
-                    })}
+                    {type === 'line' ? (
+                      <>
+                        <polygon points={`0,100 ${pts} 100,100`} fill={`url(#g-${key})`} />
+                        <polyline points={pts} fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                        {vals.map((v, i) => {
+                          const x = (i / (vals.length - 1)) * 100;
+                          const y = 100 - ((v - min) / range) * 80 - 10;
+                          return <circle key={i} cx={x} cy={y} r="2" fill={color} opacity={i === vals.length - 1 ? 1 : 0.5} />;
+                        })}
+                      </>
+                    ) : (
+                      <>
+                        {vals.map((v, i) => {
+                          const x = (i / (vals.length - 1)) * 100;
+                          const y = 100 - ((v - min) / range) * 80 - 10;
+                          const barWidth = 100 / (vals.length * 1.8);
+                          return (
+                            <rect 
+                              key={i}
+                              x={Math.max(0, x - barWidth/2)}
+                              y={y}
+                              width={barWidth}
+                              height={100 - y}
+                              fill={`url(#g-${key})`}
+                              stroke={color}
+                              strokeWidth="1"
+                              opacity={i === vals.length - 1 ? 1 : 0.7}
+                              rx="1"
+                            />
+                          );
+                        })}
+                      </>
+                    )}
                   </svg>
                   <div className="flex justify-between mt-1">
                     {allCharts.map((d, i) => <span key={i} className="text-[7px] font-black text-slate-600 flex-1 text-center uppercase">{d.name}</span>)}
@@ -1034,7 +1020,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
               );
             })}
 
-            {/* 5th chart occupies remaining space as wider panel */}
+            {/* End of 6 charts */}
           </div>
 
           {/* AI Neural Diagnostics & Event Log: Column 3 */}

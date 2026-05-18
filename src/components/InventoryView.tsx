@@ -27,6 +27,7 @@ export const InventoryView: React.FC = () => {
   const [showScrapAnalyzer, setShowScrapAnalyzer] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const [formData, setFormData] = useState({
     sku: '', name: '', description: '', category: '',
@@ -50,8 +51,23 @@ export const InventoryView: React.FC = () => {
         name: item.name || item.descripcion_mp || 'Sin nombre',
         quantity: item.quantity || 0
       })));
+      setSelectedIds([]);
     } catch (error) {
       console.error('Error loading inventory:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (!await appConfirm(`¿Deseas dar de baja los ${selectedIds.length} suministros seleccionados?`)) return;
+    try {
+      setLoading(true);
+      await Promise.all(selectedIds.map(id => inventoryService.deleteItem(id)));
+      setSelectedIds([]);
+      loadInventory();
+    } catch (error) {
+      console.error('Error in bulk delete:', error);
     } finally {
       setLoading(false);
     }
@@ -373,11 +389,36 @@ Responde en español, formato conciso con bullets. Sé directo y específico.`;
                 className="w-full bg-black/40 border border-white/5 rounded-lg py-1.5 pl-8 pr-3 text-[10px] font-bold text-white outline-none focus:border-mcvill-accent/40" 
               />
             </div>
+            {selectedIds.length > 0 && (
+              <div className="flex items-center gap-3 bg-rose-500/10 border border-rose-500/20 px-3 py-1 rounded-xl animate-in fade-in duration-200">
+                <span className="text-[10px] font-black text-rose-400 uppercase tracking-widest">{selectedIds.length} SELECCIONADOS</span>
+                <button
+                  onClick={handleBulkDelete}
+                  className="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-lg text-[9px] font-black uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-lg shadow-rose-500/20"
+                >
+                  <Trash2 size={10} /> DAR DE BAJA
+                </button>
+              </div>
+            )}
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-slate-900/80 sticky top-0 z-10 backdrop-blur-md border-b border-white/5 text-[9px] font-black text-slate-500 uppercase tracking-widest">
+                  <th className="w-10 px-4 py-2.5 text-center">
+                    <input
+                      type="checkbox"
+                      className="rounded border-white/10 bg-black/40 text-mcvill-accent focus:ring-mcvill-accent w-3 h-3 cursor-pointer"
+                      checked={filteredItems.length > 0 && selectedIds.length === filteredItems.length}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedIds(filteredItems.map(i => i.id));
+                        } else {
+                          setSelectedIds([]);
+                        }
+                      }}
+                    />
+                  </th>
                   <th className="px-4 py-2.5">Suministro / SKU</th>
                   <th className="px-4 py-2.5 text-center">Disponible</th>
                   <th className="px-4 py-2.5 text-center">Estado</th>
@@ -386,12 +427,27 @@ Responde en español, formato conciso con bullets. Sé directo y específico.`;
               </thead>
               <tbody className="divide-y divide-white/5">
                 {loading ? (
-                  <tr><td colSpan={4} className="py-10 text-center"><Loader2 className="animate-spin text-mcvill-accent mx-auto" size={20} /></td></tr>
+                  <tr><td colSpan={5} className="py-10 text-center"><Loader2 className="animate-spin text-mcvill-accent mx-auto" size={20} /></td></tr>
                 ) : (
                   filteredItems.map(item => {
                     const status = getStockStatus(item.quantity, item.min_stock);
+                    const isSelected = selectedIds.includes(item.id);
                     return (
-                      <tr key={item.id} className="hover:bg-white/5 transition-colors group">
+                      <tr key={item.id} className={clsx("hover:bg-white/5 transition-colors group", isSelected && "bg-white/[0.02]")}>
+                        <td className="w-10 px-4 py-2 text-center">
+                          <input
+                            type="checkbox"
+                            className="rounded border-white/10 bg-black/40 text-mcvill-accent focus:ring-mcvill-accent w-3 h-3 cursor-pointer"
+                            checked={isSelected}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedIds(prev => [...prev, item.id]);
+                              } else {
+                                setSelectedIds(prev => prev.filter(id => id !== item.id));
+                              }
+                            }}
+                          />
+                        </td>
                         <td className="px-4 py-2">
                           <div className="flex flex-col">
                             <span className="text-[10px] font-black text-white uppercase group-hover:text-mcvill-accent transition-colors">{item.name}</span>

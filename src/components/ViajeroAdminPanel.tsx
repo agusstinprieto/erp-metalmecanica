@@ -314,6 +314,36 @@ export const ViajeroAdminPanel: React.FC<{
     );
   };
 
+  const handleBulkDelete = () => {
+    if (selectedIds.size === 0) return;
+    const ids = Array.from(selectedIds);
+    showConfirm(
+      'Dar de Baja en Lote',
+      `¿Estás seguro de dar de baja los ${ids.length} viajeros seleccionados? Esta acción eliminará permanentemente todos los datos asociados.`,
+      async () => {
+        try {
+          setLoading(true);
+          await Promise.all([
+            supabase.from('viajero_operaciones').delete().in('viajero_id', ids),
+            supabase.from('viajero_materiales').delete().in('viajero_id', ids),
+            supabase.from('viajero_componentes').delete().in('viajero_id', ids),
+          ]);
+          const { error } = await supabase.from('viajeros').delete().in('id', ids);
+          if (error) throw error;
+          showSuccess('Baja en Lote Completa', `${ids.length} viajeros eliminados correctamente.`);
+          setSelectedIds(new Set());
+          fetchViajeros();
+        } catch (err: any) {
+          console.error('Error al dar de baja viajeros:', err);
+          showError('Error', err?.message || 'No se pudieron eliminar algunos registros.');
+        } finally {
+          setLoading(false);
+        }
+      },
+      { confirmText: 'DAR DE BAJA', cancelText: 'CANCELAR' }
+    );
+  };
+
   const filteredViajeros = viajeros.filter(v => {
     const q = searchTerm.toLowerCase();
     return (
@@ -777,6 +807,15 @@ export const ViajeroAdminPanel: React.FC<{
                 Migra
               </button>
             </div>
+
+            {selectedIds.size > 0 && (
+              <button
+                onClick={handleBulkDelete}
+                className="px-6 rounded-lg text-[9px] font-black uppercase tracking-widest text-white bg-rose-600 hover:bg-rose-500 transition-all active:scale-95 flex items-center justify-center gap-2 h-[38px] min-w-[150px] shadow-lg shadow-rose-600/20 animate-in fade-in duration-200"
+              >
+                <Trash2 size={14} /> Dar de Baja ({selectedIds.size})
+              </button>
+            )}
 
             <button
               onClick={handleBatchPrint}

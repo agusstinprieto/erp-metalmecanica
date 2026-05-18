@@ -22,14 +22,7 @@ import { productionService } from '../services/productionService';
 import { eventBus } from '../utils/eventBus';
 import clsx from 'clsx';
 
-const mockDailyData = [
-  { name: 'LUN', efficiency: 82, quality: 98, production: 450 },
-  { name: 'MAR', efficiency: 85, quality: 99, production: 520 },
-  { name: 'MIE', efficiency: 78, quality: 97, production: 380 },
-  { name: 'JUE', efficiency: 91, quality: 99, production: 610 },
-  { name: 'VIE', efficiency: 88, quality: 98, production: 580 },
-  { name: 'SAB', efficiency: 84, quality: 99, production: 420 },
-];
+import { supabase } from '../lib/supabase';
 
 const bottleneckData = [
   { center: 'LASER', delay: 12, efficiency: 85, color: '#4FA5FF' },
@@ -44,20 +37,56 @@ export const ProductionDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [alerts, setAlerts] = useState<any[]>([]);
 
+  const [chartData, setChartData] = useState<any[]>([]);
+
   useEffect(() => {
-    // In a real scenario, fetch real stats from Supabase
-    setTimeout(() => {
-      setStats({
-        oee: 84.5,
-        availability: 88,
-        performance: 96,
-        quality: 99.2,
-        activeTravelers: 124,
-        pendingJobs: 45,
-        dailyProduction: 582
-      });
-      setLoading(false);
-    }, 1000);
+    const fetchData = async () => {
+      try {
+        // Fetch telemetry
+        const { data: tData } = await supabase
+          .from('telemetry_records')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(7);
+
+        // Fetch pending work orders
+        const { count: pendingCount } = await supabase.from('viajeros').select('id', { count: 'exact', head: true }).eq('estatus', 'pendiente');
+        const { count: activeCount } = await supabase.from('viajeros').select('id', { count: 'exact', head: true }).eq('estatus', 'en_proceso');
+
+        if (tData && tData.length > 0) {
+          const latest = tData[0];
+          setStats({
+            oee: Number(latest.oee_pct).toFixed(1),
+            availability: 88, // placeholder pending real data
+            performance: 96,
+            quality: (100 - Number(latest.scrap_pct)).toFixed(1),
+            activeTravelers: activeCount || 0,
+            pendingJobs: pendingCount || 0,
+            dailyProduction: latest.piezas_producidas || 0
+          });
+
+          const cData = [...tData].reverse().map(d => {
+            const date = new Date(d.created_at);
+            const days = ['DOM','LUN','MAR','MIE','JUE','VIE','SAB'];
+            return {
+              name: days[date.getDay()],
+              efficiency: Number(d.oee_pct),
+              quality: 100 - Number(d.scrap_pct),
+              production: d.piezas_producidas
+            };
+          });
+          setChartData(cData);
+        } else {
+          setStats({ oee: 0, availability: 0, performance: 0, quality: 0, activeTravelers: 0, pendingJobs: 0, dailyProduction: 0 });
+        }
+      } catch (err) {
+        console.error("Error fetching telemetry:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
 
     // 🚀 IA.AGUS: Escuchar alertas de calidad en tiempo real
     const unsub = eventBus.subscribe('QUALITY_EVENT', (data) => {
@@ -173,7 +202,7 @@ export const ProductionDashboard: React.FC = () => {
           
           <div className="h-[300px] w-full overflow-hidden" style={{ minHeight: 300 }}>
             <ResponsiveContainer width="100%" height="100%" debounce={50}>
-              <AreaChart data={mockDailyData}>
+              <AreaChart data={chartData}>
                 <defs>
                   <linearGradient id="colorProd" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#4FA5FF" stopOpacity={0.3}/>
