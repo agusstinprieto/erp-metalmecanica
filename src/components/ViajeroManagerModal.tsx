@@ -694,7 +694,7 @@ Sé específico y realista para fabricación industrial mexicana (centros de tra
         "image_prompt": "Industrial 3D render of [pieza], heavy metal texture, photorealistic, isometric view, 8k, cinematic lighting, factory background, highly detailed."
       }`;
 
-      const data = await geminiService.generateStructuredData<any>(prompt, schema);
+      const data = await geminiService.generateStructuredData<any>(prompt, schema, { moduleName: 'viajero' });
       handleScanFill(data);
     } catch (err) {
       console.error('Error IA suggest:', err);
@@ -723,7 +723,7 @@ Considera: mano de obra directa, overhead de maquinaria, insumos y gastos de ope
 
       const data = await geminiService.generateStructuredData<{
         centros: { centro_trabajo: string; costo_hora_mxn: number; costo_hora_usd: number }[];
-      }>(prompt, schema);
+      }>(prompt, schema, { moduleName: 'viajero' });
 
       if (data?.centros) {
         const rateMap: Record<string, { mxn: number; usd: number }> = {};
@@ -773,7 +773,7 @@ Usa precios actuales de mercado en México para materiales industriales metalmec
 
       const data = await geminiService.generateStructuredData<{
         materiales: { clave: string; costo_unitario_mxn: number; costo_unitario_usd: number }[];
-      }>(prompt, schema);
+      }>(prompt, schema, { moduleName: 'viajero' });
 
       if (data?.materiales) {
         const rateMap: Record<string, { mxn: number; usd: number }> = {};

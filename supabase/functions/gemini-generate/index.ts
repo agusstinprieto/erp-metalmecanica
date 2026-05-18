@@ -58,6 +58,7 @@ serve(async (req: Request) => {
       model = 'gemini-2.5-flash-lite', provider = 'google',
       useRag = false,
       image, mimeType = 'image/jpeg',
+      moduleName = 'generico',
     } = await req.json();
 
     if (!prompt && !image && (!contents || contents.length === 0)) throw new Error('Prompt, imagen o contenidos requeridos');
@@ -233,6 +234,61 @@ serve(async (req: Request) => {
     if (provider === 'google')         content = resultData.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
     else if (provider === 'anthropic') content = resultData.content?.[0]?.text ?? '';
     else                               content = resultData.choices?.[0]?.message?.content ?? '';
+
+    // 🔐 IA.AGUS: Telemetría de Tokens por Usuario sin bloquear la respuesta del cliente
+    try {
+      let promptTokens = 0;
+      let completionTokens = 0;
+      let totalTokens = 0;
+
+      if (provider === 'google') {
+        promptTokens = resultData.usageMetadata?.promptTokenCount ?? 0;
+        completionTokens = resultData.usageMetadata?.candidatesTokenCount ?? 0;
+        totalTokens = resultData.usageMetadata?.totalTokenCount ?? (promptTokens + completionTokens);
+      } else if (provider === 'anthropic') {
+        promptTokens = resultData.usage?.input_tokens ?? 0;
+        completionTokens = resultData.usage?.output_tokens ?? 0;
+        totalTokens = promptTokens + completionTokens;
+      } else {
+        promptTokens = resultData.usage?.prompt_tokens ?? 0;
+        completionTokens = resultData.usage?.completion_tokens ?? 0;
+        totalTokens = resultData.usage?.total_tokens ?? (promptTokens + completionTokens);
+      }
+
+      let estimatedCost = 0.0;
+      if (provider === 'google') {
+        if (targetModel.includes('pro')) {
+          estimatedCost = (promptTokens * 1.25 + completionTokens * 5.00) / 1000000;
+        } else {
+          estimatedCost = (promptTokens * 0.075 + completionTokens * 0.30) / 1000000;
+        }
+      } else if (provider === 'deepseek') {
+        estimatedCost = (promptTokens * 0.14 + completionTokens * 0.28) / 1000000;
+      } else if (provider === 'anthropic') {
+        estimatedCost = (promptTokens * 3.00 + completionTokens * 15.00) / 1000000;
+      } else {
+        estimatedCost = (totalTokens * 0.20) / 1000000;
+      }
+
+      const logModuleName = moduleName || req.headers.get('x-module-name') || 'generico';
+
+      // Insertar asíncronamente en la base de datos
+      await supabaseAdmin
+        .from('ai_token_usage')
+        .insert({
+          user_id: user.id,
+          tenant_id: targetTenantId,
+          model: targetModel,
+          provider: provider,
+          prompt_tokens: promptTokens,
+          completion_tokens: completionTokens,
+          total_tokens: totalTokens,
+          cost: estimatedCost,
+          module_name: logModuleName,
+        });
+    } catch (logErr: any) {
+      console.error('⚠️ [TELEMETRIA IA]: Error registrando consumo de tokens:', logErr.message);
+    }
 
     return new Response(
       JSON.stringify({ content, ...(IS_DEV ? { debug } : {}) }),

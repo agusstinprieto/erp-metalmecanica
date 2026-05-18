@@ -653,13 +653,16 @@ public static class ViajeroMigraDocument
             pRole.Format.Alignment  = ParagraphAlignment.Center;
             pRole.Format.SpaceBefore = Unit.FromPoint(4);
 
-            var pName = cell.AddParagraph(string.IsNullOrWhiteSpace(name) ? "—" : name);
-            pName.Format.Font.Size = 6.5;
-            pName.Format.Font.Color = Color.FromRgb(100, 116, 139);
-            pName.Format.Alignment = ParagraphAlignment.Center;
+            if (!string.IsNullOrWhiteSpace(name) && name != "—")
+            {
+                var pName = cell.AddParagraph(name);
+                pName.Format.Font.Size = 6.5;
+                pName.Format.Font.Color = Color.FromRgb(100, 116, 139);
+                pName.Format.Alignment = ParagraphAlignment.Center;
+            }
         }
 
-        AddSig(0, aprov.Ingenieria,  "INGENIERÍA / DISEÑO");
+        AddSig(0, null,  "INGENIERÍA");
         AddSig(2, aprov.Produccion,  "PRODUCCIÓN / OPERACIONES");
         AddSig(4, aprov.Calidad,     "CALIDAD / INSPECCIÓN");
     }

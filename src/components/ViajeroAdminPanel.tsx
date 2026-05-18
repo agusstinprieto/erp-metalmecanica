@@ -290,15 +290,24 @@ export const ViajeroAdminPanel: React.FC<{
   const handleDelete = (id: string) => {
     showConfirm(
       'Eliminar Registro',
-      `¿Estás seguro de eliminar el Viajero ${id}? Esta acción es irreversible y eliminará todos los datos asociados.`,
+      `¿Estás seguro de eliminar el Viajero ${id}? Esta acción es irreversible y eliminará todos los datos asociados (operaciones, materiales, componentes).`,
       async () => {
         try {
+          // Eliminación en cascada manual: hijos primero para evitar error 409 (FK conflict)
+          await Promise.all([
+            supabase.from('viajero_operaciones').delete().eq('viajero_id', id),
+            supabase.from('viajero_materiales').delete().eq('viajero_id', id),
+            supabase.from('viajero_componentes').delete().eq('viajero_id', id),
+          ]);
+          // Ahora sí eliminamos el padre
           const { error } = await supabase.from('viajeros').delete().eq('id', id);
           if (error) throw error;
-          showError('Eliminado', `Viajero ${id} eliminado correctamente.`);
+          showSuccess('Eliminado', `Viajero ${id} eliminado correctamente.`);
+          setSelectedIds(prev => { const s = new Set(prev); s.delete(id); return s; });
           fetchViajeros();
-        } catch (err) {
-          showError('Error', 'No se pudo eliminar el registro.');
+        } catch (err: any) {
+          console.error('Error al eliminar viajero:', err);
+          showError('Error', err?.message || 'No se pudo eliminar el registro.');
         }
       },
       { confirmText: 'ELIMINAR AHORA', cancelText: 'CANCELAR' }

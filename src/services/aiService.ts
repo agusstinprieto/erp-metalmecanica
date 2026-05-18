@@ -20,7 +20,7 @@ export const aiService = {
     return data as KnowledgeItem[];
   },
 
-  async askGemini(question: string, contextCategory?: string, history: any[] = [], systemInstructionOverride?: string) {
+  async askGemini(question: string, contextCategory?: string, history: any[] = [], systemInstructionOverride?: string, moduleName: string = 'chat') {
     // 1. Obtener contexto relevante de la base de conocimiento
     const knowledge = await this.getKnowledge(contextCategory);
     const contextText = knowledge
@@ -65,6 +65,7 @@ export const aiService = {
           provider: aiConfig.provider,
           language: 'text',
           useRag: true,
+          moduleName,
         }
       });
 
@@ -76,7 +77,7 @@ export const aiService = {
     }
   },
 
-  async analyzeVision(imageFile: File | string, prompt: string) {
+  async analyzeVision(imageFile: File | string, prompt: string, moduleName: string = 'vision') {
     try {
       let base64Image = '';
       if (typeof imageFile !== 'string') {
@@ -105,7 +106,8 @@ export const aiService = {
           mimeType,
           model,
           provider,
-          language: 'json'
+          language: 'json',
+          moduleName
         }
       });
 
@@ -154,7 +156,7 @@ export const aiService = {
   /**
    * Ejecuta una Auditoría Neural sobre transacciones bancarias
    */
-  async performNeuralAudit(transactions: any[]) {
+  async performNeuralAudit(transactions: any[], moduleName: string = 'auditoria') {
     try {
       const prompt = `Analiza las siguientes transacciones bancarias y genera un REPORTE DE AUDITORÍA NEURAL:
       
@@ -174,7 +176,8 @@ export const aiService = {
           prompt,
           systemInstruction: 'Eres un Auditor Senior de IA especializado en finanzas corporativas de alto rendimiento.',
           provider: 'google',
-          model: 'gemini-2.5-flash-lite' // Siguiendo la regla 12
+          model: 'gemini-2.5-flash-lite', // Siguiendo la regla 12
+          moduleName
         }
       });
 

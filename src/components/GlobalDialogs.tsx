@@ -60,13 +60,13 @@ export const GlobalDialogs: React.FC = () => {
           <div className="relative w-full max-w-sm bg-slate-900 border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
             <div className={clsx(
               "h-1.5 w-full bg-gradient-to-r",
-              confirmDialog.isAlert ? "from-mcvill-accent to-blue-600" : "from-amber-500 via-rose-500 to-amber-500"
+              confirmDialog.isAlert ? "from-mcvill-accent to-blue-600" : "from-rose-700 via-rose-500 to-rose-700"
             )} />
             <div className="p-8">
               <div className="flex items-start gap-5 mb-6">
                 <div className={clsx(
                   "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border",
-                  confirmDialog.isAlert ? "bg-mcvill-accent/10 border-mcvill-accent/20 text-mcvill-accent" : "bg-amber-500/10 border-amber-500/20 text-amber-500"
+                  confirmDialog.isAlert ? "bg-mcvill-accent/10 border-mcvill-accent/20 text-mcvill-accent" : "bg-rose-500/10 border-rose-500/20 text-rose-500"
                 )}>
                   {confirmDialog.isAlert ? <ShieldCheck size={24} /> : <AlertTriangle size={24} />}
                 </div>

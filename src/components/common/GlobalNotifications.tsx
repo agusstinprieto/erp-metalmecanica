@@ -41,9 +41,10 @@ export const GlobalNotifications: React.FC = () => {
           key={n.id}
           className={clsx(
             "pointer-events-auto w-80 p-5 rounded-[1.5rem] border backdrop-blur-xl shadow-2xl animate-in slide-in-from-right-10 duration-500 flex gap-4 relative overflow-hidden group",
-            n.type === 'quality_fail' ? "bg-rose-950/40 border-rose-500/30 text-rose-500 shadow-rose-500/20" :
+            n.type === 'error' || n.type === 'quality_fail' ? "bg-rose-950/40 border-rose-500/30 text-rose-500 shadow-rose-500/20" :
+            n.type === 'warning' ? "bg-amber-950/40 border-amber-500/30 text-amber-500 shadow-amber-500/20" :
             n.type === 'success' ? "bg-emerald-950/40 border-emerald-500/30 text-emerald-500 shadow-emerald-500/20" :
-            n.type === 'protocol' ? "bg-blue-950/40 border-mcvill-accent/30 text-mcvill-accent shadow-mcvill-accent/20" :
+            n.type === 'protocol' || n.type === 'info' ? "bg-blue-950/40 border-mcvill-accent/30 text-mcvill-accent shadow-mcvill-accent/20" :
             "bg-slate-900/60 border-white/10 text-white"
           )}
         >
@@ -51,15 +52,19 @@ export const GlobalNotifications: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-shimmer" />
           
           <div className="flex-shrink-0">
-            {n.type === 'quality_fail' ? (
+            {n.type === 'error' || n.type === 'quality_fail' ? (
               <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center animate-pulse">
+                <AlertTriangle size={20} />
+              </div>
+            ) : n.type === 'warning' ? (
+              <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
                 <AlertTriangle size={20} />
               </div>
             ) : n.type === 'success' ? (
               <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
                 <ShieldCheck size={20} />
               </div>
-            ) : n.type === 'protocol' ? (
+            ) : n.type === 'protocol' || n.type === 'info' ? (
               <div className="w-10 h-10 rounded-xl bg-mcvill-accent/10 flex items-center justify-center border border-mcvill-accent/20">
                 <Zap size={20} />
               </div>

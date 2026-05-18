@@ -111,8 +111,22 @@ export const attendanceService = {
     let status = 'present';
 
     if (shift) {
-      const [eH, eM] = shift.end_time.split(':').map(Number);
+      let [eH, eM] = shift.end_time.split(':').map(Number);
+      
+      // ⏰ McVill: Turno Nocturno Crossover & Especial Jueves a las 7:00 AM
+      const checkInDay = checkIn.getDay(); // 0 = Domingo, 4 = Jueves
+      const isNocturno = shift.name.toLowerCase().includes('nocturno');
+      
+      if (isNocturno && checkInDay === 4) {
+        eH = 7;
+        eM = 0;
+      }
+
       const expectedEnd = new Date(checkIn);
+      // Como es nocturno, la salida es al día siguiente
+      if (isNocturno) {
+        expectedEnd.setDate(expectedEnd.getDate() + 1);
+      }
       expectedEnd.setHours(eH, eM, 0, 0);
       
       // Si salió después de su hora de salida, calculamos extras
@@ -120,9 +134,18 @@ export const attendanceService = {
         overtimeMinutes = Math.round((now.getTime() - expectedEnd.getTime()) / 60_000);
       }
       
-      // Si trabajó menos del 90% de su jornada teórica
+      // Calcular minutos teóricos de la jornada
       const [sH, sM] = shift.start_time.split(':').map(Number);
-      const shiftMinutes = (eH * 60 + eM) - (sH * 60 + sM);
+      let shiftMinutes = 0;
+      if (isNocturno) {
+        // Entrada 19:00 -> Salida 06:30 o 07:00 del día siguiente
+        const startMinutes = sH * 60 + sM;
+        const endMinutes = (eH + 24) * 60 + eM;
+        shiftMinutes = endMinutes - startMinutes;
+      } else {
+        shiftMinutes = (eH * 60 + eM) - (sH * 60 + sM);
+      }
+      
       if (minutesWorked < shiftMinutes * 0.9) status = 'incomplete';
     } else {
       overtimeMinutes = Math.max(0, minutesWorked - DEFAULT_SHIFT_HOURS * 60);

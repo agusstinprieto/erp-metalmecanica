@@ -24,7 +24,7 @@ export const Toast: React.FC<ToastProps> = ({ message, type, isVisible, onClose 
   if (!isVisible) return null;
 
   const styles = {
-    success: 'bg-mcvill-accent/10 border-mcvill-card-border text-mcvill-accent shadow-[0_0_20px_rgba(59,130,246,0.1)]',
+    success: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500 shadow-[0_0_20px_rgba(52,211,153,0.1)]',
     info: 'bg-mcvill-accent/10 border-mcvill-accent/20 text-mcvill-accent shadow-[0_0_20px_rgba(0,128,255,0.1)]',
     error: 'bg-rose-500/10 border-rose-500/20 text-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.1)]'
   };

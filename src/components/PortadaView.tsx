@@ -2,7 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { 
   LayoutDashboard, Factory, Route, CalendarDays, Package, 
   Camera, Zap, Cpu, Sparkles, Shield, Clock, Terminal,
-  ExternalLink, ArrowRight, Play, Pause, Activity, ChevronRight, Settings, X
+  ExternalLink, ArrowRight, Play, Pause, Activity, ChevronRight, Settings, X,
+  Truck, Palette, ClipboardCheck, ShieldAlert, Wrench, LineChart, ScanSearch,
+  GitBranch, Library, FileCheck2, MessageCircle, Scan, TrendingUp, ShoppingCart,
+  KanbanSquare, ShieldCheck, BrainCircuit, Calculator, ClipboardList, Layers,
+  Users, FileText, CalendarCheck, UserSearch, Medal, CircleDollarSign, Landmark,
+  BarChart3, Gauge, FileBarChart, Layout as LayoutIcon
 } from 'lucide-react';
 import { useConfig } from '../contexts/ConfigContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -11,9 +16,10 @@ interface PortadaViewProps {
   setView: (view: string) => void;
   onToggleChat?: () => void;
   onOpenVoice?: () => void;
+  userRole?: string;
 }
 
-export const PortadaView: React.FC<PortadaViewProps> = ({ setView, onToggleChat, onOpenVoice }) => {
+export const PortadaView: React.FC<PortadaViewProps> = ({ setView, onToggleChat, onOpenVoice, userRole = 'empleado' }) => {
   const { config, updateConfig } = useConfig();
   const { t } = useLanguage();
   const [time, setTime] = useState(new Date());
@@ -75,6 +81,87 @@ export const PortadaView: React.FC<PortadaViewProps> = ({ setView, onToggleChat,
     }
     setIsConfigModalOpen(false);
   };
+
+  // Role based access logic exactly as configured in Sidebar
+  const role = userRole.toLowerCase();
+  const isGodmode = role === 'ceo' || role === 'sistemas' || role === 'gerencia';
+
+  const hasAccess = (module: string) => {
+    if (isGodmode) return true;
+    if (['chat_ia', 'voice_link'].includes(module)) return true;
+    const permissions: Record<string, string[]> = {
+      empleado:     ['portada', 'dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      supervisor:   ['portada', 'dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse', 'engineering', 'maintenance', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      ingenieria:   ['portada', 'dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse', 'engineering', 'maintenance', 'work_instructions', 'layout_design', 'process_simulator', 'nesting', 'energy_monitor', 'preventive_maintenance_ia', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      calidad:      ['portada', 'dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse', 'spc', 'visual_ia', 'trazabilidad', 'defect_library', 'ppap', 'voc', 'seguridad', 'preventive_maintenance_ia', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      operaciones:  ['portada', 'dashboard', 'inventory', 'production', 'viajeros', 'shop_floor', 'compras', 'ventas', 'agente_cot', 'rfq_kanban', 'factibilidad', 'factibilidad_ia', 'metal_quoter', 'roi', 'maintenance', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      ventas:       ['portada', 'dashboard', 'ventas', 'agente_cot', 'rfq_kanban', 'factibilidad', 'factibilidad_ia', 'metal_quoter', 'roi', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      compras:      ['portada', 'dashboard', 'compras', 'inventory', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      almacen:      ['portada', 'dashboard', 'inventory', 'viajeros', 'hse', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      rh:           ['portada', 'dashboard', 'rh', 'payroll', 'attendance', 'recruitment', 'desempeno', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      finanzas:     ['portada', 'dashboard', 'finance', 'banco', 'costing', 'costeo', 'payroll', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      contabilidad: ['portada', 'dashboard', 'finance', 'banco', 'costing', 'payroll', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      auditoria:    ['portada', 'dashboard', 'reports', 'quality', 'spc', 'trazabilidad', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      soporte:      ['portada', 'dashboard', 'voc', 'quality', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      marketing:    ['portada', 'dashboard', 'ventas', 'voc', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      seguridad:    ['portada', 'dashboard', 'hse', 'seguridad', 'logistica', 'lead_time_predictor', 'branding_studio'],
+    };
+    return permissions[role]?.includes(module) ?? false;
+  };
+
+  const [activeCategory, setActiveCategory] = useState<'ops' | 'qa_eng' | 'com' | 'hr_fin'>('ops');
+
+  const menuItems = [
+    // Operaciones
+    { id: 'dashboard', label: 'Tablero', subtitle: 'Monitoreo Ejecutivo', desc: 'KPI generales, métricas críticas y telemetría OEE.', icon: LayoutDashboard, category: 'ops' },
+    { id: 'planeacion', label: 'Planeación', subtitle: 'Planificación Planta', desc: 'Demanda de clientes, calendario maestro y asignación de celdas.', icon: CalendarDays, category: 'ops' },
+    { id: 'inventory', label: 'Inventarios', subtitle: 'Control de Almacenes', desc: 'Materia prima, productos terminados y trazabilidad de resguardo.', icon: Package, category: 'ops' },
+    { id: 'viajeros', label: 'Viajeros', subtitle: 'Hojas Viajeras', desc: 'Procesos de ruteo de piezas, control de operaciones y firmas de liberación.', icon: Route, category: 'ops' },
+    { id: 'production', label: 'Planta', subtitle: 'Piso de Manufactura', desc: 'Control de corte, mecanizado, forja y estaciones de ensamble.', icon: Factory, category: 'ops' },
+    { id: 'logistica', label: 'Logística', subtitle: 'Control de Embarques', desc: 'Gestión de flotas, rutas de entrega e insumos en tránsito.', icon: Truck, category: 'ops' },
+    { id: 'lead_time_predictor', label: 'Predicciones IA', subtitle: 'Estimador de Tiempos', desc: 'Red neuronal predictiva para estimar tiempos de entrega (Lead Time).', icon: Clock, category: 'ops' },
+    { id: 'branding_studio', label: 'Estudio Branding', subtitle: 'Diseñador de Marca', desc: 'Personalización de logotipos, colores del ERP y reportes oficiales.', icon: Palette, category: 'ops' },
+
+    // Calidad e Ingeniería
+    { id: 'quality', label: 'Calidad', subtitle: 'Control de Calidad', desc: 'Inspecciones dimensionales, reportes de scrap y no conformidades.', icon: ClipboardCheck, category: 'qa_eng' },
+    { id: 'visual_ia', label: 'Inspección IA', subtitle: 'Auditoría Visual IA', desc: 'Detección automatizada de defectos superficiales mediante cámaras.', icon: ScanSearch, category: 'qa_eng' },
+    { id: 'spc', label: 'SPC Alertas', subtitle: 'Control Estadístico', desc: 'Alertas en tiempo real sobre desviaciones en dimensiones críticas de piezas.', icon: LineChart, category: 'qa_eng' },
+    { id: 'trazabilidad', label: 'Trazabilidad', subtitle: 'Árbol de Trazabilidad', desc: 'Historial completo de materia prima, operador y lotes de producción.', icon: GitBranch, category: 'qa_eng' },
+    { id: 'ppap', label: 'PPAP / FAI', subtitle: 'Homologación de Partes', desc: 'Carpeta técnica de aprobación de partes para clientes automotrices/industriales.', icon: FileCheck2, category: 'qa_eng' },
+    { id: 'hse', label: 'HSE', subtitle: 'Seguridad e Higiene', desc: 'Reportes de actos inseguros, dotación de EPP y auditorías de seguridad.', icon: ShieldAlert, category: 'qa_eng' },
+    { id: 'seguridad', label: 'Seguridad', subtitle: 'Video Inteligente', desc: 'Analítica en tiempo real de cámaras de seguridad y celdas Trumpf.', icon: Camera, category: 'qa_eng' },
+    { id: 'maintenance', label: 'Mantenimiento', subtitle: 'Mantenimiento General', desc: 'Órdenes de trabajo preventivas y correctivas en maquinaria.', icon: Wrench, category: 'qa_eng' },
+    { id: 'engineering', label: 'Ingeniería', subtitle: 'Centro de Ingeniería', desc: 'Hojas de proceso técnico, parámetros y especificaciones de soldadura.', icon: Cpu, category: 'qa_eng' },
+    { id: 'work_instructions', label: 'Inst. Trabajo', subtitle: 'Instrucciones de Trabajo', desc: 'Ayudas visuales animadas y paso a paso digital para ensambladores.', icon: ClipboardList, category: 'qa_eng' },
+    { id: 'layout_design', label: 'Layout Planta', subtitle: 'Plano Digital 2D/3D', desc: 'Simulación de flujo físico y acomodo de maquinaria en piso.', icon: LayoutIcon, category: 'qa_eng' },
+    { id: 'process_simulator', label: 'Simulador', subtitle: 'Procesos Físicos', desc: 'Simulador de procesos de corte, soldadura y tratamiento térmico.', icon: Zap, category: 'qa_eng' },
+    { id: 'nesting', label: 'Nesting', subtitle: 'Optimización Láminas', desc: 'Algoritmo de acomodo de piezas en láminas metálicas para mínimo desperdicio.', icon: Layers, category: 'qa_eng' },
+    { id: 'energy_monitor', label: 'Energía IA', subtitle: 'Eficiencia Energética', desc: 'Recomendador predictivo de ahorro eléctrico por celda de soldadura.', icon: Zap, category: 'qa_eng' },
+    { id: 'preventive_maintenance_ia', label: 'Mantto. Predictivo', subtitle: 'Predicción Fallas', desc: 'Algoritmo predictivo de fallas críticas en herramentales y CNC.', icon: Wrench, category: 'qa_eng' },
+
+    // Comercial y Ventas
+    { id: 'ventas', label: 'Ventas', subtitle: 'Panel de Ventas', desc: 'Cotizaciones cerradas, pipeline comercial y clientes de metalmecánica.', icon: TrendingUp, category: 'com' },
+    { id: 'compras', label: 'Compras', subtitle: 'Abastecimiento', desc: 'Órdenes de compra a proveedores, cotizaciones recibidas y requisiciones.', icon: ShoppingCart, category: 'com' },
+    { id: 'agente_cot', label: 'Agente Cot.', subtitle: 'Cotizador IA', desc: 'IA entrenada para leer requisiciones y pre-llenar presupuestos de piezas.', icon: Sparkles, category: 'com' },
+    { id: 'rfq_kanban', label: 'Kanban RFQ', subtitle: 'Embudo RFQ', desc: 'Tablero ágil para solicitudes de cotización de clientes.', icon: KanbanSquare, category: 'com' },
+    { id: 'factibilidad', label: 'Factibilidad', subtitle: 'Estudio de Factibilidad', desc: 'Auditoría técnica previa a cotizar para confirmar capacidades.', icon: ShieldCheck, category: 'com' },
+    { id: 'factibilidad_ia', label: 'Factibilidad IA', subtitle: 'Factibilidad Predictiva', desc: 'Red neuronal que evalúa viabilidad dimensional y material en segundos.', icon: BrainCircuit, category: 'com' },
+    { id: 'metal_quoter', label: 'Cotizador Metal', subtitle: 'Cotizador Paramétrico', desc: 'Cálculo exacto de peso de piezas, tiempos de maquinado y precio final.', icon: Calculator, category: 'com' },
+    { id: 'roi', label: 'Cotizador ROI', subtitle: 'Simulador de Retorno', desc: 'Cálculo automatizado de retorno de inversión para contratos multianuales.', icon: TrendingUp, category: 'com' },
+
+    // Capital Humano y Finanzas
+    { id: 'rh', label: 'RH', subtitle: 'Capital Humano', desc: 'Expedientes de personal, habilidades técnicas y credenciales.', icon: Users, category: 'hr_fin' },
+    { id: 'attendance', label: 'Asistencia', subtitle: 'Control Asistencias', desc: 'Reloj checador por código de barras y monitoreo de incidencias.', icon: CalendarCheck, category: 'hr_fin' },
+    { id: 'payroll', label: 'Nómina', subtitle: 'Gestión de Nóminas', desc: 'Cálculo de pre-nóminas, horas extra McVill y bonos por desempeño.', icon: FileText, category: 'hr_fin' },
+    { id: 'recruitment', label: 'Reclutamiento', subtitle: 'Atracción Talento', desc: 'Bolsa de trabajo, requisiciones de personal y entrevistas por IA.', icon: UserSearch, category: 'hr_fin' },
+    { id: 'desempeno', label: 'Desempeño', subtitle: 'Evaluaciones y KPI', desc: 'Tablero de incentivos, productividad de operarios y metas alcanzadas.', icon: Medal, category: 'hr_fin' },
+    { id: 'finance', label: 'Finanzas', subtitle: 'Consola Finanzas', desc: 'Cuentas por cobrar (CxC), cuentas por pagar (CxP) y flujo de caja proyectado.', icon: CircleDollarSign, category: 'hr_fin' },
+    { id: 'banco', label: 'Banco', subtitle: 'Tesorería y Bancos', desc: 'Registro de egresos, conciliaciones y transferencias bancarias de la planta.', icon: Landmark, category: 'hr_fin' },
+    { id: 'costing', label: 'Costos', subtitle: 'Costos Industriales', desc: 'Asignación de costos fijos, variables e insumos indirectos de manufactura.', icon: BarChart3, category: 'hr_fin' },
+    { id: 'costeo', label: 'Costeo Live', subtitle: 'Márgenes en Vivo', desc: 'Telemetría financiera instantánea del margen por orden de fabricación en curso.', icon: Gauge, category: 'hr_fin' }
+  ];
+
+  const filteredItems = menuItems.filter(item => item.category === activeCategory && hasAccess(item.id));
 
   return (
     <div className="space-y-6 animate-in fade-in duration-700">
@@ -235,90 +322,115 @@ export const PortadaView: React.FC<PortadaViewProps> = ({ setView, onToggleChat,
 
       </div>
 
-      {/* ── OPERATIONAL FLOW WORKSPACE: 5 KEY MILESTONES ── */}
-      <div>
-        <div className="flex items-center gap-2 mb-4">
-          <Sparkles size={14} className="text-mcvill-accent" />
-          <h2 className="text-[10px] font-black text-white uppercase tracking-[0.25em]">Flujo Operativo de Planta</h2>
+      {/* ── COCKPIT DE ÁREAS Y DEPARTAMENTOS (MENÚ DE ACCESO RÁPIDO) ── */}
+      <div className="bg-slate-950/20 border border-white/5 rounded-3xl p-6 relative overflow-hidden backdrop-blur-sm">
+        <div className="absolute inset-0 bg-gradient-to-b from-mcvill-accent/5 to-transparent pointer-events-none" />
+        
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 border-b border-white/5 pb-4">
+          <div className="space-y-1">
+            <h2 className="text-sm font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
+              <Sparkles size={16} className="text-mcvill-accent animate-pulse" />
+              Menú Principal de Áreas y Departamentos
+            </h2>
+            <p className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold">
+              Cockpit de navegación rápido para todos los departamentos autorizados de la planta
+            </p>
+          </div>
+          
+          <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest bg-slate-900 border border-white/5 px-2.5 py-1 rounded-xl shrink-0">
+            Rol de Acceso: {role}
+          </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        {/* Tab Selector Buttons */}
+        <div className="flex flex-wrap gap-2.5 mb-6">
+          <button
+            onClick={() => setActiveCategory('ops')}
+            className={`px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 border ${
+              activeCategory === 'ops'
+                ? 'bg-mcvill-accent text-slate-950 border-mcvill-accent shadow-[0_0_15px_var(--theme-glow)] font-black'
+                : 'bg-slate-900/60 text-slate-400 border-white/5 hover:text-white hover:border-white/20'
+            }`}
+          >
+            <Factory size={12} />
+            Operaciones y Planta
+          </button>
+          <button
+            onClick={() => setActiveCategory('qa_eng')}
+            className={`px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 border ${
+              activeCategory === 'qa_eng'
+                ? 'bg-mcvill-accent text-slate-950 border-mcvill-accent shadow-[0_0_15px_var(--theme-glow)] font-black'
+                : 'bg-slate-900/60 text-slate-400 border-white/5 hover:text-white hover:border-white/20'
+            }`}
+          >
+            <Shield size={12} />
+            Calidad e Ingeniería
+          </button>
+          <button
+            onClick={() => setActiveCategory('com')}
+            className={`px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 border ${
+              activeCategory === 'com'
+                ? 'bg-mcvill-accent text-slate-950 border-mcvill-accent shadow-[0_0_15px_var(--theme-glow)] font-black'
+                : 'bg-slate-900/60 text-slate-400 border-white/5 hover:text-white hover:border-white/20'
+            }`}
+          >
+            <CircleDollarSign size={12} />
+            Comercial y Ventas
+          </button>
+          <button
+            onClick={() => setActiveCategory('hr_fin')}
+            className={`px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 border ${
+              activeCategory === 'hr_fin'
+                ? 'bg-mcvill-accent text-slate-950 border-mcvill-accent shadow-[0_0_15px_var(--theme-glow)] font-black'
+                : 'bg-slate-900/60 text-slate-400 border-white/5 hover:text-white hover:border-white/20'
+            }`}
+          >
+            <Users size={12} />
+            Finanzas y Capital Humano (RH)
+          </button>
+        </div>
+
+        {/* Categories Dynamic Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {filteredItems.map(item => {
+            const IconComponent = item.icon;
+            return (
+              <div
+                key={item.id}
+                onClick={() => setView(item.id)}
+                className="group cursor-pointer rounded-2xl p-4 bg-slate-950/60 border border-white/5 hover:border-mcvill-accent/30 hover:bg-mcvill-accent/5 transition-all duration-300 relative overflow-hidden flex flex-col justify-between"
+              >
+                <div>
+                  <div className="w-9 h-9 rounded-xl bg-slate-900 border border-white/10 flex items-center justify-center text-slate-400 group-hover:text-mcvill-accent group-hover:border-mcvill-accent/30 group-hover:scale-105 transition-all">
+                    <IconComponent size={18} />
+                  </div>
+                  <h3 className="text-xs font-bold text-white uppercase tracking-widest mt-4">
+                    {item.label}
+                  </h3>
+                  <p className="text-[8px] font-black text-mcvill-accent/60 uppercase tracking-widest mt-0.5">
+                    {item.subtitle}
+                  </p>
+                  <p className="text-[10px] text-slate-500 mt-2 leading-relaxed">
+                    {item.desc}
+                  </p>
+                </div>
+                <div className="mt-4 pt-2 border-t border-white/5 flex items-center justify-between">
+                  <span className="text-[8px] font-black text-slate-600 group-hover:text-mcvill-accent uppercase tracking-widest">
+                    Acceder Módulo
+                  </span>
+                  <ChevronRight size={14} className="text-slate-600 group-hover:text-mcvill-accent transition-colors" />
+                </div>
+              </div>
+            );
+          })}
           
-          {/* Milestone 1: Tablero */}
-          <div 
-            onClick={() => setView('dashboard')}
-            className="group cursor-pointer rounded-2xl p-4 bg-slate-950/40 border border-white/5 hover:border-mcvill-accent/30 hover:bg-mcvill-accent/5 transition-all duration-300 relative overflow-hidden"
-          >
-            <div className="w-8 h-8 rounded-xl bg-slate-900 border border-white/10 flex items-center justify-center text-slate-400 group-hover:text-mcvill-accent group-hover:border-mcvill-accent/30 group-hover:scale-105 transition-all">
-              <LayoutDashboard size={16} />
+          {filteredItems.length === 0 && (
+            <div className="col-span-full py-12 text-center border border-dashed border-white/5 rounded-2xl">
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                No tienes módulos autorizados en esta categoría
+              </p>
             </div>
-            <h3 className="text-xs font-bold text-white uppercase tracking-widest mt-4">1. Tablero</h3>
-            <p className="text-[10px] text-slate-500 mt-1 leading-snug">
-              Cockpit ejecutivo y telemetría OEE.
-            </p>
-            <ChevronRight size={14} className="absolute bottom-4 right-4 text-slate-600 group-hover:text-mcvill-accent transition-colors" />
-          </div>
-
-          {/* Milestone 2: Planeación */}
-          <div 
-            onClick={() => setView('planeacion')}
-            className="group cursor-pointer rounded-2xl p-4 bg-slate-950/40 border border-white/5 hover:border-mcvill-accent/30 hover:bg-mcvill-accent/5 transition-all duration-300 relative overflow-hidden"
-          >
-            <div className="w-8 h-8 rounded-xl bg-slate-900 border border-white/10 flex items-center justify-center text-slate-400 group-hover:text-mcvill-accent group-hover:border-mcvill-accent/30 group-hover:scale-105 transition-all">
-              <CalendarDays size={16} />
-            </div>
-            <h3 className="text-xs font-bold text-white uppercase tracking-widest mt-4">2. Planeación</h3>
-            <p className="text-[10px] text-slate-500 mt-1 leading-snug">
-              Demanda, calendario y asignación.
-            </p>
-            <ChevronRight size={14} className="absolute bottom-4 right-4 text-slate-600 group-hover:text-mcvill-accent transition-colors" />
-          </div>
-
-          {/* Milestone 3: Inventarios */}
-          <div 
-            onClick={() => setView('inventory')}
-            className="group cursor-pointer rounded-2xl p-4 bg-slate-950/40 border border-white/5 hover:border-mcvill-accent/30 hover:bg-mcvill-accent/5 transition-all duration-300 relative overflow-hidden"
-          >
-            <div className="w-8 h-8 rounded-xl bg-slate-900 border border-white/10 flex items-center justify-center text-slate-400 group-hover:text-mcvill-accent group-hover:border-mcvill-accent/30 group-hover:scale-105 transition-all">
-              <Package size={16} />
-            </div>
-            <h3 className="text-xs font-bold text-white uppercase tracking-widest mt-4">3. Inventarios</h3>
-            <p className="text-[10px] text-slate-500 mt-1 leading-snug">
-              Materia prima y resguardo.
-            </p>
-            <ChevronRight size={14} className="absolute bottom-4 right-4 text-slate-600 group-hover:text-mcvill-accent transition-colors" />
-          </div>
-
-          {/* Milestone 4: Viajeros */}
-          <div 
-            onClick={() => setView('viajeros')}
-            className="group cursor-pointer rounded-2xl p-4 bg-slate-950/40 border border-white/5 hover:border-mcvill-accent/30 hover:bg-mcvill-accent/5 transition-all duration-300 relative overflow-hidden"
-          >
-            <div className="w-8 h-8 rounded-xl bg-slate-900 border border-white/10 flex items-center justify-center text-slate-400 group-hover:text-mcvill-accent group-hover:border-mcvill-accent/30 group-hover:scale-105 transition-all">
-              <Route size={16} />
-            </div>
-            <h3 className="text-xs font-bold text-white uppercase tracking-widest mt-4">4. Viajeros</h3>
-            <p className="text-[10px] text-slate-500 mt-1 leading-snug">
-              Procesos de ruteo y hojas viajeras.
-            </p>
-            <ChevronRight size={14} className="absolute bottom-4 right-4 text-slate-600 group-hover:text-mcvill-accent transition-colors" />
-          </div>
-
-          {/* Milestone 5: Planta */}
-          <div 
-            onClick={() => setView('production')}
-            className="group cursor-pointer rounded-2xl p-4 bg-slate-950/40 border border-white/5 hover:border-mcvill-accent/30 hover:bg-mcvill-accent/5 transition-all duration-300 relative overflow-hidden"
-          >
-            <div className="w-8 h-8 rounded-xl bg-slate-900 border border-white/10 flex items-center justify-center text-slate-400 group-hover:text-mcvill-accent group-hover:border-mcvill-accent/30 group-hover:scale-105 transition-all">
-              <Factory size={16} />
-            </div>
-            <h3 className="text-xs font-bold text-white uppercase tracking-widest mt-4">5. Planta</h3>
-            <p className="text-[10px] text-slate-500 mt-1 leading-snug">
-              Corte, mecanizado, forja y control.
-            </p>
-            <ChevronRight size={14} className="absolute bottom-4 right-4 text-slate-600 group-hover:text-mcvill-accent transition-colors" />
-          </div>
-
+          )}
         </div>
       </div>
 

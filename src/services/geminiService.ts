@@ -17,6 +17,7 @@ export interface GeminiOptions {
   signal?: AbortSignal;
   accessToken?: string;
   contents?: any[];
+  moduleName?: string;
 }
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -68,7 +69,8 @@ export const generateText = async (
         language: options?.language,
         model: finalModel,
         provider: finalProvider,
-        contents: options?.contents
+        contents: options?.contents,
+        moduleName: options?.moduleName || 'generico'
       };
 
       const headers: Record<string, string> = {

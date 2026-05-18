@@ -128,6 +128,7 @@ Responde SOLO con el JSON, sin texto adicional.`;
             ],
           }],
           temperature: 0.1,
+          moduleName: 'viajero',
         }
       );
       setResult(data);

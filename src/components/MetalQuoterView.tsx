@@ -32,7 +32,8 @@ export const MetalQuoterView: React.FC = () => {
                             { inlineData: fileData.inlineData }
                         ]
                     }
-                ]
+                ],
+                moduleName: 'cotizador'
             });
 
             const jsonMatch = responseText.match(/```json\n?([\s\S]*?)\n?```/) || responseText.match(/\{[\s\S]*\}/);

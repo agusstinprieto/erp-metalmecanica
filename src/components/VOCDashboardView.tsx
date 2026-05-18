@@ -145,7 +145,7 @@ export const VOCDashboardView: React.FC = () => {
       const prompt = `Analiza este correo de cliente para una empresa de manufactura metal-mecánica (${config.companyName}). Responde SOLO JSON:
 Correo: "${emailText}"
 Esquema: {"categoria":"ENTREGA|CALIDAD|PRECIO|COMUNICACIÓN|OTRO","sentimiento":"POSITIVO|NEUTRAL|NEGATIVO","prioridad":"ALTA|MEDIA|BAJA","checklist":["accion1","accion2","accion3"]}`;
-      const raw = await geminiService.generateText(prompt);
+      const raw = await geminiService.generateText(prompt, { moduleName: 'calidad' });
       const match = raw.match(/\{[\s\S]*\}/);
       if (match) {
         const parsed = JSON.parse(match[0]);

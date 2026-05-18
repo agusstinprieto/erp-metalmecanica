@@ -250,7 +250,7 @@ export const AttendanceView: React.FC = () => {
     try {
       const top3Absent = absenceReport.slice(0, 3).map(r => `${r.employee_name}: ${r.absences} faltas, ${r.late_count} retardos`).join('; ');
       const prompt = `Eres analista de RH industrial en ${config.companyName}. Resumen de asistencia últimos 7 días: ${records.length} registros. Hoy: ${kpis.present} presentes, ${kpis.late} retardos, ${kpis.absent} ausentes, ${kpis.missing_checkout} sin check-out. Empleados con mayor ausentismo: ${top3Absent || 'sin datos suficientes'}. Genera un análisis breve (máx 3 puntos) con acciones concretas para RH. Responde en español.`;
-      const insight = await geminiService.generateText(prompt);
+      const insight = await geminiService.generateText(prompt, { moduleName: 'asistencia' });
       setAiInsight(insight);
     } catch {
       setAiInsight('Error en análisis IA.');

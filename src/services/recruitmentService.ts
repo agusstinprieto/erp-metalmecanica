@@ -129,10 +129,10 @@ export const recruitmentService = {
     
     let result;
     if (candidate.resume_url && (candidate.resume_url.endsWith('.jpg') || candidate.resume_url.endsWith('.png') || candidate.resume_url.endsWith('.jpeg'))) {
-      result = await aiService.analyzeVision(candidate.resume_url, prompt);
+      result = await aiService.analyzeVision(candidate.resume_url, prompt, 'reclutamiento');
     } else {
       const { geminiService } = await import('./geminiService');
-      result = await geminiService.generateStructuredData(prompt, '{}');
+      result = await geminiService.generateStructuredData(prompt, '{}', { moduleName: 'reclutamiento' });
     }
 
     const analysis = typeof result === 'string' ? JSON.parse(result.replace(/```json|```/g, '')) : result;

@@ -1150,42 +1150,67 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
             <h3 className="text-[10px] font-black text-white uppercase tracking-widest">Demografía Operativa</h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Distribución por Género (Pie Chart) */}
-            <div className="bg-slate-950/50 border border-slate-800/40 p-4 rounded-xl flex items-center gap-6">
-              <div className="w-16 h-16 shrink-0 rounded-full relative shadow-[0_0_15px_rgba(var(--mcvill-accent-rgb),0.15)]" style={{ background: 'conic-gradient(var(--mcvill-accent) 0% 68%, #f472b6 68% 100%)' }}>
-                <div className="absolute inset-1.5 bg-slate-950 rounded-full flex flex-col items-center justify-center">
-                  <span className="text-[7px] font-black text-slate-500 uppercase tracking-widest leading-none">Total</span>
-                  <span className="text-[11px] font-black text-white leading-none mt-1">{metrics.empleados}</span>
-                </div>
+            {/* Distribución por Género (Pie Chart de Rebanadas) */}
+            <div className="bg-slate-950/50 border border-slate-800/40 p-5 rounded-xl flex flex-col sm:flex-row items-center justify-center gap-8 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-pink-500/5 rounded-full blur-3xl pointer-events-none group-hover:bg-pink-500/10 transition-colors" />
+              <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl pointer-events-none group-hover:bg-blue-500/10 transition-colors" />
+              
+              {/* Gráfica Circular (Doughnut) */}
+              <div className="relative flex items-center justify-center shrink-0">
+                {/* Outer Glow */}
+                <div className="absolute inset-0 rounded-full bg-mcvill-accent/5 blur-xl scale-110" />
+                
+                {/* SVG Pie Chart */}
+                <svg width="140" height="140" viewBox="0 0 100 100" className="relative z-10 drop-shadow-2xl hover:scale-105 transition-transform duration-500">
+                  {/* Fondo Rosa (Mujeres) */}
+                  <circle cx="50" cy="50" r="35" fill="none" stroke="#f472b6" strokeWidth="18" className="opacity-90" />
+                  
+                  {/* Progreso Azul (Hombres) dinámico */}
+                  <circle 
+                    cx="50" cy="50" r="35" 
+                    fill="none" 
+                    stroke="var(--mcvill-accent)" 
+                    strokeWidth="18" 
+                    strokeDasharray={`${(Math.round(metrics.empleados * 0.68) / metrics.empleados) * 219.91} 219.91`} 
+                    strokeDashoffset={219.91 * 0.25} 
+                    strokeLinecap="round"
+                    className="transition-all duration-1000"
+                    style={{ filter: 'drop-shadow(0 0 6px rgba(0, 128, 255, 0.4))' }}
+                  />
+                  
+                  {/* Centro oscuro */}
+                  <circle cx="50" cy="50" r="26" className="fill-slate-950" />
+                  
+                  {/* Texto Central */}
+                  <text x="50" y="46" textAnchor="middle" fill="#94a3b8" fontSize="7" fontWeight="900" className="uppercase tracking-widest">TOTAL</text>
+                  <text x="50" y="60" textAnchor="middle" fill="#ffffff" fontSize="16" fontWeight="900">{metrics.empleados}</text>
+                </svg>
               </div>
-              <div className="space-y-3 flex-1">
-                <div>
-                  <div className="flex justify-between items-center text-[8px] font-black uppercase tracking-wider mb-1">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-mcvill-accent">Hombres</span>
-                      <span className="text-[7px] text-mcvill-accent bg-mcvill-accent/10 px-1.5 py-0.5 rounded-md">
-                        {Math.round(metrics.empleados * 0.68)} op
-                      </span>
+
+              {/* Leyenda y Datos */}
+              <div className="flex flex-col gap-5 flex-1 w-full">
+                {/* Hombres */}
+                <div className="flex items-center justify-between p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-all">
+                  <div className="flex items-center gap-3">
+                    <div className="w-3.5 h-3.5 rounded bg-mcvill-accent shadow-[0_0_10px_rgba(0,128,255,0.6)]" />
+                    <div>
+                      <span className="text-[11px] font-black text-white uppercase tracking-widest block leading-none mb-1">Hombres</span>
+                      <span className="text-[9px] text-slate-400 font-bold tracking-widest uppercase">{Math.round(metrics.empleados * 0.68)} operarios</span>
                     </div>
-                    <span className="text-white">68%</span>
                   </div>
-                  <div className="h-1 w-full bg-slate-800/80 rounded-full overflow-hidden">
-                    <div className="h-full bg-mcvill-accent w-[68%]" />
-                  </div>
+                  <span className="text-2xl font-black text-mcvill-accent drop-shadow-[0_0_8px_rgba(0,128,255,0.4)]">{Math.round((Math.round(metrics.empleados * 0.68) / metrics.empleados) * 100)}%</span>
                 </div>
-                <div>
-                  <div className="flex justify-between items-center text-[8px] font-black uppercase tracking-wider mb-1">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-pink-400">Mujeres</span>
-                      <span className="text-[7px] text-pink-400 bg-pink-400/10 px-1.5 py-0.5 rounded-md">
-                        {metrics.empleados - Math.round(metrics.empleados * 0.68)} op
-                      </span>
+
+                {/* Mujeres */}
+                <div className="flex items-center justify-between p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-all">
+                  <div className="flex items-center gap-3">
+                    <div className="w-3.5 h-3.5 rounded bg-pink-400 shadow-[0_0_10px_rgba(244,114,182,0.6)]" />
+                    <div>
+                      <span className="text-[11px] font-black text-white uppercase tracking-widest block leading-none mb-1">Mujeres</span>
+                      <span className="text-[9px] text-slate-400 font-bold tracking-widest uppercase">{metrics.empleados - Math.round(metrics.empleados * 0.68)} operarias</span>
                     </div>
-                    <span className="text-white">32%</span>
                   </div>
-                  <div className="h-1 w-full bg-slate-800/80 rounded-full overflow-hidden">
-                    <div className="h-full bg-pink-400 w-[32%]" />
-                  </div>
+                  <span className="text-2xl font-black text-pink-400 drop-shadow-[0_0_8px_rgba(244,114,182,0.4)]">{Math.round(((metrics.empleados - Math.round(metrics.empleados * 0.68)) / metrics.empleados) * 100)}%</span>
                 </div>
               </div>
             </div>

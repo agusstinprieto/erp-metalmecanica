@@ -141,7 +141,7 @@ Genera un PRONÓSTICO DE DEMANDA Y REABASTECIMIENTO con:
 4. Una alerta específica si detectas riesgo de desabasto
 
 Responde en español, formato conciso con bullets. Sé directo y específico.`;
-      const text = await geminiService.generateText(prompt);
+      const text = await geminiService.generateText(prompt, { moduleName: 'inventario' });
       setForecastText(text);
     } catch {
       setForecastText('Error al generar pronóstico. Verifica la conexión con Gemini.');

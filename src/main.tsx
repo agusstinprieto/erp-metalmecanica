@@ -41,10 +41,11 @@ window.addEventListener('unhandledrejection', (e) => {
   )) handleChunkError();
 });
 
-// Initialize Sentry
-if (import.meta.env.VITE_SENTRY_DSN) {
+// Initialize Sentry only if DSN is a valid URL (not missing or literal "none")
+const sentryDsn = import.meta.env.VITE_SENTRY_DSN;
+if (sentryDsn && sentryDsn !== 'none' && sentryDsn.startsWith('https://')) {
   Sentry.init({
-    dsn: import.meta.env.VITE_SENTRY_DSN,
+    dsn: sentryDsn,
     integrations: [
       Sentry.browserTracingIntegration(),
       Sentry.replayIntegration(),

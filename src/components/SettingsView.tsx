@@ -846,6 +846,249 @@ const ShiftsTab: React.FC = () => {
   );
 };
 
+// ─── AITokenUsageDashboard ───────────────────────────────────────────────────
+
+const AITokenUsageDashboard: React.FC<{ tenantId: string }> = ({ tenantId }) => {
+  const [usageData, setUsageData] = useState<any[]>([]);
+  const [totalTokens, setTotalTokens] = useState(0);
+  const [totalCost, setTotalCost] = useState(0);
+  const [usageByUser, setUsageByUser] = useState<any[]>([]);
+  const [usageByModule, setUsageByModule] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadUsage = async () => {
+    setLoading(true);
+    try {
+      // Query token logs
+      const { data, error } = await supabase
+        .from('ai_token_usage')
+        .select(`
+          id,
+          model,
+          provider,
+          prompt_tokens,
+          completion_tokens,
+          total_tokens,
+          cost,
+          module_name,
+          created_at,
+          user_id
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const logs = data || [];
+      
+      // Calculate totals
+      let sumTokens = 0;
+      let sumCost = 0;
+      const userMap: Record<string, { name: string; email: string; tokens: number; cost: number; calls: number }> = {};
+      const moduleMap: Record<string, { tokens: number; cost: number; calls: number }> = {};
+
+      // We also need user details, let's fetch profiles to map names/emails
+      const { data: profiles } = await supabase.from('profiles').select('id, full_name, email');
+      const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+
+      logs.forEach(log => {
+        sumTokens += log.total_tokens;
+        sumCost += Number(log.cost || 0);
+
+        // Group by user
+        const uId = log.user_id || 'sistema';
+        const profile = profileMap.get(uId);
+        const name = profile?.full_name || (uId === 'sistema' ? 'SISTEMA' : 'Desconocido');
+        const email = profile?.email || '';
+
+        if (!userMap[uId]) {
+          userMap[uId] = { name, email, tokens: 0, cost: 0, calls: 0 };
+        }
+        userMap[uId].tokens += log.total_tokens;
+        userMap[uId].cost += Number(log.cost || 0);
+        userMap[uId].calls += 1;
+
+        // Group by module
+        const mod = log.module_name || 'generico';
+        if (!moduleMap[mod]) {
+          moduleMap[mod] = { tokens: 0, cost: 0, calls: 0 };
+        }
+        moduleMap[mod].tokens += log.total_tokens;
+        moduleMap[mod].cost += Number(log.cost || 0);
+        moduleMap[mod].calls += 1;
+      });
+
+      setTotalTokens(sumTokens);
+      setTotalCost(sumCost);
+
+      setUsageByUser(
+        Object.entries(userMap)
+          .map(([id, val]) => ({ id, ...val }))
+          .sort((a, b) => b.tokens - a.tokens)
+      );
+
+      setUsageByModule(
+        Object.entries(moduleMap)
+          .map(([name, val]) => ({ name, ...val }))
+          .sort((a, b) => b.tokens - a.tokens)
+      );
+
+      setUsageData(logs.slice(0, 15)); // last 15 calls
+    } catch (err) {
+      console.error('Error loading AI token usage:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadUsage();
+  }, [tenantId]);
+
+  const budgetCap = 300.00; // $300 budget cap as calculated by Agustín!
+  const progressPct = Math.min((totalCost / budgetCap) * 100, 100);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-8">
+        <Loader2 size={20} className="animate-spin text-mcvill-accent" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Cards de Métricas Principales */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Consumo total tokens */}
+        <div className="bg-slate-900/60 border border-white/5 rounded-xl p-4 space-y-1">
+          <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest block">Tokens Totales Consumidos</span>
+          <div className="text-xl font-bold font-mono text-white leading-none">
+            {totalTokens.toLocaleString('es-MX')}
+          </div>
+          <span className="text-[7.5px] text-slate-500 font-medium uppercase">Acumulado en tiempo real</span>
+        </div>
+
+        {/* Costo Acumulado Estimado */}
+        <div className="bg-slate-900/60 border border-white/5 rounded-xl p-4 space-y-1 relative overflow-hidden group">
+          <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest block">Costo Acumulado Estimado</span>
+          <div className="text-xl font-bold font-mono text-emerald-400 leading-none">
+            ${totalCost.toFixed(4)} <span className="text-[10px] text-slate-400 font-sans font-bold">USD</span>
+          </div>
+          <span className="text-[7.5px] text-slate-500 font-medium uppercase">Basado en tarifas oficiales de la API</span>
+        </div>
+
+        {/* Límite Presupuestal */}
+        <div className="bg-slate-900/60 border border-white/5 rounded-xl p-4 space-y-2">
+          <div className="flex justify-between items-center">
+            <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Presupuesto Planta ($300 USD)</span>
+            <span className="text-[9px] font-bold font-mono text-emerald-400">{progressPct.toFixed(1)}%</span>
+          </div>
+          <div className="h-1.5 w-full bg-slate-950 rounded-full overflow-hidden border border-white/5">
+            <div 
+              className={clsx(
+                "h-full rounded-full transition-all duration-500",
+                progressPct > 90 ? "bg-red-500" : progressPct > 70 ? "bg-yellow-500" : "bg-emerald-400"
+              )} 
+              style={{ width: `${progressPct}%` }}
+            />
+          </div>
+          <p className="text-[7.5px] text-slate-500 uppercase font-medium">Consumo mensual aproximado para 400 empleados</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Consumo por Usuario */}
+        <div className="bg-slate-900/40 border border-white/5 rounded-xl p-5 space-y-4">
+          <div className="flex justify-between items-center border-b border-white/5 pb-2">
+            <h4 className="text-[10px] font-black text-mcvill-accent uppercase tracking-widest">Inferencia por Colaborador</h4>
+            <span className="text-[8px] font-black text-slate-500 uppercase">Top Consumos</span>
+          </div>
+          <div className="space-y-2 max-h-[220px] overflow-y-auto custom-scrollbar">
+            {usageByUser.length === 0 ? (
+              <p className="text-[9px] text-slate-500 italic text-center py-4">Sin registros de consumo aún.</p>
+            ) : (
+              usageByUser.map((u, i) => (
+                <div key={u.id} className="flex items-center justify-between bg-black/20 p-2 rounded border border-white/5 hover:border-white/10 transition-all">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[9px] font-black text-slate-500 bg-black/40 w-5 h-5 flex items-center justify-center rounded border border-white/5 font-mono">{i + 1}</span>
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-bold text-white uppercase truncate tracking-tight">{u.name}</p>
+                      <p className="text-[8px] font-mono text-slate-500 truncate">{u.email || 'Acceso Central'}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] font-bold font-mono text-slate-300">{u.tokens.toLocaleString()} tokens</p>
+                    <p className="text-[8px] font-mono text-emerald-400">${u.cost.toFixed(5)} USD ({u.calls} llamadas)</p>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Consumo por Módulo */}
+        <div className="bg-slate-900/40 border border-white/5 rounded-xl p-5 space-y-4">
+          <div className="flex justify-between items-center border-b border-white/5 pb-2">
+            <h4 className="text-[10px] font-black text-mcvill-accent uppercase tracking-widest">Inferencia por Módulo / Operación</h4>
+            <span className="text-[8px] font-black text-slate-500 uppercase">Distribución ROI</span>
+          </div>
+          <div className="space-y-2 max-h-[220px] overflow-y-auto custom-scrollbar">
+            {usageByModule.length === 0 ? (
+              <p className="text-[9px] text-slate-500 italic text-center py-4">Sin registros de consumo aún.</p>
+            ) : (
+              usageByModule.map((m) => (
+                <div key={m.name} className="space-y-1">
+                  <div className="flex justify-between text-[9px] font-bold">
+                    <span className="text-slate-300 uppercase font-black">{m.name === 'generico' ? 'CHATS & CONSULTAS' : m.name.toUpperCase()}</span>
+                    <span className="text-slate-400 font-mono">${m.cost.toFixed(4)} USD</span>
+                  </div>
+                  <div className="flex items-center justify-between text-[8px] text-slate-500">
+                    <span>{m.tokens.toLocaleString()} tokens ({m.calls} llamadas)</span>
+                    <span className="font-mono text-emerald-400/80">{((m.cost / (totalCost || 1)) * 100).toFixed(1)}%</span>
+                  </div>
+                  <div className="h-1 bg-black/40 rounded-full overflow-hidden border border-white/5">
+                    <div className="h-full bg-mcvill-accent/70 rounded-full" style={{ width: `${(m.cost / (totalCost || 1)) * 100}%` }} />
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Historial Reciente de Inferencia */}
+      <div className="bg-slate-900/40 border border-white/5 rounded-xl p-5 space-y-3">
+        <h4 className="text-[10px] font-black text-white uppercase tracking-widest border-b border-white/5 pb-2 flex items-center gap-2">
+          <Terminal size={12} className="text-slate-500" />
+          Bitácora de Inferencia en Tiempo Real
+        </h4>
+        <div className="space-y-1.5 max-h-[200px] overflow-y-auto custom-scrollbar font-mono text-[9px]">
+          {usageData.length === 0 ? (
+            <p className="text-[9px] text-slate-500 italic text-center py-4">Esperando llamadas de Inteligencia Artificial...</p>
+          ) : (
+            usageData.map((log) => (
+              <div key={log.id} className="flex justify-between items-center py-1 border-b border-white/5 hover:bg-white/5 px-2 rounded">
+                <div className="flex items-center gap-2">
+                  <span className="text-[8px] text-slate-600 shrink-0">{format(new Date(log.created_at), 'HH:mm:ss')}</span>
+                  <span className="text-slate-400 font-bold uppercase shrink-0">[{log.provider}]</span>
+                  <span className="text-mcvill-accent truncate uppercase" style={{ maxWidth: '120px' }} title={log.model}>{log.model.replace('gemini-2.5-', '')}</span>
+                  <span className="text-slate-500 shrink-0">&gt;</span>
+                  <span className="text-slate-300 font-bold uppercase shrink-0">{log.module_name === 'generico' ? 'chat' : log.module_name}</span>
+                </div>
+                <div className="text-right text-slate-400">
+                  <span>{log.total_tokens} tokens</span>
+                  <span className="text-slate-600 mx-1">·</span>
+                  <span className="text-emerald-400">${Number(log.cost).toFixed(6)} USD</span>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // ─── Settings View ────────────────────────────────────────────────────────────
 
 export const SettingsView: React.FC<SettingsViewProps> = ({ userRole }) => {
@@ -1624,6 +1867,21 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ userRole }) => {
                   Sincronizar Integraciones
                 </button>
               </div>
+            </div>
+
+            {/* 📊 IA.AGUS: Panel Contraloría de Tokens y ROI */}
+            <div className="bg-slate-900/40 p-5 rounded-xl border border-white/5 space-y-4 animate-in fade-in duration-300">
+              <div className="flex items-center gap-3 border-b border-white/5 pb-3">
+                <div className="w-8 h-8 bg-mcvill-accent/10 rounded flex items-center justify-center border border-mcvill-accent/20 shadow-md">
+                  <Activity size={16} className="text-mcvill-accent" />
+                </div>
+                <div>
+                  <h4 className="text-[10px] font-black text-white uppercase tracking-widest">Contraloría de Consumos & ROI IA</h4>
+                  <p className="text-[8px] text-slate-500 font-black uppercase tracking-widest mt-0.5">Telemetría de Tokens y Costos en tiempo real</p>
+                </div>
+              </div>
+              
+              <AITokenUsageDashboard tenantId={tenantId || ''} />
             </div>
           </div>
         )}
