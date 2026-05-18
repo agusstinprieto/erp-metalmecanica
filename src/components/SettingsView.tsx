@@ -207,12 +207,16 @@ const TarifasTab: React.FC = () => {
 
 const PoliticasTab: React.FC = () => {
   const { config, updateConfig } = useConfig();
+  
+  // Políticas y Variables Operativas
   const [salario, setSalario] = useState(config.salarioBaseDefault ?? 4500);
-  const [prodBajo, setProdBajo] = useState(config.productividadPctBajo ?? 5);
-  const [prodAlto, setProdAlto] = useState(config.productividadPctAlto ?? 10);
-  const [calidad, setCalidad] = useState(config.calidadPct ?? 3);
-  const [seguridad, setSeguridad] = useState(config.seguridadPct ?? 2);
-  const [fiveS, setFiveS] = useState(config.fiveSPct ?? 1);
+  const [prodBajo, setProdBajo] = useState(config.productividadPctBajo ?? 5.0);
+  const [prodAlto, setProdAlto] = useState(config.productividadPctAlto ?? 10.0);
+  const [calidad, setCalidad] = useState(config.calidadPct ?? 5.0);
+  const [seguridad, setSeguridad] = useState(config.seguridadPct ?? 5.0);
+  const [fiveS, setFiveS] = useState(config.fiveSPct ?? 5.0);
+  const [industryType, setIndustryType] = useState<any>(config.industryType ?? 'metal_mechanical');
+
   // Nuevas Fórmulas del Manual
   const [umaValue, setUmaValue] = useState(config.uma_value ?? 108.57);
   const [imssIv, setImssIv] = useState(config.imss_iv ?? 0.625);
@@ -238,6 +242,7 @@ const PoliticasTab: React.FC = () => {
       calidadPct: Number(calidad),
       seguridadPct: Number(seguridad),
       fiveSPct: Number(fiveS),
+      industryType: industryType,
       uma_value: Number(umaValue),
       imss_iv: Number(imssIv),
       imss_cv: Number(imssCv),
@@ -278,6 +283,29 @@ const PoliticasTab: React.FC = () => {
       </div>
 
       <div className="flex-1 overflow-y-auto custom-scrollbar grid grid-cols-1 md:grid-cols-2 gap-6 pb-6">
+        {/* Giro Industrial */}
+        <div className="col-span-full bg-gradient-to-r from-mcvill-accent/10 to-transparent border border-mcvill-accent/30 rounded-xl p-5 space-y-4">
+          <h4 className="text-[10px] font-black text-mcvill-accent uppercase tracking-widest border-b border-white/5 pb-2">Vertical / Giro Industrial Activo</h4>
+          
+          <div className="space-y-1.5 max-w-md">
+            <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Especialización de Procesos y Módulos</label>
+            <select
+              value={industryType}
+              onChange={(e) => setIndustryType(e.target.value as any)}
+              className="bg-black/60 border border-white/5 rounded-lg w-full px-3 h-10 font-mono text-[11px] text-white focus:border-mcvill-accent/50 transition-all cursor-pointer"
+            >
+              <option value="metal_mechanical">🏭 METALMECÁNICA (Nesting, Corte, Viajeros de Acero)</option>
+              <option value="automotive">🚗 AUTOMOTRIZ (Core Tools, PPAP, APQP, Kanban RFQ)</option>
+              <option value="aerospace">✈️ AEROESPACIAL (AS9100 Quality, FAI AS9102, ITAR Certs)</option>
+              <option value="textile">👕 TEXTIL (Órdenes de Corte, Confección, Fichas de Tela)</option>
+              <option value="pharmaceutical">💊 FARMACÉUTICA (Protocolos de Receta, Control FDA/GMP, Lotes)</option>
+              <option value="electronics">⚡ ELECTRÓNICA (Rutas SMT, Primer Artículo RoHS, Control ESD)</option>
+              <option value="mining">⛏️ MINERÍA (MSHA Safety, Trazabilidad de Lotes, Cert. de Materiales)</option>
+            </select>
+            <p className="text-[8px] text-slate-600 font-medium ml-1">El ERP adaptará dinámicamente todo su menú de navegación, algoritmos de cálculo, y agentes de Inteligencia Artificial para cumplir con el giro industrial seleccionado.</p>
+          </div>
+        </div>
+
         {/* Salarios */}
         <div className="bg-slate-900/40 border border-white/5 rounded-xl p-5 space-y-4">
           <h4 className="text-[10px] font-black text-mcvill-accent uppercase tracking-widest border-b border-white/5 pb-2">Salarios y Referencias</h4>
@@ -1709,6 +1737,85 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ userRole }) => {
                 <div className="space-y-1.5">
                   <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Soporte</label>
                   <input type="email" value={config.supportEmail} onChange={(e) => updateConfig({ supportEmail: e.target.value })} className="bg-black/40 border border-white/5 rounded-lg w-full px-3 h-9 text-[11px] text-white" />
+                </div>
+              </div>
+
+              {/* ── REDES SOCIALES Y WEBSITE ── */}
+              <div className="border-t border-white/5 pt-5 space-y-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <Globe size={13} className="text-mcvill-accent" />
+                  <h4 className="text-[10px] font-black text-white uppercase tracking-widest">Sitio Web y Redes Sociales</h4>
+                </div>
+                <p className="text-[9px] text-slate-500 uppercase tracking-wider">Aparecen en la portada del ERP como links de acceso rápido.</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {([
+                    { label: 'Website', key: 'websiteUrl', placeholder: 'https://www.mcvill.com' },
+                    { label: 'Facebook', key: 'facebookUrl', placeholder: 'https://www.facebook.com/McVill.Trc' },
+                    { label: 'LinkedIn', key: 'linkedinUrl', placeholder: 'https://www.linkedin.com/company/mcvill' },
+                    { label: 'TikTok', key: 'tiktokUrl', placeholder: 'https://www.tiktok.com/@mcvil.trc' },
+                  ] as const).map(f => (
+                    <div key={f.key} className="space-y-1">
+                      <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">{f.label}</label>
+                      <input
+                        type="url"
+                        value={(config as any)[f.key] || ''}
+                        onChange={e => updateConfig({ [f.key]: e.target.value } as any)}
+                        placeholder={f.placeholder}
+                        className="bg-black/40 border border-white/5 rounded-lg w-full px-3 h-9 text-[11px] text-white placeholder:text-slate-700 focus:border-mcvill-accent/50 transition-all"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* ── FOTOS DE PLANTA (CARRUSEL PORTADA) ── */}
+              <div className="border-t border-white/5 pt-5 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Upload size={13} className="text-mcvill-accent" />
+                    <h4 className="text-[10px] font-black text-white uppercase tracking-widest">Fotografías de la Planta</h4>
+                  </div>
+                  <span className="text-[8px] text-slate-500 uppercase tracking-wider bg-slate-900 border border-white/5 px-2 py-1 rounded-lg">
+                    {(config.plantaPhotos || []).length} foto(s)
+                  </span>
+                </div>
+                <p className="text-[9px] text-slate-500 uppercase tracking-wider">Pega URLs de imágenes (de Facebook, web o Supabase Storage). Aparecen en el carrusel de la portada.</p>
+
+                <div className="space-y-2">
+                  {(config.plantaPhotos || []).map((url, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <div className="w-10 h-10 rounded-lg overflow-hidden border border-white/10 shrink-0 bg-slate-900">
+                        <img src={url} alt="" className="w-full h-full object-cover" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                      </div>
+                      <input
+                        type="url"
+                        value={url}
+                        onChange={e => {
+                          const arr = [...(config.plantaPhotos || [])];
+                          arr[idx] = e.target.value;
+                          updateConfig({ plantaPhotos: arr });
+                        }}
+                        className="flex-1 bg-black/40 border border-white/5 rounded-lg px-3 h-9 text-[11px] text-white font-mono focus:border-mcvill-accent/50 transition-all"
+                        placeholder="https://..."
+                      />
+                      <button
+                        onClick={() => {
+                          const arr = (config.plantaPhotos || []).filter((_, i) => i !== idx);
+                          updateConfig({ plantaPhotos: arr });
+                        }}
+                        className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-500 hover:text-rose-400 transition-colors shrink-0"
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    </div>
+                  ))}
+
+                  <button
+                    onClick={() => updateConfig({ plantaPhotos: [...(config.plantaPhotos || []), ''] })}
+                    className="w-full h-9 rounded-lg border border-dashed border-white/10 hover:border-mcvill-accent/30 text-slate-500 hover:text-mcvill-accent text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all"
+                  >
+                    <Plus size={12} /> Agregar URL de foto
+                  </button>
                 </div>
               </div>
             </div>

@@ -32,6 +32,11 @@ interface BrandConfig {
   fiveSPct?: number;
   industryType?: 'metal_mechanical' | 'automotive' | 'aerospace' | 'textile' | 'pharmaceutical' | 'electronic' | 'mining';
   cctvYoutubeUrl?: string;
+  websiteUrl?: string;
+  facebookUrl?: string;
+  linkedinUrl?: string;
+  tiktokUrl?: string;
+  plantaPhotos?: string[];
 }
 
 interface ConfigContextType {
@@ -52,7 +57,7 @@ const defaultConfig: BrandConfig = {
   companyCity: 'Torreón, Coah., México',
   developerName: 'IA.AGUS',
   developerUrl: 'https://ia-agus.com',
-  slogan: 'Industrial Intelligence Ecosystem',
+  slogan: 'Lo más valioso en McVill es nuestra gente',
   logoText: 'MCVILL ERP',
   version: 'SYSTEM OS v2.5',
   neuralQueryPlaceholder: 'CONSULTAR RED NEURAL (ÓRDENES, ACTIVOS, COSTOS)...',
@@ -73,6 +78,11 @@ const defaultConfig: BrandConfig = {
   fiveSPct: 1,
   industryType: 'metal_mechanical',
   cctvYoutubeUrl: 'https://www.youtube.com/embed/wxx7A63LpSo',
+  websiteUrl: 'https://www.mcvill.com',
+  facebookUrl: 'https://www.facebook.com/McVill.Trc',
+  linkedinUrl: 'https://www.linkedin.com/company/mcvill',
+  tiktokUrl: 'https://www.tiktok.com/@mcvil.trc',
+  plantaPhotos: [],
 };
 
 const THEME_PALETTES: Record<ThemeName, {
@@ -202,6 +212,11 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               fiveSPct: supabaseConfig.fiveSPct !== undefined ? supabaseConfig.fiveSPct : prev.fiveSPct,
               industryType: supabaseConfig.industryType !== undefined ? supabaseConfig.industryType : prev.industryType,
               cctvYoutubeUrl: supabaseConfig.cctvYoutubeUrl || prev.cctvYoutubeUrl,
+              websiteUrl: supabaseConfig.websiteUrl || prev.websiteUrl,
+              facebookUrl: supabaseConfig.facebookUrl || prev.facebookUrl,
+              linkedinUrl: supabaseConfig.linkedinUrl || prev.linkedinUrl,
+              tiktokUrl: supabaseConfig.tiktokUrl || prev.tiktokUrl,
+              plantaPhotos: supabaseConfig.plantaPhotos !== undefined ? supabaseConfig.plantaPhotos : prev.plantaPhotos,
             };
             localStorage.setItem('mcvill-config', JSON.stringify(merged));
             return merged;
@@ -259,6 +274,11 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               fiveSPct: updated.fiveSPct,
               industryType: updated.industryType,
               cctvYoutubeUrl: updated.cctvYoutubeUrl,
+              websiteUrl: updated.websiteUrl,
+              facebookUrl: updated.facebookUrl,
+              linkedinUrl: updated.linkedinUrl,
+              tiktokUrl: updated.tiktokUrl,
+              plantaPhotos: updated.plantaPhotos,
             }
           })
           .eq('id', tenant.id);

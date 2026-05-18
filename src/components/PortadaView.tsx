@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  LayoutDashboard, Factory, Route, CalendarDays, Package, 
+import {
+  LayoutDashboard, Factory, Route, CalendarDays, Package,
   Camera, Zap, Cpu, Sparkles, Shield, Clock, Terminal,
   ExternalLink, ArrowRight, Play, Pause, Activity, ChevronRight, Settings, X,
   Truck, Palette, ClipboardCheck, ShieldAlert, Wrench, LineChart, ScanSearch,
   GitBranch, Library, FileCheck2, MessageCircle, Scan, TrendingUp, ShoppingCart,
   KanbanSquare, ShieldCheck, BrainCircuit, Calculator, ClipboardList, Layers,
   Users, FileText, CalendarCheck, UserSearch, Medal, CircleDollarSign, Landmark,
-  BarChart3, Gauge, FileBarChart, Layout as LayoutIcon
+  BarChart3, Gauge, FileBarChart, Layout as LayoutIcon,
+  Globe, ChevronLeft, Image
 } from 'lucide-react';
 import { useConfig } from '../contexts/ConfigContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -109,6 +110,17 @@ export const PortadaView: React.FC<PortadaViewProps> = ({ setView, onToggleChat,
     return permissions[role]?.includes(module) ?? false;
   };
 
+  // Carousel state
+  const photos = config.plantaPhotos || [];
+  const [carouselIdx, setCarouselIdx] = useState(0);
+  const [carouselPaused, setCarouselPaused] = useState(false);
+
+  useEffect(() => {
+    if (photos.length <= 1 || carouselPaused) return;
+    const t = setInterval(() => setCarouselIdx(i => (i + 1) % photos.length), 4500);
+    return () => clearInterval(t);
+  }, [photos.length, carouselPaused]);
+
   const [activeCategory, setActiveCategory] = useState<'ops' | 'qa_eng' | 'com' | 'hr_fin'>('ops');
 
   const menuItems = [
@@ -182,6 +194,38 @@ export const PortadaView: React.FC<PortadaViewProps> = ({ setView, onToggleChat,
           <p className="text-xs text-slate-400">
             Orquestador predictivo y visual para manufactura pesada y metalmecánica.
           </p>
+
+          {/* Social / Web Links */}
+          <div className="flex items-center gap-2 mt-3 flex-wrap">
+            {config.websiteUrl && (
+              <a href={config.websiteUrl} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-[9px] font-black uppercase text-slate-400 hover:text-white hover:border-mcvill-accent/40 transition-all">
+                <Globe size={10} />
+                Website
+              </a>
+            )}
+            {config.facebookUrl && (
+              <a href={config.facebookUrl} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-[9px] font-black uppercase text-slate-400 hover:text-white hover:border-blue-500/40 transition-all">
+                <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                Facebook
+              </a>
+            )}
+            {config.linkedinUrl && (
+              <a href={config.linkedinUrl} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-[9px] font-black uppercase text-slate-400 hover:text-white hover:border-sky-500/40 transition-all">
+                <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                LinkedIn
+              </a>
+            )}
+            {config.tiktokUrl && (
+              <a href={config.tiktokUrl} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-[9px] font-black uppercase text-slate-400 hover:text-white hover:border-pink-500/40 transition-all">
+                <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg>
+                TikTok
+              </a>
+            )}
+          </div>
         </div>
 
         {/* Live Clock Widget */}
@@ -199,6 +243,93 @@ export const PortadaView: React.FC<PortadaViewProps> = ({ setView, onToggleChat,
           </div>
         </div>
       </div>
+
+      {/* ── CARRUSEL DE FOTOGRAFÍAS DE LA PLANTA ── */}
+      {photos.length > 0 ? (
+        <div
+          className="relative rounded-3xl overflow-hidden border border-mcvill-accent/20 shadow-xl"
+          style={{ height: '320px' }}
+          onMouseEnter={() => setCarouselPaused(true)}
+          onMouseLeave={() => setCarouselPaused(false)}
+        >
+          {photos.map((src, i) => (
+            <img
+              key={i}
+              src={src}
+              alt={`${config.companyName} — planta ${i + 1}`}
+              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${i === carouselIdx ? 'opacity-100' : 'opacity-0'}`}
+            />
+          ))}
+
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-slate-950/50 pointer-events-none" />
+
+          {/* Central phrase */}
+          {config.slogan && (
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center px-8 pointer-events-none">
+              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-mcvill-accent mb-3">
+                {config.companyName}
+              </p>
+              <h2 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tight leading-tight max-w-2xl drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+                {config.slogan}
+              </h2>
+            </div>
+          )}
+
+          {/* Company name + city (bottom left) */}
+          <div className="absolute bottom-5 left-6 z-10">
+            {!config.slogan && <p className="text-xl font-black text-white uppercase tracking-tight leading-none">{config.companyName}</p>}
+            {config.companyCity && <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">{config.companyCity}</p>}
+          </div>
+
+          {/* Photo counter */}
+          <div className="absolute top-4 right-5 z-10 px-2.5 py-1 rounded-xl bg-slate-950/70 backdrop-blur border border-white/10 text-[9px] font-black text-slate-300 font-mono">
+            {carouselIdx + 1} / {photos.length}
+          </div>
+
+          {/* Arrows */}
+          {photos.length > 1 && (
+            <>
+              <button
+                onClick={() => setCarouselIdx(i => (i - 1 + photos.length) % photos.length)}
+                className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-xl bg-slate-950/70 backdrop-blur border border-white/10 flex items-center justify-center text-white hover:bg-slate-900 transition-all"
+              >
+                <ChevronLeft size={16} />
+              </button>
+              <button
+                onClick={() => setCarouselIdx(i => (i + 1) % photos.length)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-xl bg-slate-950/70 backdrop-blur border border-white/10 flex items-center justify-center text-white hover:bg-slate-900 transition-all"
+              >
+                <ChevronRight size={16} />
+              </button>
+            </>
+          )}
+
+          {/* Dots */}
+          {photos.length > 1 && (
+            <div className="absolute bottom-5 right-6 z-10 flex gap-1.5">
+              {photos.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCarouselIdx(i)}
+                  className={`rounded-full transition-all duration-300 ${i === carouselIdx ? 'w-4 h-1.5 bg-mcvill-accent' : 'w-1.5 h-1.5 bg-white/30 hover:bg-white/60'}`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        /* Empty state — only visible to admins */
+        isGodmode && (
+          <button
+            onClick={() => setView('settings')}
+            className="w-full rounded-3xl border border-dashed border-white/10 hover:border-mcvill-accent/30 bg-white/[0.02] hover:bg-mcvill-accent/5 transition-all p-8 flex flex-col items-center gap-3 text-slate-500 hover:text-slate-300"
+          >
+            <Image size={28} />
+            <p className="text-[10px] font-black uppercase tracking-widest">Agregar fotos de la planta desde Configuración → Identidad Visual</p>
+          </button>
+        )
+      )}
 
       {/* ── MAIN PORTADA CONTAINER: CINEMATIC FEED & SYSTEM TELEMETRY ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
