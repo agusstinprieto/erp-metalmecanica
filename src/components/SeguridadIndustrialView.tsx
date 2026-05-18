@@ -31,10 +31,10 @@ interface Incidente {
 }
 
 const DEFAULT_CAMERAS: SecurityCamera[] = [
-  { id: 'c1', nombre: 'Entrada Principal',  area: 'Acceso',      url: 'https://www.youtube.com/watch?v=F3zZ-2OspvI', tipo: 'mjpeg', online: true  },
-  { id: 'c2', nombre: 'Área de Soldadura',  area: 'Producción',  url: 'https://www.youtube.com/watch?v=7XGplK3yV-E', tipo: 'mjpeg', online: true  },
-  { id: 'c3', nombre: 'Almacén General',    area: 'Almacén',     url: 'https://www.youtube.com/watch?v=dAXdeqcftp4', tipo: 'mjpeg', online: true  },
-  { id: 'c4', nombre: 'Taller CNC',         area: 'Producción',  url: 'https://www.youtube.com/watch?v=s5eA30XW-tY', tipo: 'mjpeg', online: true },
+  { id: 'c1', nombre: 'Entrada Principal',  area: 'Acceso',      url: 'https://www.youtube.com/watch?v=tF4DML7FIWk', tipo: 'mjpeg', online: true  },
+  { id: 'c2', nombre: 'Área de Soldadura',  area: 'Producción',  url: 'https://www.youtube.com/watch?v=b89uL79P3nE', tipo: 'mjpeg', online: true  },
+  { id: 'c3', nombre: 'Almacén General',    area: 'Almacén',     url: 'https://www.youtube.com/watch?v=rVlhMGQgDkY', tipo: 'mjpeg', online: true  },
+  { id: 'c4', nombre: 'Taller CNC',         area: 'Producción',  url: 'https://www.youtube.com/watch?v=8_lfxPI5ObM', tipo: 'mjpeg', online: true },
   { id: 'c5', nombre: 'Área de Pintura',    area: 'Producción',  url: 'https://www.youtube.com/watch?v=8_lfxPI5ObM', tipo: 'mjpeg', online: true  },
   { id: 'c6', nombre: 'Estacionamiento',    area: 'Exterior',    url: 'https://www.youtube.com/watch?v=tF4DML7FIWk', tipo: 'mjpeg', online: true  },
 ];
@@ -505,12 +505,16 @@ export const SeguridadIndustrialView: React.FC = () => {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          // Robust initial self-heal to catch cached empty/non-YouTube/GoogleStorage links for all 6 channels
+          // Robust initial self-heal to catch cached empty/non-YouTube/GoogleStorage/Blocked links for all 6 channels
           const hasLegacy = parsed.some(c => 
             !c.url || 
             (c.url.includes('youtube.com') === false && c.url.includes('youtu.be') === false) ||
             c.url.includes('googleapis.com') ||
-            c.url.includes('googleusercontent.com')
+            c.url.includes('googleusercontent.com') ||
+            c.url.includes('F3zZ-2OspvI') ||
+            c.url.includes('7XGplK3yV-E') ||
+            c.url.includes('dAXdeqcftp4') ||
+            c.url.includes('s5eA30XW-tY')
           );
           if (hasLegacy) {
             return DEFAULT_CAMERAS;
@@ -540,7 +544,11 @@ export const SeguridadIndustrialView: React.FC = () => {
             !c.url || 
             (c.url.includes('youtube.com') === false && c.url.includes('youtu.be') === false) ||
             c.url.includes('googleapis.com') ||
-            c.url.includes('googleusercontent.com')
+            c.url.includes('googleusercontent.com') ||
+            c.url.includes('F3zZ-2OspvI') ||
+            c.url.includes('7XGplK3yV-E') ||
+            c.url.includes('dAXdeqcftp4') ||
+            c.url.includes('s5eA30XW-tY')
           );
           if (hasLegacy) {
             setCameras(DEFAULT_CAMERAS);
