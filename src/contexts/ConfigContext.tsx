@@ -19,6 +19,8 @@ interface BrandConfig {
   software_accelerator_url?: string;
   logo?: string;
   logoDark?: string;
+  logoIcon?: string;
+  favicon?: string;
   quotationLogo?: string;
   loginBackground?: string;
   themeColor?: string;
@@ -64,8 +66,10 @@ const defaultConfig: BrandConfig = {
   supportEmail: 'soporte@mcvill.mx',
   selectedApi: 'gemini-2.5-flash-lite',
   software_accelerator_url: 'https://mcvill-acelerador.vercel.app',
-  logo: '/logo-erp.png',
-  logoDark: '/logo-erp.png',
+  logo: '/mcvill-mcv.png',
+  logoDark: '/mcvill-mcv.png',
+  logoIcon: '/mcvill-logo-cyber.png',
+  favicon: '/favicon.png',
   loginBackground: '/login-bg.png',
   themeColor: '#3B82F6',
   themeColorLight: '#1D4ED8',
@@ -114,6 +118,18 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [tenantId, setTenantId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(true); // Default to dark mode for "Agus Pro" aesthetic
+
+  useEffect(() => {
+    const faviconUrl = config.favicon || config.logoIcon || config.logo;
+    if (!faviconUrl) return;
+    let link = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'icon';
+      document.head.appendChild(link);
+    }
+    link.href = faviconUrl;
+  }, [config.favicon, config.logoIcon, config.logo]);
 
   useEffect(() => {
     const palette = THEME_PALETTES[config.themeName ?? 'blue'];
@@ -199,6 +215,8 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               themeName: (supabaseConfig.themeName as ThemeName) || prev.themeName,
               logo: supabaseConfig.logo_url || prev.logo,
               logoDark: supabaseConfig.logo_url || prev.logoDark,
+              logoIcon: supabaseConfig.logo_icon_url || prev.logoIcon,
+              favicon: supabaseConfig.favicon_url || prev.favicon,
               quotationLogo: supabaseConfig.quotation_logo_url || prev.quotationLogo,
               companyName: supabaseConfig.company_name || prev.companyName,
               companyCity: supabaseConfig.company_city || prev.companyCity,

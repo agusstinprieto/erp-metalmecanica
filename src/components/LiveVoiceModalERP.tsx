@@ -207,34 +207,14 @@ export const LiveVoiceModalERP: React.FC<LiveVoiceModalERPProps> = ({
       setLoadingVoice(voiceId);
       window.speechSynthesis.cancel();
  
-      // Retrieve API Key dynamically from Supabase
-      const tenantCfg = await tenantService.getConfig();
-      const apiKey = tenantCfg.gemini_api_key?.trim();
-      if (!apiKey) {
-        throw new Error("API Key no detectada en Supabase.");
-      }
- 
-      // Initialize SDK
-      const ai = new GoogleGenAI({ apiKey } as any);
- 
-      // Call authorized native audio model for perfect voice fidelity
-      const response = await ai.models.generateContent({
-        model: 'models/gemini-2.5-flash-native-audio-preview-12-2025',
-        contents: `Preséntate de forma extremadamente corta y profesional diciendo: "Hola, soy la voz de ${voiceName} del ERP McVill. ¿En qué te puedo ayudar hoy?"`,
-        config: {
-          responseModalities: ['AUDIO'],
-          speechConfig: {
-            voiceConfig: {
-              prebuiltVoiceConfig: {
-                voiceName: voiceId
-              }
-            }
-          }
-        }
-      } as any);
- 
-      // Extract base64 audio
-      const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+      // Route through Edge Function — key never leaves the server
+      const { data, error: fnError } = await supabase.functions.invoke('gemini-voice', {
+        body: { voiceId, voiceName },
+      });
+      if (fnError) throw fnError;
+      if (data?.error) throw new Error(data.error);
+
+      const base64Audio: string = data.base64Audio;
       if (!base64Audio) {
         throw new Error("No se recibió audio de la API de Gemini.");
       }
@@ -348,10 +328,17 @@ export const LiveVoiceModalERP: React.FC<LiveVoiceModalERPProps> = ({
       setIsConnecting(true);
 
       const tenantCfg = await tenantService.getConfig();
-      const apiKey = tenantCfg.gemini_api_key?.trim();
+
+      // gemini_api_key is stored as a direct column in tenants, fetch it separately
+      const { data: tenantRow } = await supabase
+        .from('tenants')
+        .select('gemini_api_key')
+        .eq('id', tenantCfg.id)
+        .maybeSingle();
+      const apiKey = tenantRow?.gemini_api_key?.trim();
 
       if (!apiKey) {
-        throw new Error("API Key no detectada en Supabase. Configúrala en el panel de Administración.");
+        throw new Error("API Key no detectada en Supabase. Configúrala en Ajustes → Motores IA.");
       }
 
       // ── Resolución dinámica del nombre del asistente (Zero Hardcoding) ────
