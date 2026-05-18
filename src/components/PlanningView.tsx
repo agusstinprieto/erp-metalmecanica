@@ -387,7 +387,7 @@ const GanttTab: React.FC = () => {
     try {
       // Separate queries to avoid Supabase 400 relationship errors
       const { data: wos } = await supabase
-        .from('work_orders')
+        .from('ordenes_trabajo')
         .select('id, order_number, status, created_at, project_id')
         .in('status', ['pending', 'in_progress', 'completed'])
         .order('created_at', { ascending: false })
@@ -605,7 +605,7 @@ const MRPTab: React.FC = () => {
       try {
         const [matRes, woRes] = await Promise.all([
           supabase.from('materiales').select('descripcion_mp, peso_mp, stock_minimo_mp, unidad_mp').limit(50),
-          supabase.from('work_orders').select('id, order_number').in('status', ['pending', 'in_progress']).limit(20),
+          supabase.from('ordenes_trabajo').select('id, order_number').in('status', ['pending', 'in_progress']).limit(20),
         ]);
 
         const mats   = matRes.data ?? [];
@@ -899,7 +899,7 @@ const ForecastTab: React.FC = () => {
       setLoading(true);
       try {
         const { data: orders } = await supabase
-          .from('work_orders')
+          .from('ordenes_trabajo')
           .select('created_at, status')
           .gte('created_at', new Date(Date.now() - 90 * 86400000).toISOString())
           .order('created_at');
@@ -1040,8 +1040,8 @@ const SOPTab: React.FC = () => {
       try {
         const [quotesRes, ordersRes, stagesRes] = await Promise.all([
           supabase.from('cotizaciones').select('id, numero_cotizacion, cliente_nombre, precio_total, estado, created_at').order('created_at', { ascending: false }).limit(8),
-          supabase.from('work_orders').select('id, status').limit(100),
-          supabase.from('work_orders').select('id, status').eq('status', 'in_progress').limit(100),
+          supabase.from('ordenes_trabajo').select('id, status').limit(100),
+          supabase.from('ordenes_trabajo').select('id, status').eq('status', 'in_progress').limit(100),
         ]);
 
         setPipeline(quotesRes.data ?? []);

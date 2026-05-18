@@ -31,7 +31,7 @@ export const productionService = {
   async getWorkOrders() {
     // Separate queries to avoid missing relationship error (400)
     const [woRes, epRes] = await Promise.all([
-      supabase.from('work_orders').select('*').order('created_at', { ascending: false }),
+      supabase.from('ordenes_trabajo').select('*').order('created_at', { ascending: false }),
       supabase.from('engineering_projects').select('id, title')
     ]);
 
@@ -51,14 +51,14 @@ export const productionService = {
     if (!wo.order_number) {
       const year = new Date().getFullYear();
       const { data: countData } = await supabase
-        .from('work_orders')
+        .from('ordenes_trabajo')
         .select('id', { count: 'exact' });
       const count = (countData?.length || 0) + 1;
       wo.order_number = `OT-${year}-${count.toString().padStart(3, '0')}`;
     }
 
     const { data, error } = await supabase
-      .from('work_orders')
+      .from('ordenes_trabajo')
       .insert([wo])
       .select()
       .single();
@@ -119,7 +119,7 @@ export const productionService = {
 
   async updateWorkOrderProgress(workOrderId: string, progress: number) {
     const { error } = await supabase
-      .from('work_orders')
+      .from('ordenes_trabajo')
       .update({ progress })
       .eq('id', workOrderId);
 
@@ -128,7 +128,7 @@ export const productionService = {
 
   async updateWorkOrder(id: string, updates: Partial<WorkOrder>) {
     const { data, error } = await supabase
-      .from('work_orders')
+      .from('ordenes_trabajo')
       .update(updates)
       .eq('id', id)
       .select()
@@ -140,7 +140,7 @@ export const productionService = {
 
   async deleteWorkOrder(id: string) {
     const { error } = await supabase
-      .from('work_orders')
+      .from('ordenes_trabajo')
       .delete()
       .eq('id', id);
 
@@ -255,7 +255,7 @@ export const productionService = {
   }> {
     // Get all work orders
     const { data: workOrders } = await supabase
-      .from('work_orders')
+      .from('ordenes_trabajo')
       .select('*');
 
     if (!workOrders || workOrders.length === 0) {

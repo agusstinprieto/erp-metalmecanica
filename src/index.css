@@ -364,20 +364,53 @@
 /* ── Fondos oscuros adicionales (slate-800/900/950 con opacidad) ── */
 .light .bg-slate-950\/20,
 .light .bg-slate-950\/30,
-.light .bg-slate-950\/60 { background-color: rgba(241,245,249,0.97) !important; }
+.light .bg-slate-950\/60,
+.light .bg-slate-950\/70 { background-color: rgba(241,245,249,0.97) !important; }
 
 .light .bg-slate-900\/10,
-.light .bg-slate-900\/20 { background-color: rgba(241,245,249,0.92) !important; }
+.light .bg-slate-900\/20,
+.light .bg-slate-900\/70 { background-color: rgba(241,245,249,0.92) !important; }
 
 .light .bg-slate-800,
+.light .bg-slate-800\/20,
+.light .bg-slate-800\/30,
 .light .bg-slate-800\/40,
 .light .bg-slate-800\/50,
 .light .bg-slate-800\/60,
 .light .bg-slate-800\/80 { background-color: #E8EFF7 !important; }
 
 .light .bg-slate-700,
+.light .bg-slate-700\/30,
+.light .bg-slate-700\/40,
 .light .bg-slate-700\/50,
 .light .bg-slate-700\/60 { background-color: #E2E8F0 !important; }
+
+/* ── bg-black con opacidades faltantes ───────────────────── */
+.light .bg-black\/70,
+.light .bg-black\/90 { background-color: rgba(255,255,255,0.95) !important; }
+
+/* ── Bordes adicionales con opacidad ─────────────────────── */
+.light .border-slate-800\/60 { border-color: #D1D9E6 !important; }
+.light .border-slate-800\/20,
+.light .border-slate-800\/30 { border-color: #E2E8F0 !important; }
+.light .border-slate-900\/30,
+.light .border-slate-900\/40,
+.light .border-slate-900\/50 { border-color: #CBD5E1 !important; }
+
+/* ── Hover states oscuros faltantes ──────────────────────── */
+.light .hover\:bg-slate-900:hover,
+.light .hover\:bg-slate-950:hover { background-color: #E2E8F0 !important; }
+
+/* ── Divisores ───────────────────────────────────────────── */
+.light .divide-slate-800 > * + * { border-color: #E2E8F0 !important; }
+
+/* ── AIChatBubble — panel flotante ───────────────────────── */
+.light .bg-slate-900.rounded-2xl,
+.light .bg-slate-950.rounded-2xl { background-color: #FFFFFF !important; box-shadow: 0 4px 24px rgba(15,23,42,0.10) !important; }
+
+/* ── border-t / border-b con slate oscuro ────────────────── */
+.light [class*="border-t"][class*="slate-800"],
+.light [class*="border-b"][class*="slate-800"] { border-color: #E2E8F0 !important; }
 
 /* ── Bordes adicionales ─────────────────────────────────── */
 .light .border-slate-800\/40,

@@ -144,7 +144,7 @@ export const McVillChat: React.FC<McVillChatProps> = ({
       let knowledgeContext = '';
       try {
         const [orders, inventory, customers, knowledge] = await Promise.all([
-          supabase.from('work_orders').select('id, order_number, status').limit(5),
+          supabase.from('ordenes_trabajo').select('id, order_number, status').limit(5),
           supabase.from('materiales').select('descripcion_mp, peso_mp').limit(5),
           supabase.from('clientes').select('razon_social').limit(5),
           aiService.getKnowledge().catch(() => []),

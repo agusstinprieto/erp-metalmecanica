@@ -353,9 +353,9 @@ export const payrollService = {
     employees_cost: { employee_id: string; name: string; cost: number }[];
     details: { employee_id: string; name: string; gross: number; bonus_oee: number; overtime: number }[];
   }> {
-    // Get employees who worked on this project (from work_orders)
+    // Get employees who worked on this project (from ordenes_trabajo)
     const { data: workOrders } = await supabase
-      .from('work_orders')
+      .from('ordenes_trabajo')
       .select('id, assigned_to')
       .eq('project_id', projectId);
 

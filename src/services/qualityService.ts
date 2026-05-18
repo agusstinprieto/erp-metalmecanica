@@ -66,7 +66,7 @@ export const qualityService = {
   async getInspections() {
     const [qiRes, woRes, epRes] = await Promise.all([
       supabase.from('quality_inspections').select('*').order('created_at', { ascending: false }),
-      supabase.from('work_orders').select('id, order_number, project_id'),
+      supabase.from('ordenes_trabajo').select('id, order_number, project_id'),
       supabase.from('engineering_projects').select('id, title')
     ]);
 
@@ -86,7 +86,7 @@ export const qualityService = {
 
   async getProductionOrders() {
     const [woRes, epRes] = await Promise.all([
-      supabase.from('work_orders').select('id, order_number, project_id').order('order_number', { ascending: false }),
+      supabase.from('ordenes_trabajo').select('id, order_number, project_id').order('order_number', { ascending: false }),
       supabase.from('engineering_projects').select('id, title')
     ]);
     if (woRes.error) throw woRes.error;

@@ -403,10 +403,9 @@ export const LiveVoiceModalERP: React.FC<LiveVoiceModalERPProps> = ({
 
       let systemSnapshot = '';
       try {
-        // Consultas resilientes para el snapshot (prueban nombres nuevos y viejos)
         const [ordersRes, inventoryRes, customersRes] = await Promise.all([
-          supabase.from('ordenes_trabajo').select('*').limit(3).then(r => r.error ? supabase.from('work_orders').select('*').limit(3) : r),
-          supabase.from('materiales').select('*').limit(3).then(r => r.error ? supabase.from('suministros').select('*').limit(3) : r),
+          supabase.from('ordenes_trabajo').select('*').limit(3),
+          supabase.from('materiales').select('*').limit(3),
           supabase.from('clientes').select('*').limit(3)
         ]);
         
