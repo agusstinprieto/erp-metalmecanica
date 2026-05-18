@@ -32,7 +32,7 @@ interface Incidente {
 
 const DEFAULT_CAMERAS: SecurityCamera[] = [
   { id: 'c1', nombre: 'Entrada Principal',  area: 'Acceso',      url: 'https://www.youtube.com/watch?v=tF4DML7FIWk', tipo: 'mjpeg', online: true  },
-  { id: 'c2', nombre: 'Área de Soldadura',  area: 'Producción',  url: 'https://www.youtube.com/watch?v=b89uL79P3nE', tipo: 'mjpeg', online: true  },
+  { id: 'c2', nombre: 'Área de Soldadura',  area: 'Producción',  url: 'https://www.youtube.com/watch?v=wxx7A63LpSo', tipo: 'mjpeg', online: true  },
   { id: 'c3', nombre: 'Almacén General',    area: 'Almacén',     url: 'https://www.youtube.com/watch?v=rVlhMGQgDkY', tipo: 'mjpeg', online: true  },
   { id: 'c4', nombre: 'Taller CNC',         area: 'Producción',  url: 'https://www.youtube.com/watch?v=8_lfxPI5ObM', tipo: 'mjpeg', online: true },
   { id: 'c5', nombre: 'Área de Pintura',    area: 'Producción',  url: 'https://www.youtube.com/watch?v=8_lfxPI5ObM', tipo: 'mjpeg', online: true  },
@@ -514,7 +514,8 @@ export const SeguridadIndustrialView: React.FC = () => {
             c.url.includes('F3zZ-2OspvI') ||
             c.url.includes('7XGplK3yV-E') ||
             c.url.includes('dAXdeqcftp4') ||
-            c.url.includes('s5eA30XW-tY')
+            c.url.includes('s5eA30XW-tY') ||
+            c.url.includes('b89uL79P3nE')
           );
           if (hasLegacy) {
             return DEFAULT_CAMERAS;
@@ -548,7 +549,8 @@ export const SeguridadIndustrialView: React.FC = () => {
             c.url.includes('F3zZ-2OspvI') ||
             c.url.includes('7XGplK3yV-E') ||
             c.url.includes('dAXdeqcftp4') ||
-            c.url.includes('s5eA30XW-tY')
+            c.url.includes('s5eA30XW-tY') ||
+            c.url.includes('b89uL79P3nE')
           );
           if (hasLegacy) {
             setCameras(DEFAULT_CAMERAS);
