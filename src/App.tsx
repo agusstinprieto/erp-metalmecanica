@@ -68,13 +68,14 @@ const SeguridadIndustrialView = lz(() => import('./components/SeguridadIndustria
 const EnergyMonitorView      = lz(() => import('./components/EnergyMonitorView'),      'EnergyMonitorView');
 const PreventiveMaintenanceIAView = lz(() => import('./components/PreventiveMaintenanceIAView'), 'PreventiveMaintenanceIAView');
 const CeoMobileSim = lz(() => import('./components/CeoMobileSim'), 'CeoMobileSim');
+const PortadaView = lz(() => import('./components/PortadaView'), 'PortadaView');
 
 type UserRole = 'ceo' | 'gerencia' | 'sistemas' | 'empleado' | 'rh' | 'finanzas' | 'contabilidad' | 'supervisor' | 'ingenieria' | 'calidad' | 'operaciones' | 'ventas' | 'compras' | 'almacen' | 'auditoria' | 'soporte' | 'marketing' | 'seguridad';
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [sessionChecked, setSessionChecked] = useState(false);
-  const [activeView, setActiveView] = useState('dashboard');
+  const [activeView, setActiveView] = useState('portada');
   const [userRole, setUserRole] = useState<UserRole>('empleado');
   const [userEmail, setUserEmail] = useState<string>('');
   const [userDisplayName, setUserDisplayName] = useState<string>('');
@@ -523,6 +524,7 @@ function App() {
               <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Cargando módulo...</p>
             </div>
           }>
+            {activeView === 'portada' && <PortadaView setView={setActiveView} onToggleChat={() => setIsChatOpen(v => !v)} onOpenVoice={() => { setIsChatOpen(true); setPanelType('voice'); }} />}
             {activeView === 'dashboard' && <Dashboard onNavigateToBanco={() => setActiveView('banco')} />}
             {activeView === 'inventory' && <InventoryView />}
             {activeView === 'payroll' && <PayrollView />}

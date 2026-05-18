@@ -62,11 +62,12 @@ const sidebarSections: SidebarSection[] = [
   {
     title: 'Operaciones',
     items: [
+      { id: 'portada', label: 'Portada', icon: Layout },
       { id: 'dashboard', label: 'Tablero', icon: LayoutDashboard },
-      { id: 'production', label: 'Planta', icon: Factory },
-      { id: 'viajeros', label: 'Viajeros', icon: Route },
       { id: 'planeacion', label: 'Planeación', icon: CalendarDays },
       { id: 'inventory', label: 'Inventarios', icon: Package },
+      { id: 'viajeros', label: 'Viajeros', icon: Route },
+      { id: 'production', label: 'Planta', icon: Factory },
     ]
   },
   {
@@ -174,21 +175,21 @@ export const Sidebar = (props: {
     if (isGodmode) return true;
     if (['chat_ia', 'voice_link'].includes(module)) return true;
     const permissions: Record<string, string[]> = {
-      empleado:     ['dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse'],
-      supervisor:   ['dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse', 'engineering', 'maintenance'],
-      ingenieria:   ['dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse', 'engineering', 'maintenance', 'work_instructions', 'layout_design', 'process_simulator', 'nesting', 'energy_monitor', 'preventive_maintenance_ia'],
-      calidad:      ['dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse', 'spc', 'visual_ia', 'trazabilidad', 'defect_library', 'ppap', 'voc', 'seguridad', 'preventive_maintenance_ia'],
-      operaciones:  ['dashboard', 'inventory', 'production', 'viajeros', 'shop_floor', 'compras', 'ventas', 'agente_cot', 'rfq_kanban', 'factibilidad', 'factibilidad_ia', 'metal_quoter', 'roi', 'maintenance'],
-      ventas:       ['dashboard', 'ventas', 'agente_cot', 'rfq_kanban', 'factibilidad', 'factibilidad_ia', 'metal_quoter', 'roi'],
-      compras:      ['dashboard', 'compras', 'inventory'],
-      almacen:      ['dashboard', 'inventory', 'viajeros', 'hse'],
-      rh:           ['dashboard', 'rh', 'payroll', 'attendance', 'recruitment', 'desempeno'],
-      finanzas:     ['dashboard', 'finance', 'banco', 'costing', 'costeo', 'payroll'],
-      contabilidad: ['dashboard', 'finance', 'banco', 'costing', 'payroll'],
-      auditoria:    ['dashboard', 'reports', 'quality', 'spc', 'trazabilidad'],
-      soporte:      ['dashboard', 'voc', 'quality'],
-      marketing:    ['dashboard', 'ventas', 'voc'],
-      seguridad:    ['dashboard', 'hse', 'seguridad'],
+      empleado:     ['portada', 'dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse'],
+      supervisor:   ['portada', 'dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse', 'engineering', 'maintenance'],
+      ingenieria:   ['portada', 'dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse', 'engineering', 'maintenance', 'work_instructions', 'layout_design', 'process_simulator', 'nesting', 'energy_monitor', 'preventive_maintenance_ia'],
+      calidad:      ['portada', 'dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse', 'spc', 'visual_ia', 'trazabilidad', 'defect_library', 'ppap', 'voc', 'seguridad', 'preventive_maintenance_ia'],
+      operaciones:  ['portada', 'dashboard', 'inventory', 'production', 'viajeros', 'shop_floor', 'compras', 'ventas', 'agente_cot', 'rfq_kanban', 'factibilidad', 'factibilidad_ia', 'metal_quoter', 'roi', 'maintenance'],
+      ventas:       ['portada', 'dashboard', 'ventas', 'agente_cot', 'rfq_kanban', 'factibilidad', 'factibilidad_ia', 'metal_quoter', 'roi'],
+      compras:      ['portada', 'dashboard', 'compras', 'inventory'],
+      almacen:      ['portada', 'dashboard', 'inventory', 'viajeros', 'hse'],
+      rh:           ['portada', 'dashboard', 'rh', 'payroll', 'attendance', 'recruitment', 'desempeno'],
+      finanzas:     ['portada', 'dashboard', 'finance', 'banco', 'costing', 'costeo', 'payroll'],
+      contabilidad: ['portada', 'dashboard', 'finance', 'banco', 'costing', 'payroll'],
+      auditoria:    ['portada', 'dashboard', 'reports', 'quality', 'spc', 'trazabilidad'],
+      soporte:      ['portada', 'dashboard', 'voc', 'quality'],
+      marketing:    ['portada', 'dashboard', 'ventas', 'voc'],
+      seguridad:    ['portada', 'dashboard', 'hse', 'seguridad'],
     };
     return permissions[role]?.includes(module) ?? false;
   };
@@ -202,11 +203,12 @@ export const Sidebar = (props: {
   const showAdvancedContainer = showQualitySection || showCommercialSection || showEngineeringSection || showHRSection || showFinanceSection || showSystemSection;
 
   const ALL_NAV_ITEMS: { id: string; label: string; icon: any; godmode?: boolean; superadmin?: boolean; special?: 'chat' | 'voice' }[] = [
+    { id: 'portada',           label: 'Portada',         icon: Layout },
     { id: 'dashboard',         label: 'Tablero',         icon: LayoutDashboard },
-    { id: 'production',        label: 'Planta',           icon: Factory },
-    { id: 'viajeros',          label: 'Viajeros',         icon: Route },
     { id: 'planeacion',        label: 'Planeación',       icon: CalendarDays },
     { id: 'inventory',         label: 'Inventarios',      icon: Package },
+    { id: 'viajeros',          label: 'Viajeros',         icon: Route },
+    { id: 'production',        label: 'Planta',           icon: Factory },
     { id: 'quality',           label: 'Calidad',          icon: ClipboardCheck },
     { id: 'hse',               label: 'HSE',              icon: ShieldAlert },
     { id: 'maintenance',       label: 'Mantenimiento',    icon: Wrench },
