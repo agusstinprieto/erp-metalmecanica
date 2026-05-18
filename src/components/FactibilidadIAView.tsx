@@ -3,8 +3,9 @@ import {
   BrainCircuit, Clock, DollarSign, Factory, AlertTriangle,
   CheckCircle, AlertCircle, XCircle, Trash2, Save, Sparkles, History,
   ChevronRight, Loader2, Zap, Package, Wrench,
-  RefreshCw
+  RefreshCw, FileDown
 } from 'lucide-react';
+import { reportUtils } from '../utils/reportUtils';
 import clsx from 'clsx';
 import { fetchRFQs, type RFQCotizacion } from '../services/quoteService';
 import { useTenant } from '../hooks/useTenant';
@@ -133,6 +134,28 @@ const AnalysisResult = ({
 }) => {
   const fmt = (n: number) => n.toLocaleString('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 });
 
+  const handleExportPDF = () => {
+    const rows = [
+      { Sección: 'Veredicto', Detalle: analisis.factibilidad, Valor: `Confianza ${analisis.confianza}%` },
+      { Sección: 'Costo por pieza', Detalle: 'Rango estimado', Valor: `${fmt(analisis.costo_estimado.por_pieza_min)} – ${fmt(analisis.costo_estimado.por_pieza_max)}` },
+      { Sección: 'Costo por lote', Detalle: 'Rango estimado', Valor: `${fmt(analisis.costo_estimado.por_lote_min)} – ${fmt(analisis.costo_estimado.por_lote_max)}` },
+      { Sección: 'Tiempo entrega', Detalle: 'Días hábiles', Valor: `${analisis.tiempo_entrega_dias} días` },
+      { Sección: 'Capacidad planta', Detalle: analisis.capacidad_planta, Valor: '' },
+      { Sección: 'Resumen ejecutivo', Detalle: analisis.resumen_ejecutivo, Valor: '' },
+      ...analisis.riesgos.map(r => ({ Sección: `Riesgo — ${r.categoria}`, Detalle: r.descripcion, Valor: r.nivel })),
+      ...analisis.cuellos_botella.map(c => ({ Sección: 'Cuello de botella', Detalle: c, Valor: '' })),
+      ...analisis.procesos_criticos.map(p => ({ Sección: 'Proceso crítico', Detalle: p, Valor: '' })),
+      ...analisis.recomendaciones.map(r => ({ Sección: 'Recomendación', Detalle: r, Valor: '' })),
+      ...analisis.condiciones_especiales.map(c => ({ Sección: 'Condición especial', Detalle: c, Valor: '' })),
+    ];
+    reportUtils.exportToPDF(
+      `Factibilidad IA — ${rfq.cliente} · ${rfq.descripcion || rfq.alcance_general}`,
+      rows,
+      `factibilidad_${rfq.cliente.toLowerCase().replace(/\s+/g, '_')}`,
+      'COTIZACIONES'
+    );
+  };
+
   return (
     <div className="flex flex-col gap-4 animate-fade-in">
       {/* Header verdict */}
@@ -146,19 +169,27 @@ const AnalysisResult = ({
             <span className="text-slate-400 text-xs">Confianza IA</span>
             <span className="text-mcvill-accent font-black text-lg">{analisis.confianza}%</span>
           </div>
-          <button
-            onClick={onSave}
-            disabled={saved}
-            className={clsx(
-              'flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold border transition-all',
-              saved
-                ? 'bg-emerald-500/10 border-emerald-400/30 text-emerald-300 cursor-default'
-                : 'bg-mcvill-accent/15 border-mcvill-accent/30 text-mcvill-accent hover:bg-mcvill-accent/25'
-            )}
-          >
-            {saved ? <CheckCircle size={13} /> : <Save size={13} />}
-            {saved ? 'Guardado' : 'Guardar análisis'}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleExportPDF}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold border transition-all bg-white/5 border-white/10 text-slate-300 hover:bg-white/10"
+            >
+              <FileDown size={13} /> Exportar PDF
+            </button>
+            <button
+              onClick={onSave}
+              disabled={saved}
+              className={clsx(
+                'flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold border transition-all',
+                saved
+                  ? 'bg-emerald-500/10 border-emerald-400/30 text-emerald-300 cursor-default'
+                  : 'bg-mcvill-accent/15 border-mcvill-accent/30 text-mcvill-accent hover:bg-mcvill-accent/25'
+              )}
+            >
+              {saved ? <CheckCircle size={13} /> : <Save size={13} />}
+              {saved ? 'Guardado' : 'Guardar análisis'}
+            </button>
+          </div>
         </div>
       </div>
 

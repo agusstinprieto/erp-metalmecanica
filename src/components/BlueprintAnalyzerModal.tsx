@@ -17,6 +17,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { aiService } from '../services/aiService';
 import { engineeringService } from '../services/engineeringService';
 import { useConfig } from '../contexts/ConfigContext';
+import { reportUtils } from '../utils/reportUtils';
 import { toast } from '../lib/dialogs';
 import clsx from 'clsx';
 
@@ -94,6 +95,22 @@ export const BlueprintAnalyzerModal: React.FC<BlueprintAnalyzerModalProps> = ({
     } finally {
       setIsAnalyzing(false);
     }
+  };
+
+  const handleExportBOM = () => {
+    if (!analysisResult) return;
+    reportUtils.exportToPDF(
+      `BOM — ${file?.name ?? 'Plano'} (Proyecto ${projectId})`,
+      analysisResult.map((item: any, i: number) => ({
+        '#': i + 1,
+        Componente: item.component_name,
+        Cantidad: item.quantity,
+        Unidad: item.unit,
+        'Notas técnicas': item.notes || '—',
+      })),
+      `bom_${projectId}_${(file?.name ?? 'plano').replace(/\.[^.]+$/, '')}`,
+      'INGENIERÍA'
+    );
   };
 
   const handleSave = async () => {
@@ -292,14 +309,22 @@ export const BlueprintAnalyzerModal: React.FC<BlueprintAnalyzerModalProps> = ({
                   <p className={clsx("text-xs font-bold", isDarkMode ? "text-blue-300" : "text-blue-700")}>Validación de Integridad</p>
                   <p className="text-[10px] text-slate-500 mt-1 uppercase tracking-widest">Al guardar, estas {analysisResult.length} piezas se añadirán automáticamente al BOM del proyecto actual.</p>
                 </div>
-                <button
-                  onClick={handleSave}
-                  disabled={isSaving}
-                  className="px-8 py-3 bg-blue-600 text-white rounded-xl font-black uppercase tracking-widest hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20 flex items-center gap-2 disabled:opacity-50"
-                >
-                  {isSaving ? <Loader2 className="animate-spin" size={14} /> : <CheckCircle2 size={14} />}
-                  Integrar al BOM
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleExportBOM}
+                    className="px-5 py-3 bg-slate-700 text-white rounded-xl font-black uppercase tracking-widest hover:bg-slate-600 transition-all flex items-center gap-2"
+                  >
+                    <Layers size={14} /> Exportar PDF
+                  </button>
+                  <button
+                    onClick={handleSave}
+                    disabled={isSaving}
+                    className="px-8 py-3 bg-blue-600 text-white rounded-xl font-black uppercase tracking-widest hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20 flex items-center gap-2 disabled:opacity-50"
+                  >
+                    {isSaving ? <Loader2 className="animate-spin" size={14} /> : <CheckCircle2 size={14} />}
+                    Integrar al BOM
+                  </button>
+                </div>
               </div>
             </div>
           )}

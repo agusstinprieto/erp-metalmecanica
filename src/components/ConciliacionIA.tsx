@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import clsx from 'clsx';
 import { aiService } from '../services/aiService';
+import { reportUtils } from '../utils/reportUtils';
 import type { BankAccount, BankTx } from './BancoView';
 
 /* ─── Types ─── */
@@ -443,6 +444,24 @@ const ConciliacionIA: React.FC<ConciliacionIAProps> = ({ accounts, txs, onMarkCo
   const noMatchERP    = matches.filter(m => m.status === 'sin_match_erp').length;
   const totalConciled = autoCount + approvedCount;
 
+  const exportConciliacion = () => {
+    const rows = matches.map(m => ({
+      Fecha: m.bankLine?.fecha ?? m.erpTx?.fecha ?? '',
+      'Descripción Banco': m.bankLine?.descripcion ?? '—',
+      'Concepto ERP': m.erpTx?.concepto ?? '—',
+      Monto: m.bankLine ? fmt(m.bankLine.monto) : (m.erpTx ? fmt(m.erpTx.monto) : '—'),
+      Referencia: m.bankLine?.referencia ?? m.erpTx?.referencia ?? '—',
+      Confianza: m.confidence ? `${m.confidence}%` : '—',
+      Estado: m.status === 'auto' ? 'Auto-match' : m.status === 'aprobado' ? 'Aprobado' : m.status === 'sugerido' ? 'En revisión' : m.status === 'sin_match_banco' ? 'Sin mov. banco' : 'Sin mov. ERP',
+    }));
+    reportUtils.exportToPDF(
+      `Conciliación Bancaria ${periodo}`,
+      rows,
+      `conciliacion_${periodo}`,
+      'FINANZAS'
+    );
+  };
+
   const saldoERP = erpTxsForAccount.reduce((s, t) =>
     s + (t.tipo === 'ingreso' ? t.monto : -t.monto), 0);
   const saldoBanco = parseFloat(saldoExtracto) || 0;
@@ -753,7 +772,7 @@ const ConciliacionIA: React.FC<ConciliacionIAProps> = ({ accounts, txs, onMarkCo
                   className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white text-[9px] font-black uppercase transition-all">
                   <RotateCcw size={12} /> Nueva conciliación
                 </button>
-                <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 text-[9px] font-black uppercase hover:bg-emerald-600/30 transition-all">
+                <button onClick={exportConciliacion} className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 text-[9px] font-black uppercase hover:bg-emerald-600/30 transition-all">
                   <Download size={12} /> Descargar reporte
                 </button>
               </div>

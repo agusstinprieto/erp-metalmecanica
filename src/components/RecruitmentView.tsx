@@ -16,11 +16,13 @@ import {
   BarChart3,
   Award,
   ShieldCheck,
-  Loader2
+  Loader2,
+  FileDown
 } from 'lucide-react';
 import { recruitmentService } from '../services/recruitmentService';
 import { aiService } from '../services/aiService';
 import type { Vacancy, Candidate } from '../types/index';
+import { reportUtils } from '../utils/reportUtils';
 import clsx from 'clsx';
 
 export const RecruitmentView: React.FC = () => {
@@ -80,6 +82,30 @@ export const RecruitmentView: React.FC = () => {
   useEffect(() => {
     fetchInitialData();
   }, []);
+
+  const exportCandidatePDF = (candidate: Candidate) => {
+    const vacancy = vacancies.find(v => v.id === candidate.vacancy_id);
+    const strengths: string[] = candidate.ai_analysis?.strengths ?? [];
+    const weaknesses: string[] = candidate.ai_analysis?.weaknesses ?? [];
+    const rows = [
+      { Campo: 'Candidato', Valor: candidate.name },
+      { Campo: 'Email', Valor: candidate.email },
+      { Campo: 'Teléfono', Valor: candidate.phone || '—' },
+      { Campo: 'Vacante', Valor: vacancy?.title ?? 'Talent Pool' },
+      { Campo: 'Score IA', Valor: `${candidate.ai_score ?? 0}%` },
+      { Campo: 'Estatus', Valor: candidate.status },
+      { Campo: 'Veredicto IA', Valor: candidate.ai_analysis?.recommendation ?? '—' },
+      { Campo: 'Justificación', Valor: candidate.ai_analysis?.justification ?? '—' },
+      ...strengths.map((s, i) => ({ Campo: `Fortaleza ${i + 1}`, Valor: s })),
+      ...weaknesses.map((w, i) => ({ Campo: `Área oportunidad ${i + 1}`, Valor: w })),
+    ];
+    reportUtils.exportToPDF(
+      `Análisis Candidato — ${candidate.name}`,
+      rows,
+      `candidato_${candidate.name.toLowerCase().replace(/\s+/g, '_')}`,
+      'RECLUTAMIENTO'
+    );
+  };
 
   const fetchInitialData = async () => {
     try {
@@ -708,7 +734,13 @@ export const RecruitmentView: React.FC = () => {
                       <FileText size={16} /> Ver Currículum Original
                     </a>
                   )}
-                  <button 
+                  <button
+                    onClick={() => exportCandidatePDF(selectedCandidate)}
+                    className="w-full py-4 bg-slate-800 border border-white/10 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-700 transition-all flex items-center justify-center gap-2"
+                  >
+                    <FileDown size={14} /> Exportar PDF
+                  </button>
+                  <button
                     onClick={() => setShowAnalysis(false)}
                     className="w-full py-4 bg-mcvill-accent text-slate-950 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white transition-all"
                   >
