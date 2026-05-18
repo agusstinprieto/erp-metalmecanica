@@ -57,3 +57,33 @@ export const updateUserPassword = async (newPassword: string) => {
   if (error) throw error;
   return data;
 };
+
+/**
+ * Gets the active tenant UUID.
+ * Resolves by looking up the correct active tenant and caching it.
+ */
+export const getActiveTenantId = async (): Promise<string> => {
+  const cached = localStorage.getItem('mcvill-tenant-id');
+  if (cached && cached.includes('-')) {
+    return cached;
+  }
+
+  try {
+    const { data } = await supabase
+      .from('tenants')
+      .select('id')
+      .eq('slug', 'mcvill')
+      .maybeSingle();
+
+    if (data?.id) {
+      localStorage.setItem('mcvill-tenant-id', data.id);
+      return data.id;
+    }
+  } catch (e) {
+    console.error('Error fetching active tenant ID:', e);
+  }
+
+  // Fallback to McVill production UUID
+  return 'c89d6183-5f66-48dd-8b66-2b8b6b993e61';
+};
+

@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase';
+import { supabase, getActiveTenantId } from '../lib/supabase';
 
 export interface Employee {
   id: string;
@@ -33,11 +33,11 @@ export const employeeService = {
    * Obtiene todos los empleados del tenant activo.
    */
   async listEmployees() {
-    const { data: tenantData } = await supabase.from('tenants').select('id').limit(1).maybeSingle();
+    const tenantId = await getActiveTenantId();
     let query = supabase.from('employees').select('*').order('employee_number', { ascending: true });
 
-    if (tenantData) {
-      query = query.eq('tenant_id', tenantData.id);
+    if (tenantId) {
+      query = query.eq('tenant_id', tenantId);
     }
 
     const { data, error } = await query;
@@ -54,11 +54,11 @@ export const employeeService = {
    * Crea un nuevo empleado.
    */
   async createEmployee(employee: Partial<Employee>) {
-    const { data: tenantData } = await supabase.from('tenants').select('id').limit(1).maybeSingle();
+    const tenantId = await getActiveTenantId();
 
     const { data, error } = await supabase
       .from('employees')
-      .insert({ ...employee, tenant_id: tenantData?.id })
+      .insert({ ...employee, tenant_id: tenantId })
       .select()
       .single();
 

@@ -1,8 +1,7 @@
-import { supabase } from '../lib/supabase';
+import { supabase, getActiveTenantId } from '../lib/supabase';
 
-const getTenantId = async (): Promise<string | undefined> => {
-  const { data } = await supabase.from('tenants').select('id').limit(1).maybeSingle();
-  return data?.id;
+const getTenantId = async (): Promise<string> => {
+  return await getActiveTenantId();
 };
 
 export interface EmployeeSkill {

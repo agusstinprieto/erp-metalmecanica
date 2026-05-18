@@ -161,17 +161,20 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             currentTenantId = profile.tenant_id;
           }
         }
-        
-        setTenantId(currentTenantId);
 
         // Step 3: Fetch from Supabase (Rule 16)
-        const { data: tenant, error } = await supabase
-          .from('tenants')
-          .select('brand_name, system_name, slogan, selected_api, config')
-          .eq('id', currentTenantId)
-          .maybeSingle();
+        let tenantQuery = supabase.from('tenants').select('id, brand_name, system_name, slogan, selected_api, config');
+        if (currentTenantId && currentTenantId.includes('-')) {
+          tenantQuery = tenantQuery.eq('id', currentTenantId);
+        } else {
+          tenantQuery = tenantQuery.eq('slug', currentTenantId);
+        }
+
+        const { data: tenant, error } = await tenantQuery.maybeSingle();
         
         if (tenant) {
+          setTenantId(tenant.id);
+          localStorage.setItem('mcvill-tenant-id', tenant.id);
           const supabaseConfig = tenant.config || {};
           // Merge on top of whatever localStorage already restored (prev), not the stale closure value
           setConfig(prev => {

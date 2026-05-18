@@ -1,8 +1,7 @@
-import { supabase } from '../lib/supabase';
+import { supabase, getActiveTenantId } from '../lib/supabase';
 
-const getTenantId = async (): Promise<string | undefined> => {
-  const { data } = await supabase.from('tenants').select('id').limit(1).maybeSingle();
-  return data?.id;
+const getTenantId = async (): Promise<string> => {
+  return await getActiveTenantId();
 };
 
 export interface Transaction {
@@ -84,11 +83,11 @@ export const financeService = {
   },
 
   async createTransaction(tx: Partial<Transaction>): Promise<Transaction> {
-    const { data: tenantData } = await supabase.from('tenants').select('id').single();
-    if (!tenantData) throw new Error('No active tenant found');
+    const tenantId = await getActiveTenantId();
+    if (!tenantId) throw new Error('No active tenant found');
     const { data, error } = await supabase
       .from('financial_transactions')
-      .insert({ ...tx, tenant_id: tenantData.id })
+      .insert({ ...tx, tenant_id: tenantId })
       .select().single();
     if (error) throw error;
     return data as Transaction;

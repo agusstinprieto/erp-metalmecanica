@@ -109,16 +109,16 @@ export const ProcessSimulatorView: React.FC = () => {
     <div className="h-full flex flex-col bg-slate-950 overflow-hidden -m-8">
       {/* Header */}
       <div className="px-4 py-2 border-b border-white/5 bg-slate-900/40 flex items-center gap-4 shrink-0">
-        <div className="w-8 h-8 rounded-lg bg-fuchsia-500/20 border border-fuchsia-500/30 flex items-center justify-center">
-          <FlaskConical size={16} className="text-fuchsia-400" />
+        <div className="w-8 h-8 rounded-lg bg-purple-500/20 border border-purple-500/30 flex items-center justify-center">
+          <FlaskConical size={16} className="text-purple-400" />
         </div>
         <div>
           <h1 className="text-sm font-black text-white uppercase tracking-[0.15em]">Simulación de Procesos</h1>
-          <span className="text-[10px] font-bold text-fuchsia-400 uppercase tracking-widest">Monte Carlo — Análisis What-If</span>
+          <span className="text-[10px] font-bold text-purple-400 uppercase tracking-widest">Monte Carlo — Análisis What-If</span>
         </div>
         <div className="ml-auto flex items-center gap-2">
           <select value={iterations} onChange={e => setIterations(Number(e.target.value))}
-            className="px-3 py-1.5 rounded-lg bg-slate-800/60 border border-white/10 text-xs text-slate-300 focus:outline-none focus:border-fuchsia-500/50">
+            className="px-3 py-1.5 rounded-lg bg-slate-800/60 border border-white/10 text-xs text-slate-300 focus:outline-none focus:border-purple-500/50">
             <option value={200}>200 iteraciones</option>
             <option value={500}>500 iteraciones</option>
             <option value={1000}>1,000 iteraciones</option>
@@ -127,13 +127,12 @@ export const ProcessSimulatorView: React.FC = () => {
             <RefreshCw size={13} />
           </button>
           <button onClick={run} disabled={running}
-            className="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-fuchsia-500/20 border border-fuchsia-500/30 text-fuchsia-400 font-bold text-xs hover:bg-fuchsia-500/30 transition-all disabled:opacity-50">
+            className="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-400 font-bold text-xs hover:bg-purple-500/30 transition-all disabled:opacity-50">
             <Play size={13} className={running ? 'animate-spin' : ''} />
             {running ? 'Simulando...' : 'Simular'}
           </button>
         </div>
       </div>
-
       <div className="flex-1 flex gap-4 overflow-hidden p-4 min-h-0">
         {/* Controls */}
         <div className="w-64 shrink-0 flex flex-col gap-4 overflow-y-auto">
@@ -142,7 +141,7 @@ export const ProcessSimulatorView: React.FC = () => {
             <div className="grid grid-cols-2 gap-2">
               {ESCENARIOS.map((e, i) => (
                 <button key={i} onClick={() => loadEscenario(i)}
-                  className="px-2 py-2 rounded-lg bg-slate-800/60 border border-white/5 text-[10px] text-slate-300 hover:border-fuchsia-500/30 hover:text-fuchsia-400 transition-all text-left">
+                  className="px-2 py-2 rounded-lg bg-slate-800/60 border border-white/5 text-[10px] text-slate-300 hover:border-purple-500/30 hover:text-purple-400 transition-all text-left">
                   {e.label}
                 </button>
               ))}
@@ -160,7 +159,8 @@ export const ProcessSimulatorView: React.FC = () => {
                   </div>
                   <input type="range" min={p.min} max={p.max} step={p.step} value={p.value}
                     onChange={e => setParams(prev => prev.map(pp => pp.id === p.id ? { ...pp, value: Number(e.target.value) } : pp))}
-                    className="w-full h-1.5 rounded-full bg-slate-700 appearance-none cursor-pointer accent-fuchsia-500" />
+                    className="w-full h-1.5 rounded-full bg-slate-700 appearance-none cursor-pointer"
+                    style={{ accentColor: 'var(--theme-accent)' }} />
                   <div className="flex justify-between text-[9px] text-slate-600 mt-0.5">
                     <span>{p.min}</span><span>{p.max}</span>
                   </div>
@@ -174,7 +174,7 @@ export const ProcessSimulatorView: React.FC = () => {
         <div className="flex-1 flex flex-col gap-3 overflow-y-auto">
           {!result && (
             <div className={`flex-1 ${panel} flex flex-col items-center justify-center gap-3`}>
-              <FlaskConical size={40} className="text-fuchsia-400/20" />
+              <FlaskConical size={40} className="text-purple-400/20" />
               <p className="text-slate-400 text-sm">Configura los parámetros y presiona Simular</p>
             </div>
           )}
@@ -219,9 +219,9 @@ export const ProcessSimulatorView: React.FC = () => {
                     <YAxis stroke="rgba(255,255,255,0.2)" tick={{ fontSize: 10 }} />
                     <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, fontSize: 11 }}
                       formatter={(v: number) => [v, 'Iteraciones']} />
-                    <ReferenceLine x={result.throughput} stroke="#c084fc" strokeDasharray="4 4"
-                      label={{ value: 'Media', fill: '#c084fc', fontSize: 10 }} />
-                    <Bar dataKey="frecuencia" fill="#c084fc" opacity={0.7} radius={[4, 4, 0, 0]} />
+                    <ReferenceLine x={result.throughput} stroke="var(--theme-accent)" strokeDasharray="4 4"
+                      label={{ value: 'Media', fill: 'var(--theme-accent)', fontSize: 10 }} />
+                    <Bar dataKey="frecuencia" fill="var(--theme-accent)" opacity={0.7} radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
                 <p className="text-[10px] text-slate-500 mt-2 text-center">
