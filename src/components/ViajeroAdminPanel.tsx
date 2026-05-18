@@ -13,6 +13,7 @@ import { tenantService } from '../services/tenantService';
 import type { TenantConfig } from '../services/tenantService';
 import { useConfig } from '../contexts/ConfigContext';
 import { useCyberModal } from '../hooks/useCyberModal';
+import { QRCodeSVG } from 'qrcode.react';
 import { eventBus } from '../utils/eventBus';
 import { ViajeroManagerModal } from './ViajeroManagerModal';
 import { CatalogManagerModal } from './CatalogManagerModal';
@@ -55,11 +56,12 @@ export const ViajeroAdminPanel: React.FC<{
 
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedViajero, setSelectedViajero] = useState<string | null>(null);
-  const [activeTabForModal, setActiveTabForModal] = useState<'general' | 'operaciones' | 'materiales'>('general');
+  const [activeTabForModal, setActiveTabForModal] = useState<'general'|'operaciones'|'materiales'>('general');
+  const [qrViajero, setQrViajero] = useState<any>(null);
+  const [qrsToPrint, setQrsToPrint] = useState<any[]>([]);
   const [isCatalogModalOpen, setIsCatalogModalOpen] = useState(false);
   const [isOCModalOpen, setIsOCModalOpen] = useState(false);
   const [catalogType, setCatalogType] = useState<'operaciones' | 'materiales'>('operaciones');
-  const [qrViajero, setQrViajero] = useState<any | null>(null);
   const [viewMode, setViewMode] = useState<'lista' | 'tarjetas'>('lista');
 
   // Ordenamiento
@@ -469,6 +471,16 @@ export const ViajeroAdminPanel: React.FC<{
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const handleBatchPrintQRs = () => {
+    if (selectedIds.size === 0) return;
+    const selected = viajeros.filter(v => selectedIds.has(v.id));
+    setQrsToPrint(selected);
+  };
+
+  const handleSinglePrintQR = (viajero: any) => {
+    setQrsToPrint([viajero]);
   };
 
   const handleBatchPrint = () => {
@@ -1063,8 +1075,16 @@ export const ViajeroAdminPanel: React.FC<{
                       <button
                         onClick={(e) => { e.stopPropagation(); handleSinglePrint(viajero.id); }}
                         className="flex-1 flex items-center justify-center gap-1 py-1.5 bg-blue-600/80 hover:bg-blue-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all"
+                        title="Imprimir PDF"
                       >
-                        <Printer size={10} /> Print
+                        <Printer size={10} /> PDF
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleSinglePrintQR(viajero); }}
+                        className="flex-1 flex items-center justify-center gap-1 py-1.5 bg-emerald-600/80 hover:bg-emerald-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all"
+                        title="Imprimir Etiquetas QR"
+                      >
+                        <QrCode size={10} /> QRs
                       </button>
                       <button
                         onClick={(e) => { e.stopPropagation(); handleOpenEditor(viajero.id); }}
@@ -1072,12 +1092,6 @@ export const ViajeroAdminPanel: React.FC<{
                         title="Editar Viajero"
                       >
                         <Edit size={11} />
-                      </button>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setQrViajero(viajero); }}
-                        className="p-1.5 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 hover:text-white rounded-lg transition-all"
-                      >
-                        <QrCode size={11} />
                       </button>
                     </div>
                   </div>
@@ -1226,9 +1240,9 @@ export const ViajeroAdminPanel: React.FC<{
                             <Printer size={14} />
                           </button>
                           <button
-                            onClick={() => setQrViajero(viajero)}
-                            className="p-1.5 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500 hover:text-white rounded-lg transition-all"
-                            title="Ver código QR"
+                            onClick={() => handleSinglePrintQR(viajero)}
+                            className="p-1.5 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white rounded-lg transition-all"
+                            title="Imprimir código QR"
                           >
                             <QrCode size={14} />
                           </button>
@@ -1366,11 +1380,18 @@ export const ViajeroAdminPanel: React.FC<{
                     CANCELAR
                   </button>
                   <button 
+                    onClick={handleBatchPrintQRs}
+                    className="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(16,185,129,0.4)] flex items-center gap-2 group active:scale-95"
+                  >
+                    <QrCode size={16} className="group-hover:scale-110 transition-transform" /> 
+                    IMPRIMIR QRS
+                  </button>
+                  <button 
                     onClick={handleBatchPrint}
-                    className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(37,99,235,0.4)] flex items-center gap-3 group active:scale-95"
+                    className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(37,99,235,0.4)] flex items-center gap-2 group active:scale-95"
                   >
                     <Printer size={16} className="group-hover:rotate-12 transition-transform" /> 
-                    IMPRIMIR VIAJEROS
+                    VIAJEROS
                   </button>
                 </div>
               </div>
@@ -1425,6 +1446,55 @@ export const ViajeroAdminPanel: React.FC<{
 
       {qrViajero && (
         <ViajeroQRModal viajero={qrViajero} onClose={() => setQrViajero(null)} />
+      )}
+
+      {qrsToPrint.length > 0 && (
+        <div id="batch-qr-print-container" className="fixed inset-0 bg-white z-[99999] overflow-auto text-black">
+          {/* Controles NO imprimibles */}
+          <div className="fixed top-0 left-0 w-full p-4 flex gap-4 bg-slate-900 justify-center shadow-xl print:hidden">
+            <button 
+              onClick={() => { 
+                setTimeout(() => window.print(), 300); 
+              }} 
+              className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-xl font-black uppercase tracking-widest flex gap-2 items-center transition-all shadow-lg shadow-emerald-600/20 active:scale-95"
+            >
+              <Printer size={16}/> Confirmar Impresión
+            </button>
+            <button 
+              onClick={() => setQrsToPrint([])} 
+              className="bg-rose-600 hover:bg-rose-500 text-white px-6 py-2 rounded-xl font-black uppercase tracking-widest flex gap-2 items-center transition-all shadow-lg shadow-rose-600/20 active:scale-95"
+            >
+              <X size={16}/> Cerrar
+            </button>
+          </div>
+
+          {/* Contenido Imprimible */}
+          <div className="pt-24 p-8 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 print:grid-cols-3 print:pt-0 print:p-0">
+            {qrsToPrint.map((v, i) => (
+              <div key={v.id + '-' + i} className="flex flex-col items-center justify-center p-6 border-2 border-slate-300 rounded-2xl break-inside-avoid shadow-sm">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-4 text-slate-500">{config.logoText} VIAJERO</p>
+                <QRCodeSVG value={v.id} size={140} bgColor="#ffffff" fgColor="#000000" level="M" />
+                <h2 className="mt-4 text-lg font-black tracking-tighter text-black">{v.id}</h2>
+                <p className="text-xs font-bold text-slate-700 uppercase mt-1 text-center truncate w-full px-2">{v.numero_parte || 'S/N'}</p>
+                <p className="text-[9px] text-slate-500 uppercase font-bold text-center truncate w-full px-2 mt-1">{v.cliente || 'S/C'}</p>
+              </div>
+            ))}
+          </div>
+          
+          <style dangerouslySetInnerHTML={{__html: `
+            @media print {
+              @page { size: auto; margin: 5mm; }
+              body * { visibility: hidden; }
+              #batch-qr-print-container, #batch-qr-print-container * { visibility: visible; }
+              #batch-qr-print-container { position: absolute; left: 0; top: 0; width: 100%; padding: 0; margin: 0; background: white; }
+              .print\\:hidden { display: none !important; }
+              .print\\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 10px !important; }
+              .print\\:pt-0 { padding-top: 0 !important; }
+              .print\\:p-0 { padding: 0 !important; border: none !important; }
+              .break-inside-avoid { break-inside: avoid; page-break-inside: avoid; }
+            }
+          `}} />
+        </div>
       )}
     </div>
   );
