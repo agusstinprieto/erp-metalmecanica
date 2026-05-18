@@ -975,71 +975,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
 
         </div>
 
-        {/* ── PRIMA DE ANTIGÜEDAD 15 AÑOS (Art. 162 LFT) ─────────────────── */}
-        <div className="bg-slate-900/40 border border-amber-500/20 rounded-2xl p-4 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
-
-          <div className="flex items-start justify-between mb-4 relative z-10">
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400">
-                <Award size={16} />
-              </div>
-              <div>
-                <h3 className="text-[11px] font-black text-white uppercase tracking-widest">Prima de Antigüedad — 15 años</h3>
-                <p className="text-[9px] text-slate-500 mt-0.5">Art. 162 LFT · 12 días × años · tope 2× SMG ($557.60/día)</p>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-[8px] font-black text-amber-400/70 uppercase tracking-widest">Pasivo Total</p>
-              <p className="text-2xl font-black text-amber-400 tracking-tight leading-none">
-                {primaData
-                  ? `$${primaData.totalPasivo.toLocaleString('es-MX', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
-                  : '—'}
-              </p>
-              <p className="text-[8px] text-slate-500 mt-0.5">
-                {primaData ? `${primaData.elegibles} empleado${primaData.elegibles !== 1 ? 's' : ''} elegible${primaData.elegibles !== 1 ? 's' : ''}` : 'Cargando...'}
-              </p>
-            </div>
-          </div>
-
-          {primaData && primaData.top5.length > 0 ? (
-            <div className="relative z-10">
-              <div className="grid grid-cols-[1fr_auto_auto_auto] gap-x-3 mb-1.5 px-2">
-                <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest">Empleado</span>
-                <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest text-right">Años</span>
-                <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest text-right">Sal. diario</span>
-                <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest text-right">Prima</span>
-              </div>
-              <div className="space-y-1">
-                {primaData.top5.map((emp, i) => (
-                  <div key={i} className="grid grid-cols-[1fr_auto_auto_auto] gap-x-3 items-center bg-slate-800/30 rounded-xl px-2 py-2 hover:bg-slate-800/50 transition-colors">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className="text-[9px] font-black text-amber-500/60 w-4 shrink-0">#{i + 1}</span>
-                      <span className="text-[10px] font-semibold text-slate-200 truncate">{emp.nombre}</span>
-                    </div>
-                    <span className="text-[10px] font-black text-slate-300 text-right tabular-nums">{emp.anos} <span className="text-slate-600 font-normal">años</span></span>
-                    <span className="text-[10px] font-mono text-slate-400 text-right tabular-nums">${emp.salarioDiario.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                    <span className="text-[10px] font-black text-amber-400 text-right tabular-nums">${emp.prima.toLocaleString('es-MX', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
-                  </div>
-                ))}
-              </div>
-              {primaData.elegibles > 5 && (
-                <p className="text-[8px] text-slate-600 text-center mt-2">
-                  + {primaData.elegibles - 5} empleado{primaData.elegibles - 5 !== 1 ? 's' : ''} más · ver detalle en módulo RH
-                </p>
-              )}
-            </div>
-          ) : primaData && primaData.elegibles === 0 ? (
-            <p className="text-[10px] text-slate-500 text-center py-3 relative z-10">
-              Ningún empleado activo cumple 15 años de antigüedad aún.
-            </p>
-          ) : (
-            <div className="flex items-center justify-center py-3 relative z-10">
-              <Loader2 size={14} className="animate-spin text-amber-500/50" />
-            </div>
-          )}
-        </div>
-
         {/* ── MULTI-CHART GRID + AI PANEL ─────────────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
@@ -1368,6 +1303,71 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* ── PRIMA DE ANTIGÜEDAD 15 AÑOS (Art. 162 LFT) ─────────────────── */}
+        <div className="bg-slate-900/40 border border-amber-500/20 rounded-2xl p-4 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="flex items-start justify-between mb-4 relative z-10">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400">
+                <Award size={16} />
+              </div>
+              <div>
+                <h3 className="text-[11px] font-black text-white uppercase tracking-widest">Prima de Antigüedad — 15 años</h3>
+                <p className="text-[9px] text-slate-500 mt-0.5">Art. 162 LFT · 12 días × años · tope 2× SMG ($557.60/día)</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-[8px] font-black text-amber-400/70 uppercase tracking-widest">Pasivo Total</p>
+              <p className="text-2xl font-black text-amber-400 tracking-tight leading-none">
+                {primaData
+                  ? `$${primaData.totalPasivo.toLocaleString('es-MX', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
+                  : '—'}
+              </p>
+              <p className="text-[8px] text-slate-500 mt-0.5">
+                {primaData ? `${primaData.elegibles} empleado${primaData.elegibles !== 1 ? 's' : ''} elegible${primaData.elegibles !== 1 ? 's' : ''}` : 'Cargando...'}
+              </p>
+            </div>
+          </div>
+
+          {primaData && primaData.top5.length > 0 ? (
+            <div className="relative z-10">
+              <div className="grid grid-cols-[1fr_auto_auto_auto] gap-x-3 mb-1.5 px-2">
+                <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest">Empleado</span>
+                <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest text-right">Años</span>
+                <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest text-right">Sal. diario</span>
+                <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest text-right">Prima</span>
+              </div>
+              <div className="space-y-1">
+                {primaData.top5.map((emp, i) => (
+                  <div key={i} className="grid grid-cols-[1fr_auto_auto_auto] gap-x-3 items-center bg-slate-800/30 rounded-xl px-2 py-2 hover:bg-slate-800/50 transition-colors">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-[9px] font-black text-amber-500/60 w-4 shrink-0">#{i + 1}</span>
+                      <span className="text-[10px] font-semibold text-slate-200 truncate">{emp.nombre}</span>
+                    </div>
+                    <span className="text-[10px] font-black text-slate-300 text-right tabular-nums">{emp.anos} <span className="text-slate-600 font-normal">años</span></span>
+                    <span className="text-[10px] font-mono text-slate-400 text-right tabular-nums">${emp.salarioDiario.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    <span className="text-[10px] font-black text-amber-400 text-right tabular-nums">${emp.prima.toLocaleString('es-MX', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
+                  </div>
+                ))}
+              </div>
+              {primaData.elegibles > 5 && (
+                <p className="text-[8px] text-slate-600 text-center mt-2">
+                  + {primaData.elegibles - 5} empleado{primaData.elegibles - 5 !== 1 ? 's' : ''} más · ver detalle en módulo RH
+                </p>
+              )}
+            </div>
+          ) : primaData && primaData.elegibles === 0 ? (
+            <p className="text-[10px] text-slate-500 text-center py-3 relative z-10">
+              Ningún empleado activo cumple 15 años de antigüedad aún.
+            </p>
+          ) : (
+            <div className="flex items-center justify-center py-3 relative z-10">
+              <Loader2 size={14} className="animate-spin text-amber-500/50" />
+            </div>
+          )}
         </div>
 
         {/* ── GRID DE ACCESOS RÁPIDOS ────────────────────────────────────────── */}
