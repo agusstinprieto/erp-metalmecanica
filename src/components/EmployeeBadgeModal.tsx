@@ -196,7 +196,11 @@ export const EmployeeBadgeModal: React.FC<EmployeeBadgeModalProps> = ({ isOpen, 
         @media print {
           body * { visibility: hidden !important; }
           #badge-print-area,
-          #badge-print-area * { visibility: visible !important; }
+          #badge-print-area * { 
+            visibility: visible !important; 
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
           #badge-print-area {
             position: fixed !important;
             top: 50% !important; left: 50% !important;
