@@ -43,7 +43,7 @@ serve(async (req: Request) => {
     if (!apiKey) throw new Error('API Key de Gemini no configurada. Agrega gemini_api_key en el tenant.');
 
     // 4. Call Gemini native audio model
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-native-audio-preview-12-2025:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
 
     const body = {
       contents: [{ role: 'user', parts: [{ text: promptText }] }],

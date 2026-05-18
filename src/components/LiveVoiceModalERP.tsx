@@ -425,7 +425,7 @@ export const LiveVoiceModalERP: React.FC<LiveVoiceModalERPProps> = ({
       }
 
       const sessionPromise = ai.live.connect({
-        model: 'models/gemini-2.5-flash-native-audio-preview-12-2025',
+        model: 'models/gemini-2.0-flash-live-001',
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: {
