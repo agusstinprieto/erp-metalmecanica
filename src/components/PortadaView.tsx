@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   LayoutDashboard, Factory, Route, CalendarDays, Package, 
   Camera, Zap, Cpu, Sparkles, Shield, Clock, Terminal,
-  ExternalLink, ArrowRight, Play, Pause, Activity
+  ExternalLink, ArrowRight, Play, Pause, Activity, ChevronRight
 } from 'lucide-react';
 import { useConfig } from '../contexts/ConfigContext';
 import { useLanguage } from '../contexts/LanguageContext';
