@@ -166,6 +166,8 @@ mark{background:rgba(251,191,36,.35);color:var(--text);border-radius:2px;padding
   <a class="nav-link" href="#rfq">RFQ Kanban</a>
   <a class="nav-link" href="#factibilidad">AI Feasibility</a>
   <a class="nav-link" href="#metal-quoter">Metal Quoter</a>
+  <a class="nav-link" href="#branding-studio">Branding &amp; Marketing AI</a>
+
 
   <div class="nav-section">Engineering</div>
   <a class="nav-link" href="#ingenieria">Engineering &amp; Design</a>
@@ -194,6 +196,10 @@ mark{background:rgba(251,191,36,.35);color:var(--text);border-radius:2px;padding
   <a class="nav-link" href="#chat-ia">AI Chat &amp; Voice Link</a>
   <a class="nav-link" href="#minutas">AI Minutes</a>
   <a class="nav-link" href="#shop-floor">Shop Floor Monitor</a>
+
+  <div class="nav-section">Configuration</div>
+  <a class="nav-link" href="#settings">Integration Vault &amp; APIs</a>
+
 
   <div class="nav-section">Hardware &amp; IoT</div>
   <a class="nav-link" href="#hw-escaner">Barcode Scanners</a>
@@ -1071,7 +1077,110 @@ Urgency level:
 <p>Live plant floor visualization showing machinery operational statuses: 🟢 Running · 🟡 Setup · 🔴 Down. The <strong>TV Mode</strong> displays clean data optimized for plant overhead television displays.</p>
 </section>
 
+</section>
+
 <!-- ═══════════════════════════════════════════════════ -->
+<section id="branding-studio">
+<h2>AI Branding &amp; Identity Studio</h2>
+<p>The <strong>AI Branding &amp; Identity Studio</strong> is the corporate core for marketing, internal culture, and human capital recruitment. It automates high-fidelity visual asset production, recruiting campaigns, and employee retention programs, significantly reducing organizational OpEx.</p>
+
+<h3>Key Modules &amp; Subcomponents</h3>
+<ul>
+  <li><strong>Branding Prompt Generator (Midjourney / DALL-E 3):</strong> Instantly outputs precise, industry-ready design prompts in English and Spanish for modern logos, corporate color schemes, PVC identity card mockups, banners, employee uniform designs with safety gear (PPE), and glassmorphic badge designs.</li>
+  <li><strong>STPS-Compliant Job Posting Generator:</strong> Queries internal job profiles, shifts, CNC/welding certifications, and safety standards (e.g. NOM-035) to instantly generate compelling, accurate job advertisements optimized for LinkedIn and Facebook.</li>
+  <li><strong>Corporate Birthday &amp; Anniversary Card Compiler:</strong> Automatically designs elegant milestone cards for birthdays, work anniversaries, and Employee of the Month awards, with unique AI-crafted personal letters, boosting employee engagement and retention.</li>
+  <li><strong>Instant Copy &amp; Export:</strong> Single-click buttons to copy prompts and generated text directly to your clipboard or export them for publishing.</li>
+</ul>
+
+<div class="card">
+  <h3 style="color:var(--success);">✨ Practical Case Study: Job Advertisement Generation</h3>
+  <p>When selecting the <em>"Pressure Vessel Welder"</em> position, the system fetches the ASME Section IX certificate criteria, night shift details, and standard compensation scales from the database. The AI then constructs an ad with:</p>
+  <ol>
+    <li>Clear job title and physical location.</li>
+    <li>Technical responsibilities (weld joints, metal thickness, safety standards).</li>
+    <li>Required certifications and credentials (AWS, ASME).</li>
+    <li>Benefits and incentives (base salary, OEE performance bonuses).</li>
+    <li>Clear application steps via a direct WhatsApp recruiter link.</li>
+  </ol>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="settings">
+<h2>Secure Integration Vault &amp; APIs (Zero Hardcoding)</h2>
+<p>Following strict <strong>Zero Hardcoding</strong> standards, all sensitive brand assets, logos, palette configurations, and API credentials are dynamically fetched from Supabase's secure vault at runtime. No secret key is hardcoded within client code.</p>
+
+<div style="overflow-x:auto;margin:1.5rem 0">
+<svg viewBox="0 0 660 380" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#020617;border-radius:12px;border:1px solid rgba(79,165,255,.2);font-family:'Segoe UI',system-ui,sans-serif">
+  <defs>
+    <marker id="bov-b" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><polygon points="0 0,6 3,0 6" fill="#4FA5FF"/></marker>
+    <marker id="bov-g" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><polygon points="0 0,6 3,0 6" fill="#34d399"/></marker>
+  </defs>
+  <text x="330" y="24" text-anchor="middle" fill="#4FA5FF" font-size="11" font-weight="800" letter-spacing="1">SECURITY ARCHITECTURE · SECURE VAULT</text>
+  
+  <!-- CLIENT FRONTEND -->
+  <rect x="30" y="150" width="160" height="80" rx="8" fill="rgba(79,165,255,.05)" stroke="#4FA5FF" stroke-width="1.5"/>
+  <text x="110" y="180" text-anchor="middle" fill="#f1f5f9" font-size="10" font-weight="700">ERP CLIENT</text>
+  <text x="110" y="196" text-anchor="middle" fill="#94a3b8" font-size="8">Premium Web Interface</text>
+  <text x="110" y="208" text-anchor="middle" fill="#a78bfa" font-size="8">Zero Hardcoding</text>
+
+  <!-- SUPABASE SECURE VAULT -->
+  <rect x="250" y="130" width="160" height="120" rx="8" fill="rgba(52,211,153,.05)" stroke="#34d399" stroke-width="2"/>
+  <text x="330" y="160" text-anchor="middle" fill="#34d399" font-size="11" font-weight="800">🔒 SUPABASE VAULT</text>
+  <text x="330" y="176" text-anchor="middle" fill="#94a3b8" font-size="8">Encrypted Secrets</text>
+  <rect x="265" y="190" width="130" height="48" rx="4" fill="rgba(52,211,153,.1)" stroke="rgba(52,211,153,.3)" stroke-width="1"/>
+  <text x="330" y="206" text-anchor="middle" fill="#f1f5f9" font-size="8">Encrypted API Keys</text>
+  <text x="330" y="220" text-anchor="middle" fill="#34d399" font-size="8">tenants.config</text>
+
+  <!-- EXTERNAL APIS -->
+  <rect x="470" y="50" width="160" height="280" rx="8" fill="rgba(248,113,113,.03)" stroke="rgba(248,113,113,.3)" stroke-width="1"/>
+  <text x="550" y="75" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="700">EXTERNAL APIS</text>
+  
+  <!-- FB/IG -->
+  <rect x="485" y="95" width="130" height="36" rx="4" fill="rgba(255,255,255,.03)" stroke="rgba(255,255,255,.15)" stroke-width="1"/>
+  <text x="550" y="117" text-anchor="middle" fill="#94a3b8" font-size="9">Facebook / Instagram</text>
+  
+  <!-- LINKEDIN -->
+  <rect x="485" y="145" width="130" height="36" rx="4" fill="rgba(255,255,255,.03)" stroke="rgba(255,255,255,.15)" stroke-width="1"/>
+  <text x="550" y="167" text-anchor="middle" fill="#94a3b8" font-size="9">LinkedIn API</text>
+  
+  <!-- WHATSAPP -->
+  <rect x="485" y="195" width="130" height="36" rx="4" fill="rgba(52,211,153,.05)" stroke="rgba(52,211,153,.2)" stroke-width="1"/>
+  <text x="550" y="217" text-anchor="middle" fill="#34d399" font-size="9">WhatsApp Cloud API</text>
+  
+  <!-- RESEND -->
+  <rect x="485" y="245" width="130" height="36" rx="4" fill="rgba(255,255,255,.03)" stroke="rgba(255,255,255,.15)" stroke-width="1"/>
+  <text x="550" y="267" text-anchor="middle" fill="#94a3b8" font-size="9">Resend Email API</text>
+
+  <!-- FLOW LINES -->
+  <line x1="190" y1="190" x2="242" y2="190" stroke="#4FA5FF" stroke-width="1.5" marker-end="url(#bov-b)"/>
+  <text x="216" y="182" text-anchor="middle" fill="#4FA5FF" font-size="7.5">Secure Request</text>
+  
+  <path d="M410,180 L440,180 L440,113 L477,113" stroke="#34d399" stroke-width="1.5" fill="none" marker-end="url(#bov-g)"/>
+  <path d="M410,190 L477,190" stroke="#34d399" stroke-width="1.5" fill="none" marker-end="url(#bov-g)"/>
+  <path d="M410,200 L440,200 L440,213 L477,213" stroke="#34d399" stroke-width="1.5" fill="none" marker-end="url(#bov-g)"/>
+  <path d="M410,210 L440,210 L440,263 L477,263" stroke="#34d399" stroke-width="1.5" fill="none" marker-end="url(#bov-g)"/>
+  <text x="442" y="148" text-anchor="middle" fill="#34d399" font-size="7.5" transform="rotate(-90,442,148)">Encrypted Dispatch</text>
+</svg>
+</div>
+
+<h3>Integration Credentials</h3>
+<p>Administrators have absolute power to register, modify, and monitor key integration nodes:</p>
+<ul>
+  <li><strong>WhatsApp Cloud API:</strong> Configure authorization tokens, target Phone Numbers, and Meta Business IDs to dispatch instant quality notifications, parts checklists, and emergency shutdown alerts.</li>
+  <li><strong>Meta Developer Suite (Facebook &amp; Instagram):</strong> Link page access tokens to publish recruitment graphics and marketing updates from the Branding Studio.</li>
+  <li><strong>LinkedIn API Portal:</strong> Register Client IDs and secrets to push active job roles directly onto company feeds.</li>
+  <li><strong>TikTok for Business:</strong> Credentials for video ad distribution.</li>
+  <li><strong>Resend Email API:</strong> Enterprise key for automated dispatch of detailed paystubs, quote proposals, and PDF shop travelers.</li>
+</ul>
+
+<div class="warn">
+  Never expose API keys or passwords within client bundles or public repositories. All outgoing API requests pass through protected Supabase Edge Functions that decrypt credentials on-the-fly based on secure JWT and Tenant ID verification.
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+
 <section id="hw-escaner">
 <h1>Hardware — Barcode Scanners</h1>
 <p>The system natively supports three scanning configurations:</p>

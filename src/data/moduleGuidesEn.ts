@@ -1329,6 +1329,83 @@ export const MODULE_GUIDES_EN: Record<string, ModuleGuide> = {
     ],
   },
 
+  branding_studio: {
+    moduleId: 'branding_studio',
+    label: 'Branding Studio & Marketing AI',
+    emoji: '🎨',
+    description: 'Generate brand assets, post jobs using RAG, and manage social media channels',
+    steps: [
+      {
+        icon: 'Palette', color: 'text-mcvill-accent', bg: 'bg-mcvill-accent/10 border-mcvill-accent/30',
+        title: 'Branding Studio',
+        subtitle: 'Generate photorealistic Midjourney prompts for your brand',
+        tips: [
+          '🎨 Design alternative logos, business cards, glassmorphic site badges, operator PPE uniforms, and web banners.',
+          '🧠 The AI processes your brand\'s dynamic attributes (colors, values, industry) and drafts high-impact text prompts ready to copy.',
+          '📸 Preview generated high-fidelity asset concepts inside the studio interface.',
+        ],
+      },
+      {
+        icon: 'UserSearch', color: 'text-yellow-400', bg: 'bg-yellow-400/10 border-yellow-400/30',
+        title: 'RAG STPS Recruitment',
+        subtitle: 'Draft highly persuasive job listings based on your DB profiles',
+        tips: [
+          '🔧 Automatically compile target listings for Welders AWS, CNC Operators, Quality Inspectors, or Supervisors.',
+          '📋 Dynamic RAG: The engine scans physical job profile requirements and shifts directly from your McVill database.',
+          '📢 Copies are structured with optimized tags and call-to-actions ready for Facebook and LinkedIn.',
+        ],
+      },
+      {
+        icon: 'Gift', color: 'text-pink-400', bg: 'bg-pink-400/10 border-pink-400/30',
+        title: 'Greeting Cards',
+        subtitle: 'Foster company loyalty and employee engagement',
+        tips: [
+          '🎂 Design personalized cards for Birthdays, Service Anniversaries, or Employee of the Month milestones.',
+          '✨ Incorporate AI-generated artistic dedication drafts copyable in one click.',
+          '🏆 Proactive recognition lowers invisible OpEx losses triggered by employee turnover.',
+        ],
+      },
+      {
+        icon: 'Share2', color: 'text-blue-400', bg: 'bg-blue-400/10 border-blue-400/30',
+        title: 'Social Hub Manager',
+        subtitle: 'Synchronized social media scheduling and publishing',
+        tips: [
+          '🔗 Post updates across Facebook, LinkedIn, Instagram, and TikTok simultaneously.',
+          '⚡ Dynamic Detection: Toggle buttons activate automatically based on safe API token availability in Supabase.',
+          '🤖 Tonal Composer: Rewrite copies setting target tones (Professional, Friendly, Viral).',
+        ],
+      },
+    ],
+  },
+
+  settings: {
+    moduleId: 'settings',
+    label: 'Tenant Config & API Vault',
+    emoji: '⚙️',
+    description: 'Configure tenant metadata and security vaults for safe API storage',
+    steps: [
+      {
+        icon: 'Settings2', color: 'text-mcvill-accent', bg: 'bg-mcvill-accent/10 border-mcvill-accent/30',
+        title: 'Tenant Metadata',
+        subtitle: 'Zero Hardcoding: dynamic custom personalization',
+        tips: [
+          '🏢 Adjust system labels, trade brands, custom logos, and corporate URLs on the fly.',
+          '🎨 Select target visual color systems to match your custom company identity.',
+        ],
+      },
+      {
+        icon: 'ShieldCheck', color: 'text-red-400', bg: 'bg-red-400/10 border-red-400/30',
+        title: 'API Security Vault',
+        subtitle: 'Store sensitive integration credentials safely inside Supabase',
+        tips: [
+          '🔒 Encrypt keys for Facebook Page API, LinkedIn Corp API, Instagram Business, and TikTok Creator API.',
+          '💬 Setup credentials for WhatsApp Cloud API and Resend Email to handle real-time automated notifications.',
+          '🚫 Security Standard: Integration tokens are never exposed inside client bundles; they are fetched securely via backend calls.',
+        ],
+      },
+    ],
+  },
+
 };
 
 export const DEFAULT_GUIDE_EN: ModuleGuide = {

@@ -209,6 +209,8 @@ mark{background:rgba(251,191,36,.35);color:var(--text);border-radius:2px;padding
   <a class="nav-link" href="#factibilidad">Factibilidad</a>
   <a class="nav-link" href="#factibilidad-ia">Factibilidad IA Avanzada</a>
   <a class="nav-link" href="#metal-quoter">Metal Quoter</a>
+  <a class="nav-link" href="#branding-studio">Branding &amp; Marketing IA</a>
+
 
   <div class="nav-section">Ingeniería</div>
   <a class="nav-link" href="#ingenieria">Ingeniería y Diseño</a>
@@ -240,6 +242,10 @@ mark{background:rgba(251,191,36,.35);color:var(--text);border-radius:2px;padding
   <a class="nav-link" href="#chat-ia">Chat IA &amp; Voice Link</a>
   <a class="nav-link" href="#minutas">Minutas IA</a>
   <a class="nav-link" href="#shop-floor">Shop Floor Monitor</a>
+
+  <div class="nav-section">Configuración</div>
+  <a class="nav-link" href="#settings">Bóveda de Integraciones &amp; APIs</a>
+
 
   <div class="nav-section">Hardware &amp; IoT</div>
   <a class="nav-link" href="#hw-escaner">Escáner de Códigos</a>
@@ -1883,6 +1889,107 @@ El agente calcula automáticamente:
 </section>
 
 <!-- ═══════════════════════════════════════════════════ -->
+<section id="branding-studio">
+<h2>Estudio de Branding e Identidad por IA</h2>
+<p>El <strong>Estudio de Branding e Identidad por IA</strong> es el centro neurálgico de marketing y cultura corporativa de la empresa. Automatiza la creación de activos visuales, campañas de atracción de talento y programas de retención e incentivo al personal, eliminando intermediarios y reduciendo el OpEx operativo.</p>
+
+<h3>Capacidades y Sub-Módulos Principales</h3>
+<ul>
+  <li><strong>Generador de Prompts de Branding (Midjourney / DALL-E 3):</strong> Diseña instantáneamente prompts hiper-precisos en inglés y español para logotipos modernos, variantes de color de la marca, maquetación de tarjetas de presentación de PVC, banners corporativos, uniformes técnicos de operadores con equipo de protección (EPP) y gafetes de control de planta con estética cyberpunk/glassmorphic.</li>
+  <li><strong>Reclutamiento de Personal STPS con RAG:</strong> Enlaza la base de datos interna de perfiles de puesto, turnos de planta, requerimientos de soldadura/CNC y normas HSE (como NOM-035) para redactar automáticamente anuncios de empleo persuasivos, técnicos y listos para publicar en LinkedIn y Facebook en 1 segundo.</li>
+  <li><strong>Compilador de Tarjetas de Felicitación:</strong> Genera automáticamente tarjetas personalizadas de cumpleaños, aniversario de antigüedad laboral y empleado del mes con dedicatorias únicas redactadas por IA, fomentando el sentido de pertenencia y reduciendo la rotación de operadores en piso.</li>
+  <li><strong>Exportación y Copiado Rápido:</strong> Botón de copia en un clic de prompts estructurados y textos generados para usarlos externamente o imprimirlos de inmediato.</li>
+</ul>
+
+<div class="card">
+  <h3 style="color:var(--success);">✨ Caso de Uso Práctico: Generación de Anuncio de Reclutamiento</h3>
+  <p>Al seleccionar el puesto de <em>"Soldador de Tanques de Presión"</em>, el sistema recupera de la base de datos la certificación requerida (ej. ASME Sección IX), el turno nocturno rotativo, y el sueldo tabulado. La IA formula un anuncio detallado con los siguientes apartados:</p>
+  <ol>
+    <li>Título del puesto y ubicación exacta en planta.</li>
+    <li>Responsabilidades técnicas clave (tipos de junta, espesores, normas de seguridad).</li>
+    <li>Requisitos obligatorios y certificaciones (AWS, ASME).</li>
+    <li>Beneficios (sueldo base, bonos de OEE, vales de despensa).</li>
+    <li>Instrucciones claras para postularse por WhatsApp (integrado con el QR del reclutador).</li>
+  </ol>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="settings">
+<h2>Bóveda de Integraciones &amp; APIs (Zero Hardcoding)</h2>
+<p>Cumpliendo estrictamente con el estándar <strong>Zero Hardcoding</strong>, toda la información de marca, logotipos, colores principales, y credenciales críticas del sistema se recuperan de manera dinámica desde la base de datos segura y la bóveda de secretos de Supabase. Ninguna clave o parámetro se escribe directamente en el código del cliente.</p>
+
+<div style="overflow-x:auto;margin:1.5rem 0">
+<svg viewBox="0 0 660 380" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#020617;border-radius:12px;border:1px solid rgba(79,165,255,.2);font-family:'Segoe UI',system-ui,sans-serif">
+  <defs>
+    <marker id="bov-b" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><polygon points="0 0,6 3,0 6" fill="#4FA5FF"/></marker>
+    <marker id="bov-g" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><polygon points="0 0,6 3,0 6" fill="#34d399"/></marker>
+  </defs>
+  <text x="330" y="24" text-anchor="middle" fill="#4FA5FF" font-size="11" font-weight="800" letter-spacing="1">ARQUITECTURA DE SEGURIDAD · BÓVEDA DE SECRETOS</text>
+  
+  <!-- CLIENT FRONTEND -->
+  <rect x="30" y="150" width="160" height="80" rx="8" fill="rgba(79,165,255,.05)" stroke="#4FA5FF" stroke-width="1.5"/>
+  <text x="110" y="180" text-anchor="middle" fill="#f1f5f9" font-size="10" font-weight="700">ERP CLIENTE</text>
+  <text x="110" y="196" text-anchor="middle" fill="#94a3b8" font-size="8">Interfaz Web Premium</text>
+  <text x="110" y="208" text-anchor="middle" fill="#a78bfa" font-size="8">Zero Hardcoding</text>
+
+  <!-- SUPABASE SECURE VAULT -->
+  <rect x="250" y="130" width="160" height="120" rx="8" fill="rgba(52,211,153,.05)" stroke="#34d399" stroke-width="2"/>
+  <text x="330" y="160" text-anchor="middle" fill="#34d399" font-size="11" font-weight="800">🔒 SUPABASE VAULT</text>
+  <text x="330" y="176" text-anchor="middle" fill="#94a3b8" font-size="8">Secretos Encriptados</text>
+  <rect x="265" y="190" width="130" height="48" rx="4" fill="rgba(52,211,153,.1)" stroke="rgba(52,211,153,.3)" stroke-width="1"/>
+  <text x="330" y="206" text-anchor="middle" fill="#f1f5f9" font-size="8">API Keys Encriptadas</text>
+  <text x="330" y="220" text-anchor="middle" fill="#34d399" font-size="8">tenants.config</text>
+
+  <!-- EXTERNAL APIS -->
+  <rect x="470" y="50" width="160" height="280" rx="8" fill="rgba(248,113,113,.03)" stroke="rgba(248,113,113,.3)" stroke-width="1"/>
+  <text x="550" y="75" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="700">APIs EXTERNAS</text>
+  
+  <!-- FB/IG -->
+  <rect x="485" y="95" width="130" height="36" rx="4" fill="rgba(255,255,255,.03)" stroke="rgba(255,255,255,.15)" stroke-width="1"/>
+  <text x="550" y="117" text-anchor="middle" fill="#94a3b8" font-size="9">Facebook / Instagram</text>
+  
+  <!-- LINKEDIN -->
+  <rect x="485" y="145" width="130" height="36" rx="4" fill="rgba(255,255,255,.03)" stroke="rgba(255,255,255,.15)" stroke-width="1"/>
+  <text x="550" y="167" text-anchor="middle" fill="#94a3b8" font-size="9">LinkedIn API</text>
+  
+  <!-- WHATSAPP -->
+  <rect x="485" y="195" width="130" height="36" rx="4" fill="rgba(52,211,153,.05)" stroke="rgba(52,211,153,.2)" stroke-width="1"/>
+  <text x="550" y="217" text-anchor="middle" fill="#34d399" font-size="9">WhatsApp Cloud API</text>
+  
+  <!-- RESEND -->
+  <rect x="485" y="245" width="130" height="36" rx="4" fill="rgba(255,255,255,.03)" stroke="rgba(255,255,255,.15)" stroke-width="1"/>
+  <text x="550" y="267" text-anchor="middle" fill="#94a3b8" font-size="9">Resend Email API</text>
+
+  <!-- FLOW LINES -->
+  <line x1="190" y1="190" x2="242" y2="190" stroke="#4FA5FF" stroke-width="1.5" marker-end="url(#bov-b)"/>
+  <text x="216" y="182" text-anchor="middle" fill="#4FA5FF" font-size="7.5">Petición Segura</text>
+  
+  <path d="M410,180 L440,180 L440,113 L477,113" stroke="#34d399" stroke-width="1.5" fill="none" marker-end="url(#bov-g)"/>
+  <path d="M410,190 L477,190" stroke="#34d399" stroke-width="1.5" fill="none" marker-end="url(#bov-g)"/>
+  <path d="M410,200 L440,200 L440,213 L477,213" stroke="#34d399" stroke-width="1.5" fill="none" marker-end="url(#bov-g)"/>
+  <path d="M410,210 L440,210 L440,263 L477,263" stroke="#34d399" stroke-width="1.5" fill="none" marker-end="url(#bov-g)"/>
+  <text x="442" y="148" text-anchor="middle" fill="#34d399" font-size="7.5" transform="rotate(-90,442,148)">Envío Encriptado</text>
+</svg>
+</div>
+
+<h3>Bóveda de Secretos y API Keys</h3>
+<p>El sistema cuenta con un panel centralizado de integraciones desde el cual el Administrador/CEO puede registrar y validar la conectividad de las siguientes plataformas:</p>
+<ul>
+  <li><strong>WhatsApp Cloud API:</strong> Token permanente, ID de teléfono de envío e ID de cuenta comercial de Meta para el despacho automático de reportes de calidad, alertas críticas de stock y notificaciones a clientes.</li>
+  <li><strong>Meta Developer Suite (Facebook &amp; Instagram):</strong> Token de acceso a páginas y credenciales para publicación simultánea de campañas de marketing e identidad desde el panel de branding.</li>
+  <li><strong>LinkedIn Developer Portal:</strong> Client ID y Client Secret para la publicación directa de ofertas de empleo y comunicados corporativos de la marca.</li>
+  <li><strong>TikTok for Business:</strong> Credenciales de integración de video marketing.</li>
+  <li><strong>Resend Email API:</strong> Token de envío seguro para despacho de nóminas, cotizaciones formales y reportes periódicos por correo electrónico.</li>
+</ul>
+
+<div class="warn">
+  Nunca exponga ni comparta claves de API en el código fuente o repositorios de control de versiones. Todas las llamadas externas pasan a través de Edge Functions seguras que validan el Tenant ID y desencriptan las claves al vuelo en el backend de Supabase.
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+
 <section id="hw-escaner">
 <h1>Hardware — Escáner de Códigos <span class="badge">IoT</span></h1>
 <p>El ERP soporta tres métodos de lectura de códigos de barras, en orden de preferencia:</p>

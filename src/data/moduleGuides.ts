@@ -1461,6 +1461,83 @@ export const MODULE_GUIDES: Record<string, ModuleGuide> = {
     ],
   },
 
+  branding_studio: {
+    moduleId: 'branding_studio',
+    label: 'Estudio Branding & Marketing IA',
+    emoji: '🎨',
+    description: 'Generación de activos de marca, anuncios RAG y gestión de redes sociales',
+    steps: [
+      {
+        icon: 'Palette', color: 'text-mcvill-accent', bg: 'bg-mcvill-accent/10 border-mcvill-accent/30',
+        title: 'Estudio de Branding',
+        subtitle: 'Genera prompts fotorealistas de Midjourney para tu marca',
+        tips: [
+          '🎨 Diseña logotipos alternos, tarjetas de presentación, gafetes de planta glassmorphic, uniformes EPP de operadores y banners web.',
+          '🧠 La IA procesa los datos dinámicos de tu marca (colores, valores, giro) y genera prompts en texto listos para copiar.',
+          '📸 Puedes previsualizar en el estudio versiones generadas de alta fidelidad.',
+        ],
+      },
+      {
+        icon: 'UserSearch', color: 'text-yellow-400', bg: 'bg-yellow-400/10 border-yellow-400/30',
+        title: 'Reclutamiento STPS RAG',
+        subtitle: 'Genera copys persuasivos de empleo basados en tu BD',
+        tips: [
+          '🔧 Genera automáticamente anuncios para Soldadores AWS, Operadores CNC, Inspectores de Calidad o Supervisores.',
+          '📋 RAG dinámico: El sistema lee las especificaciones reales de perfiles de puesto y turnos desde tu base de datos de McVill.',
+          '📢 Los copys se estructuran con hashtags optimizados y llamados a la acción claros para Facebook y LinkedIn.',
+        ],
+      },
+      {
+        icon: 'Gift', color: 'text-pink-400', bg: 'bg-pink-400/10 border-pink-400/30',
+        title: 'Tarjetas de Felicitación',
+        subtitle: 'Reconocimiento y engagement de colaboradores',
+        tips: [
+          '🎂 Diseña tarjetas personalizadas para Cumpleaños, Aniversarios de Antigüedad o Empleado del Mes.',
+          '✨ Incluye dedicatorias artísticas generadas con IA que puedes copiar con un solo clic.',
+          '🏆 El reconocimiento oportuno reduce el OpEx invisible por rotación de personal.',
+        ],
+      },
+      {
+        icon: 'Share2', color: 'text-blue-400', bg: 'bg-blue-400/10 border-blue-400/30',
+        title: 'Hub de Gestión de Redes Sociales',
+        subtitle: 'Publicación social conectada en tiempo real',
+        tips: [
+          '🔗 Publica en Facebook, LinkedIn, Instagram y TikTok de forma sincronizada.',
+          '⚡ Detección automática: Los conmutadores se habilitan dinámicamente según la presencia de tokens en Supabase.',
+          '🤖 El compositor permite redactar y re-escribir copys ajustando el tono (Profesional, Amigable, Viral).',
+        ],
+      },
+    ],
+  },
+
+  settings: {
+    moduleId: 'settings',
+    label: 'Configuración Central & Bóveda de Motores IA',
+    emoji: '⚙️',
+    description: 'Configura las credenciales de tu tenant y la Bóveda Segura de APIs',
+    steps: [
+      {
+        icon: 'Settings2', color: 'text-mcvill-accent', bg: 'bg-mcvill-accent/10 border-mcvill-accent/30',
+        title: 'Configuración de Tenant',
+        subtitle: 'Cero hardcoding: personalización dinámica',
+        tips: [
+          '🏢 Modifica el nombre de marca, nombre del sistema, logotipos y URLs dinámicamente.',
+          '🎨 Cambia los esquemas de colores principales del ERP para adaptarlos a tu identidad corporativa.',
+        ],
+      },
+      {
+        icon: 'ShieldCheck', color: 'text-red-400', bg: 'bg-red-400/10 border-red-400/30',
+        title: 'Bóveda de Motores IA y Redes',
+        subtitle: 'Credenciales en Supabase de forma segura',
+        tips: [
+          '🔒 Registra de forma encriptada tus tokens de Facebook Page API, LinkedIn Corp, Instagram Business y TikTok Creator.',
+          '💬 Agrega tus claves de WhatsApp Cloud API y Resend Email para notificaciones y alertas en tiempo real.',
+          '🚫 Regla de Seguridad: Ningún token se expone en el código fuente del cliente; se recuperan dinámicamente desde el backend seguro.',
+        ],
+      },
+    ],
+  },
+
 };
 
 export const DEFAULT_GUIDE: ModuleGuide = {
