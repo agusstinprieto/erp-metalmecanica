@@ -291,6 +291,20 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     quotationLogo: config.quotationLogo || (isDarkMode ? (config.logoDark || defaultConfig.logoDark) : (config.logo || defaultConfig.logo)),
   };
 
+  useEffect(() => {
+    // Zero Hardcoding: Update browser tab title dynamically
+    document.title = `ERP IA | ${currentConfig.companyName}`;
+    
+    // Zero Hardcoding: Update favicon dynamically
+    let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'icon';
+      document.getElementsByTagName('head')[0].appendChild(link);
+    }
+    link.href = currentConfig.logo || '/favicon.ico';
+  }, [currentConfig.brandName, currentConfig.systemName, currentConfig.logo]);
+
   return (
     <ConfigContext.Provider value={{
       config: currentConfig,

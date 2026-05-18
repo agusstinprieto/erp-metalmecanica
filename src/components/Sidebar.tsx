@@ -330,13 +330,13 @@ export const Sidebar = (props: {
             <div className="flex flex-col min-w-0 flex-1">
               <div className="flex items-center gap-1.5">
                 <h1 className="text-base font-bold text-mcvill-text tracking-tight leading-none uppercase truncate">
-                  {config.systemName}
+                  ERP IA
                 </h1>
                 <span className="px-1.5 py-0.5 rounded bg-mcvill-accent text-[7px] font-black text-slate-950 tracking-widest shrink-0 shadow-[0_0_10px_var(--theme-glow)]">
                   V.10
                 </span>
               </div>
-              <p className="text-xs font-medium text-mcvill-accent tracking-widest uppercase mt-1 truncate">{config.brandName}</p>
+              <p className="text-xs font-medium text-mcvill-accent tracking-widest uppercase mt-1 truncate">{config.companyName}</p>
             </div>
           )}
         </div>
@@ -410,7 +410,7 @@ export const Sidebar = (props: {
                 {!isSidebarCollapsed && (
                   <p className="px-3 mb-1 text-[9px] font-black text-mcvill-text-muted/60 tracking-[0.25em] uppercase flex items-center gap-2">
                     <span className="w-1 h-1 rounded-full bg-mcvill-accent/50" />
-                    {section.items[0].id === 'dashboard' ? t('section.operations', section.title) : t('section.quality', section.title)}
+                    {(section.items[0].id === 'portada' || section.items[0].id === 'dashboard') ? t('section.operations', section.title) : t('section.quality', section.title)}
                   </p>
                 )}
                 {section.items.map(item => {
