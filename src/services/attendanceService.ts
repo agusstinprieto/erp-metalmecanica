@@ -48,7 +48,7 @@ export const attendanceService = {
     
     // Obtener turno del empleado
     const { data: emp } = await supabase
-      .from('employees')
+      .from('empleados')
       .select('shift_id, work_shifts(*)')
       .eq('id', employeeId)
       .maybeSingle();
@@ -101,7 +101,7 @@ export const attendanceService = {
       .single();
     
     const { data: emp } = await supabase
-      .from('employees')
+      .from('empleados')
       .select('work_shifts(*)')
       .eq('id', record?.employee_id)
       .maybeSingle();
@@ -184,7 +184,7 @@ export const attendanceService = {
 
   async getEmployeeByBadge(badgeCode: string) {
     const { data, error } = await supabase
-      .from('employees')
+      .from('empleados')
       .select('id, first_name, last_name, employee_number, tenant_id')
       .eq('employee_number', badgeCode.toUpperCase())
       .maybeSingle();

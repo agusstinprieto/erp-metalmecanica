@@ -48,7 +48,7 @@ export const HSEFormModal: React.FC<HSEFormModalProps> = ({ isOpen, onClose, typ
   const loadDependencies = async () => {
     try {
       const [{ data: emps }, { data: crs }] = await Promise.all([
-        supabase.from('employees').select('id, first_name, last_name').eq('status', 'active'),
+        supabase.from('empleados').select('id, first_name, last_name').eq('status', 'active'),
         supabase.from('hse_courses').select('*')
       ]);
       setEmployees(emps?.map(e => ({ id: e.id, name: `${e.first_name} ${e.last_name}` })) || []);

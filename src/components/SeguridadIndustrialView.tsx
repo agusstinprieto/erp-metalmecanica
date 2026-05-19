@@ -570,7 +570,7 @@ export const SeguridadIndustrialView: React.FC = () => {
   const loadData = async () => {
     try {
       const [empRes, safetyRes, incRes] = await Promise.all([
-        supabase.from('employees').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+        supabase.from('empleados').select('id', { count: 'exact', head: true }).eq('status', 'active'),
         supabase.from('seguridad_metricas').select('dias_sin_accidente').limit(1),
         supabase.from('seguridad_incidentes').select('*').order('created_at', { ascending: false })
       ]);

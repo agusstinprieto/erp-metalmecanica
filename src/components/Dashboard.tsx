@@ -488,7 +488,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
     try {
       const todayISO = new Date().toISOString().split('T')[0];
       const [empRes, presentRes, ordenRes, safetyRes] = await Promise.all([
-        supabase.from('employees').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+        supabase.from('empleados').select('id', { count: 'exact', head: true }).eq('status', 'active'),
         supabase.from('attendance_records').select('id', { count: 'exact', head: true }).eq('date', todayISO),
         supabase.from('ordenes_mantenimiento').select('id', { count: 'exact', head: true }).in('estado', ['pendiente', 'en_proceso']),
         supabase.from('seguridad_metricas').select('dias_sin_accidente').limit(1),
@@ -529,7 +529,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
       const hoy = new Date();
 
       const { data: empleados, error } = await supabase
-        .from('employees')
+        .from('empleados')
         .select('first_name, last_name, hire_date, daily_salary')
         .eq('status', 'active')
         .not('hire_date', 'is', null);
