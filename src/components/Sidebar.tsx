@@ -143,8 +143,6 @@ const WORKFLOW_SECTIONS: WorkflowSection[] = [
       { id: 'banco',         label: 'Banco',       icon: Landmark },
       { id: 'costing',       label: 'Costos',      icon: BarChart3 },
       { id: 'costeo',        label: 'Costeo Live', icon: Gauge },
-      { id: 'reports',       label: 'Reportes',    icon: FileBarChart },
-      { id: 'ceo_mobile_sim',label: 'CEO Móvil',   icon: Smartphone },
     ],
   },
 ];
@@ -564,6 +562,8 @@ export const Sidebar = (props: {
 
             {/* Standalone items */}
             <div className='pt-2 border-t border-mcvill-accent/10'>
+              {hasAccess('reports') && <SidebarItem icon={FileBarChart} label='Reportes' active={activeView==='reports'} onClick={()=>navigate('reports')} collapsed={isSidebarCollapsed} />}
+              {hasAccess('ceo_mobile_sim') && <SidebarItem icon={Smartphone} label='CEO Móvil' active={activeView==='ceo_mobile_sim'} onClick={()=>navigate('ceo_mobile_sim')} collapsed={isSidebarCollapsed} />}
               {hasAccess('branding_studio') && <SidebarItem icon={Palette} label='Estudio Branding' active={activeView==='branding_studio'} onClick={()=>navigate('branding_studio')} collapsed={isSidebarCollapsed} />}
               {hasAccess('whatsapp_center') && <SidebarItem icon={MessageCircle} label='Hub Mensajería' active={activeView==='whatsapp_center'} onClick={()=>navigate('whatsapp_center')} collapsed={isSidebarCollapsed} />}
             </div>
