@@ -33,7 +33,10 @@ import {
   AlertCircle,
   BadgeCheck,
   Package,
-  RefreshCw
+  RefreshCw,
+  LayoutGrid,
+  List,
+  Check
 } from 'lucide-react';
 import { RecruitmentView } from './RecruitmentView';
 import { useConfig } from '../contexts/ConfigContext';
@@ -225,6 +228,7 @@ export const RHView: React.FC = () => {
   const [badgeEmployee, setBadgeEmployee] = useState<Employee | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [bajaModal, setBajaModal] = useState<{ employee: Employee; onConfirm: () => Promise<void> } | null>(null);
+  const [employeeLayout, setEmployeeLayout] = useState<'list' | 'card'>('list');
 
   const fetchEmployees = async () => {
     try {
@@ -428,34 +432,58 @@ export const RHView: React.FC = () => {
                 <button onClick={handleDownloadReport} className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-white/10 text-slate-400 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all">
                   <Download size={12} /> {language === 'en' ? 'REPORT' : 'REPORTE'}
                 </button>
-                <button onClick={fetchEmployees} className="p-2 bg-white/5 border border-white/10 rounded-lg text-slate-400 hover:text-white transition-all">
+                <button onClick={fetchEmployees} className="p-2 bg-white/5 border border-white/10 rounded-lg text-slate-400 hover:text-white transition-all mr-1">
                   <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
                 </button>
+                <div className="flex bg-slate-950 p-1 rounded-xl border border-white/10">
+                  <button
+                    onClick={() => setEmployeeLayout('card')}
+                    className={clsx(
+                      "p-1.5 rounded-lg transition-all",
+                      employeeLayout === 'card' ? "bg-blue-600 text-white shadow-md" : "text-slate-500 hover:text-white"
+                    )}
+                    title={language === 'en' ? 'Card View' : 'Vista Tarjetas'}
+                  >
+                    <LayoutGrid size={12} />
+                  </button>
+                  <button
+                    onClick={() => setEmployeeLayout('list')}
+                    className={clsx(
+                      "p-1.5 rounded-lg transition-all",
+                      employeeLayout === 'list' ? "bg-blue-600 text-white shadow-md" : "text-slate-500 hover:text-white"
+                    )}
+                    title={language === 'en' ? 'List View' : 'Vista Lista'}
+                  >
+                    <List size={12} />
+                  </button>
+                </div>
               </div>
             </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left">
-                  <thead>
-                    <tr className="bg-slate-950/30 text-[8px] font-black text-slate-500 uppercase tracking-widest border-b border-white/5">
-                      <th className="px-4 py-3 w-10 text-center">
-                        <input 
-                          type="checkbox" 
-                          checked={filteredEmployees.length > 0 && selectedIds.length === filteredEmployees.length}
-                          onChange={handleSelectAll}
-                          className="rounded border-white/10 bg-slate-950 text-blue-500 focus:ring-0 cursor-pointer"
-                        />
-                      </th>
-                      <th className="px-4 py-3">{language === 'en' ? 'Employee / ID' : 'Colaborador / ID'}</th>
-                      <th className="px-4 py-3">{language === 'en' ? 'Job Title' : 'Cargo'}</th>
-                      <th className="px-4 py-3 text-center">{language === 'en' ? 'Status' : 'Estado'}</th>
-                      <th className="px-4 py-3 text-right">{language === 'en' ? 'Actions' : 'Acciones'}</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/5">
-                    {loading ? (
-                      <tr><td colSpan={5} className="py-10 text-center"><Loader2 className="animate-spin text-blue-500 mx-auto" size={20} /></td></tr>
-                    ) : (
-                      filteredEmployees.map(e => (
+              {loading ? (
+                <div className="py-20 text-center">
+                  <Loader2 className="animate-spin text-blue-500 mx-auto" size={24} />
+                </div>
+              ) : employeeLayout === 'list' ? (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="bg-slate-950/30 text-[8px] font-black text-slate-500 uppercase tracking-widest border-b border-white/5">
+                        <th className="px-4 py-3 w-10 text-center">
+                          <input 
+                            type="checkbox" 
+                            checked={filteredEmployees.length > 0 && selectedIds.length === filteredEmployees.length}
+                            onChange={handleSelectAll}
+                            className="rounded border-white/10 bg-slate-950 text-blue-500 focus:ring-0 cursor-pointer"
+                          />
+                        </th>
+                        <th className="px-4 py-3">{language === 'en' ? 'Employee / ID' : 'Colaborador / ID'}</th>
+                        <th className="px-4 py-3">{language === 'en' ? 'Job Title' : 'Cargo'}</th>
+                        <th className="px-4 py-3 text-center">{language === 'en' ? 'Status' : 'Estado'}</th>
+                        <th className="px-4 py-3 text-right">{language === 'en' ? 'Actions' : 'Acciones'}</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {filteredEmployees.map(e => (
                         <tr key={e.id} onClick={() => loadEmployeeDetails(e)} className="hover:bg-white/5 transition-colors group cursor-pointer">
                           <td className="px-4 py-2 w-10 text-center" onClick={ev => ev.stopPropagation()}>
                             <input 
@@ -504,11 +532,115 @@ export const RHView: React.FC = () => {
                             </div>
                           </td>
                         </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
+                      ))}
+                      {filteredEmployees.length === 0 && (
+                        <tr>
+                          <td colSpan={5} className="py-8 text-center text-slate-600 uppercase font-black tracking-widest text-[9px]">
+                            {language === 'en' ? 'NO EMPLOYEES FOUND' : 'NO SE ENCONTRARON COLABORADORES'}
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                /* Gorgeous cards layout */
+                <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-h-[60vh] overflow-y-auto custom-scrollbar">
+                  {filteredEmployees.map(e => {
+                    const isSelected = selectedIds.includes(e.id);
+                    return (
+                      <div 
+                        key={e.id}
+                        onClick={() => loadEmployeeDetails(e)}
+                        className={clsx(
+                          "glass-premium p-5 border border-white/5 hover:border-blue-500/30 rounded-2xl cursor-pointer transition-all group relative flex flex-col justify-between h-44",
+                          isSelected && "border-blue-500/50 bg-blue-500/5"
+                        )}
+                      >
+                        <div className="flex justify-between items-start gap-3">
+                          <div className="flex items-center gap-3 min-w-0">
+                            {/* Checkbox */}
+                            <div 
+                              onClick={(ev) => {
+                                ev.stopPropagation();
+                                handleSelectRow(e.id);
+                              }}
+                              className={clsx(
+                                "w-4.5 h-4.5 rounded border flex items-center justify-center transition-all cursor-pointer shrink-0",
+                                isSelected
+                                  ? "border-blue-500 bg-blue-500 text-slate-950"
+                                  : "border-white/10 bg-slate-950 hover:border-white/30"
+                              )}
+                            >
+                              {isSelected && <Check size={10} strokeWidth={3} />}
+                            </div>
+
+                            <div className="w-10 h-10 rounded-xl bg-slate-900 border border-white/10 overflow-hidden flex items-center justify-center shrink-0">
+                              {e.photo_url ? (
+                                <img src={e.photo_url} alt="" className="w-full h-full object-cover" />
+                              ) : (
+                                <User size={18} className="text-slate-700" />
+                              )}
+                            </div>
+                            
+                            <div className="min-w-0">
+                              <h4 className="text-xs font-black text-white group-hover:text-blue-400 transition-colors uppercase truncate leading-tight">
+                                {e.first_name} {e.last_name}
+                              </h4>
+                              <span className="text-[8px] text-slate-500 font-mono tracking-wider">{e.employee_number || 'SIN ID'}</span>
+                            </div>
+                          </div>
+                          <div onClick={ev => ev.stopPropagation()}>
+                            <StatusBadge status={e.status} />
+                          </div>
+                        </div>
+
+                        <div className="mt-4">
+                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-wide truncate">{e.job_title || 'SIN PUESTO'}</p>
+                          <p className="text-[8px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">{e.department || 'SIN DEPARTAMENTO'}</p>
+                        </div>
+
+                        <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
+                          <span className="text-[8px] text-slate-600 font-black uppercase tracking-widest">
+                            Ingreso: {e.hire_date || '—'}
+                          </span>
+                          
+                          <div className="flex gap-1.5" onClick={ev => ev.stopPropagation()}>
+                            <button 
+                              onClick={() => { 
+                                setBadgeEmployee(e); 
+                                setIsBadgeModalOpen(true); 
+                              }} 
+                              className="p-1.5 bg-slate-950 border border-white/5 text-slate-400 hover:text-indigo-400 hover:border-indigo-400/20 rounded-lg transition-all"
+                              title="Generar Gafete"
+                            >
+                              <Award size={11} />
+                            </button>
+                            <button 
+                              onClick={() => { setEditingEmployee(e); setIsModalOpen(true); }} 
+                              className="p-1.5 bg-slate-950 border border-white/5 text-slate-400 hover:text-blue-400 hover:border-blue-400/20 rounded-lg transition-all"
+                              title="Editar"
+                            >
+                              <Edit3 size={11} />
+                            </button>
+                            <button 
+                              onClick={() => handleDelete(e.id)} 
+                              className="p-1.5 bg-slate-950 border border-white/5 text-slate-400 hover:text-rose-400 hover:border-rose-400/20 rounded-lg transition-all"
+                              title="Dar de Baja"
+                            >
+                              <Trash2 size={11} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {filteredEmployees.length === 0 && (
+                    <div className="col-span-full py-12 text-center text-slate-600 uppercase font-black tracking-widest text-[9px]">
+                      {language === 'en' ? 'NO EMPLOYEES FOUND' : 'NO SE ENCONTRARON COLABORADORES'}
+                    </div>
+                  )}
+                </div>
             </div>
           </div>
         ) : (

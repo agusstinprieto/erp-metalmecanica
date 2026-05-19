@@ -45,6 +45,16 @@ export const RecruitmentView: React.FC = () => {
   // Search & Batch Selection state for Vacancies
   const [vacancySearchQuery, setVacancySearchQuery] = useState('');
   const [selectedVacancyIds, setSelectedVacancyIds] = useState<string[]>([]);
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    isOpen: boolean;
+    type: 'single' | 'batch';
+    idToDelete?: string;
+    message: string;
+  }>({
+    isOpen: false,
+    type: 'single',
+    message: ''
+  });
 
   // Filtered vacancies list based on search
   const filteredVacancies = vacancies.filter(v => 
@@ -53,11 +63,17 @@ export const RecruitmentView: React.FC = () => {
   );
 
   // Batch delete handler
-  const handleBatchDeleteVacancies = async () => {
+  const handleBatchDeleteVacancies = () => {
     if (selectedVacancyIds.length === 0) return;
-    const confirm = window.confirm(`¿Seguro que deseas dar de baja las ${selectedVacancyIds.length} vacantes seleccionadas? Todos los candidatos asociados perderán su vinculación.`);
-    if (!confirm) return;
-    
+    setDeleteConfirm({
+      isOpen: true,
+      type: 'batch',
+      message: `¿Seguro que deseas dar de baja las ${selectedVacancyIds.length} vacantes seleccionadas? Todos los candidatos asociados perderán su vinculación.`
+    });
+  };
+
+  const executeBatchDelete = async () => {
+    setDeleteConfirm(prev => ({ ...prev, isOpen: false }));
     try {
       setLoading(true);
       await Promise.all(selectedVacancyIds.map(id => recruitmentService.deleteVacancy(id)));
@@ -215,10 +231,18 @@ export const RecruitmentView: React.FC = () => {
     setIsAddingVacancy(true);
   };
 
-  const handleDeleteVacancy = async (e: React.MouseEvent, id: string) => {
+  const handleDeleteVacancy = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    const confirm = window.confirm('¿Seguro que deseas eliminar esta vacante? Todos los candidatos asociados perderán su vinculación.');
-    if (!confirm) return;
+    setDeleteConfirm({
+      isOpen: true,
+      type: 'single',
+      idToDelete: id,
+      message: '¿Seguro que deseas eliminar esta vacante? Todos los candidatos asociados perderán su vinculación.'
+    });
+  };
+
+  const executeSingleDelete = async (id: string) => {
+    setDeleteConfirm(prev => ({ ...prev, isOpen: false }));
     try {
       await recruitmentService.deleteVacancy(id);
       fetchInitialData();
