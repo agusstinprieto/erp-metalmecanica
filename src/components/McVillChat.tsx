@@ -336,7 +336,7 @@ export const McVillChat: React.FC<McVillChatProps> = ({
       className={`flex flex-col overflow-hidden border ${
         isPanel 
           ? 'w-full h-full bg-mcvill-bg/40 backdrop-blur-3xl border-transparent' 
-          : 'fixed bottom-6 right-6 w-[400px] h-[600px] z-[100] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-mcvill-card-border/50 bg-mcvill-bg/90 backdrop-blur-xl'
+          : 'fixed z-[100] shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-mcvill-card-border/50 bg-mcvill-bg/90 backdrop-blur-xl bottom-0 left-0 right-0 w-full h-[85vh] rounded-t-2xl rounded-b-none sm:bottom-6 sm:right-6 sm:left-auto sm:w-[400px] sm:h-[600px] sm:rounded-2xl'
       }`}
     >
       {/* Header */}
@@ -567,7 +567,7 @@ export const McVillChat: React.FC<McVillChatProps> = ({
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => setIsOpen(true)}
-            className="fixed bottom-6 right-6 w-16 h-16 rounded-2xl btn-ai shadow-2xl z-[100] flex items-center justify-center group border border-white/20 overflow-hidden"
+            className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-14 h-14 sm:w-16 sm:h-16 rounded-2xl btn-ai shadow-2xl z-[100] flex items-center justify-center group border border-white/20 overflow-hidden"
           >
             <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
             <MessageSquare size={24} className="group-hover:scale-110 transition-transform" />
