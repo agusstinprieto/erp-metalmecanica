@@ -380,6 +380,155 @@ export const ViajeroAdminPanel: React.FC<{
     setCurrentPage(1);
   }, [filteredViajeros, sortConfig]);
 
+  useEffect(() => {
+    if (qrsToPrint.length === 0) return;
+
+    const timer = setTimeout(() => {
+      const svgEls = Array.from(document.querySelectorAll<SVGSVGElement>('#hidden-qr-print-container svg'));
+      if (svgEls.length === 0) {
+        setQrsToPrint([]);
+        return;
+      }
+
+      const newWin = window.open('', '_blank');
+      if (!newWin) {
+        showError('Bloqueador Activo', 'Por favor permite las ventanas emergentes para poder imprimir las etiquetas QR.');
+        setQrsToPrint([]);
+        return;
+      }
+
+      const esc = (s?: string) => (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      
+      const cardsHTML = qrsToPrint.map((v: any, i: number) => {
+        const svgContent = svgEls[i] ? svgEls[i].outerHTML : '';
+        return `
+          <div class="card">
+            <div class="lbl">${esc(config.logoText || 'McVill')} VIAJERO</div>
+            <div class="qr-wrapper">${svgContent}</div>
+            <div class="job-id">${esc(v.id)}</div>
+            <div class="part">${esc(v.numero_parte || 'S/N')}</div>
+            <div class="client">${esc(v.cliente || 'S/C')}</div>
+          </div>
+        `;
+      }).join('');
+
+      newWin.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Imprimir QR - ${esc(config.brandName || 'McVill')}</title>
+          <style>
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+            body { 
+              font-family: Arial, sans-serif; 
+              background: #ffffff; 
+              padding: 20px; 
+              display: flex;
+              justify-content: center;
+            }
+            .grid { 
+              display: grid; 
+              grid-template-columns: repeat(3, 1fr); 
+              gap: 20px; 
+              width: 100%;
+              max-width: 1000px;
+            }
+            .card { 
+              display: flex; 
+              flex-direction: column; 
+              align-items: center; 
+              justify-content: center;
+              padding: 24px; 
+              border: 2px solid #e2e8f0; 
+              border-radius: 16px; 
+              background: #ffffff;
+              break-inside: avoid; 
+              page-break-inside: avoid;
+              text-align: center;
+              box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            }
+            .lbl { 
+              font-size: 9px; 
+              font-weight: 900; 
+              text-transform: uppercase; 
+              letter-spacing: 0.2em; 
+              color: #64748b; 
+              margin-bottom: 16px; 
+            }
+            .qr-wrapper {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              padding: 8px;
+              border: 1px solid #e2e8f0;
+              border-radius: 12px;
+              background: #ffffff;
+            }
+            .job-id { 
+              font-size: 20px; 
+              font-weight: 900; 
+              color: #0f172a; 
+              margin-top: 16px; 
+              letter-spacing: -0.02em;
+            }
+            .part { 
+              font-size: 11px; 
+              font-weight: 800; 
+              color: #334155; 
+              text-transform: uppercase; 
+              margin-top: 6px; 
+              max-width: 100%;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+            .client { 
+              font-size: 9px; 
+              color: #64748b; 
+              text-transform: uppercase; 
+              font-weight: 800; 
+              margin-top: 4px; 
+              max-width: 100%;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+            @media print {
+              body { padding: 0; }
+              .grid { 
+                grid-template-columns: repeat(3, 1fr); 
+                gap: 15px; 
+              }
+              .card { 
+                border: 1px solid #cbd5e1; 
+                box-shadow: none;
+              }
+              @page { size: auto; margin: 10mm; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="grid">
+            ${cardsHTML}
+          </div>
+          <script>
+            window.onload = function() {
+              setTimeout(function() {
+                window.print();
+              }, 300);
+            };
+          </script>
+        </body>
+        </html>
+      `);
+      newWin.document.close();
+      setQrsToPrint([]);
+    }, 150);
+
+    return () => clearTimeout(timer);
+  }, [qrsToPrint]);
+
   const sortedViajeros = React.useMemo(() => {
     if (!sortConfig.direction || !sortConfig.key) return filteredViajeros;
 
@@ -1454,74 +1603,12 @@ export const ViajeroAdminPanel: React.FC<{
       )}
 
       {qrsToPrint.length > 0 && (
-        <div id="batch-qr-print-container" className="fixed inset-0 bg-white z-[99999] overflow-auto text-black">
-          {/* Controles NO imprimibles */}
-          <div className="fixed top-0 left-0 w-full p-4 flex gap-4 bg-slate-900 justify-center shadow-xl print:hidden">
-            <button
-              onClick={() => {
-                const svgEls = Array.from(document.querySelectorAll<SVGSVGElement>('#batch-qr-print-container svg'));
-                const newWin = window.open('', '_blank');
-                if (!newWin) { setTimeout(() => window.print(), 300); return; }
-                const esc = (s?: string) => (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                const cardsHTML = qrsToPrint.map((v: any, i: number) =>
-                  '<div class="card"><div class="lbl">' + esc(config.logoText) + ' VIAJERO</div>' +
-                  (svgEls[i]?.outerHTML || '') +
-                  '<div class="job-id">' + esc(v.id) + '</div>' +
-                  '<div class="part">' + esc(v.numero_parte || 'S/N') + '</div>' +
-                  '<div class="client">' + esc(v.cliente || 'S/C') + '</div></div>'
-                ).join('');
-                newWin.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>QR Viajeros</title><style>' +
-                  '*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;background:#fff;padding:16px}' +
-                  '.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}' +
-                  '.card{display:flex;flex-direction:column;align-items:center;padding:16px;border:2px solid #e2e8f0;border-radius:12px;break-inside:avoid;page-break-inside:avoid}' +
-                  '.lbl{font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.15em;color:#64748b;margin-bottom:10px;text-align:center}' +
-                  '.job-id{font-size:16px;font-weight:900;color:#0f172a;margin-top:10px;text-align:center}' +
-                  '.part{font-size:9px;font-weight:700;color:#334155;text-transform:uppercase;margin-top:3px;text-align:center}' +
-                  '.client{font-size:8px;color:#64748b;text-transform:uppercase;font-weight:700;margin-top:3px;text-align:center}' +
-                  '@media print{@page{size:auto;margin:5mm}body{padding:0}.grid{grid-template-columns:repeat(3,1fr);gap:10px}}' +
-                  '</style></head><body><div class="grid">' + cardsHTML + '</div></body></html>');
-                newWin.document.close();
-                setTimeout(() => { newWin.print(); }, 600);
-                setQrsToPrint([]);
-              }}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-xl font-black uppercase tracking-widest flex gap-2 items-center transition-all shadow-lg shadow-emerald-600/20 active:scale-95"
-            >
-              <Printer size={16}/> Confirmar Impresión
-            </button>
-            <button 
-              onClick={() => setQrsToPrint([])} 
-              className="bg-rose-600 hover:bg-rose-500 text-white px-6 py-2 rounded-xl font-black uppercase tracking-widest flex gap-2 items-center transition-all shadow-lg shadow-rose-600/20 active:scale-95"
-            >
-              <X size={16}/> Cerrar
-            </button>
-          </div>
-
-          {/* Contenido Imprimible */}
-          <div className="pt-24 p-8 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 print:grid-cols-3 print:pt-0 print:p-0">
-            {qrsToPrint.map((v, i) => (
-              <div key={v.id + '-' + i} className="flex flex-col items-center justify-center p-6 border-2 border-slate-300 rounded-2xl break-inside-avoid shadow-sm">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-4 text-slate-500">{config.logoText} VIAJERO</p>
-                <QRCodeSVG value={v.id} size={140} bgColor="#ffffff" fgColor="#000000" level="M" />
-                <h2 className="mt-4 text-lg font-black tracking-tighter text-black">{v.id}</h2>
-                <p className="text-xs font-bold text-slate-700 uppercase mt-1 text-center truncate w-full px-2">{v.numero_parte || 'S/N'}</p>
-                <p className="text-[9px] text-slate-500 uppercase font-bold text-center truncate w-full px-2 mt-1">{v.cliente || 'S/C'}</p>
-              </div>
-            ))}
-          </div>
-          
-          <style dangerouslySetInnerHTML={{__html: `
-            @media print {
-              @page { size: auto; margin: 5mm; }
-              body * { visibility: hidden; }
-              #batch-qr-print-container, #batch-qr-print-container * { visibility: visible; }
-              #batch-qr-print-container { position: absolute; left: 0; top: 0; width: 100%; padding: 0; margin: 0; background: white; }
-              .print\\:hidden { display: none !important; }
-              .print\\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 10px !important; }
-              .print\\:pt-0 { padding-top: 0 !important; }
-              .print\\:p-0 { padding: 0 !important; border: none !important; }
-              .break-inside-avoid { break-inside: avoid; page-break-inside: avoid; }
-            }
-          `}} />
+        <div id="hidden-qr-print-container" style={{ display: 'none' }}>
+          {qrsToPrint.map((v, i) => (
+            <div key={v.id + '-' + i}>
+              <QRCodeSVG value={v.id} size={140} bgColor="#ffffff" fgColor="#000000" level="M" />
+            </div>
+          ))}
         </div>
       )}
     </div>
