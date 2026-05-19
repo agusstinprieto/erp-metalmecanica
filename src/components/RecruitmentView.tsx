@@ -30,9 +30,12 @@ import type { Vacancy, Candidate } from '../types/index';
 import { reportUtils } from '../utils/reportUtils';
 import clsx from 'clsx';
 import { useConfig } from '../contexts/ConfigContext';
+import { toast } from '../lib/dialogs';
 
 export const RecruitmentView: React.FC = () => {
-  const { showAlert } = useConfig();
+  const showAlert = (title: string, message: string, type: 'success' | 'error' | 'info' | 'warning' = 'info') => {
+    toast(message, type === 'error' ? 'error' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : 'info', title);
+  };
   const [vacancies, setVacancies] = useState<Vacancy[]>([]);
   const [candidates, setCandidates] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
