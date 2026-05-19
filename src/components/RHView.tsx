@@ -544,7 +544,6 @@ export const RHView: React.FC = () => {
                   </table>
                 </div>
               ) : (
-                /* Gorgeous cards layout */
                 <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-h-[60vh] overflow-y-auto custom-scrollbar">
                   {filteredEmployees.map(e => {
                     const isSelected = selectedIds.includes(e.id);
@@ -641,6 +640,7 @@ export const RHView: React.FC = () => {
                     </div>
                   )}
                 </div>
+              )}
             </div>
           </div>
         ) : (
