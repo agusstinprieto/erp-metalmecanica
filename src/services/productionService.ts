@@ -152,7 +152,7 @@ export const productionService = {
   async getTraveler(id: string) {
     const { data, error } = await supabase
       .from('viajeros')
-      .select('*, traveler_operations:viajero_operaciones(*)')
+      .select('*, traveler_operations:viajero_operaciones(*), traveler_materials:viajero_materiales(*)')
       .eq('id', id)
       .single();
 

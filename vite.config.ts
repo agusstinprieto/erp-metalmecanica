@@ -14,6 +14,8 @@ export default defineConfig(({ mode }) => {
       'import.meta.env.VITE_GEMINI_API_KEY': JSON.stringify(geminiKey),
     },
     server: {
+      host: true,
+      port: 5173,
       headers: {
         'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
       }

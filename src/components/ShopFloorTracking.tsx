@@ -14,7 +14,10 @@ import {
   Loader2,
   Camera,
   ShieldCheck,
-  Package
+  Package,
+  Hammer,
+  Warehouse,
+  Box
 } from 'lucide-react';
 import { productionService } from '../services/productionService';
 import { useConfig } from '../contexts/ConfigContext';
@@ -34,6 +37,15 @@ export const ShopFloorTracking: React.FC<{ onBack: () => void }> = ({ onBack }) 
   const [workerName, setWorkerName] = useState('');
   const [showIAModal, setShowIAModal] = useState(false);
   const [showQRScanner, setShowQRScanner] = useState(false);
+  const [activeTab, setActiveTab] = useState<'operaciones' | 'bom' | 'recogidas'>('operaciones');
+  const [pickedItems, setPickedItems] = useState<Record<string, boolean>>({});
+
+  const togglePicked = (matId: string) => {
+    setPickedItems(prev => ({
+      ...prev,
+      [matId]: !prev[matId]
+    }));
+  };
 
   const handleQRScanSuccess = (decodedText: string) => {
     let cleanId = decodedText.trim();
@@ -291,51 +303,185 @@ export const ShopFloorTracking: React.FC<{ onBack: () => void }> = ({ onBack }) 
               </div>
             </div>
 
-            <div className="space-y-4 pb-20">
-              <h5 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] ml-1">Ruta de Operaciones</h5>
-              {selectedTraveler.traveler_operations?.sort((a: any, b: any) => a.orden - b.orden).map((op: any) => (
-                <div 
-                  key={op.id}
+            {/* Tabs Selector */}
+            <div className="flex gap-2 p-1.5 bg-white/5 border border-mcvill-card-border rounded-2xl shrink-0">
+              {[
+                { id: 'operaciones', label: 'Operaciones', count: selectedTraveler.traveler_operations?.length || 0, icon: <Hammer size={14} /> },
+                { id: 'bom', label: 'BOM (Directo)', count: selectedTraveler.traveler_materials?.filter((m: any) => !m.es_recogida).length || 0, icon: <Package size={14} /> },
+                { id: 'recogidas', label: 'Recogidas', count: selectedTraveler.traveler_materials?.filter((m: any) => m.es_recogida).length || 0, icon: <Warehouse size={14} /> },
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
                   className={clsx(
-                    "cyber-panel p-5 border transition-all flex items-center justify-between group",
-                    op.estado === 'completed' 
-                      ? "bg-emerald-500/5 border-emerald-500/20 opacity-60" 
-                      : "bg-white/5 border-mcvill-card-border hover:border-mcvill-accent/40"
+                    "flex-1 py-3 px-2 rounded-xl flex items-center justify-center gap-1.5 text-[9px] font-black uppercase tracking-wider transition-all",
+                    activeTab === tab.id 
+                      ? "bg-mcvill-accent text-slate-950 shadow-[0_0_12px_rgba(59,130,246,0.4)] font-black" 
+                      : "text-slate-400 hover:text-white hover:bg-white/5 font-bold"
                   )}
                 >
-                  <div className="flex items-center gap-5">
-                    <div className={clsx(
-                      "w-12 h-12 rounded-2xl flex items-center justify-center border font-black text-xs transition-all duration-500",
-                      op.estado === 'completed' 
-                        ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-500" 
-                        : "bg-mcvill-bg border-mcvill-card-border text-slate-500 group-hover:border-mcvill-accent group-hover:text-mcvill-accent shadow-xl"
-                    )}>
-                      {op.orden}
+                  {tab.icon}
+                  <span className="hidden sm:inline">{tab.label}</span>
+                  <span className={clsx(
+                    "px-1.5 py-0.5 rounded-full text-[8px] font-black leading-none",
+                    activeTab === tab.id ? "bg-slate-950 text-mcvill-accent" : "bg-white/10 text-slate-400"
+                  )}>
+                    {tab.count}
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            <div className="space-y-4 pb-20">
+              {activeTab === 'operaciones' && (
+                <>
+                  <h5 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] ml-1">Ruta de Operaciones</h5>
+                  {selectedTraveler.traveler_operations?.sort((a: any, b: any) => a.orden - b.orden).map((op: any) => (
+                    <div 
+                      key={op.id}
+                      className={clsx(
+                        "cyber-panel p-5 border transition-all flex items-center justify-between group",
+                        op.estado === 'completed' 
+                          ? "bg-emerald-500/5 border-emerald-500/20 opacity-60" 
+                          : "bg-white/5 border-mcvill-card-border hover:border-mcvill-accent/40"
+                      )}
+                    >
+                      <div className="flex items-center gap-5">
+                        <div className={clsx(
+                          "w-12 h-12 rounded-2xl flex items-center justify-center border font-black text-xs transition-all duration-500",
+                          op.estado === 'completed' 
+                            ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-500" 
+                            : "bg-mcvill-bg border-mcvill-card-border text-slate-500 group-hover:border-mcvill-accent group-hover:text-mcvill-accent shadow-xl"
+                        )}>
+                          {op.orden}
+                        </div>
+                        <div>
+                          <h6 className={clsx(
+                            "text-sm font-black uppercase transition-colors",
+                            op.estado === 'completed' ? "text-emerald-500/70" : "text-white group-hover:text-mcvill-accent"
+                          )}>{op.nombre_operacion}</h6>
+                          <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">{op.centro_trabajo} • EST: {op.tiempo_estimado}H</p>
+                        </div>
+                      </div>
+                      
+                      {op.estado === 'completed' ? (
+                        <div className="flex flex-col items-end gap-1">
+                          <CheckCircle2 className="text-emerald-500" size={20} />
+                          <span className="text-[8px] font-black text-emerald-600 uppercase">Listo</span>
+                        </div>
+                      ) : (
+                        <button 
+                          onClick={() => startOperation(op)}
+                          className="w-12 h-12 bg-mcvill-accent/10 text-mcvill-accent border border-mcvill-accent/20 rounded-2xl flex items-center justify-center hover:bg-mcvill-accent hover:text-slate-950 transition-all shadow-xl active:scale-90"
+                        >
+                          <Play size={20} fill="currentColor" />
+                        </button>
+                      )}
                     </div>
-                    <div>
-                      <h6 className={clsx(
-                        "text-sm font-black uppercase transition-colors",
-                        op.estado === 'completed' ? "text-emerald-500/70" : "text-white group-hover:text-mcvill-accent"
-                      )}>{op.nombre_operacion}</h6>
-                      <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">{op.centro_trabajo} • EST: {op.tiempo_estimado}H</p>
-                    </div>
-                  </div>
-                  
-                  {op.estado === 'completed' ? (
-                    <div className="flex flex-col items-end gap-1">
-                      <CheckCircle2 className="text-emerald-500" size={20} />
-                      <span className="text-[8px] font-black text-emerald-600 uppercase">Listo</span>
+                  ))}
+                </>
+              )}
+
+              {activeTab === 'bom' && (
+                <>
+                  <h5 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] ml-1">Lista de Materiales (BOM)</h5>
+                  {(!selectedTraveler.traveler_materials || selectedTraveler.traveler_materials.filter((m: any) => !m.es_recogida).length === 0) ? (
+                    <div className="text-center py-12 text-slate-500 uppercase text-[10px] font-black tracking-widest border border-dashed border-white/5 rounded-2xl bg-white/[0.01]">
+                      Sin componentes estándar registrados
                     </div>
                   ) : (
-                    <button 
-                      onClick={() => startOperation(op)}
-                      className="w-12 h-12 bg-mcvill-accent/10 text-mcvill-accent border border-mcvill-accent/20 rounded-2xl flex items-center justify-center hover:bg-mcvill-accent hover:text-slate-950 transition-all shadow-xl active:scale-90"
-                    >
-                      <Play size={20} fill="currentColor" />
-                    </button>
+                    selectedTraveler.traveler_materials.filter((m: any) => !m.es_recogida).map((mat: any) => (
+                      <div 
+                        key={mat.id}
+                        className="cyber-panel p-5 bg-white/5 border border-mcvill-card-border hover:border-emerald-500/30 transition-all flex items-center justify-between group"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-transform shrink-0">
+                            <Box size={16} />
+                          </div>
+                          <div>
+                            <h6 className="text-sm font-black text-white uppercase group-hover:text-emerald-400 transition-colors leading-tight">
+                              {mat.descripcion}
+                            </h6>
+                            <p className="text-[9px] font-mono text-slate-500 uppercase tracking-wider mt-1">
+                              Clave: {mat.clave || 'S/K'} • Ubicac: {mat.ubicacion || 'ALMACÉN GRAL'}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3 pl-4 border-l border-white/5 shrink-0">
+                          <div className="text-right">
+                            <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">CANT REQ</p>
+                            <p className="text-sm font-black text-white">{mat.cantidad || 0} <span className="text-[9px] font-bold text-slate-500">{mat.unidad}</span></p>
+                          </div>
+                        </div>
+                      </div>
+                    ))
                   )}
-                </div>
-              ))}
+                </>
+              )}
+
+              {activeTab === 'recogidas' && (
+                <>
+                  <h5 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] ml-1">Recogidas de Almacén (Picking)</h5>
+                  {(!selectedTraveler.traveler_materials || selectedTraveler.traveler_materials.filter((m: any) => m.es_recogida).length === 0) ? (
+                    <div className="text-center py-12 text-slate-500 uppercase text-[10px] font-black tracking-widest border border-dashed border-white/5 rounded-2xl bg-white/[0.01]">
+                      Sin recogidas de almacén registradas
+                    </div>
+                  ) : (
+                    selectedTraveler.traveler_materials.filter((m: any) => m.es_recogida).map((mat: any) => {
+                      const isPicked = !!pickedItems[mat.id];
+                      return (
+                        <div 
+                          key={mat.id}
+                          className={clsx(
+                            "cyber-panel p-5 border transition-all flex items-center justify-between group cursor-pointer",
+                            isPicked 
+                              ? "bg-amber-500/5 border-amber-500/20 opacity-60 animate-in fade-in" 
+                              : "bg-white/5 border-mcvill-card-border hover:border-amber-500/30"
+                          )}
+                          onClick={() => togglePicked(mat.id)}
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className={clsx(
+                              "w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 shrink-0 border",
+                              isPicked 
+                                ? "bg-amber-500/20 border-amber-500/40 text-amber-400" 
+                                : "bg-slate-800 border-white/10 text-slate-500"
+                            )}>
+                              <Warehouse size={16} />
+                            </div>
+                            <div>
+                              <h6 className={clsx(
+                                "text-sm font-black uppercase transition-colors leading-tight",
+                                isPicked ? "text-amber-500/70 line-through" : "text-white group-hover:text-amber-400"
+                              )}>
+                                {mat.descripcion}
+                              </h6>
+                              <p className="text-[9px] font-mono text-slate-500 uppercase tracking-wider mt-1">
+                                Clave: {mat.clave || 'S/K'} • Ubicac: {mat.ubicacion || 'ALMACÉN GRAL'}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4 pl-4 border-l border-white/5 shrink-0">
+                            <div className="text-right">
+                              <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">PICKING</p>
+                              <p className="text-sm font-black text-white">{mat.cantidad || 0} <span className="text-[9px] font-bold text-slate-500">{mat.unidad}</span></p>
+                            </div>
+                            <div className={clsx(
+                              "w-6 h-6 rounded-lg border flex items-center justify-center transition-all",
+                              isPicked 
+                                ? "bg-amber-500 border-amber-400 text-slate-950" 
+                                : "border-white/20 text-transparent"
+                            )}>
+                              <CheckCircle2 size={14} />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </>
+              )}
             </div>
           </div>
         ) : (
