@@ -303,29 +303,6 @@ const PoliticasTab: React.FC = () => {
       </div>
 
       <div className="flex-1 overflow-y-auto custom-scrollbar grid grid-cols-1 md:grid-cols-2 gap-6 pb-6">
-        {/* Giro Industrial */}
-        <div className="col-span-full bg-gradient-to-r from-mcvill-accent/10 to-transparent border border-mcvill-accent/30 rounded-xl p-5 space-y-4">
-          <h4 className="text-[10px] font-black text-mcvill-accent uppercase tracking-widest border-b border-white/5 pb-2">Vertical / Giro Industrial Activo</h4>
-          
-          <div className="space-y-1.5 max-w-md">
-            <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Especialización de Procesos y Módulos</label>
-            <select
-              value={industryType}
-              onChange={(e) => setIndustryType(e.target.value as any)}
-              className="bg-black/60 border border-white/5 rounded-lg w-full px-3 h-10 font-mono text-[11px] text-white focus:border-mcvill-accent/50 transition-all cursor-pointer"
-            >
-              <option value="metal_mechanical">🏭 METALMECÁNICA (Nesting, Corte, Viajeros de Acero)</option>
-              <option value="automotive">🚗 AUTOMOTRIZ (Core Tools, PPAP, APQP, Kanban RFQ)</option>
-              <option value="aerospace">✈️ AEROESPACIAL (AS9100 Quality, FAI AS9102, ITAR Certs)</option>
-              <option value="textile">👕 TEXTIL (Órdenes de Corte, Confección, Fichas de Tela)</option>
-              <option value="pharmaceutical">💊 FARMACÉUTICA (Protocolos de Receta, Control FDA/GMP, Lotes)</option>
-              <option value="electronics">⚡ ELECTRÓNICA (Rutas SMT, Primer Artículo RoHS, Control ESD)</option>
-              <option value="mining">⛏️ MINERÍA (MSHA Safety, Trazabilidad de Lotes, Cert. de Materiales)</option>
-            </select>
-            <p className="text-[8px] text-slate-600 font-medium ml-1">El ERP adaptará dinámicamente todo su menú de navegación, algoritmos de cálculo, y agentes de Inteligencia Artificial para cumplir con el giro industrial seleccionado.</p>
-          </div>
-        </div>
-
         {/* Salarios */}
         <div className="bg-slate-900/40 border border-white/5 rounded-xl p-5 space-y-4">
           <h4 className="text-[10px] font-black text-mcvill-accent uppercase tracking-widest border-b border-white/5 pb-2">Salarios y Referencias</h4>

@@ -552,32 +552,36 @@ export const ViajeroAdminPanel: React.FC<{
           <p>${ids.length} Viajeros Industriales</p>
           <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-bar"></div></div>
           <div id="progress-text">0 / ${ids.length}</div>
-          <script>
-            const TOTAL = ${ids.length};
-            const TOKEN = '${token}';
-            const BRIDGE = '${BRIDGE_URL}';
-
-            let secs = 0;
-            const counterEl = document.getElementById('counter');
-            setInterval(() => { secs++; counterEl.innerText = secs; }, 1000);
-
-            async function poll() {
-              try {
-                const r = await fetch(BRIDGE + '/api/progress/' + TOKEN);
-                if (!r.ok) return;
-                const d = await r.json();
-                const done = d.done || 0;
-                const total = d.total || TOTAL;
-                document.getElementById('progress-text').innerText = done + ' / ' + total;
-                document.getElementById('progress-bar').style.width = (total > 0 ? (done / total * 100) : 0) + '%';
-              } catch(e) {}
-            }
-            const pollTimer = setInterval(poll, 500);
-          </script>
         </body>
         </html>
       `);
       pdfWindow.document.close();
+
+      // Timer y polling controlados desde la ventana padre (evita SyntaxError de inline script)
+      let secs = 0;
+      const timerInt = setInterval(() => {
+        if (pdfWindow.closed) { clearInterval(timerInt); return; }
+        secs++;
+        try {
+          const el = pdfWindow.document.getElementById('counter');
+          if (el) el.innerText = String(secs);
+        } catch { clearInterval(timerInt); }
+      }, 1000);
+
+      const pollInt = setInterval(async () => {
+        if (pdfWindow.closed) { clearInterval(timerInt); clearInterval(pollInt); return; }
+        try {
+          const r = await fetch(BRIDGE_URL + '/api/progress/' + token);
+          if (!r.ok) return;
+          const d = await r.json();
+          const done = d.done || 0;
+          const total = d.total || ids.length;
+          const ptEl = pdfWindow.document.getElementById('progress-text');
+          const pbEl = pdfWindow.document.getElementById('progress-bar');
+          if (ptEl) ptEl.innerText = done + ' / ' + total;
+          if (pbEl) pbEl.style.width = (total > 0 ? Math.round(done / total * 100) : 0) + '%';
+        } catch { clearInterval(pollInt); }
+      }, 500);
     }
 
     generatePDF(ids, pdfWindow, token);
@@ -640,19 +644,20 @@ export const ViajeroAdminPanel: React.FC<{
           </div>
           <h2>Generando PDF</h2>
           <p>Procesando Viajero Industrial ${id}</p>
-          <script>
-            let count = 0;
-            const counterEl = document.getElementById('counter');
-            counterEl.innerText = count;
-            const timer = setInterval(() => {
-              count++;
-              counterEl.innerText = count;
-            }, 1000);
-          </script>
         </body>
         </html>
       `);
       pdfWindow.document.close();
+
+      let count = 0;
+      const timerInt = setInterval(() => {
+        if (pdfWindow.closed) { clearInterval(timerInt); return; }
+        count++;
+        try {
+          const el = pdfWindow.document.getElementById('counter');
+          if (el) el.innerText = String(count);
+        } catch { clearInterval(timerInt); }
+      }, 1000);
     }
     generatePDF([id], pdfWindow);
   };
@@ -1452,10 +1457,33 @@ export const ViajeroAdminPanel: React.FC<{
         <div id="batch-qr-print-container" className="fixed inset-0 bg-white z-[99999] overflow-auto text-black">
           {/* Controles NO imprimibles */}
           <div className="fixed top-0 left-0 w-full p-4 flex gap-4 bg-slate-900 justify-center shadow-xl print:hidden">
-            <button 
-              onClick={() => { 
-                setTimeout(() => window.print(), 300); 
-              }} 
+            <button
+              onClick={() => {
+                const svgEls = Array.from(document.querySelectorAll<SVGSVGElement>('#batch-qr-print-container svg'));
+                const newWin = window.open('', '_blank');
+                if (!newWin) { setTimeout(() => window.print(), 300); return; }
+                const esc = (s?: string) => (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                const cardsHTML = qrsToPrint.map((v: any, i: number) =>
+                  '<div class="card"><div class="lbl">' + esc(config.logoText) + ' VIAJERO</div>' +
+                  (svgEls[i]?.outerHTML || '') +
+                  '<div class="job-id">' + esc(v.id) + '</div>' +
+                  '<div class="part">' + esc(v.numero_parte || 'S/N') + '</div>' +
+                  '<div class="client">' + esc(v.cliente || 'S/C') + '</div></div>'
+                ).join('');
+                newWin.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>QR Viajeros</title><style>' +
+                  '*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;background:#fff;padding:16px}' +
+                  '.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}' +
+                  '.card{display:flex;flex-direction:column;align-items:center;padding:16px;border:2px solid #e2e8f0;border-radius:12px;break-inside:avoid;page-break-inside:avoid}' +
+                  '.lbl{font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.15em;color:#64748b;margin-bottom:10px;text-align:center}' +
+                  '.job-id{font-size:16px;font-weight:900;color:#0f172a;margin-top:10px;text-align:center}' +
+                  '.part{font-size:9px;font-weight:700;color:#334155;text-transform:uppercase;margin-top:3px;text-align:center}' +
+                  '.client{font-size:8px;color:#64748b;text-transform:uppercase;font-weight:700;margin-top:3px;text-align:center}' +
+                  '@media print{@page{size:auto;margin:5mm}body{padding:0}.grid{grid-template-columns:repeat(3,1fr);gap:10px}}' +
+                  '</style></head><body><div class="grid">' + cardsHTML + '</div></body></html>');
+                newWin.document.close();
+                setTimeout(() => { newWin.print(); }, 600);
+                setQrsToPrint([]);
+              }}
               className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-xl font-black uppercase tracking-widest flex gap-2 items-center transition-all shadow-lg shadow-emerald-600/20 active:scale-95"
             >
               <Printer size={16}/> Confirmar Impresión

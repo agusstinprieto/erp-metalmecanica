@@ -12,11 +12,14 @@ import {
   ChevronRight,
   Zap,
   Loader2,
-  Camera
+  Camera,
+  ShieldCheck,
+  Package
 } from 'lucide-react';
 import { productionService } from '../services/productionService';
 import { useConfig } from '../contexts/ConfigContext';
 import { VisualIAInspection } from './VisualIAInspection';
+import { ShopFloorQRScannerModal } from './ShopFloorQRScannerModal';
 import clsx from 'clsx';
 
 export const ShopFloorTracking: React.FC<{ onBack: () => void }> = ({ onBack }) => {
@@ -30,6 +33,16 @@ export const ShopFloorTracking: React.FC<{ onBack: () => void }> = ({ onBack }) 
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [workerName, setWorkerName] = useState('');
   const [showIAModal, setShowIAModal] = useState(false);
+  const [showQRScanner, setShowQRScanner] = useState(false);
+
+  const handleQRScanSuccess = (decodedText: string) => {
+    let cleanId = decodedText.trim();
+    if (cleanId.includes('://')) {
+      const parts = cleanId.split('/');
+      cleanId = parts[parts.length - 1];
+    }
+    selectTraveler(cleanId);
+  };
 
   useEffect(() => {
     let interval: any;
@@ -203,7 +216,11 @@ export const ShopFloorTracking: React.FC<{ onBack: () => void }> = ({ onBack }) 
           <p className="text-[10px] font-black text-mcvill-accent uppercase tracking-[0.3em]">Terminal de Piso</p>
           <h3 className="text-lg font-black text-white uppercase">Tracker de Manufactura</h3>
         </div>
-        <button className="p-2 text-mcvill-accent">
+        <button 
+          onClick={() => setShowQRScanner(true)} 
+          className="p-2 text-mcvill-accent hover:scale-110 active:scale-95 transition-transform"
+          title="Escanear QR de Viajero"
+        >
           <Scan size={24} />
         </button>
       </div>
@@ -340,6 +357,14 @@ export const ShopFloorTracking: React.FC<{ onBack: () => void }> = ({ onBack }) 
         <VisualIAInspection 
           onClose={() => setShowIAModal(false)} 
           onComplete={() => setShowIAModal(false)} 
+        />
+      )}
+
+      {showQRScanner && (
+        <ShopFloorQRScannerModal
+          isOpen={showQRScanner}
+          onClose={() => setShowQRScanner(false)}
+          onScanSuccess={handleQRScanSuccess}
         />
       )}
     </div>

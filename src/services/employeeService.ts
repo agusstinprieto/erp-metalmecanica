@@ -34,37 +34,37 @@ export const employeeService = {
    * Obtiene todos los empleados del tenant activo.
    */
   async listEmployees() {
+    const MCVILL_TENANT = 'c89d6183-5f66-48dd-8b66-2b8b6b993e61';
     const tenantId = await getActiveTenantId();
-    let query = supabase.from('empleados').select('*').order('employee_number', { ascending: true });
 
-    if (tenantId) {
-      query = query.eq('tenant_id', tenantId);
-    }
+    // Intento 1: filtrar por tenant activo
+    const { data, error } = await supabase
+      .from('empleados')
+      .select('*')
+      .eq('tenant_id', tenantId)
+      .order('employee_number', { ascending: true });
 
-    const { data, error } = await query;
+    if (error) throw error;
+    if (data && data.length > 0) return data as Employee[];
 
-    if (error) {
-      console.error('Error fetching employees:', error);
-      throw error;
-    }
-
-    // LÓGICA DE AUTO-RECUPERACIÓN MCVILL PRO
-    // Si no se encuentran empleados para el tenant activo, pero el tenant activo no es el principal de McVill,
-    // hacemos un query directo al tenant oficial de producción de McVill para no dejar la pantalla vacía.
-    if ((!data || data.length === 0) && tenantId !== 'c89d6183-5f66-48dd-8b66-2b8b6b993e61') {
-      console.warn('Fallback inteligente: No se encontraron empleados para el tenant', tenantId, '- Buscando en el tenant principal de McVill...');
-      const fallbackQuery = await supabase
+    // Intento 2: filtrar por tenant McVill principal (si el activo era diferente)
+    if (tenantId !== MCVILL_TENANT) {
+      const { data: d2, error: e2 } = await supabase
         .from('empleados')
         .select('*')
-        .eq('tenant_id', 'c89d6183-5f66-48dd-8b66-2b8b6b993e61')
+        .eq('tenant_id', MCVILL_TENANT)
         .order('employee_number', { ascending: true });
-      
-      if (!fallbackQuery.error && fallbackQuery.data && fallbackQuery.data.length > 0) {
-        return fallbackQuery.data as Employee[];
-      }
+      if (!e2 && d2 && d2.length > 0) return d2 as Employee[];
     }
 
-    return data as Employee[];
+    // Intento 3: sin filtro de tenant (todos los empleados visibles por RLS)
+    const { data: d3, error: e3 } = await supabase
+      .from('empleados')
+      .select('*')
+      .order('employee_number', { ascending: true });
+    if (!e3 && d3) return d3 as Employee[];
+
+    return [] as Employee[];
   },
 
   /**

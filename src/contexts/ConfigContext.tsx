@@ -177,14 +177,44 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         let currentTenantId = 'mcvill'; // Default fallback
 
         if (user) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('tenant_id')
-            .eq('id', user.id)
-            .maybeSingle();
-          
-          if (profile?.tenant_id) {
-            currentTenantId = profile.tenant_id;
+          try {
+            let { data: profile } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', user.id)
+              .maybeSingle();
+            
+            if (!profile) {
+              console.warn('Self-healing profiles: Profile missing in public.profiles. Attempting automatic creation...');
+              const rawRole = user.user_metadata?.role || user.email?.split('@')[0] || 'sistemas';
+              const validRoles = ['ceo', 'gerente', 'rh', 'sistemas', 'contabilidad', 'supervisor', 'ingenieria', 'calidad', 'operaciones'];
+              const resolvedRole = validRoles.includes(rawRole.toLowerCase()) ? rawRole.toLowerCase() : 'sistemas';
+
+              const { data: newProfile, error: insertError } = await supabase
+                .from('profiles')
+                .insert({
+                  id: user.id,
+                  tenant_id: 'c89d6183-5f66-48dd-8b66-2b8b6b993e61', // Tenant principal de McVill
+                  full_name: user.user_metadata?.full_name || 'Admin Sistemas',
+                  email: user.email,
+                  role: resolvedRole
+                })
+                .select()
+                .maybeSingle();
+
+              if (!insertError && newProfile) {
+                profile = newProfile;
+                console.log('Self-healing profiles: Profile created successfully:', newProfile);
+              } else {
+                console.error('Self-healing profiles: Error creating profile:', insertError);
+              }
+            }
+
+            if (profile?.tenant_id) {
+              currentTenantId = profile.tenant_id;
+            }
+          } catch (err) {
+            console.error('Self-healing profiles: Fatal exception:', err);
           }
         }
 

@@ -6,7 +6,7 @@ import {
   ChevronDown, ChevronRight, Info, FileDown, Award
 } from 'lucide-react';
 import { useConfig } from '../contexts/ConfigContext';
-import { supabase } from '../lib/supabase';
+import { supabase, getActiveTenantId } from '../lib/supabase';
 import { productionService } from '../services/productionService';
 import { reportUtils } from '../utils/reportUtils';
 
@@ -425,6 +425,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
     stockCritico: 0,
     safetyDays: 0,
   });
+
+  const [activeEmployeesList, setActiveEmployeesList] = useState<any[]>([]);
+  const [presentIds, setPresentIds] = useState<Set<string>>(new Set());
 
   const [primaData, setPrimaData] = useState<{
     totalPasivo: number;

@@ -86,14 +86,20 @@ export const inventoryService = {
     const { data, error } = await supabase
       .from('materiales')
       .insert({
+        name: item.name,
         descripcion_mp: item.name,
-        peso_mp: item.quantity,
         sku: item.sku,
         category: item.category,
+        categoria: item.category,
         unit: item.unit,
+        unidad: item.unit,
         min_stock: item.min_stock,
+        stock_minimo: item.min_stock,
         location: item.location,
+        ubicacion: item.location,
         description: item.description,
+        cantidad: item.quantity,
+        peso_mp: item.quantity,
         tenant_id: tenantData?.id
       })
       .select()
