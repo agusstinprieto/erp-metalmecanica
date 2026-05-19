@@ -116,6 +116,7 @@ export const ViajeroAdminPanel: React.FC<{
     fetchViajeros();
     fetchFilterData();
     loadTenantConfig();
+    if (window.innerWidth < 768) setViewMode('tarjetas');
   }, []);
 
   const loadTenantConfig = async () => {
@@ -837,26 +838,26 @@ export const ViajeroAdminPanel: React.FC<{
           <div className="flex items-center gap-1.5 shrink-0">
             <button
               onClick={() => { setCatalogType('operaciones'); setIsCatalogModalOpen(true); }}
-              className="p-1.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-lg transition-all group"
+              className="hidden sm:block p-1.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-lg transition-all group"
               title="Catálogo de Operaciones"
             >
               <Database size={13} className="text-blue-400 group-hover:scale-110" />
             </button>
             <button
               onClick={() => { setCatalogType('materiales'); setIsCatalogModalOpen(true); }}
-              className="p-1.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-lg transition-all group"
+              className="hidden sm:block p-1.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-lg transition-all group"
               title="Catálogo BOM"
             >
               <Box size={13} className="text-emerald-400 group-hover:scale-110" />
             </button>
             <button
               onClick={() => setIsOCModalOpen(true)}
-              className="p-1.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-lg transition-all group"
+              className="hidden sm:block p-1.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-lg transition-all group"
               title="Órdenes de Compra Clientes"
             >
               <FileText size={13} className="text-indigo-400 group-hover:scale-110" />
             </button>
-            <div className="w-px h-4 bg-white/10 mx-0.5" />
+            <div className="hidden sm:block w-px h-4 bg-white/10 mx-0.5" />
             {/* Toggle vista lista / tarjetas */}
             <div className="flex bg-black/40 border border-white/10 rounded-lg p-0.5">
               <button
@@ -883,7 +884,7 @@ export const ViajeroAdminPanel: React.FC<{
             </button>
             <button
               onClick={onToggleTV}
-              className="flex items-center gap-2 px-4 py-2.5 bg-slate-900 border border-white/10 text-slate-400 hover:text-white hover:border-blue-500/50 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all"
+              className="hidden md:flex items-center gap-2 px-4 py-2.5 bg-slate-900 border border-white/10 text-slate-400 hover:text-white hover:border-blue-500/50 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all"
               title="Activar Monitor de Piso (TV)"
             >
               <Zap size={14} className="text-blue-500" /> Monitor TV
@@ -891,7 +892,7 @@ export const ViajeroAdminPanel: React.FC<{
 
             <button
               onClick={() => eventBus.emit('CHAT_ASK', { prompt: '¿Cómo puedo optimizar la producción hoy?' })}
-              className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600/10 border border-indigo-500/30 text-indigo-400 hover:bg-indigo-600 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all shadow-lg shadow-indigo-600/10"
+              className="hidden md:flex items-center gap-2 px-4 py-2.5 bg-indigo-600/10 border border-indigo-500/30 text-indigo-400 hover:bg-indigo-600 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all shadow-lg shadow-indigo-600/10"
               title="Consultar Inteligencia Artificial"
             >
               <Sparkles size={14} /> Consultar IA
@@ -1385,7 +1386,7 @@ export const ViajeroAdminPanel: React.FC<{
                         </div>
                       </td>
                       <td className="px-3 py-1.5 text-right">
-                        <div className="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
+                        <div className="flex items-center justify-end gap-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all sm:transform sm:translate-x-2 sm:group-hover:translate-x-0">
                           <button
                             onClick={() => handleSinglePrint(viajero.id)}
                             className="p-1.5 bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white rounded-lg transition-all"
@@ -1509,43 +1510,43 @@ export const ViajeroAdminPanel: React.FC<{
               initial={{ y: 100, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 100, opacity: 0 }}
-              className="fixed bottom-8 left-[calc(50%+8rem)] -translate-x-1/2 z-[60] w-full max-w-4xl px-6"
+              className="fixed bottom-4 sm:bottom-8 left-1/2 lg:left-[calc(50%+8rem)] -translate-x-1/2 z-[60] w-full max-w-4xl px-3 sm:px-6"
             >
-              <div className={`${isDarkMode ? 'bg-[#0f172a]/95' : 'bg-white/95'} backdrop-blur-2xl border border-white/10 rounded-[30px] p-4 flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-t-white/20`}>
-                <div className="flex items-center gap-3">
-                  <div className="flex bg-black/40 p-1 rounded-2xl border border-white/5">
-                    <button className="px-6 py-2 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-600/20">
-                      {selectedIds.size} SELECCIONADOS
+              <div className={`${isDarkMode ? 'bg-[#0f172a]/95' : 'bg-white/95'} backdrop-blur-2xl border border-white/10 rounded-2xl sm:rounded-[30px] p-3 sm:p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-0 shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-t-white/20`}>
+                <div className="flex items-center gap-2">
+                  <div className="flex bg-black/40 p-1 rounded-xl border border-white/5 flex-1 sm:flex-none">
+                    <button className="flex-1 sm:flex-none px-3 sm:px-6 py-1.5 sm:py-2 bg-blue-600 text-white rounded-lg sm:rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-600/20">
+                      {selectedIds.size} SEL.
                     </button>
-                    <button 
+                    <button
                       onClick={() => setSelectedIds(new Set(filteredViajeros.map(v => v.id)))}
-                      className="px-6 py-2 text-slate-500 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
+                      className="flex-1 sm:flex-none px-3 sm:px-6 py-1.5 sm:py-2 text-slate-500 hover:text-white rounded-lg sm:rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
                     >
                       TODOS ({filteredViajeros.length})
                     </button>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4">
-                  <button 
+                <div className="flex items-center gap-2">
+                  <button
                     onClick={() => setSelectedIds(new Set())}
-                    className="px-8 py-3 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border border-white/5 active:scale-95"
+                    className="flex-1 sm:flex-none px-4 sm:px-8 py-2.5 sm:py-3 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white rounded-xl sm:rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border border-white/5 active:scale-95"
                   >
                     CANCELAR
                   </button>
-                  <button 
+                  <button
                     onClick={handleBatchPrintQRs}
-                    className="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(16,185,129,0.4)] flex items-center gap-2 group active:scale-95"
+                    className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl sm:rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(16,185,129,0.4)] flex items-center justify-center gap-2 group active:scale-95"
                   >
-                    <QrCode size={16} className="group-hover:scale-110 transition-transform" /> 
-                    IMPRIMIR QRS
+                    <QrCode size={15} className="group-hover:scale-110 transition-transform" />
+                    <span className="hidden sm:inline">IMPRIMIR </span>QRS
                   </button>
-                  <button 
+                  <button
                     onClick={handleBatchPrint}
-                    className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(37,99,235,0.4)] flex items-center gap-2 group active:scale-95"
+                    className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl sm:rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(37,99,235,0.4)] flex items-center justify-center gap-2 group active:scale-95"
                   >
-                    <Printer size={16} className="group-hover:rotate-12 transition-transform" /> 
-                    VIAJEROS
+                    <Printer size={15} className="group-hover:rotate-12 transition-transform" />
+                    PDF
                   </button>
                 </div>
               </div>
