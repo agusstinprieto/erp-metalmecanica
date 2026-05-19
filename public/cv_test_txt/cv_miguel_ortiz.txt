@@ -1,0 +1,54 @@
+========================================================================
+MIGUEL ÁNGEL ORTIZ VILLANUEVA - CURRÍCULUM VITAE
+========================================================================
+Puesto Objetivo: Operador y Programador de CNC (Torno y Centro de Maquinado)
+Contacto: miguel.ortiz.cnc@email.com | Tel: +52 81 5566 7788
+Ubicación: Apodaca, Nuevo León, México
+Estado Civil: Soltero | Disponibilidad de Turno: Rotativo (Día, Tarde, Noche)
+
+------------------------------------------------------------------------
+PERFIL PROFESIONAL
+------------------------------------------------------------------------
+Técnico en Máquinas y Herramientas con más de 7 años de experiencia práctica en el maquinado de precisión de componentes metálicos de alta gama. Especialista en la operación, ajuste y programación de tornos CNC y centros de maquinado vertical de 3 y 4 ejes. Dominio avanzado de los controladores FANUC, HAAS y MAZATROL. Experto en la interpretación de códigos G y M, selección de herramientas de corte, cálculo de velocidades de avance e interpretación de dibujos técnicos con tolerancias estrictas (GD&T). Persona comprometida con el mantenimiento productivo autónomo (TPM) y el cumplimiento estricto del estándar de productividad OEE.
+
+------------------------------------------------------------------------
+COMPETENCIAS TÉCNICAS
+------------------------------------------------------------------------
+* Programación a pie de máquina en código numérico estándar (Código G y M).
+* Configuración (Set-up) de herramientas de corte, palpación de cero pieza y ajuste de correctores (Offsets).
+* Lectura y análisis de planos industriales, tolerancias de precisión geométrica de hasta +/- 0.005 mm.
+* Maquinado de materiales diversos: Acero A36, acero aleado 4140T, acero inoxidable, aluminio, bronce y nylamid.
+* Uso e interpretación de instrumentos de medición industrial: micrómetros exteriores/interiores, indicadores de carátula, calibrador vernier digital e indicadores de rosca.
+
+------------------------------------------------------------------------
+EXPERIENCIA LABORAL
+------------------------------------------------------------------------
+1. PROGRAMADOR Y MAQUINISTA CNC | Manufactura de Precisión Regiomontana
+   Periodo: Noviembre 2021 – Presente
+   Responsabilidades y Logros:
+   - Programación e instalación de herramental en centros de maquinado vertical HAAS VF-3 y tornos CNC Fanuc 21i-T.
+   - Fabricación de flechas de transmisión y componentes mecánicos de alta complejidad con cero rechazos dimensionales en producción regular.
+   - Optimización de programas CNC que redujeron los tiempos de ciclo en un 12% mediante la reducción de recorridos en vacío.
+   - Ejecución del mantenimiento autónomo del equipo (niveles de lubricante, limpieza de rebaba y verificación de presión de aire).
+
+2. OPERADOR DE MÁQUINAS HERRAMIENTAS CNC | Componentes y Componentes Metalmecánicos
+   Periodo: Marzo 2018 – Octubre 2021
+   Responsabilidades y Logros:
+   - Carga y descarga de piezas brutas en tornos CNC Mazak Quick Turn de alta velocidad.
+   - Inspección dimensional de piezas al 100% utilizando calibradores vernier e indicadores pasa/no-pasa.
+   - Reemplazo y ajuste de insertos de carburo desgastados basados en las desviaciones dimensionales del monitor de calidad.
+   - Organización del área de trabajo bajo el estándar de orden 5S de planta.
+
+------------------------------------------------------------------------
+EDUCACIÓN Y CAPACITACIÓN
+------------------------------------------------------------------------
+* Técnico Medio en Máquinas y Herramientas
+  Escuela Industrial y Preparatoria Técnica "Álvaro Obregón" - UANL (Graduación: 2017)
+* Curso de Programación CNC Avanzada en Torno y Fresadora
+  Centro de Entrenamiento en Automatización Industrial (CEAI), 2019 (Duración: 60 horas).
+
+------------------------------------------------------------------------
+SOFTWARE Y HERRAMIENTAS CAD/CAM
+------------------------------------------------------------------------
+- CAD/CAM: Mastercam (Nivel Intermedio - Generación de trayectorias básicas de 2D/3D), AutoCAD.
+========================================================================

@@ -87,6 +87,7 @@ const PortadaView = lz(() => import('./components/PortadaView'), 'PortadaView');
 const DeliveryTrackerView = lz(() => import('./components/DeliveryTrackerView'), 'DeliveryTrackerView');
 const LeadTimePredictorView = lz(() => import('./components/LeadTimePredictorView'), 'LeadTimePredictorView');
 const BrandingStudioView = lz(() => import('./components/BrandingStudioView'), 'BrandingStudioView');
+const WhatsAppCenterView = lz(() => import('./components/WhatsAppCenterView'), 'WhatsAppCenterView');
 
 type UserRole = 'ceo' | 'gerencia' | 'sistemas' | 'empleado' | 'rh' | 'finanzas' | 'contabilidad' | 'supervisor' | 'ingenieria' | 'calidad' | 'operaciones' | 'ventas' | 'compras' | 'almacen' | 'auditoria' | 'soporte' | 'marketing' | 'seguridad';
 
@@ -550,6 +551,7 @@ function App() {
             {activeView === 'costing' && <CostingView />}
             {activeView === 'engineering' && <EngineeringView />}
             {activeView === 'trazabilidad' && <TrazabilidadView />}
+            {activeView === 'ordenes_trabajo' && <ProductionView />}
             {activeView === 'production' && <ProductionView />}
             {activeView === 'viajeros' && (
               selectedViajeroId ? (
@@ -614,6 +616,7 @@ function App() {
             {activeView === 'logistica' && <DeliveryTrackerView />}
             {activeView === 'lead_time_predictor' && <LeadTimePredictorView />}
             {activeView === 'branding_studio' && <BrandingStudioView />}
+            {activeView === 'whatsapp_center' && <WhatsAppCenterView />}
           </Suspense>
           </div>
         </div>

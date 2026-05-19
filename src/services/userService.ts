@@ -58,7 +58,7 @@ export const userService = {
       })
       .eq('id', userId)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
 

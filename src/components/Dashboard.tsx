@@ -430,6 +430,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
 
   const [activeEmployeesList, setActiveEmployeesList] = useState<any[]>([]);
   const [presentIds, setPresentIds] = useState<Set<string>>(new Set());
+  const [positionStats, setPositionStats] = useState<Array<{puesto: string, total: number, presentes: number}>>([]);
 
   const [primaData, setPrimaData] = useState<{
     totalPasivo: number;
@@ -509,11 +510,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
   const loadDbStats = async () => {
     try {
       const todayISO = new Date().toISOString().split('T')[0];
-      const [empRes, presentRes, ordenRes, safetyRes] = await Promise.all([
+      const [empRes, presentRes, ordenRes, safetyRes, empDetailRes, attendDetailRes] = await Promise.all([
         supabase.from('empleados').select('id', { count: 'exact', head: true }).eq('status', 'active'),
         supabase.from('attendance_records').select('id', { count: 'exact', head: true }).eq('date', todayISO),
         supabase.from('ordenes_mantenimiento').select('id', { count: 'exact', head: true }).in('estado', ['pendiente', 'en_proceso']),
         supabase.from('seguridad_metricas').select('dias_sin_accidente').limit(1),
+        supabase.from('empleados').select('id, shift_id, job_title').eq('status', 'active'),
+        supabase.from('attendance_records').select('employee_id').eq('date', todayISO),
       ]);
 
       let stockCritico = 0;
@@ -536,6 +539,24 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
         stockCritico,
         safetyDays: safetyRes.data && safetyRes.data.length > 0 ? safetyRes.data[0].dias_sin_accidente : 0,
       });
+
+      const empList = (empDetailRes.data || []) as Array<{id: string, shift_id: string | null, job_title: string | null}>;
+      const presentSet = new Set<string>((attendDetailRes.data || []).map((a: any) => a.employee_id));
+      setActiveEmployeesList(empList);
+      setPresentIds(presentSet);
+
+      const posMap: Record<string, {total: number, presentes: number}> = {};
+      for (const e of empList) {
+        const key = e.job_title || 'Sin Puesto';
+        if (!posMap[key]) posMap[key] = { total: 0, presentes: 0 };
+        posMap[key].total++;
+        if (presentSet.has(e.id)) posMap[key].presentes++;
+      }
+      setPositionStats(
+        Object.entries(posMap)
+          .map(([puesto, v]) => ({ puesto, ...v }))
+          .sort((a, b) => b.total - a.total)
+      );
     } catch (error) {
       console.error('Error loading stats:', error);
       setErrorMsg('No se pudieron cargar los indicadores de base de datos. Usando simulación de planta activa.');
@@ -760,79 +781,22 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
   const bancoConectado = !!localStorage.getItem(BANK_API_KEY);
 
   return (
-    <div className="h-full flex flex-col bg-mcvill-bg overflow-hidden animate-in fade-in duration-700 -m-8">
-      
       {/* ── TOP CONTROL PANEL (FILTERBAR) ────────────────────────────────────── */}
-      <div className="px-4 py-3 border-b border-white/5 bg-slate-950/80 backdrop-blur flex flex-col lg:flex-row lg:items-center justify-between gap-4 z-20">
+      <div className="px-6 py-3.5 border-b border-white/5 bg-slate-950/80 backdrop-blur flex flex-col gap-3 z-20">
         
-        {/* Title */}
-        <div className="flex items-center gap-3">
-          <div className="w-2.5 h-2.5 rounded bg-mcvill-accent animate-pulse shadow-[0_0_8px_rgba(var(--mcvill-accent-rgb),0.7)]" />
-          <div>
-            <h2 className="text-[10px] font-black text-white uppercase tracking-[0.25em]">McVill Predictive Control</h2>
-            <p className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5">Industrial IoT Core v2.5</p>
-          </div>
-        </div>
-
-        {/* Filters Grid */}
-        <div className="flex flex-wrap items-center justify-end gap-2 shrink-0">
-          
-          {/* Planta Selector */}
-          <div className="relative">
-            <select
-              value={selectedPlanta}
-              onChange={e => setSelectedPlanta(e.target.value as PlantaKey)}
-              className="w-full bg-slate-900 border border-slate-800 text-[10px] font-black uppercase text-white rounded-xl px-3 py-2 outline-none focus:border-mcvill-accent/50 cursor-pointer appearance-none pr-8 transition-all"
-            >
-              <option value="todas">🏭 Todas las Plantas</option>
-              <option value="torreon_laser">⚡ Torreón - Corte Láser</option>
-              <option value="torreon_mecanizado">⚙️ Torreón - Mecanizado CNC</option>
-              <option value="torreon_forja">🔥 Torreón - Forja Pesada</option>
-            </select>
-            <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-          </div>
-
-          {/* Turno Selector */}
-          <div className="relative">
-            <select
-              value={selectedTurno}
-              onChange={e => setSelectedTurno(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-800 text-[10px] font-black uppercase text-white rounded-xl px-3 py-2 outline-none focus:border-mcvill-accent/50 cursor-pointer appearance-none pr-8 transition-all"
-            >
-              <option value="todos">⏰ Todos los Turnos</option>
-              {shifts.map((s: any) => {
-                const isMat = s.name.toLowerCase().includes('matutino') || s.name.toLowerCase().includes('admin');
-                const isVesp = s.name.toLowerCase().includes('vespertino');
-                const emoji = isMat ? '☀️' : isVesp ? '⛅' : '🌙';
-                return (
-                  <option key={s.id} value={s.id}>
-                    {emoji} {s.name} ({s.start_time.substring(0, 5)}-{s.end_time.substring(0, 5)}h)
-                  </option>
-                );
-              })}
-            </select>
-            <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-          </div>
-
-          {/* Time Range Pills */}
-          <div className="flex gap-1 bg-slate-900 border border-slate-800 rounded-xl p-1">
-            {TIME_RANGES.map(t => (
-              <button
-                key={t.id}
-                onClick={() => setTimeRange(t.id)}
-                className={`px-2.5 py-1 rounded-lg text-[8px] font-black uppercase tracking-wider transition-all ${
-                  timeRange === t.id
-                    ? 'bg-mcvill-accent/20 border border-mcvill-accent/40 text-mcvill-accent'
-                    : 'text-slate-500 hover:text-slate-300'
-                }`}
-              >
-                {t.label}
-              </button>
-            ))}
+        {/* Row 1: Title & Actions */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          {/* Title */}
+          <div className="flex items-center gap-3">
+            <div className="w-2.5 h-2.5 rounded bg-mcvill-accent animate-pulse shadow-[0_0_8px_rgba(var(--mcvill-accent-rgb),0.7)]" />
+            <div>
+              <h2 className="text-[10px] font-black text-white uppercase tracking-[0.25em]">McVill Predictive Control</h2>
+              <p className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5">Industrial IoT Core v2.5</p>
+            </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={handleExportPDF}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-white/10 text-slate-400 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all whitespace-nowrap"
@@ -852,7 +816,65 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
               <Plus size={12} /> ORDEN
             </button>
           </div>
+        </div>
 
+        {/* Row 2: Selectors & Time Pills */}
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-2.5 border-t border-white/5">
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Planta Selector */}
+            <div className="relative">
+              <select
+                value={selectedPlanta}
+                onChange={e => setSelectedPlanta(e.target.value as PlantaKey)}
+                className="bg-slate-900 border border-slate-800 text-[10px] font-black uppercase text-white rounded-xl px-3 py-2 outline-none focus:border-mcvill-accent/50 cursor-pointer appearance-none pr-8 transition-all"
+              >
+                <option value="todas">🏭 Todas las Plantas</option>
+                <option value="torreon_laser">⚡ Torreón - Corte Láser</option>
+                <option value="torreon_mecanizado">⚙️ Torreón - Mecanizado CNC</option>
+                <option value="torreon_forja">🔥 Torreón - Forja Pesada</option>
+              </select>
+              <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+            </div>
+
+            {/* Turno Selector */}
+            <div className="relative">
+              <select
+                value={selectedTurno}
+                onChange={e => setSelectedTurno(e.target.value)}
+                className="bg-slate-900 border border-slate-800 text-[10px] font-black uppercase text-white rounded-xl px-3 py-2 outline-none focus:border-mcvill-accent/50 cursor-pointer appearance-none pr-8 transition-all"
+              >
+                <option value="todos">⏰ Todos los Turnos</option>
+                {shifts.map((s: any) => {
+                  const isMat = s.name.toLowerCase().includes('matutino') || s.name.toLowerCase().includes('admin');
+                  const isVesp = s.name.toLowerCase().includes('vespertino');
+                  const emoji = isMat ? '☀️' : isVesp ? '⛅' : '🌙';
+                  return (
+                    <option key={s.id} value={s.id}>
+                      {emoji} {s.name} ({s.start_time.substring(0, 5)}-{s.end_time.substring(0, 5)}h)
+                    </option>
+                  );
+                })}
+              </select>
+              <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+            </div>
+          </div>
+
+          {/* Time Range Pills */}
+          <div className="flex gap-1 bg-slate-900 border border-slate-800 rounded-xl p-1">
+            {TIME_RANGES.map(t => (
+              <button
+                key={t.id}
+                onClick={() => setTimeRange(t.id)}
+                className={`px-2.5 py-1 rounded-lg text-[8px] font-black uppercase tracking-wider transition-all ${
+                  timeRange === t.id
+                    ? 'bg-mcvill-accent/20 border border-mcvill-accent/40 text-mcvill-accent'
+                    : 'text-slate-500 hover:text-slate-300'
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
         </div>
 
       </div>
@@ -1123,33 +1145,30 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
             <div className="bg-slate-950/50 border border-slate-800/40 rounded-xl p-3">
               <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-2.5 flex items-center gap-1.5"><Clock size={10} /> Por Turno</p>
               <div className="space-y-2">
-                {[
-                  { label: 'Matutino 06-14h',   pct: 0.95, color: 'bg-amber-400' },
-                  { label: 'Vespertino 14-22h',  pct: 0.88, color: 'bg-blue-400' },
-                  { label: 'Nocturno 22-06h',    pct: 0.72, color: 'bg-purple-400' },
-                ].map(t => {
-                  const n = Math.max(1, Math.round(metrics.empleados / 3));
-                  const activeShiftObj = shifts.find((s: any) => s.id === selectedTurno);
-                  const resolvedShiftKey = activeShiftObj
-                    ? (activeShiftObj.name.toLowerCase().includes('vespertino') || activeShiftObj.name.toLowerCase().includes('t2')
-                      ? 'vespertino'
-                      : activeShiftObj.name.toLowerCase().includes('nocturno') || activeShiftObj.name.toLowerCase().includes('t3')
-                        ? 'nocturno'
-                        : 'matutino')
-                    : 'todos';
-                  const present = Math.round(n * t.pct * (resolvedShiftKey === 'todos' ? 1 : resolvedShiftKey === 'matutino' && t.label.startsWith('Mat') ? 1 : resolvedShiftKey === 'vespertino' && t.label.startsWith('Ves') ? 1 : resolvedShiftKey === 'nocturno' && t.label.startsWith('Noc') ? 1 : 0.82));
-                  return (
-                    <div key={t.label}>
-                      <div className="flex justify-between text-[8px] font-black mb-1">
-                        <span className="text-slate-400">{t.label}</span>
-                        <span className="text-white">{present}<span className="text-slate-600">/{n === 1 && metrics.empleados === 0 ? 0 : n}</span></span>
+                {shifts.filter((s: any) => s.is_active).length > 0 ? (
+                  shifts.filter((s: any) => s.is_active).map((shift: any, i: number) => {
+                    const shiftColors = ['bg-amber-400', 'bg-blue-400', 'bg-purple-400', 'bg-emerald-400', 'bg-rose-400'];
+                    const color = shiftColors[i % shiftColors.length];
+                    const shiftEmps = activeEmployeesList.filter((e: any) => e.shift_id === shift.id);
+                    const shiftTotal = shiftEmps.length;
+                    const shiftPresent = shiftEmps.filter((e: any) => presentIds.has(e.id)).length;
+                    const label = `${shift.name} ${(shift.start_time || '').slice(0, 5)}-${(shift.end_time || '').slice(0, 5)}`;
+                    return (
+                      <div key={shift.id}>
+                        <div className="flex justify-between text-[8px] font-black mb-1">
+                          <span className="text-slate-400">{label}</span>
+                          <span className="text-white">{shiftPresent}<span className="text-slate-600">/{shiftTotal}</span></span>
+                        </div>
+                        <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                          <div className={`h-full ${color} rounded-full transition-all duration-700`}
+                            style={{ width: shiftTotal > 0 ? `${Math.round((shiftPresent / shiftTotal) * 100)}%` : '0%' }} />
+                        </div>
                       </div>
-                      <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                        <div className={`h-full ${t.color} rounded-full transition-all duration-700`} style={{ width: `${(present/n)*100}%` }} />
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+                ) : (
+                  <p className="text-[8px] text-slate-600 text-center py-4">Sin turnos configurados</p>
+                )}
               </div>
             </div>
 
@@ -1157,27 +1176,24 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
             <div className="bg-slate-950/50 border border-slate-800/40 rounded-xl p-3">
               <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-2.5 flex items-center gap-1.5"><Factory size={10} /> Por Puesto</p>
               <div className="space-y-1.5">
-                {[
-                  { puesto: 'Operador Máquina',   total: 12, pct: 0.92 },
-                  { puesto: 'Soldador',           total: 8,  pct: 0.88 },
-                  { puesto: 'Control Calidad',    total: 5,  pct: 1.00 },
-                  { puesto: 'Mantenimiento',      total: 4,  pct: 0.75 },
-                  { puesto: 'Almacén / Logística',total: 4,  pct: 0.80 },
-                ].map(p => {
-                  const present = Math.round(p.total * p.pct);
-                  const missing = p.total - present;
-                  return (
-                    <div key={p.puesto} className="flex items-center justify-between">
-                      <span className="text-[8px] text-slate-400 font-black truncate flex-1">{p.puesto}</span>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        <span className="text-[8px] font-black text-white">{present}/{p.total}</span>
-                        {missing > 0 && (
-                          <span className="text-[7px] font-black text-red-400 bg-red-500/10 px-1 rounded">-{missing}</span>
-                        )}
+                {positionStats.length > 0 ? (
+                  positionStats.slice(0, 5).map(p => {
+                    const missing = p.total - p.presentes;
+                    return (
+                      <div key={p.puesto} className="flex items-center justify-between">
+                        <span className="text-[8px] text-slate-400 font-black truncate flex-1">{p.puesto}</span>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <span className="text-[8px] font-black text-white">{p.presentes}/{p.total}</span>
+                          {missing > 0 && (
+                            <span className="text-[7px] font-black text-red-400 bg-red-500/10 px-1 rounded">-{missing}</span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+                ) : (
+                  <p className="text-[8px] text-slate-600 text-center py-4">Sin datos de puestos</p>
+                )}
               </div>
             </div>
 
@@ -1191,10 +1207,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
                       <div className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
                       <p className="text-[8px] text-red-300 font-black">{metrics.empleados - metrics.presentes} operadores sin registrar entrada</p>
                     </div>
-                    <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 rounded-lg px-2.5 py-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                      <p className="text-[8px] text-amber-300 font-black">Mantenimiento con cobertura del 75% — riesgo medio</p>
-                    </div>
+                    {positionStats.filter(p => p.total > 0 && (p.presentes / p.total) < 0.85).slice(0, 1).map(p => (
+                      <div key={p.puesto} className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 rounded-lg px-2.5 py-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                        <p className="text-[8px] text-amber-300 font-black">
+                          {p.puesto} con cobertura del {Math.round((p.presentes / p.total) * 100)}% — riesgo medio
+                        </p>
+                      </div>
+                    ))}
                   </>
                 ) : (
                   <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-2.5 py-2">

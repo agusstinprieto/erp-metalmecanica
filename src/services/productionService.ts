@@ -83,7 +83,44 @@ export const productionService = {
       }))
     );
 
+    // Auto-generate viajero linked to this OT
+    await productionService._createViajeroFromWorkOrder(data, wo);
+
     return data;
+  },
+
+  async _createViajeroFromWorkOrder(ot: any, woInput: Partial<WorkOrder>) {
+    try {
+      const { data: existing } = await supabase.from('viajeros').select('id');
+      const nums = (existing || [])
+        .map((v: any) => { const m = String(v.id).match(/\d+/); return m ? parseInt(m[0]) : null; })
+        .filter((n: any): n is number => n !== null);
+      const nextId = String((nums.length > 0 ? Math.max(...nums) : 1000) + 1);
+
+      const priorityMap: Record<string, string> = {
+        urgent: 'URGENTE', high: 'URGENTE', medium: 'NORMAL', low: 'BAJA'
+      };
+
+      await supabase.from('viajeros').insert([{
+        id: nextId,
+        numero_parte: ot.order_number,
+        descripcion: ot.project_title || ot.order_number,
+        cliente: '',
+        cantidad_orden: 1,
+        cant_fabricada: 0,
+        fecha_orden: new Date().toISOString().split('T')[0],
+        horas_est_totales: 0,
+        estatus: 'PENDIENTE',
+        prioridad: priorityMap[ot.priority] ?? 'NORMAL',
+        avance_porcentaje: 0,
+        notas: ot.notes || '',
+        orden_trabajo_id: ot.id,
+        ...(woInput.tenant_id ? { tenant_id: woInput.tenant_id } : {}),
+      }]);
+    } catch (err) {
+      // Non-critical: OT was already saved, log and continue
+      console.warn('Viajero auto-gen failed (non-blocking):', err);
+    }
   },
 
   async getStages(workOrderId: string) {

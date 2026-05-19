@@ -100,6 +100,51 @@ export const MODULE_GUIDES: Record<string, ModuleGuide> = {
     ],
   },
 
+  ordenes_trabajo: {
+    moduleId: 'ordenes_trabajo',
+    label: 'Órdenes de Trabajo',
+    emoji: '📋',
+    description: 'Panel completo de órdenes de trabajo — desde la apertura hasta el cobro',
+    steps: [
+      {
+        icon: 'ClipboardList', color: 'text-mcvill-accent', bg: 'bg-mcvill-accent/10 border-mcvill-accent/30',
+        title: 'Flujo Completo: Ingeniería → Cobro',
+        subtitle: 'El ciclo de vida de una orden de trabajo',
+        tips: [
+          '1️⃣  INGENIERÍA crea un proyecto en el módulo Ingeniería: cliente, alcance, planos y cotización aprobada.',
+          '2️⃣  PRODUCCIÓN abre una Orden de Trabajo (OT) vinculada a ese proyecto — el sistema genera número OT automático (OT-2026-001).',
+          '3️⃣  Al crear la OT, el sistema genera automáticamente el Viajero de Producción con las etapas estándar de manufactura.',
+          '4️⃣  El Viajero acompaña físicamente la pieza por cada estación: Corte → Mecanizado → Soldadura → Calidad → Pintura.',
+          '5️⃣  Al completar todas las etapas, la OT pasa a estado "Completada" y se habilita la facturación en Ventas.',
+          '6️⃣  FINANZAS genera la factura / CFDI y registra el cobro en el módulo de Banco.',
+        ],
+      },
+      {
+        icon: 'Factory', color: 'text-yellow-400', bg: 'bg-yellow-400/10 border-yellow-400/30',
+        title: 'Crear y Gestionar Órdenes',
+        subtitle: 'Alta, edición y seguimiento de OTs',
+        tips: [
+          '➕ Botón "Nueva Orden": selecciona el proyecto de ingeniería, prioridad, fecha de entrega y responsable.',
+          '✏️ Toca el ícono de edición en cualquier OT para modificar datos sin perder el historial.',
+          '🗑️ "Eliminar" solo está disponible en OTs en estado Pendiente — las completadas quedan como historial permanente.',
+          '🔍 Usa la barra de búsqueda para filtrar por número de OT, proyecto o responsable.',
+          '📊 El campo "Progreso" se actualiza automáticamente conforme el Viajero avanza por las estaciones.',
+        ],
+      },
+      {
+        icon: 'Route', color: 'text-emerald-400', bg: 'bg-emerald-400/10 border-emerald-400/30',
+        title: 'Viajero Auto-Generado',
+        subtitle: 'La OT crea el Viajero automáticamente',
+        tips: [
+          '📄 Al abrir una OT, el sistema crea el Viajero con número correlativo (1001, 1002…) y lo vincula a la OT.',
+          '🏭 El Viajero ya viene precargado con las 5 etapas estándar de manufactura de McVill.',
+          '📱 Ve al módulo Viajeros para imprimir el PDF con código QR y entregarlo al operador.',
+          '🔗 El Viajero siempre muestra el número de OT de origen para trazabilidad completa.',
+        ],
+      },
+    ],
+  },
+
   production: {
     moduleId: 'production',
     label: 'Control de Planta',
@@ -1545,6 +1590,37 @@ export const MODULE_GUIDES: Record<string, ModuleGuide> = {
           '🔒 Registra de forma encriptada tus tokens de Facebook Page API, LinkedIn Corp, Instagram Business y TikTok Creator.',
           '💬 Agrega tus claves de WhatsApp Cloud API y Resend Email para notificaciones y alertas en tiempo real.',
           '🚫 Regla de Seguridad: Ningún token se expone en el código fuente del cliente; se recuperan dinámicamente desde el backend seguro.',
+        ],
+      },
+    ],
+  },
+
+  whatsapp_center: {
+    moduleId: 'whatsapp_center',
+    label: 'Centro de Mensajes WhatsApp',
+    emoji: '💬',
+    description: 'Campañas masivas de WhatsApp Deep Link con costo de ejecución cero',
+    steps: [
+      {
+        icon: 'MessageSquare', color: 'text-mcvill-accent', bg: 'bg-mcvill-accent/10 border-mcvill-accent/30',
+        title: 'Campañas de WhatsApp Masivas',
+        subtitle: 'Envía notificaciones de planta a Clientes y Colaboradores',
+        tips: [
+          '⚡ Elige entre múltiples audiencias predefinidas: Clientes, Operadores de celda, Proveedores o Viajeros de producción.',
+          '💡 Utiliza las plantillas interactivas preestablecidas para estatus de pedidos, alertas de paro, KPIs o recibos de nómina.',
+          '🤖 Activa el copiloto redactor Gemini 2.5 Flash-Lite ingresando una idea para que la IA genere el copy ideal.',
+          '🎯 El sistema reemplaza dinámicamente las variables encerradas en llaves como {nombre} o {viajero} al compilar la cola.',
+        ],
+      },
+      {
+        icon: 'Play', color: 'text-emerald-400', bg: 'bg-emerald-400/10 border-emerald-400/30',
+        title: 'Cola de Envío y Previsualización',
+        subtitle: 'Aprobación manual rápida con costo cero',
+        tips: [
+          '📱 Visualiza en tiempo real el mockup interactivo del celular simulado para ver cómo quedará el mensaje en el chat de WhatsApp.',
+          '🔗 El botón "Enviar y Siguiente" abre el Deep Link oficial de WhatsApp Web o Escritorio con el texto pre-cargado.',
+          '⏩ Haz clic en "Omitir" para saltar al siguiente elemento de la cola sin enviarlo.',
+          '🛡️ Filosofía BNI Laguna: Control total del usuario, sin cobros de Meta API Gateway ni bloqueos de cuenta.',
         ],
       },
     ],

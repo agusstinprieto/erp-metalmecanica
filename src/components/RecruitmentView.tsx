@@ -121,23 +121,23 @@ export const RecruitmentView: React.FC = () => {
   const VACANCY_TEMPLATES = [
     {
       title: 'Operador de CNC',
-      description: 'Responsable de la operaciÃ³n y configuraciÃ³n de centros de maquinado CNC. Lectura de planos y uso de instrumentos de mediciÃ³n.',
-      requirements: 'Experiencia previa en CNC\nInterpretaciÃ³n de planos tÃ©cnicos\nConocimiento de herramientas de mediciÃ³n (Vernier, MicrÃ³metro)\nDisponibilidad de turno'
+      description: 'Responsable de la operación y configuración de centros de maquinado CNC. Lectura de planos y uso de instrumentos de medición.',
+      requirements: 'Experiencia previa en CNC\nInterpretación de planos técnicos\nConocimiento de herramientas de medición (Vernier, Micrómetro)\nDisponibilidad de turno'
     },
     {
       title: 'Ingeniero de Calidad',
-      description: 'Asegurar el cumplimiento de los estÃ¡ndares ISO 9001:2015. GestiÃ³n de No Conformidades, APQP, PPAP y SPC.',
-      requirements: 'IngenierÃ­a Industrial o afÃ­n\nConocimiento en Core Tools (APQP, PPAP, FMEA)\nExperiencia en auditorÃ­as internas\nInglÃ©s tÃ©cnico intermedio'
+      description: 'Asegurar el cumplimiento de los estándares ISO 9001:2015. Gestión de No Conformidades, APQP, PPAP y SPC.',
+      requirements: 'Ingeniería Industrial o afín\nConocimiento en Core Tools (APQP, PPAP, FMEA)\nExperiencia en auditorías internas\nInglés técnico intermedio'
     },
     {
       title: 'Soldador Certificado',
-      description: 'EjecuciÃ³n de procesos de soldadura TIG/MIG siguiendo especificaciones tÃ©cnicas de McVill y normas internacionales.',
-      requirements: 'CertificaciÃ³n vigente AWS\nExperiencia en soldadura industrial (acero/aluminio)\nUso de equipo de seguridad EPP\nLectura de simbologÃ­a de soldadura'
+      description: 'Ejecución de procesos de soldadura TIG/MIG siguiendo especificaciones técnicas de McVill y normas internacionales.',
+      requirements: 'Certificación vigente AWS\nExperiencia en soldadura industrial (acero/aluminio)\nUso de equipo de seguridad EPP\nLectura de simbología de soldadura'
     },
     {
-      title: 'Supervisor de ProducciÃ³n',
-      description: 'Liderar cÃ©lulas de producciÃ³n para cumplir con el programa diario. Monitoreo de OEE, calidad y seguridad industrial.',
-      requirements: 'Liderazgo de equipos (min 10 personas)\nEnfoque en mejora continua (Lean Manufacturing)\nControl de mermas y tiempos de ciclo\nExperiencia en ambiente industrial metalmecÃ¡nico'
+      title: 'Supervisor de Producción',
+      description: 'Liderar células de producción para cumplir con el programa diario. Monitoreo de OEE, calidad y seguridad industrial.',
+      requirements: 'Liderazgo de equipos (min 10 personas)\nEnfoque en mejora continua (Lean Manufacturing)\nControl de mermas y tiempos de ciclo\nExperiencia en ambiente industrial metalmecánico'
     }
   ];
 

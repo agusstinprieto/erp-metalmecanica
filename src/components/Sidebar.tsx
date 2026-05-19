@@ -214,6 +214,7 @@ export const Sidebar = (props: {
     { id: 'planeacion',        label: 'Planeación',       icon: CalendarDays },
     { id: 'inventory',         label: 'Inventarios',      icon: Package },
     { id: 'viajeros',          label: 'Viajeros',         icon: Route },
+    { id: 'ordenes_trabajo',   label: 'Órdenes de Trabajo', icon: ClipboardList },
     { id: 'production',        label: 'Planta',           icon: Factory },
     { id: 'logistica',         label: 'Logística',        icon: Truck },
     { id: 'lead_time_predictor', label: 'Predicciones IA', icon: Clock },

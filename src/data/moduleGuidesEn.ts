@@ -1418,6 +1418,51 @@ export const MODULE_GUIDES_EN: Record<string, ModuleGuide> = {
     ],
   },
 
+  ordenes_trabajo: {
+    moduleId: 'ordenes_trabajo',
+    label: 'Work Orders',
+    emoji: '📋',
+    description: 'Full work order management — from engineering project to final invoice',
+    steps: [
+      {
+        icon: 'ClipboardList', color: 'text-mcvill-accent', bg: 'bg-mcvill-accent/10 border-mcvill-accent/30',
+        title: 'Full Flow: Engineering → Invoice',
+        subtitle: 'The lifecycle of a work order',
+        tips: [
+          '1️⃣  ENGINEERING creates a project: client, scope, drawings, and approved quote.',
+          '2️⃣  PRODUCTION opens a Work Order (WO) linked to that project — the system auto-generates the WO number (WO-2026-001).',
+          '3️⃣  When the WO is created, the system automatically generates the Production Traveler with standard manufacturing stages.',
+          '4️⃣  The Traveler follows the part through each station: Cutting → Machining → Welding → Quality → Painting.',
+          '5️⃣  Once all stages are complete, the WO moves to "Completed" and the invoice can be issued in Sales.',
+          '6️⃣  FINANCE generates the invoice / CFDI and records the payment in the Bank module.',
+        ],
+      },
+      {
+        icon: 'Factory', color: 'text-yellow-400', bg: 'bg-yellow-400/10 border-yellow-400/30',
+        title: 'Create & Manage Work Orders',
+        subtitle: 'Create, edit, and track WOs',
+        tips: [
+          '➕ "New Order" button: select the engineering project, priority, due date and responsible engineer.',
+          '✏️ Tap the edit icon on any WO to update data without losing history.',
+          '🗑️ Delete is only available for Pending WOs — completed ones remain as permanent records.',
+          '🔍 Use the search bar to filter by WO number, project or assignee.',
+          '📊 The Progress field updates automatically as the Traveler advances through manufacturing stations.',
+        ],
+      },
+      {
+        icon: 'Route', color: 'text-emerald-400', bg: 'bg-emerald-400/10 border-emerald-400/30',
+        title: 'Auto-Generated Traveler',
+        subtitle: 'The WO automatically creates the Traveler',
+        tips: [
+          '📄 When a WO is opened, the system creates the Traveler with a sequential ID (1001, 1002…) and links it to the WO.',
+          '🏭 The Traveler comes pre-loaded with McVill\'s 5 standard manufacturing stages.',
+          '📱 Go to the Travelers module to print the PDF with QR code and hand it to the operator.',
+          '🔗 The Traveler always shows the source WO number for full traceability.',
+        ],
+      },
+    ],
+  },
+
 };
 
 export const DEFAULT_GUIDE_EN: ModuleGuide = {

@@ -167,6 +167,7 @@ mark{background:rgba(251,191,36,.35);color:var(--text);border-radius:2px;padding
   <a class="nav-link" href="#factibilidad">AI Feasibility</a>
   <a class="nav-link" href="#metal-quoter">Metal Quoter</a>
   <a class="nav-link" href="#branding-studio">Branding &amp; Marketing AI</a>
+  <a class="nav-link" href="#whatsapp_center">Premium Messaging Hub</a>
 
 
   <div class="nav-section">Engineering</div>
@@ -630,18 +631,11 @@ BOM — Subcomponents:
   <span class="comment">Example: $450 × 22 days = $9,900</span>
 </div>
 
-<h2>Step 3 — Overtime Payments (LFT Art. 67-68)</h2>
-<p>According to Article 67 and 68 of the Mexican Federal Labor Law (LFT): the first 9 weekly overtime hours are paid at <strong>double rate</strong> (200% of standard hourly rate). Any overtime hours exceeding 9 hours in a single week must be paid at <strong>triple rate</strong> (300% of standard hourly rate).</p>
+<h2>Step 3 — Overtime Payments</h2>
 <div class="formula">
   <span class="eq">hourly_rate</span> = daily_wage / 8<br>
-  <span class="eq">double_hours</span> = min(9, overtime_hours)<br>
-  <span class="eq">triple_hours</span> = max(0, overtime_hours - 9)<br>
-  <span class="eq">overtime_amount</span> = (double_hours × hourly_rate × 2) + (triple_hours × hourly_rate × 3)<br><br>
-  <span class="comment">Example (10 hrs OT with a $450 base daily wage):</span><br>
-  hourly_rate = $450 / 8 = $56.25<br>
-  double_hours = 9 hrs × $56.25 × 2 = $1,012.50<br>
-  triple_hours = 1 hr × $56.25 × 3 = $168.75<br>
-  overtime_amount = $1,012.50 + $168.75 = <span class="eq">$1,181.25</span>
+  <span class="eq">overtime_amount</span> = overtime_hours × hourly_rate × 2.0<br><br>
+  <span class="comment">Example: 10 hrs OT × ($450/8) × 2 = $1,125</span>
 </div>
 
 <h2>Step 4 — Productivity OEE Bonus</h2>
@@ -732,9 +726,6 @@ Gross Salary             $11,575.25   Total Deductions  $539.93
 <!-- ═══════════════════════════════════════════════════ -->
 <section id="desempeno">
 <h2>Performance &amp; Incentives</h2>
-<div class="tip">
-  <strong>💡 Engineering & Operational Gamification Proposal:</strong> This integrated schema (Performance + Incentives) and its real-time automated synchronization from the Human Resources ledger (eliminating double data entry) represents our own proposed value blueprint. It is specifically designed to motivate production-floor efficiency, improve plant throughput, foster teamwork, and maximize overall OEE in a measurable and auditable format.
-</div>
 <h3>Operator KPIs</h3>
 <div class="formula">
   <span class="eq">Efficiency</span> = (actual_parts / target_parts) × 100%<br>
@@ -757,13 +748,25 @@ Gross Salary             $11,575.25   Total Deductions  $539.93
 
 <!-- ═══════════════════════════════════════════════════ -->
 <section id="reclutamiento">
-<h2>AI Recruitment</h2>
+<h2>Advanced AI Recruitment &amp; Public Candidate Portal</h2>
+<p>The <strong>Advanced AI Recruitment Module</strong> (<code>recruitment</code>) is an intelligent, high-throughput talent acquisition and automated parsing system designed to eliminate manual resume screening. It merges the analytical power of Gemini 2.5 with a public job portal and high-density bulk operation tools.</p>
+
+<h3>Intelligent Pipeline Workflow</h3>
 <ol class="steps">
-  <li>Post job openings with structured requirements</li>
-  <li>Upload multiple candidate resumes in PDF format</li>
-  <li>AI analyzes CV contents and scores candidates from 0 to 100 with detailed rationale</li>
-  <li>System generates customized interview questions based on candidate resume gaps</li>
-  <li>Track hiring via Kanban board: New → Screened → Interviewed → Offered → Hired</li>
+  <li><strong>Opening Registration:</strong> Register open job positions directly in the ERP. Outline specific profiles, shift details, required certifications (e.g. AWS welder, CNC technician), and baseline compensation.</li>
+  <li><strong>Real-Time Dynamic Search:</strong> Instantly filter active or archived vacancies using the high-speed search bar, boosting recruiter search efficiency.</li>
+  <li><strong>High-Density Multi-Selection &amp; Bulk Toolbar:</strong> The recruitment dashboard features individual row checkboxes and a global "Select All" toggle. This enables recruiters to manage vacancies in bulk with one-click actions:
+    <ul>
+      <li>🔴 <strong>Archive / Delete</strong> multiple inactive job vacancies in a single action.</li>
+      <li>⏸️ <strong>Pause</strong> a selection of vacancies to freeze new applicant processing.</li>
+      <li>🟢 <strong>Reactivate</strong> paused vacancies in bulk as production demands change.</li>
+    </ul>
+  </li>
+  <li><strong>External Candidate Portal:</strong> Features a public-facing job portal where candidates can browse open roles, enter their contact credentials, and upload their resume in PDF format directly into McVill's secure storage.</li>
+  <li><strong>Automated AI Parsing &amp; Scoring:</strong> Whether uploaded manually by a recruiter or submitted via the public portal, the Gemini 2.5 Flash model parses the PDF, maps skills against the position profile, and scores candidate compatibility (0 to 100) with detailed strengths, gaps, and technical justifications.</li>
+  <li><strong>Targeted Interview Guide:</strong> The AI automatically generates an interview guide containing specific questions designed to explore the exact technical gaps and experience doubts identified during the CV parsing stage.</li>
+  <li><strong>Visual Kanban Funnel:</strong> Easily manage applicants by dragging and dropping profile cards across states: <em>New → Screened → Interviewed → Offered → Hired</em>.</li>
+  <li><strong>Seamless HR Syncing:</strong> On clicking "Hire", the candidate's complete profile, contact information, and parsed records automatically sync to the Human Resources employee database, saving administrative hours.</li>
 </ol>
 </section>
 
@@ -1030,37 +1033,11 @@ Urgency level:
 <h2>Finance &amp; ROI</h2>
 <h3>Financial Dashboards</h3>
 <ul>
-  <li><strong>Cash Flow Forecasts:</strong> Projections of upcoming payments and collections over an 8-week horizon.</li>
-  <li><strong>AR Ledger:</strong> Accounts receivable aging logs.</li>
-  <li><strong>AP Ledger:</strong> Accounts payable calendar.</li>
-  <li><strong>ERP ROI Tracker:</strong> Real-time financial analysis of returns on investment achieved via operational savings.</li>
+  <li><strong>Cash Flow Forecasts:</strong> Projections of upcoming payments and collections over an 8-week horizon</li>
+  <li><strong>AR Ledger:</strong> Accounts receivable aging logs</li>
+  <li><strong>AP Ledger:</strong> Accounts payable calendar</li>
+  <li><strong>ERP ROI Tracker:</strong> Real-time financial analysis of returns on investment achieved via operational savings</li>
 </ul>
-
-<h3>Corporate Calendar &amp; Treasury Alerts</h3>
-<p>The ERP natively integrates milestone dates and key periods from the <strong>McVill Operational Calendar</strong> to ensure seamless working capital forecasts and prevent cash crunches:</p>
-<div class="tip">
-  <strong>⏰ Automated Alerts &amp; Financial Accruals:</strong>
-  <ul>
-    <li><strong>Real-Time Accruals:</strong> To protect end-of-year cash balances from sudden payroll drains, the system automatically calculates and records weekly and bi-weekly fractional provisions for employee Savings Funds (Caja de Ahorro) and Christmas Bonuses (Aguinaldos).</li>
-    <li><strong>Preventive Notifications (15-day lead time):</strong> The system issues direct dashboard alerts to the Finance and Treasury department to prepare funds ahead of key disbursement dates:
-      <ul>
-        <li><strong>January 30:</strong> Distribution of the remaining 25% savings fund from the prior fiscal year.</li>
-        <li><strong>December 10:</strong> Saving funds annual lock closure and full capital liquidation.</li>
-        <li><strong>December 16:</strong> Christmas Bonus (Aguinaldo) disbursement, completed well ahead of the legal December 20 Mexican LFT deadline.</li>
-        <li><strong>January 29 (Next year):</strong> Distribution of the remaining 25% savings fund.</li>
-      </ul>
-    </li>
-  </ul>
-</div>
-
-<div class="warn">
-  <strong>⚖️ Statutory Holidays &amp; Plant Inactivity Adjustments:</strong>
-  <ul>
-    <li><strong>Automatic Holiday Pay Rates:</strong> Shift hours logged on official Mexican statutory holidays (Jan 1, Feb 5, Mar 16, May 1, Sep 16, Nov 16, Dec 25) automatically calculate at <strong>triple (3.0)</strong> standard base rates, ensuring compliance with Mexican LFT regulations.</li>
-    <li><strong>OEE Availability Exclusions:</strong> Official statutory holidays and institutional plant-down holidays (Semana Santa, Christmas Party on Dec 12, Year-End Vacation from Dec 21 to Dec 31) are automatically excluded from workstation capacity calculations. This ensures that scheduled plant closures do not falsely penalize OEE plant availability metrics.</li>
-    <li><strong>Budget Cycle Timeline:</strong> Track budget cycle deadlines during October: Start (Oct 5), Pre-Revision (Oct 23), and Final Submission (Oct 30).</li>
-  </ul>
-</div>
 </section>
 
 <!-- ═══════════════════════════════════════════════════ -->
@@ -1138,6 +1115,33 @@ Urgency level:
     <li>Benefits and incentives (base salary, OEE performance bonuses).</li>
     <li>Clear application steps via a direct WhatsApp recruiter link.</li>
   </ol>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="whatsapp_center">
+<h2>Premium Omnichannel Messaging Hub</h2>
+<p>The <strong>Premium Omnichannel Messaging Hub</strong> (<code>whatsapp_center</code>) is a unified and autonomous communication dispatch platform designed under the <strong>Agus Pro</strong> standard to consolidate all of McVill's corporate messaging with clients, suppliers, and factory floor operators. It orchestrates automated or bulk broadcasts across three critical channels: WhatsApp, Email, and Microsoft Teams.</p>
+
+<h3>Active Channels &amp; Capacities</h3>
+<ul>
+  <li><strong>WhatsApp Cloud API:</strong> Dispatch interactive templates authorized by Meta, with full support for dynamic placeholders (names, work order numbers, custom PDFs, or real-time production links). All message signatures can be configured on the fly.</li>
+  <li><strong>Email Channel (Resend API):</strong> Send beautifully formatted premium HTML executive summaries, quotes, and paystubs to any recipient with custom attachment mapping.</li>
+  <li><strong>Microsoft Teams Webhooks:</strong> Push automated real-time operational notifications and quality alerts directly into target channels (Adaptive Cards) to keep managers, QC leads, and directors in sync.</li>
+</ul>
+
+<h3>Operational Workflow &amp; Queue Management</h3>
+<p>The messaging center runs a queue manager that processes dispatches sequentially to ensure delivery rates without hitting rate limit thresholds:</p>
+<ol>
+  <li><strong>Unified Contact Filter:</strong> Reclutador, client, or employee profiles can be queried dynamically and selected individually or in bulk (select-all button).</li>
+  <li><strong>AI-Assisted Composer (Gemini 2.5):</strong> Instantly draft and polish notices or templates using context-aware AI prompts that adapt tone settings (professional, friendly, urgent) depending on the active channel.</li>
+  <li><strong>Visual Queue Monitor:</strong> Previews active recipients, selected channels, and customized signatures before dispatching the queue.</li>
+  <li><strong>Dynamic Tenant Signatures:</strong> Automatically appends custom footers and operational details dynamically parsed from the active Supabase tenant configurations.</li>
+</ol>
+
+<div class="card">
+  <h3 style="color:var(--success);">💡 Zero Hardcoding Dynamic Integration</h3>
+  <p>All credentials (API keys, webhook endpoints, and WhatsApp tokens) are managed securely and incriptedly in Supabase, and accessed dynamically through the <strong>Secure Integration Vault (SettingsView)</strong>. If a channel's token is missing, the corresponding button in the Messaging Hub is automatically disabled to prevent production runtime errors.</p>
 </div>
 </section>
 

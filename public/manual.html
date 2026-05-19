@@ -210,6 +210,7 @@ mark{background:rgba(251,191,36,.35);color:var(--text);border-radius:2px;padding
   <a class="nav-link" href="#factibilidad-ia">Factibilidad IA Avanzada</a>
   <a class="nav-link" href="#metal-quoter">Metal Quoter</a>
   <a class="nav-link" href="#branding-studio">Branding &amp; Marketing IA</a>
+  <a class="nav-link" href="#whatsapp_center">Hub Mensajería Premium</a>
 
 
   <div class="nav-section">Ingeniería</div>
@@ -278,7 +279,7 @@ mark{background:rgba(251,191,36,.35);color:var(--text);border-radius:2px;padding
 <div class="card">
   <h3>Capacidades principales</h3>
   <ul>
-    <li><strong>+60 módulos</strong> integrados — desde dashboard hasta PPAP</li>
+    <li><strong>+49 módulos</strong> integrados — desde dashboard hasta PPAP</li>
     <li><strong>IA Gemini</strong> en producción, calidad, cotizaciones, inspección visual y voz</li>
     <li><strong>Multi-tenant</strong> — cada empresa tiene sus datos completamente aislados</li>
     <li><strong>Tiempo real</strong> — Supabase Realtime sincroniza estados al instante</li>
@@ -663,28 +664,18 @@ BOM — Componentes:
   Si va dentro de tiempo → <span style="color:#34d399">OK</span>
 </div>
 
-<h3>Código QR del Viajero y Generación Técnica</h3>
-<p>Cada vez que una Orden de Trabajo (OT) o Viajero es liberada en el sistema, el backend genera de forma instantánea y automática un identificador único global (UUID) encriptado en un código QR de alta densidad.</p>
-<div class="tip">
-  <strong>¿Cómo funciona el escaneo técnico?</strong> El código QR encripta el endpoint REST seguro de la base de datos (ej: <code>https://erp-mcvill.vercel.app/viajero/vj-uuid</code>). Al ser escaneado con cualquier dispositivo móvil (cámara del smartphone, tablet o pistola lectora USB HID), el sistema descifra el token, valida la sesión del operador y abre de forma instantánea la pantalla del <strong>ShopFloor Tracking</strong> con los planos 3D y especificaciones sin necesidad de papel.
-</div>
-
-<h3>Transformación "Paperless" — Erradicación del Papel en Piso</h3>
-<p>El ERP McVill está diseñado bajo el estándar <strong>Agus Pro</strong> para lograr una operación de manufactura 100% digital y sustentable. Tradicionalmente, un viajero en papel representaba un folleto de 5 a 10 páginas impresas que viajaba físicamente por la planta.</p>
-
+<h3>Transformación Paperless: El Código QR del Viajero</h3>
+<p>Al liberar una Orden de Trabajo (OT) en el ERP, el sistema <strong>genera automáticamente un código QR único</strong> vinculado a la base de datos (Supabase). En lugar de imprimir el "librito" de 5 a 10 hojas que suele acompañar a las piezas, <strong>solo se imprime una pequeña etiqueta adhesiva de 5x5 cm</strong> (usando una impresora térmica de etiquetas) o se graba en láser sobre el contenedor/pieza. A partir de ahí, el metal viaja por la planta y las hojas de papel ya no existen.</p>
+<p>Cuando el operador recibe el material, simplemente "escanea" ese QR con su <strong>App Móvil PWA</strong> en el celular o tablet, y la pantalla le muestra el plano, historial y la operación exacta que le toca realizar, permitiéndole registrar sus tiempos con un solo toque o mediante <strong>Voz Manos Libres</strong>.</p>
 <div class="card">
-  <h3>Impacto Financiero de la Erradicación de Papel:</h3>
+  <h3 style="margin-top:0; color:var(--success);">💰 Análisis ROI (Retorno de Inversión) por Eliminar el Papel</h3>
   <ul>
-    <li><strong>Volumen promedio diario de impresión:</strong> 1,500 hojas al día (viajeros, planos, revisiones, reportes de control).</li>
-    <li><strong>Costo directo estimado por hoja:</strong> $0.80 MXN (papel físico + tóner industrial + mantenimiento e insumos de impresión).</li>
-    <li><strong>Fuga mensual de capital (24 días laborables):</strong> 1,500 hojas × $0.80 MXN × 24 = <strong>$28,800.00 MXN mensuales</strong> tirados a la basura.</li>
-    <li><strong>Fuga anualizada (Impacto directo en OpEx):</strong> <strong>$345,600.00 MXN anuales</strong> en consumibles directos.</li>
-    <li><strong>Ahorro en tiempos muertos (Costo invisible):</strong> +200 horas-hombre mensuales dedicadas a archivar, buscar viajeros perdidos, transcribir firmas a mano o re-imprimir planos manchados de grasa.</li>
+    <li><strong>Impresión actual estimada:</strong> ~1,500 hojas diarias.</li>
+    <li><strong>Costo directo:</strong> $0.80 MXN por hoja impresa (papel + tóner + desgaste de equipo).</li>
+    <li><strong>Fuga mensual (24 días hábiles):</strong> $1,200 MXN diarios x 24 días = <strong>$28,800 MXN tirados a la basura al mes</strong>.</li>
+    <li><strong>Fuga anual:</strong> <strong>$345,600 MXN anuales</strong> solo en consumibles físicos (sin contar el tiempo administrativo perdido buscando documentos o descifrando firmas a mano).</li>
   </ul>
-</div>
-
-<div class="tip">
-  <strong>Recomendación Operativa:</strong> En lugar de imprimir el "librito" de viajeros de papel, la planta solo requiere imprimir una <strong>pequeña etiqueta autoadherible de 5×5 cm</strong> con el código QR usando impresoras térmicas directas Zebra (cero costo de tinta), o bien grabar el QR con láser directo sobre la placa base del material. El viajero digital está respaldado en la nube en tiempo real, garantizando la trazabilidad perfecta e indestructible.
+  <p style="margin-top:10px; opacity:0.9;"><strong>Conclusión Financiera:</strong> El sistema ERP se paga solo en menos de 1 año exclusivamente con el ahorro de papelería (directo a la utilidad neta), sin contar los incrementos masivos en productividad y control de calidad al digitalizar la operación en tiempo real.</p>
 </div>
 </section>
 
@@ -985,18 +976,12 @@ BOM — Componentes:
   <span class="comment">Ejemplo: $450 × 22 días = $9,900</span>
 </div>
 
-<h2>Paso 3 — Pago de Horas Extra (LFT Art. 67-68)</h2>
-<p>Según el Art. 67 y 68 de la Ley Federal del Trabajo (México): las primeras 9 horas extra semanales se pagan al <strong>doble</strong> (200% de la cuota por hora). Toda hora extra que exceda el límite de 9 horas semanales se pagará al <strong>triple</strong> (300% de la cuota por hora).</p>
+<h2>Paso 3 — Pago de Horas Extra</h2>
+<p>Según el Art. 67 de la LFT: las primeras 9 horas extra semanales se pagan al <strong>doble</strong>. Las que excedan ese límite se pagan al <strong>triple</strong>.</p>
 <div class="formula">
   <span class="eq">hourly_rate</span> = daily_salary / 8<br>
-  <span class="eq">horas_dobles</span> = min(9, overtime_hours)<br>
-  <span class="eq">horas_triples</span> = max(0, overtime_hours - 9)<br>
-  <span class="eq">overtime_amount</span> = (horas_dobles × hourly_rate × 2) + (horas_triples × hourly_rate × 3)<br><br>
-  <span class="comment">Ejemplo (10h extra con salario diario de $450):</span><br>
-  hourly_rate = $450 / 8 = $56.25<br>
-  horas_dobles = 9h × $56.25 × 2 = $1,012.50<br>
-  horas_triples = 1h × $56.25 × 3 = $168.75<br>
-  overtime_amount = $1,012.50 + $168.75 = <span class="eq">$1,181.25</span>
+  <span class="eq">overtime_amount</span> = overtime_hours × hourly_rate × 2<br><br>
+  <span class="comment">Ejemplo: 10h extra × ($450/8) × 2 = $1,125</span>
 </div>
 
 <h2>Paso 4 — Bono OEE (Productividad)</h2>
@@ -1209,9 +1194,6 @@ Bruto                    $11,575.25   Total deducciones $539.93
 <!-- ═══════════════════════════════════════════════════ -->
 <section id="desempeno">
 <h2>Desempeño e Incentivos</h2>
-<div class="tip">
-  <strong>💡 Propuesta de Gamificación Operativa e Ingeniería de Software:</strong> Este esquema integrado (Desempeño + Incentivos) y su vinculación automatizada en tiempo real desde el expediente de Recursos Humanos (para evitar la doble captura) representan una propuesta de valor de nuestra autoría. Está diseñado específicamente para motivar la eficiencia, elevar la productividad en planta, fomentar el trabajo en equipo y maximizar el OEE global de la empresa de manera medible y auditable.
-</div>
 <h3>KPIs por Operador</h3>
 <div class="formula">
   <span class="eq">Eficiencia</span> = (piezas_reales / piezas_meta) × 100%<br>
@@ -1239,14 +1221,25 @@ Bruto                    $11,575.25   Total deducciones $539.93
 
 <!-- ═══════════════════════════════════════════════════ -->
 <section id="reclutamiento">
-<h2>Reclutamiento IA</h2>
+<h2>Reclutamiento IA Avanzado &amp; Portal Público</h2>
+<p>El módulo de <strong>Reclutamiento IA Avanzado</strong> (<code>recruitment</code>) es un sistema inteligente de atracción y calificación automatizada de talento diseñado para erradicar el trabajo manual de filtrado de CVs. Combina la potencia analítica de Gemini 2.5 con un portal de empleo externo y una barra de herramientas de alta densidad para operaciones masivas.</p>
+
+<h3>Flujo de Selección Inteligente</h3>
 <ol class="steps">
-  <li>Crear vacante con perfil de puesto detallado</li>
-  <li>Subir CVs en PDF (uno o múltiples simultáneamente)</li>
-  <li>IA analiza cada CV y asigna puntuación 0–100 con justificación</li>
-  <li>Sistema genera guía de entrevista personalizada por candidato</li>
-  <li>Kanban: Nuevo → Revisión → Entrevista → Oferta → Contratado</li>
-  <li>Al contratar: datos fluyen automáticamente a módulo RH y onboarding</li>
+  <li><strong>Creación de Vacante:</strong> Registre la vacante en el ERP detallando el perfil del puesto, certificaciones requeridas (ej. AWS para soldadores, CNC para operarios de tornos) y horario.</li>
+  <li><strong>Buscador Dinámico e Interactivo:</strong> Filtre instantáneamente vacantes activas o pausadas mediante la barra de búsqueda en tiempo real, agilizando la localización de perfiles específicos.</li>
+  <li><strong>Barra de Selección Múltiple y Operaciones en Lote:</strong> La tabla cuenta con selectores múltiples (checkboxes) y un conmutador de selección total para ejecutar acciones masivas. Con un solo clic, el reclutador puede:
+    <ul>
+      <li>🔴 <strong>Dar de Baja / Eliminar</strong> múltiples vacantes inactivas a la vez.</li>
+      <li>⏸️ <strong>Pausar</strong> vacantes de forma grupal para detener la recepción de postulantes.</li>
+      <li>🟢 <strong>Reactivar</strong> en lote vacantes previamente pausadas.</li>
+    </ul>
+  </li>
+  <li><strong>Portal Público de Empleo y Carga de CV:</strong> Se incluye un portal web público y externo donde los candidatos pueden ver el catálogo activo de vacantes de McVill, completar su información de contacto y subir su CV directamente en formato PDF.</li>
+  <li><strong>Análisis Automatizado por IA:</strong> Al subir un currículum (ya sea manualmente por el reclutador o a través del portal público), la IA extrae los datos clave y otorga una calificación de compatibilidad del 0 al 100 basada en el perfil de puesto. Detalla fortalezas, brechas y una justificación técnica.</li>
+  <li><strong>Guía de Entrevista Personalizada:</strong> La IA elabora una guía de preguntas específicas para el entrevistador basada en las brechas y áreas de duda detectadas en el análisis del CV del candidato.</li>
+  <li><strong>Flujo Visual Kanban:</strong> Administre el pipeline de selección arrastrando las tarjetas de los candidatos en las etapas: <em>Nuevo → En Revisión → Entrevista → Oferta → Contratado</em>.</li>
+  <li><strong>Contratación Paperless:</strong> Al presionar "Contratar", el expediente del candidato fluye automáticamente hacia la base de datos de empleados del módulo de Recursos Humanos, integrando su ficha y previendo su onboarding.</li>
 </ol>
 </section>
 
@@ -1821,37 +1814,11 @@ El agente calcula automáticamente:
 </svg></div>
 <h3>Módulos financieros</h3>
 <ul>
-  <li><strong>Flujo de Caja:</strong> Cobros esperados vs pagos, proyección 8 semanas.</li>
-  <li><strong>CxC:</strong> Cuentas por cobrar con días vencidos.</li>
-  <li><strong>CxP:</strong> Cuentas por pagar con fechas de vencimiento.</li>
-  <li><strong>ROI del ERP:</strong> Calcula en tiempo real el retorno de inversión del sistema.</li>
+  <li><strong>Flujo de Caja:</strong> Cobros esperados vs pagos, proyección 8 semanas</li>
+  <li><strong>CxC:</strong> Cuentas por cobrar con días vencidos</li>
+  <li><strong>CxP:</strong> Cuentas por pagar con fechas de vencimiento</li>
+  <li><strong>ROI del ERP:</strong> Calcula en tiempo real el retorno de inversión del sistema</li>
 </ul>
-
-<h3>Calendario Corporativo y Alertas de Tesorería</h3>
-<p>El ERP integra de manera nativa los hitos y fechas clave extraídos del <strong>Calendario de Operaciones McVill</strong>, asegurando una planeación eficiente y previniendo crisis de flujo de efectivo:</p>
-<div class="tip">
-  <strong>⏰ Automatización de Alertas y Provisiones:</strong>
-  <ul>
-    <li><strong>Provisiones en Tiempo Real:</strong> Para evitar descalces severos en el flujo al final de año, el ERP calcula y pre-provisiona de forma quincenal y semanal el impacto proporcional de la Caja de Ahorro y los Aguinaldos de los empleados.</li>
-    <li><strong>Alertas Preventivas (15 días de anticipación):</strong> El sistema notifica al departamento de Finanzas y Tesorería con antelación para preparar los fondos en las siguientes fechas críticas:
-      <ul>
-        <li><strong>30 de Enero:</strong> Entrega del 25% remanente de la caja de ahorro del año anterior.</li>
-        <li><strong>10 de Diciembre:</strong> Cierre de caja de ahorro y entrega total de los fondos acumulados.</li>
-        <li><strong>16 de Diciembre:</strong> Pago anual de Aguinaldos (liquidado con anterioridad al límite legal del 20 de diciembre).</li>
-        <li><strong>29 de Enero (Siguiente año):</strong> Entrega del 25% remanente del fondo de ahorro acumulado.</li>
-      </ul>
-    </li>
-  </ul>
-</div>
-
-<div class="warn">
-  <strong>⚖️ Impacto Operativo de Días Festivos y Descansos McVill:</strong>
-  <ul>
-    <li><strong>Cálculo Automático de Días Festivos:</strong> Las jornadas trabajadas durante los días marcados como <em>FESTIVO</em> oficial en el calendario (1 Ene, 5 Feb, 16 Mar, 1 May, 16 Sep, 16 Nov, 25 Dic) son remuneradas de forma automatizada con el multiplicador al <strong>triple (3.0)</strong> en concordancia con la Ley Federal del Trabajo.</li>
-    <li><strong>Exclusión de Inactividad Programada en OEE:</strong> Los días festivos oficiales y los descansos/vacaciones internas de McVill (Semana Santa, Posada Navideña el 12 de Dic y Vacaciones de fin de año del 21 al 31 de Dic) se excluyen automáticamente de las horas hábiles planeadas en el OEE. Esto previene distorsiones y caídas artificiales en el indicador de disponibilidad de planta de las células.</li>
-    <li><strong>Planeación de Presupuestos:</strong> El sistema calendariza alertas de flujo para el ciclo presupuestal anual durante octubre (Inicio el 5 Oct, Revisión previa el 23 Oct y Entrega final el 30 Oct).</li>
-  </ul>
-</div>
 </section>
 
 <!-- ═══════════════════════════════════════════════════ -->
@@ -1923,6 +1890,8 @@ El agente calcula automáticamente:
 <p>Panel de piso en vivo. Estado de cada máquina: 🟢 Produciendo · 🟡 Setup · 🔴 Paro. Actualización cada 30 segundos. OEE y pareto de tiempos muertos en tiempo real. <strong>Modo TV</strong> para proyectar en pantalla grande del piso — sin interfaz, solo datos clave.</p>
 </section>
 
+</section>
+
 <!-- ═══════════════════════════════════════════════════ -->
 <section id="branding-studio">
 <h2>Estudio de Branding e Identidad por IA</h2>
@@ -1946,6 +1915,33 @@ El agente calcula automáticamente:
     <li>Beneficios (sueldo base, bonos de OEE, vales de despensa).</li>
     <li>Instrucciones claras para postularse por WhatsApp (integrado con el QR del reclutador).</li>
   </ol>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="whatsapp_center">
+<h2>Hub de Mensajería Omnicanal Premium</h2>
+<p>El <strong>Hub de Mensajería Omnicanal Premium</strong> (<code>whatsapp_center</code>) es una solución unificada y autónoma diseñada bajo el estándar <strong>Agus Pro</strong> para centralizar todas las comunicaciones de McVill con clientes, proveedores y operarios de planta. Permite orquestar y enviar notificaciones masivas o dirigidas por tres canales críticos: WhatsApp, Correo Electrónico y Microsoft Teams.</p>
+
+<h3>Canales de Comunicación y Capacidades</h3>
+<ul>
+  <li><strong>Canal WhatsApp Cloud API:</strong> Envío de plantillas interactivas autorizadas por Meta. Soporta parámetros dinámicos (variables) para incluir nombres, folios de OT, enlaces de PDF o estatus de producción. Toda la firma de mensajes es personalizable dinámicamente.</li>
+  <li><strong>Canal Correo Electrónico (Resend API):</strong> Envío de reportes automatizados, cotizaciones y nóminas con formato HTML premium. Permite configurar remitentes dinámicos y adjuntar documentos directamente.</li>
+  <li><strong>Canal Microsoft Teams (Webhooks / API):</strong> Despacho de notificaciones y alertas internas para canales de supervisión, celdas de soldadura o avisos urgentes a la dirección general en formato de tarjetas adaptativas (Adaptive Cards).</li>
+</ul>
+
+<h3>Flujo de Operación y Cola de Despacho</h3>
+<p>El hub cuenta con un sistema de colas inteligente para garantizar la entrega secuencial sin saturar los endpoints:</p>
+<ol>
+  <li><strong>Buscador y Selector de Contactos:</strong> Permite filtrar dinámicamente contactos, operarios o clientes y seleccionarlos de forma múltiple o masiva (botón "Seleccionar Todos").</li>
+  <li><strong>Compositor Asistido por IA (Gemini 2.5):</strong> Redacta anuncios, alertas de entrega o plantillas de forma manual o asistida por IA para refinar el tono del copy (profesional, urgente, etc.) según el canal activo.</li>
+  <li><strong>Cola de Despacho Visual:</strong> Visualiza en tiempo real los destinatarios seleccionados, el canal correspondiente y el botón interactivo de ejecución masiva.</li>
+  <li><strong>Firma Dinámica Centralizada:</strong> Agrega automáticamente firmas personalizadas con datos recuperados desde la configuración del tenant en Supabase.</li>
+</ol>
+
+<div class="card">
+  <h3 style="color:var(--success);">💡 Configuración Dinámica Cero Hardcoding</h3>
+  <p>Todas las configuraciones y tokens necesarios para el funcionamiento del Hub de Mensajería (como el WhatsApp Token, Phone Number ID, tokens de Resend o Webhooks de Microsoft Teams) se administran encriptadamente en Supabase y son accesibles de forma dinámica desde el panel de <strong>Configuración (Bóveda de Motores IA)</strong>. Si un token no está registrado, el canal correspondiente se desactiva visualmente en la interfaz para evitar errores en producción.</p>
 </div>
 </section>
 

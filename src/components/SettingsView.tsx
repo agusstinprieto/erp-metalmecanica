@@ -1589,7 +1589,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ userRole }) => {
           <div className="flex items-center gap-2">
             <Shield className="text-mcvill-accent" size={16} />
             <h2 className="text-base font-black text-mcvill-text tracking-tight uppercase">
-              {language === 'en' ? 'CONFIGURATION' : 'CENTRAL DE'} <span className="text-mcvill-accent">{language === 'en' ? 'CENTRAL' : 'CONFIGURACIÓN'}</span>
+              {language === 'en' ? 'CONFIGURATION' : 'CENTRAL DE'} <span className="text-mcvill-accent">{language === 'en' ? 'HUB' : 'CONFIGURACIÓN'}</span>
             </h2>
           </div>
           <div className="h-4 w-px bg-white/10 hidden md:block" />

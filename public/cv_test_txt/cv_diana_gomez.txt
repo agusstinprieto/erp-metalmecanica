@@ -1,0 +1,55 @@
+========================================================================
+DIANA LAURA GÓMEZ RESÉNDIZ - CURRÍCULUM VITAE
+========================================================================
+Puesto Objetivo: Ingeniero de Calidad / Auditor del Sistema de Gestión de Calidad (SGC)
+Contacto: diana.gomez.quality@email.com | Tel: +52 81 1122 3344
+Ubicación: Monterrey, Nuevo León, México
+Disponibilidad: Inmediata | Turno: Administrativo / Oficina y Piso de Planta
+
+------------------------------------------------------------------------
+PERFIL PROFESIONAL
+------------------------------------------------------------------------
+Ingeniera Industrial y de Sistemas certificada por ASQ (American Society for Quality) como CQE (Certified Quality Engineer). Más de 5 años de trayectoria profesional en la industria metalmecánica e inyección de plástico. Sólido dominio en el desarrollo, implementación y auditoría de Sistemas de Gestión de Calidad (SGC) bajo la norma ISO 9001:2015 e IATF 16949. Especialista en Core Tools (APQP, PPAP, FMEA, SPC, MSA). Con enfoque analítico orientado a la mejora continua (Seis Sigma Green Belt), reducción de costo por scrap, gestión de No Conformidades y atención directa a quejas de clientes automotrices e industriales de primer nivel.
+
+------------------------------------------------------------------------
+ÁREAS DE EXPERTISE
+------------------------------------------------------------------------
+* Desarrollo de documentación para PPAP (Production Part Approval Process) y FAI (First Article Inspection).
+* Control de Procesos Estadístico (SPC) mediante gráficos de control Cp y Cpk.
+* Auditorías Internas y de Proveedores bajo metodologías ISO 19011 e ISO 9001.
+* Análisis de Causa Raíz mediante metodologías 8Ds, 5 Porqués e Diagrama de Ishikawa.
+* Metrología Dimensional: Lectura de planos mecánicos y tolerancias geométricas (GD&T).
+
+------------------------------------------------------------------------
+EXPERIENCIA LABORAL
+------------------------------------------------------------------------
+1. INGENIERO DE CALIDAD | Componentes Mecánicos McVill S.A. de C.V.
+   Periodo: Enero 2023 – Presente
+   Responsabilidades y Logros:
+   - Coordinación de las auditorías de producto y proceso en celdas de corte láser, doblado y ensamble soldado.
+   - Reducción del índice de rechazos internos (FTT) de un 4.5% a un 1.2% en la línea de ensamble soldado de recipientes.
+   - Elaboración e instrumentación de las lecciones aprendidas de calidad y planes de control para nuevos lanzamientos de piezas mecanizadas.
+   - Implementación del sistema SPC digitalizado en planta para el control dimensional de tolerancias de barrenado en fresadoras CNC.
+
+2. ANALISTA DE ASEGURAMIENTO DE CALIDAD | Manufacturas Metálicas Regiomontanas
+   Periodo: Septiembre 2020 – Diciembre 2022
+   Responsabilidades y Logros:
+   - Administración de las quejas de cliente y desarrollo formal del paquete de acciones correctivas utilizando formato 8D.
+   - Liberación de primeros artículos (FAI) para componentes automotrices estampados.
+   - Capacitación del personal de piso (operarios y soldadores) sobre defectos de calidad críticos: discontinuidades de soldadura, porosidad y rayaduras cosméticas.
+
+------------------------------------------------------------------------
+EDUCACIÓN Y CERTIFICACIONES
+------------------------------------------------------------------------
+* Ingeniería Industrial y de Sistemas (IIS)
+  Universidad Autónoma de Nuevo León (UANL), Monterrey, N.L. (Graduación: 2020)
+* Certificación ASQ Certified Quality Engineer (CQE) - ID: 8945722 (Vigente).
+* Certificación Six Sigma Green Belt (UANL, 2021).
+* Auditor Interno ISO 9001:2015 (Bureau Veritas, 2022 - Duración: 24 horas).
+
+------------------------------------------------------------------------
+IDIOMAS Y SOFTWARE
+------------------------------------------------------------------------
+- Español: Nativo | Inglés: Avanzado (TOEFL: 580 puntos - Capacidad de negociación).
+- Software: Minitab, SolidWorks (Básico/Lectura CAD), MS Office avanzado.
+========================================================================
