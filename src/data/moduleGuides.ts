@@ -1626,6 +1626,130 @@ export const MODULE_GUIDES: Record<string, ModuleGuide> = {
     ],
   },
 
+  ceo_mobile_sim: {
+    moduleId: 'ceo_mobile_sim',
+    label: 'CEO Móvil Simulator',
+    emoji: '📱',
+    description: 'Tu planta industrial en el celular — ROI, CCTV y Copilot IA',
+    steps: [
+      {
+        icon: 'Smartphone', color: 'text-mcvill-accent', bg: 'bg-mcvill-accent/10 border-mcvill-accent/30',
+        title: 'Simulador CEO Godmode',
+        subtitle: 'Diseño del ecosistema móvil de McVill',
+        tips: [
+          '📱 Esta vista muestra el diseño conceptual de la app móvil para el dueño o director de la empresa.',
+          '🔵 Interactúa con el iPhone simulado usando las pestañas ROI, CCTV IA, Estatus y Copilot.',
+          '⚡ El botón LIVE FEED / PAUSED activa o pausa el escáner de calidad neural en tiempo real.',
+          '🎯 Cada panel del teléfono es completamente interactivo — toca los botones de preguntas rápidas.',
+        ],
+      },
+      {
+        icon: 'CircleDollarSign', color: 'text-emerald-400', bg: 'bg-emerald-400/10 border-emerald-400/30',
+        title: 'Panel ROI / Finanzas',
+        subtitle: 'Margen operativo neto del día en tiempo real',
+        tips: [
+          '💰 Muestra el Margen Neto acumulado del día restando energía, nómina y scrap.',
+          '⚡ El Costo KWh y la Fuga por Scrap se actualizan con cada turno de producción.',
+          '📊 El diagnóstico financiero al pie explica qué decisión de nesting generó o perdió dinero.',
+        ],
+      },
+      {
+        icon: 'Camera', color: 'text-blue-400', bg: 'bg-blue-400/10 border-blue-400/30',
+        title: 'CCTV IA + Copilot',
+        subtitle: 'Inspección visual y órdenes por voz desde el celular',
+        tips: [
+          '🔴 El escáner CCTV IA detecta defectos de soldadura y dimensional pieza por pieza.',
+          '🟢 Verde = pieza aprobada. Rojo parpadeante = scrap detectado con nivel de confianza.',
+          '🤖 El Copilot IA responde preguntas en lenguaje natural: OEE, scrap, directivas a piso.',
+          '🏭 El Semáforo muestra el OEE de cada línea (Corte Láser, Mecanizado, Forja) en tiempo real.',
+        ],
+      },
+    ],
+  },
+
+  logistica: {
+    moduleId: 'logistica',
+    label: 'Logística & Rastreo',
+    emoji: '🚚',
+    description: 'Seguimiento de entregas con geocercas y alertas en tiempo real',
+    steps: [
+      {
+        icon: 'Truck', color: 'text-mcvill-accent', bg: 'bg-mcvill-accent/10 border-mcvill-accent/30',
+        title: 'Rastreador de Entregas',
+        subtitle: 'Visualiza en mapa cada embarque activo',
+        tips: [
+          '🗺️ El mapa de canvas muestra la ruta del camión desde planta hasta el cliente en tiempo real.',
+          '📍 El punto azul es la posición actual del transportista — se mueve automáticamente en la simulación.',
+          '🔵 El círculo azul alrededor del cliente es la geocerca — cuando el camión entra, genera alerta.',
+          '▶️ Usa los botones Play / Pause / Reset para controlar la simulación de la ruta activa.',
+        ],
+      },
+      {
+        icon: 'Bell', color: 'text-amber-400', bg: 'bg-amber-400/10 border-amber-400/30',
+        title: 'Alertas y Geocercas',
+        subtitle: 'Notificaciones automáticas al llegar al cliente',
+        tips: [
+          '🔔 Al entrar a la geocerca del cliente se dispara una alerta de llegada registrada en el historial.',
+          '⚙️ Configura el radio de la geocerca en metros desde el panel de Rutas.',
+          '📲 Las alertas de entrega se pueden conectar al WhatsApp Center para notificar al cliente automáticamente.',
+        ],
+      },
+      {
+        icon: 'Users', color: 'text-purple-400', bg: 'bg-purple-400/10 border-purple-400/30',
+        title: 'Choferes y Rutas',
+        subtitle: 'Administra el equipo de logística',
+        tips: [
+          '👤 Registra choferes con nombre, licencia, teléfono y placas desde el panel "Choferes".',
+          '🛣️ Crea Rutas con cliente destino, distancia en km y radio de geocerca personalizado.',
+          '📋 Cada entrega queda registrada con OT, chofer, ruta y timestamp de llegada confirmada.',
+          '🤖 El Copilot IA puede consultar el historial de entregas y generar reportes de puntualidad.',
+        ],
+      },
+    ],
+  },
+
+  lead_time_predictor: {
+    moduleId: 'lead_time_predictor',
+    label: 'Predictor de Lead Time',
+    emoji: '⏱️',
+    description: 'Predice tiempos de entrega con IA antes de comprometerte con el cliente',
+    steps: [
+      {
+        icon: 'Clock', color: 'text-mcvill-accent', bg: 'bg-mcvill-accent/10 border-mcvill-accent/30',
+        title: '¿Qué es el Lead Time Predictor?',
+        subtitle: 'IA que calcula cuántos días tardará tu pedido',
+        tips: [
+          '⏱️ Ingresa cliente, número de parte, cantidad y estado del material para obtener una predicción.',
+          '🎯 El sistema calcula días estimados con un porcentaje de confiabilidad basado en datos históricos.',
+          '🔴 Si el SLA del cliente no se cumplirá, la predicción aparece en rojo con recomendaciones.',
+          '💡 Úsalo ANTES de comprometerte con una fecha de entrega a Caterpillar, John Deere u OEM.',
+        ],
+      },
+      {
+        icon: 'Layers', color: 'text-blue-400', bg: 'bg-blue-400/10 border-blue-400/30',
+        title: 'Variables de la Predicción',
+        subtitle: 'Factores que afectan el tiempo estimado',
+        tips: [
+          '📦 Estado del material: Listo = sin impacto, En tránsito = +3.5 días, Backorder = +8 días.',
+          '🏭 Capacidad CNC: Alta carga = más días estimados, Baja carga = entrega más rápida.',
+          '🔄 Turnos activos: 1 turno, 2 turnos o 3 turnos impactan directamente el tiempo de producción.',
+          '📊 La cantidad de piezas se divide entre la tasa de producción diaria para calcular la base.',
+        ],
+      },
+      {
+        icon: 'TrendingUp', color: 'text-emerald-400', bg: 'bg-emerald-400/10 border-emerald-400/30',
+        title: 'Resultado y Recomendaciones',
+        subtitle: 'Toma de decisión basada en datos',
+        tips: [
+          '✅ Verde = SLA cumplido. Rojo = SLA en riesgo — el sistema sugiere acciones correctivas.',
+          '🤖 Las recomendaciones IA indican si conviene agregar turno nocturno, priorizar material o subcontratar.',
+          '📝 Los cuellos de botella detectados aparecen listados para que el supervisor los atienda.',
+          '📤 Puedes compartir la predicción al cliente vía WhatsApp Center como ETA confirmado.',
+        ],
+      },
+    ],
+  },
+
 };
 
 export const DEFAULT_GUIDE: ModuleGuide = {
