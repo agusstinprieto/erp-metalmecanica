@@ -51,7 +51,7 @@ export const attendanceService = {
       .from('employees')
       .select('shift_id, work_shifts(*)')
       .eq('id', employeeId)
-      .single();
+      .maybeSingle();
 
     let isLate = false;
     const shift = emp?.work_shifts;
@@ -104,7 +104,7 @@ export const attendanceService = {
       .from('employees')
       .select('work_shifts(*)')
       .eq('id', record?.employee_id)
-      .single();
+      .maybeSingle();
 
     const shift = emp?.work_shifts;
     let overtimeMinutes = 0;
