@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { appAlert } from '../lib/dialogs';
 import confetti from 'canvas-confetti';
+import { reportUtils } from '../utils/reportUtils';
 
 export const MetalQuoterView: React.FC = () => {
     const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -145,14 +146,38 @@ Devuelve ÚNICAMENTE un JSON válido que coincida exactamente con la siguiente e
     };
 
     const handleConfirmQuote = async () => {
+        if (!analysisResult) return;
+        const rows = [
+            { 'SECCIÓN': 'PROYECTO', 'DETALLE': analysisResult.projectName, 'VALOR': '' },
+            { 'SECCIÓN': 'Material', 'DETALLE': analysisResult.material, 'VALOR': analysisResult.gauge },
+            { 'SECCIÓN': 'Dimensiones', 'DETALLE': analysisResult.dimensions, 'VALOR': `${analysisResult.weightKg} kg` },
+            { 'SECCIÓN': 'Barrenos', 'DETALLE': 'Perforaciones detectadas', 'VALOR': String(analysisResult.geometryStats.holes) },
+            { 'SECCIÓN': 'Dobleces', 'DETALLE': 'Líneas de doblez', 'VALOR': String(analysisResult.geometryStats.bends) },
+            { 'SECCIÓN': 'Perímetro corte', 'DETALLE': 'Longitud total de corte láser', 'VALOR': `${analysisResult.geometryStats.perimeterMm} mm` },
+            { 'SECCIÓN': '---', 'DETALLE': 'DESGLOSE DE COSTOS (USD)', 'VALOR': '' },
+            { 'SECCIÓN': 'Material Base', 'DETALLE': 'Costo acero neto c/descuento scrap', 'VALOR': `$${analysisResult.costs.material.toFixed(2)}` },
+            { 'SECCIÓN': 'Tiempo Máquina', 'DETALLE': 'Láser + doblez CNC', 'VALOR': `$${analysisResult.costs.machine.toFixed(2)}` },
+            { 'SECCIÓN': 'Mano de Obra', 'DETALLE': 'Ensamble + rebabeo', 'VALOR': `$${analysisResult.costs.labor.toFixed(2)}` },
+            { 'SECCIÓN': 'TOTAL', 'DETALLE': 'Precio con markup 30% (utilidad + indirectos)', 'VALOR': `$${analysisResult.costs.total.toFixed(2)}` },
+            { 'SECCIÓN': '---', 'DETALLE': 'PROCESOS DETECTADOS', 'VALOR': '' },
+            ...analysisResult.processes.map(p => ({
+                'SECCIÓN': p.name,
+                'DETALLE': p.description,
+                'VALOR': p.estimatedTime,
+            })),
+        ];
+        reportUtils.exportToPDF(
+            `Cotización Técnica — ${analysisResult.projectName}`,
+            rows,
+            `cotizacion_${analysisResult.projectName.toLowerCase().replace(/[\s/\\]+/g, '_')}`,
+            'COTIZADOR IA'
+        );
         confetti({
             particleCount: 150,
             spread: 70,
             origin: { y: 0.6 },
             colors: ['#4FA5FF', '#ffffff', '#000000']
         });
-        await appAlert("Cotización aprobada. Se ha generado la orden de trabajo en el módulo de producción.", "Éxito Industrial");
-        setAnalysisResult(null);
     };
 
     return (
