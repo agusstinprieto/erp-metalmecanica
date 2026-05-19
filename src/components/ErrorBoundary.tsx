@@ -56,7 +56,19 @@ export class ErrorBoundary extends React.Component<{ children: React.ReactNode }
             </p>
             <div className="flex gap-3 justify-center">
               <button
-                onClick={() => this.setState({ hasError: false, error: null })}
+                onClick={() => {
+                  // For chunk errors, a full reload is needed to get new asset URLs
+                  const isChunk = this.state.error?.message?.includes('Failed to fetch') ||
+                    this.state.error?.message?.includes('MIME type') ||
+                    this.state.error?.message?.includes('chunk');
+                  if (isChunk) {
+                    sessionStorage.removeItem('erp_chunk_reload');
+                    sessionStorage.removeItem('__chunk_reload');
+                    window.location.reload();
+                  } else {
+                    this.setState({ hasError: false, error: null });
+                  }
+                }}
                 className="flex items-center gap-2 px-4 py-2 bg-mcvill-accent text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-500 transition-all"
               >
                 <RefreshCw size={12} />
