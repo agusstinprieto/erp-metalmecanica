@@ -52,8 +52,13 @@ interface McVillChatProps {
 // Contexto del Manual específico para el ERP Control - Compilado Dinámicamente para todos los módulos
 function getErpManualContext(logoText: string): string {
   const allModulesSummary = Object.values(MODULE_GUIDES)
-    .map((g, i) => `${i + 1}. **${g.label}** (${g.emoji}): ${g.description}. Pasos clave: ${g.steps.map(s => s.title).join(' ➔ ')}`)
-    .join('\n');
+    .map((g, i) => {
+      const stepsDetail = g.steps.map(s =>
+        `  • ${s.title}: ${s.tips.join(' | ')}`
+      ).join('\n');
+      return `${i + 1}. **${g.label}** (${g.emoji}): ${g.description}\n${stepsDetail}`;
+    })
+    .join('\n\n');
 
   return `
 Eres el Manual Oficial e Inteligencia de Soporte de Control ERP (${logoText}).
