@@ -4,11 +4,12 @@ import {
   Wrench, Building2, ClipboardList,
   Plus, Pencil, Trash2, Save, X, Loader2,
   AlertCircle, Search, ChevronRight,
-  CheckCircle2, Clock, XCircle, Upload,
+  CheckCircle2, Clock, XCircle, Upload, FileBarChart,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { ImportDataModal, IMPORT_CONFIGS } from './ImportDataModal';
 import { useTenant } from '../hooks/useTenant';
+import { reportUtils } from '../utils/reportUtils';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -216,6 +217,8 @@ const MaquinasTab: React.FC = () => {
   const [saving, setSaving]       = useState(false);
   const [delId, setDelId]         = useState<string | null>(null);
   const [showImport, setShowImport] = useState(false);
+  const [selected, setSelected]   = useState<Set<string>>(new Set());
+  const [bulkDeletePending, setBulkDeletePending] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -227,6 +230,29 @@ const MaquinasTab: React.FC = () => {
   useEffect(() => { load(); }, [load]);
 
   const filtered = rows.filter(r => !search || JSON.stringify(r).toLowerCase().includes(search.toLowerCase()));
+
+  const toggleSelect = (id: string) => setSelected(prev => {
+    const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n;
+  });
+  const toggleAll = () => setSelected(
+    selected.size === filtered.length ? new Set() : new Set(filtered.map(r => (r as any).id))
+  );
+  const confirmBulkDelete = async () => {
+    await Promise.all([...selected].map(id => supabase.from('activos_maquinas').delete().eq('id', id)));
+    setSelected(new Set()); setBulkDeletePending(false); load();
+  };
+  const exportPDF = () => reportUtils.exportToPDF(
+    'Inventario de Máquinas',
+    filtered.map(r => ({
+      CÓDIGO: r.codigo, NOMBRE: r.nombre,
+      'MODELO/FAB': [r.modelo, r.fabricante].filter(Boolean).join(' / ') || '—',
+      UBICACIÓN: r.ubicacion || '—',
+      'HORAS USO': `${r.horas_uso ?? 0} h`,
+      'PRÓX. MANT.': r.proximo_mantenimiento || '—',
+      ESTADO: r.estado || '—',
+    })),
+    'inventario_maquinas', 'INVENTARIO DE MÁQUINAS'
+  );
 
   const save = async () => {
     if (!edit) return;
@@ -250,7 +276,8 @@ const MaquinasTab: React.FC = () => {
     <div className="px-4 py-3 space-y-3">
       <div className="flex items-center gap-3">
         <Toolbar search={search} onSearch={setSearch} placeholder="Buscar máquinas..." color="brand"
-          onNew={() => { setEdit({ ...EMPTY_MAQ }); setIsNew(true); }} label="Nueva Máquina" />
+          onNew={() => { setEdit({ ...EMPTY_MAQ }); setIsNew(true); }} label="Nueva Máquina"
+          onExport={exportPDF} />
         <button onClick={() => setShowImport(true)}
           className="flex items-center gap-2 px-4 py-2.5 rounded-2xl border text-xs font-black uppercase tracking-widest transition-all text-slate-400 border-white/10 bg-white/3 hover:text-white hover:border-white/20 shrink-0">
           <Upload size={13} /> Importar CSV
@@ -258,21 +285,44 @@ const MaquinasTab: React.FC = () => {
       </div>
       {error && <ErrorBar msg={error} onClose={() => setError(null)} />}
 
+      {/* Selection bar */}
+      {selected.size > 0 && (
+        <div className="flex items-center gap-3 px-3 py-2 bg-rose-500/10 border border-rose-500/20 rounded-xl">
+          <span className="text-xs text-rose-400 font-black">{selected.size} seleccionado{selected.size > 1 ? 's' : ''}</span>
+          <button onClick={() => setBulkDeletePending(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-500/20 border border-rose-500/30 text-rose-300 text-[10px] font-black uppercase rounded-xl hover:bg-rose-500/30 transition-all">
+            <Trash2 size={11} /> Eliminar seleccionados
+          </button>
+          <button onClick={() => setSelected(new Set())} className="ml-auto text-slate-500 hover:text-slate-300 transition-colors">
+            <X size={14} />
+          </button>
+        </div>
+      )}
+
       <div className="bg-slate-900/40 border border-white/5 rounded-xl overflow-hidden">
         {loading ? <LoadingRow /> : filtered.length === 0 ? (
           <EmptyRow icon={Wrench} label="máquinas" onNew={() => { setEdit({ ...EMPTY_MAQ }); setIsNew(true); }} color="blue" />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <THead cols={['Código', 'Nombre', 'Modelo / Fab.', 'Ubicación', 'Horas Uso', 'Próx. Mant.', 'Estado', '']} />
+              <THead
+                cols={['Código', 'Nombre', 'Modelo / Fab.', 'Ubicación', 'Horas Uso', 'Próx. Mant.', 'Estado', '']}
+                onSelectAll={toggleAll}
+                allSelected={selected.size > 0 && selected.size === filtered.length}
+              />
               <tbody>
                 {filtered.map((r, i) => {
                   const est = ESTADO_MAQUINA[r.estado || 'operativa'] || ESTADO_MAQUINA.operativa;
                   const vencido = isVencido(r.proximo_mantenimiento);
                   const proximo = isProximo(r.proximo_mantenimiento);
+                  const rowId = (r as any).id;
                   return (
-                    <motion.tr key={(r as any).id} initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { delay: i * 0.03 } }}
+                    <motion.tr key={rowId} initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { delay: i * 0.03 } }}
                       className="border-b border-white/5 hover:bg-white/3 transition-colors group">
+                      <td className="pl-4 pr-2 py-1 w-8">
+                        <input type="checkbox" checked={selected.has(rowId)} onChange={() => toggleSelect(rowId)}
+                          className="w-3.5 h-3.5 rounded border-white/20 bg-black/40 accent-mcvill-accent cursor-pointer" />
+                      </td>
                       <td className="px-4 py-1 font-mono text-[10px] text-mcvill-accent font-bold">{r.codigo}</td>
                       <td className="px-4 py-1 text-white text-[11px] font-bold uppercase">{r.nombre}</td>
                       <td className="px-4 py-1 text-slate-400 text-[10px] uppercase">{[r.modelo, r.fabricante].filter(Boolean).join(' / ') || '—'}</td>
@@ -289,7 +339,7 @@ const MaquinasTab: React.FC = () => {
                         </span>
                       </td>
                       <td className="px-4 py-1 text-right">
-                        <RowActions onEdit={() => { setEdit({ ...r }); setIsNew(false); }} onDel={() => setDelId((r as any).id)} />
+                        <RowActions onEdit={() => { setEdit({ ...r }); setIsNew(false); }} onDel={() => setDelId(rowId)} />
                       </td>
                     </motion.tr>
                   );
@@ -339,6 +389,7 @@ const MaquinasTab: React.FC = () => {
           </Drawer>
         )}
         {delId && <DeleteConfirm onCancel={() => setDelId(null)} onConfirm={del} />}
+        {bulkDeletePending && <DeleteConfirm onCancel={() => setBulkDeletePending(false)} onConfirm={confirmBulkDelete} />}
       </AnimatePresence>
     </div>
   );
@@ -359,6 +410,8 @@ const EdificioTab: React.FC = () => {
   const [saving, setSaving]       = useState(false);
   const [delId, setDelId]         = useState<string | null>(null);
   const [showImport, setShowImport] = useState(false);
+  const [selected, setSelected]   = useState<Set<string>>(new Set());
+  const [bulkDeletePending, setBulkDeletePending] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -370,6 +423,30 @@ const EdificioTab: React.FC = () => {
   useEffect(() => { load(); }, [load]);
 
   const filtered = rows.filter(r => !search || JSON.stringify(r).toLowerCase().includes(search.toLowerCase()));
+
+  const toggleSelect = (id: string) => setSelected(prev => {
+    const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n;
+  });
+  const toggleAll = () => setSelected(
+    selected.size === filtered.length ? new Set() : new Set(filtered.map(r => (r as any).id))
+  );
+  const confirmBulkDelete = async () => {
+    await Promise.all([...selected].map(id => supabase.from('activos_edificio').delete().eq('id', id)));
+    setSelected(new Set()); setBulkDeletePending(false); load();
+  };
+  const exportPDF = () => reportUtils.exportToPDF(
+    'Inventario de Instalaciones',
+    filtered.map(r => ({
+      NOMBRE: r.nombre,
+      TIPO: r.tipo || '—',
+      UBICACIÓN: r.ubicacion || '—',
+      'ÁREA (m²)': r.area_m2 ?? '—',
+      RESPONSABLE: r.responsable || '—',
+      'PRÓX. MANT.': r.proximo_mantenimiento || '—',
+      ESTADO: r.estado || '—',
+    })),
+    'inventario_edificio', 'INVENTARIO DE INSTALACIONES'
+  );
 
   const save = async () => {
     if (!edit) return;
@@ -395,7 +472,8 @@ const EdificioTab: React.FC = () => {
     <div className="px-4 py-3 space-y-3">
       <div className="flex items-center gap-3">
         <Toolbar search={search} onSearch={setSearch} placeholder="Buscar instalaciones..." color="amber"
-          onNew={() => { setEdit({ ...EMPTY_EDI }); setIsNew(true); }} label="Nueva Instalación" />
+          onNew={() => { setEdit({ ...EMPTY_EDI }); setIsNew(true); }} label="Nueva Instalación"
+          onExport={exportPDF} />
         <button onClick={() => setShowImport(true)}
           className="flex items-center gap-2 px-4 py-2.5 rounded-2xl border text-xs font-black uppercase tracking-widest transition-all text-slate-400 border-white/10 bg-white/3 hover:text-white hover:border-white/20 shrink-0">
           <Upload size={13} /> Importar CSV
@@ -403,21 +481,44 @@ const EdificioTab: React.FC = () => {
       </div>
       {error && <ErrorBar msg={error} onClose={() => setError(null)} />}
 
+      {/* Selection bar */}
+      {selected.size > 0 && (
+        <div className="flex items-center gap-3 px-3 py-2 bg-rose-500/10 border border-rose-500/20 rounded-xl">
+          <span className="text-xs text-rose-400 font-black">{selected.size} seleccionado{selected.size > 1 ? 's' : ''}</span>
+          <button onClick={() => setBulkDeletePending(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-500/20 border border-rose-500/30 text-rose-300 text-[10px] font-black uppercase rounded-xl hover:bg-rose-500/30 transition-all">
+            <Trash2 size={11} /> Eliminar seleccionados
+          </button>
+          <button onClick={() => setSelected(new Set())} className="ml-auto text-slate-500 hover:text-slate-300 transition-colors">
+            <X size={14} />
+          </button>
+        </div>
+      )}
+
       <div className="bg-slate-900/40 border border-white/5 rounded-xl overflow-hidden">
         {loading ? <LoadingRow /> : filtered.length === 0 ? (
           <EmptyRow icon={Building2} label="instalaciones" onNew={() => { setEdit({ ...EMPTY_EDI }); setIsNew(true); }} color="amber" />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <THead cols={['Nombre', 'Tipo', 'Ubicación', 'Responsable', 'Próx. Mant.', 'Estado', '']} />
+              <THead
+                cols={['Nombre', 'Tipo', 'Ubicación', 'Responsable', 'Próx. Mant.', 'Estado', '']}
+                onSelectAll={toggleAll}
+                allSelected={selected.size > 0 && selected.size === filtered.length}
+              />
               <tbody>
                 {filtered.map((r, i) => {
                   const est = ESTADO_EDIFICIO[r.estado || 'bueno'] || ESTADO_EDIFICIO.bueno;
                   const vencido = isVencido(r.proximo_mantenimiento);
                   const proximo = isProximo(r.proximo_mantenimiento);
+                  const rowId = (r as any).id;
                   return (
-                    <motion.tr key={(r as any).id} initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { delay: i * 0.03 } }}
+                    <motion.tr key={rowId} initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { delay: i * 0.03 } }}
                       className="border-b border-white/5 hover:bg-white/3 transition-colors group">
+                      <td className="pl-4 pr-2 py-1 w-8">
+                        <input type="checkbox" checked={selected.has(rowId)} onChange={() => toggleSelect(rowId)}
+                          className="w-3.5 h-3.5 rounded border-white/20 bg-black/40 accent-mcvill-accent cursor-pointer" />
+                      </td>
                       <td className="px-4 py-1 text-white text-[11px] font-bold uppercase">{r.nombre}</td>
                       <td className="px-4 py-1 text-[10px]">
                         <span className="px-2 py-0.5 rounded-full text-[8px] font-black uppercase bg-amber-500/10 text-amber-400 border border-amber-500/20">
@@ -435,7 +536,7 @@ const EdificioTab: React.FC = () => {
                         <span className={`px-2 py-0.5 rounded-full border text-[8px] font-black uppercase ${est.cls}`}>{est.label}</span>
                       </td>
                       <td className="px-4 py-1 text-right">
-                        <RowActions onEdit={() => { setEdit({ ...r }); setIsNew(false); }} onDel={() => setDelId((r as any).id)} />
+                        <RowActions onEdit={() => { setEdit({ ...r }); setIsNew(false); }} onDel={() => setDelId(rowId)} />
                       </td>
                     </motion.tr>
                   );
@@ -480,6 +581,7 @@ const EdificioTab: React.FC = () => {
           </Drawer>
         )}
         {delId && <DeleteConfirm onCancel={() => setDelId(null)} onConfirm={del} />}
+        {bulkDeletePending && <DeleteConfirm onCancel={() => setBulkDeletePending(false)} onConfirm={confirmBulkDelete} />}
       </AnimatePresence>
     </div>
   );
@@ -519,7 +621,6 @@ const NuevaOrdenModal: React.FC<{ onClose: () => void; onSaved: () => void }> = 
   const [assets, setAssets] = useState<MaintenanceAsset[]>([]);
 
   useEffect(() => {
-    // Try to load assets; silently ignore if table doesn't exist
     supabase
       .from('maintenance_assets')
       .select('id, nombre, name, codigo')
@@ -557,7 +658,6 @@ const NuevaOrdenModal: React.FC<{ onClose: () => void; onSaved: () => void }> = 
         className="fixed inset-0 top-16 left-64 flex items-center justify-center z-50 p-6"
       >
         <div className="bg-slate-950 border border-white/5 rounded-[2rem] p-6 w-full max-w-lg space-y-4 shadow-2xl">
-          {/* Modal header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="p-2 bg-mcvill-accent/10 rounded-xl border border-mcvill-accent/20">
@@ -570,23 +670,14 @@ const NuevaOrdenModal: React.FC<{ onClose: () => void; onSaved: () => void }> = 
             </button>
           </div>
 
-          {/* Fields */}
           <Field label="Título *">
-            <input
-              value={form.title}
-              onChange={e => setForm(p => ({ ...p, title: e.target.value }))}
-              placeholder="Ej: Cambio de aceite — TORNO CNC MQ-001"
-              className={inputCls + ' mt-1'}
-            />
+            <input value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))}
+              placeholder="Ej: Cambio de aceite — TORNO CNC MQ-001" className={inputCls + ' mt-1'} />
           </Field>
 
           <Field label="Activo">
             {assets.length > 0 ? (
-              <select
-                value={form.asset_id}
-                onChange={e => setForm(p => ({ ...p, asset_id: e.target.value }))}
-                className={inputCls + ' mt-1'}
-              >
+              <select value={form.asset_id} onChange={e => setForm(p => ({ ...p, asset_id: e.target.value }))} className={inputCls + ' mt-1'}>
                 <option value="">— Sin activo específico —</option>
                 {assets.map(a => (
                   <option key={a.id} value={a.id}>
@@ -595,55 +686,33 @@ const NuevaOrdenModal: React.FC<{ onClose: () => void; onSaved: () => void }> = 
                 ))}
               </select>
             ) : (
-              <input
-                value={form.asset_id}
-                onChange={e => setForm(p => ({ ...p, asset_id: e.target.value }))}
-                placeholder="ID o nombre del activo (opcional)"
-                className={inputCls + ' mt-1'}
-              />
+              <input value={form.asset_id} onChange={e => setForm(p => ({ ...p, asset_id: e.target.value }))}
+                placeholder="ID o nombre del activo (opcional)" className={inputCls + ' mt-1'} />
             )}
           </Field>
 
           <div className="grid grid-cols-2 gap-3">
             <Field label="Prioridad">
-              <Sel
-                value={form.priority}
-                onChange={v => setForm(p => ({ ...p, priority: v as NuevaOrdenForm['priority'] }))}
-                options={[['normal', 'Normal'], ['urgente', 'Urgente'], ['critical', 'Crítica']]}
-              />
+              <Sel value={form.priority} onChange={v => setForm(p => ({ ...p, priority: v as NuevaOrdenForm['priority'] }))}
+                options={[['normal', 'Normal'], ['urgente', 'Urgente'], ['critical', 'Crítica']]} />
             </Field>
             <Field label="Fecha Programada">
-              <input
-                type="date"
-                value={form.scheduled_date}
-                onChange={e => setForm(p => ({ ...p, scheduled_date: e.target.value }))}
-                className={inputCls + ' mt-1'}
-              />
+              <input type="date" value={form.scheduled_date} onChange={e => setForm(p => ({ ...p, scheduled_date: e.target.value }))} className={inputCls + ' mt-1'} />
             </Field>
           </div>
 
           <Field label="Descripción">
-            <textarea
-              value={form.description}
-              onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
-              rows={3}
-              placeholder="Describe el trabajo de mantenimiento requerido..."
-              className={inputCls + ' mt-1 resize-none'}
-            />
+            <textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
+              rows={3} placeholder="Describe el trabajo de mantenimiento requerido..." className={inputCls + ' mt-1 resize-none'} />
           </Field>
 
           <Field label="Técnico Asignado">
-            <input
-              value={form.assigned_to}
-              onChange={e => setForm(p => ({ ...p, assigned_to: e.target.value }))}
-              placeholder="Nombre del técnico responsable"
-              className={inputCls + ' mt-1'}
-            />
+            <input value={form.assigned_to} onChange={e => setForm(p => ({ ...p, assigned_to: e.target.value }))}
+              placeholder="Nombre del técnico responsable" className={inputCls + ' mt-1'} />
           </Field>
 
           {error && <ErrorBar msg={error} onClose={() => setError(null)} />}
 
-          {/* Actions */}
           <div className="flex gap-3 pt-1">
             <button onClick={onClose}
               className="flex-1 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-400 text-xs font-bold uppercase tracking-widest border border-white/5 transition-all">
@@ -677,6 +746,8 @@ const OrdenesTab: React.FC = () => {
   const [saving, setSaving]   = useState(false);
   const [delId, setDelId]     = useState<string | null>(null);
   const [showNuevaOrden, setShowNuevaOrden] = useState(false);
+  const [selected, setSelected]   = useState<Set<string>>(new Set());
+  const [bulkDeletePending, setBulkDeletePending] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -692,6 +763,30 @@ const OrdenesTab: React.FC = () => {
     const matchEstado = filtroEstado === 'todos' || r.estado === filtroEstado;
     return matchSearch && matchEstado;
   });
+
+  const toggleSelect = (id: string) => setSelected(prev => {
+    const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n;
+  });
+  const toggleAll = () => setSelected(
+    selected.size === filtered.length ? new Set() : new Set(filtered.map(r => (r as any).id))
+  );
+  const confirmBulkDelete = async () => {
+    await Promise.all([...selected].map(id => supabase.from('ordenes_mantenimiento').delete().eq('id', id)));
+    setSelected(new Set()); setBulkDeletePending(false); load();
+  };
+  const exportPDF = () => reportUtils.exportToPDF(
+    'Órdenes de Trabajo — Mantenimiento',
+    filtered.map(r => ({
+      'N° OT': r.numero_orden || '—',
+      ACTIVO: r.activo_nombre || '—',
+      TIPO: r.tipo_mantenimiento || '—',
+      TÉCNICO: r.tecnico_asignado || '—',
+      'F. PROGRAMADA': r.fecha_programada || '—',
+      PRIORIDAD: r.prioridad || '—',
+      ESTADO: r.estado || '—',
+    })),
+    'ordenes_mantenimiento', 'ÓRDENES DE TRABAJO — MANTENIMIENTO'
+  );
 
   const save = async () => {
     if (!edit) return;
@@ -724,7 +819,7 @@ const OrdenesTab: React.FC = () => {
 
   return (
     <div className="px-4 py-3 space-y-3">
-      {/* KPI Cards — Compact Matrix */}
+      {/* KPI Cards */}
       <div className="grid grid-cols-3 gap-3 shrink-0">
         {[
           { label: 'PENDIENTES',  val: counts.pendiente,  cls: 'text-slate-400 bg-slate-900 border-white/5' },
@@ -753,6 +848,10 @@ const OrdenesTab: React.FC = () => {
           <option value="completada">Completada</option>
           <option value="cancelada">Cancelada</option>
         </select>
+        <button onClick={exportPDF}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-2xl border text-xs font-black uppercase tracking-widest transition-all text-emerald-400 border-emerald-500/30 bg-emerald-500/10 hover:opacity-80 shrink-0">
+          <FileBarChart size={13} /> PDF
+        </button>
         <button onClick={() => setShowNuevaOrden(true)}
           className="flex items-center gap-2 px-4 py-2.5 rounded-2xl border text-xs font-black uppercase tracking-widest transition-all text-mcvill-accent border-mcvill-accent/30 bg-mcvill-accent/10 hover:opacity-80">
           <Plus size={14} /> Nueva Orden
@@ -765,20 +864,43 @@ const OrdenesTab: React.FC = () => {
 
       {error && <ErrorBar msg={error} onClose={() => setError(null)} />}
 
+      {/* Selection bar */}
+      {selected.size > 0 && (
+        <div className="flex items-center gap-3 px-3 py-2 bg-rose-500/10 border border-rose-500/20 rounded-xl">
+          <span className="text-xs text-rose-400 font-black">{selected.size} seleccionado{selected.size > 1 ? 's' : ''}</span>
+          <button onClick={() => setBulkDeletePending(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-500/20 border border-rose-500/30 text-rose-300 text-[10px] font-black uppercase rounded-xl hover:bg-rose-500/30 transition-all">
+            <Trash2 size={11} /> Eliminar seleccionados
+          </button>
+          <button onClick={() => setSelected(new Set())} className="ml-auto text-slate-500 hover:text-slate-300 transition-colors">
+            <X size={14} />
+          </button>
+        </div>
+      )}
+
       <div className="bg-slate-900/40 border border-white/5 rounded-xl overflow-hidden">
         {loading ? <LoadingRow /> : filtered.length === 0 ? (
           <EmptyRow icon={ClipboardList} label="órdenes de trabajo" onNew={() => { setEdit({ ...EMPTY_OT }); setIsNew(true); }} color="cyan" />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <THead cols={['N° OT', 'Activo', 'Tipo', 'Descripción', 'Técnico', 'F. Programada', 'Prioridad', 'Estado', '']} />
+              <THead
+                cols={['N° OT', 'Activo', 'Tipo', 'Descripción', 'Técnico', 'F. Programada', 'Prioridad', 'Estado', '']}
+                onSelectAll={toggleAll}
+                allSelected={selected.size > 0 && selected.size === filtered.length}
+              />
               <tbody>
                 {filtered.map((r, i) => {
                   const est = ESTADO_ORDEN[r.estado || 'pendiente'] || ESTADO_ORDEN.pendiente;
                   const priorCls = PRIORIDAD_CLS[r.prioridad || 'media'] || PRIORIDAD_CLS.media;
+                  const rowId = (r as any).id;
                   return (
-                    <motion.tr key={(r as any).id} initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { delay: i * 0.03 } }}
+                    <motion.tr key={rowId} initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { delay: i * 0.03 } }}
                       className="border-b border-white/5 hover:bg-white/3 transition-colors group">
+                      <td className="pl-4 pr-2 py-1 w-8">
+                        <input type="checkbox" checked={selected.has(rowId)} onChange={() => toggleSelect(rowId)}
+                          className="w-3.5 h-3.5 rounded border-white/20 bg-black/40 accent-mcvill-accent cursor-pointer" />
+                      </td>
                       <td className="px-4 py-1 font-mono text-[10px] text-mcvill-accent font-bold whitespace-nowrap">{r.numero_orden || '—'}</td>
                       <td className="px-4 py-1 text-[10px]">
                         <div className="text-white font-bold uppercase">{r.activo_nombre || '—'}</div>
@@ -799,7 +921,7 @@ const OrdenesTab: React.FC = () => {
                         </span>
                       </td>
                       <td className="px-4 py-1 text-right">
-                        <RowActions onEdit={() => { setEdit({ ...r }); setIsNew(false); }} onDel={() => setDelId((r as any).id)} />
+                        <RowActions onEdit={() => { setEdit({ ...r }); setIsNew(false); }} onDel={() => setDelId(rowId)} />
                       </td>
                     </motion.tr>
                   );
@@ -854,6 +976,7 @@ const OrdenesTab: React.FC = () => {
           </Drawer>
         )}
         {delId && <DeleteConfirm onCancel={() => setDelId(null)} onConfirm={del} />}
+        {bulkDeletePending && <DeleteConfirm onCancel={() => setBulkDeletePending(false)} onConfirm={confirmBulkDelete} />}
       </AnimatePresence>
     </div>
   );
@@ -861,26 +984,40 @@ const OrdenesTab: React.FC = () => {
 
 // ─── Shared UI helpers ──────────────────────────────────────────────────────────
 
-const Toolbar: React.FC<{ search: string; onSearch: (v: string) => void; placeholder: string; color: string; onNew: () => void; label: string }> =
-  ({ search, onSearch, placeholder, color, onNew, label }) => {
-    const cls = COLOR[color] || COLOR.cyan;
-    return (
-      <div className="flex items-center gap-3">
-        <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
-          <input value={search} onChange={e => onSearch(e.target.value)} placeholder={placeholder}
-            className="w-full bg-black/40 border border-white/10 rounded-2xl py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-blue-500/40 transition-all placeholder:text-slate-700" />
-        </div>
-        <button onClick={onNew} className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl border text-xs font-black uppercase tracking-widest transition-all hover:opacity-80 ${cls}`}>
-          <Plus size={14} />{label}
-        </button>
+const Toolbar: React.FC<{
+  search: string; onSearch: (v: string) => void; placeholder: string;
+  color: string; onNew: () => void; label: string; onExport?: () => void;
+}> = ({ search, onSearch, placeholder, color, onNew, label, onExport }) => {
+  const cls = COLOR[color] || COLOR.cyan;
+  return (
+    <div className="flex items-center gap-3 flex-1">
+      <div className="flex-1 relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
+        <input value={search} onChange={e => onSearch(e.target.value)} placeholder={placeholder}
+          className="w-full bg-black/40 border border-white/10 rounded-2xl py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-blue-500/40 transition-all placeholder:text-slate-700" />
       </div>
-    );
-  };
+      <button onClick={onNew} className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl border text-xs font-black uppercase tracking-widest transition-all hover:opacity-80 shrink-0 ${cls}`}>
+        <Plus size={14} />{label}
+      </button>
+      {onExport && (
+        <button onClick={onExport}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-2xl border text-xs font-black uppercase tracking-widest transition-all text-emerald-400 border-emerald-500/30 bg-emerald-500/10 hover:opacity-80 shrink-0">
+          <FileBarChart size={13} /> PDF
+        </button>
+      )}
+    </div>
+  );
+};
 
-const THead: React.FC<{ cols: string[] }> = ({ cols }) => (
+const THead: React.FC<{ cols: string[]; onSelectAll?: () => void; allSelected?: boolean }> = ({ cols, onSelectAll, allSelected }) => (
   <thead>
     <tr className="border-b border-white/5">
+      {onSelectAll !== undefined && (
+        <th className="pl-4 pr-2 py-2 w-8">
+          <input type="checkbox" checked={allSelected ?? false} onChange={onSelectAll}
+            className="w-3.5 h-3.5 rounded border-white/20 bg-black/40 accent-mcvill-accent cursor-pointer" />
+        </th>
+      )}
       {cols.map(h => (
         <th key={h} className="px-4 py-2 text-left text-[9px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">{h}</th>
       ))}
