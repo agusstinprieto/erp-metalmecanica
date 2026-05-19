@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react'; // McVill OC Manager
+import React, { useState, useEffect, useRef } from 'react'; // McVill OC Manager
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  X, Save, Plus, Search, FileText, 
+import {
+  X, Save, Plus, Search, FileText,
   Calendar, User, DollarSign, Trash2,
   RefreshCw, CheckCircle2, AlertCircle,
   ChevronDown, ExternalLink, UserPlus,
-  List, LayoutGrid
+  List, LayoutGrid, Edit2, Check,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { appConfirm } from '../lib/dialogs';
@@ -52,6 +52,9 @@ export const OCManagerModal: React.FC<OCManagerModalProps> = ({ isOpen, onClose,
   const [viewMode, setViewMode] = useState<'card' | 'list'>('list');
   const [montoInputs, setMontoInputs] = useState<Record<number, string>>({});
   const [cantidadInputs, setCantidadInputs] = useState<Record<number, string>>({});
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkDeletePending, setBulkDeletePending] = useState(false);
+  const headerCbRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isOpen || isInline) {
@@ -75,6 +78,27 @@ export const OCManagerModal: React.FC<OCManagerModalProps> = ({ isOpen, onClose,
     } finally {
       setLoading(false);
     }
+  };
+
+  const toggleSelect = (id: string) => setSelected(prev => {
+    const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n;
+  });
+
+  const toggleAll = () => {
+    const ids = filteredOcs.filter(oc => oc.id).map(oc => oc.id!);
+    if (ids.every(id => selected.has(id))) setSelected(new Set());
+    else setSelected(new Set(ids));
+  };
+
+  const handleBulkDelete = async () => {
+    try {
+      await Promise.all([...selected].map(id =>
+        supabase.from('ordenes_compra_cliente').delete().eq('id', id)
+      ));
+      setSelected(new Set());
+      setBulkDeletePending(false);
+      fetchData();
+    } catch (err: any) { setError(err.message); }
   };
 
   const handleAddOC = () => {
@@ -248,11 +272,46 @@ export const OCManagerModal: React.FC<OCManagerModalProps> = ({ isOpen, onClose,
             </div>
           )}
 
+          {/* Bulk delete bar */}
+          {selected.size > 0 && (
+            <div className="mb-4 flex items-center justify-between gap-3 px-5 py-3 bg-rose-500/10 border border-rose-500/30 rounded-2xl">
+              <span className="text-[10px] text-rose-400 font-black">{selected.size} OC{selected.size > 1 ? 's' : ''} seleccionada{selected.size > 1 ? 's' : ''}</span>
+              <div className="flex gap-2">
+                <button onClick={() => { setSelected(new Set()); setBulkDeletePending(false); }}
+                  className="px-3 py-1.5 text-[9px] text-slate-400 border border-white/10 rounded-xl hover:text-white transition-colors">Cancelar</button>
+                {!bulkDeletePending ? (
+                  <button onClick={() => setBulkDeletePending(true)}
+                    className="px-3 py-1.5 text-[9px] font-black text-white bg-rose-600 rounded-xl hover:bg-rose-500 flex items-center gap-1.5">
+                    <Trash2 size={11} /> Eliminar selección
+                  </button>
+                ) : (
+                  <div className="flex gap-1">
+                    <button onClick={handleBulkDelete}
+                      className="px-3 py-1.5 text-[9px] font-black text-white bg-rose-600 rounded-xl hover:bg-rose-500 flex items-center gap-1.5">
+                      <Check size={11} /> Confirmar
+                    </button>
+                    <button onClick={() => setBulkDeletePending(false)}
+                      className="px-3 py-1.5 text-[9px] text-slate-400 border border-white/10 rounded-xl hover:text-white">Cancelar</button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {viewMode === 'list' && filteredOcs.length > 0 ? (
             <div className="bg-slate-900/40 border border-white/5 rounded-[32px] overflow-hidden shadow-2xl">
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="border-b border-white/5 bg-white/[0.02]">
+                    <th className="pl-5 pr-2 py-4 w-8">
+                      <input
+                        ref={headerCbRef}
+                        type="checkbox"
+                        className="accent-blue-500"
+                        checked={filteredOcs.filter(o => o.id).every(o => selected.has(o.id!))}
+                        onChange={toggleAll}
+                      />
+                    </th>
                     <th className="px-6 py-4 text-left text-[9px] font-black text-slate-500 uppercase tracking-widest">Orden</th>
                     <th className="px-6 py-4 text-left text-[9px] font-black text-slate-500 uppercase tracking-widest">Cliente</th>
                     <th className="px-6 py-4 text-left text-[9px] font-black text-slate-500 uppercase tracking-widest">P/N & Descripción</th>
@@ -264,7 +323,15 @@ export const OCManagerModal: React.FC<OCManagerModalProps> = ({ isOpen, onClose,
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {filteredOcs.map((oc, idx) => (
-                    <tr key={oc.id || `row-${idx}`} className="hover:bg-blue-500/[0.02] transition-colors group">
+                    <tr key={oc.id || `row-${idx}`}
+                      className={`hover:bg-blue-500/[0.02] transition-colors group ${oc.id && selected.has(oc.id) ? 'bg-blue-500/5' : ''}`}>
+                      <td className="pl-5 pr-2 py-4 w-8" onClick={e => e.stopPropagation()}>
+                        {oc.id && (
+                          <input type="checkbox" className="accent-blue-500"
+                            checked={selected.has(oc.id)}
+                            onChange={() => toggleSelect(oc.id!)} />
+                        )}
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="text-xs font-black text-blue-400 uppercase tracking-tighter">{oc.numero_oc || 'SIN FOLIO'}</span>
                       </td>
@@ -292,13 +359,22 @@ export const OCManagerModal: React.FC<OCManagerModalProps> = ({ isOpen, onClose,
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button 
-                            onClick={() => setViewMode('card')} 
+                          <button
+                            onClick={() => setViewMode('card')}
                             className="p-1.5 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 rounded-lg transition-all border border-blue-500/20"
-                            title="Editar en Tarjeta"
+                            title="Editar"
                           >
-                            <ExternalLink size={14} />
+                            <Edit2 size={14} />
                           </button>
+                          {oc.id && (
+                            <button
+                              onClick={() => handleDelete(oc.id!)}
+                              className="p-1.5 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 rounded-lg transition-all border border-rose-500/20"
+                              title="Eliminar"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
