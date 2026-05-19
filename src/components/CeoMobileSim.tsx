@@ -1,25 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Smartphone, 
-  Activity, 
-  CircleDollarSign, 
-  Factory, 
-  Cpu, 
-  Camera, 
-  Play, 
-  Volume2, 
-  ShieldCheck, 
-  ArrowRight, 
-  Zap, 
-  CheckCircle2, 
-  AlertTriangle, 
-  Users, 
+import {
+  Smartphone,
+  Activity,
+  CircleDollarSign,
+  Factory,
+  Cpu,
+  Camera,
+  Play,
+  Volume2,
+  ShieldCheck,
+  ArrowRight,
+  Zap,
+  CheckCircle2,
+  AlertTriangle,
+  Users,
   MessageSquare,
   Sparkles,
   Wifi,
   Battery,
   Send,
-  Phone
+  Phone,
+  MapPin,
+  MousePointer2,
+  Lock,
+  MonitorSmartphone,
+  ChevronRight,
+  Info
 } from 'lucide-react';
 import { useConfig } from '../contexts/ConfigContext';
 
@@ -536,6 +542,157 @@ export const CeoMobileSim: React.FC = () => {
 
           </div>
 
+        </div>
+
+      </div>
+
+      {/* ─── GUÍA DE ACCESO ────────────────────────────────────────────── */}
+      <div className="w-full max-w-5xl mt-10 space-y-6">
+
+        {/* How to access */}
+        <div className="bg-slate-900/40 border border-slate-800/40 rounded-2xl p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="p-2 rounded-lg bg-mcvill-accent/10 border border-mcvill-accent/20">
+              <MapPin size={14} className="text-mcvill-accent" />
+            </div>
+            <div>
+              <h4 className="text-[10px] font-black text-white uppercase tracking-widest">Cómo Acceder a Esta Vista</h4>
+              <p className="text-[8px] text-slate-500 font-mono">Ruta de navegación dentro del ERP</p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-1.5 mb-5">
+            {[
+              { icon: MonitorSmartphone, label: 'ERP McVill' },
+              { icon: ChevronRight, label: null },
+              { icon: MousePointer2, label: 'Menú Lateral' },
+              { icon: ChevronRight, label: null },
+              { icon: Smartphone, label: 'CEO Móvil' },
+            ].map((step, i) =>
+              step.label === null ? (
+                <ChevronRight key={i} size={10} className="text-slate-600" />
+              ) : (
+                <div key={i} className="flex items-center gap-1 px-2.5 py-1 bg-slate-800/60 border border-white/5 rounded-lg">
+                  <step.icon size={10} className="text-mcvill-accent" />
+                  <span className="text-[9px] font-black text-white uppercase tracking-wider">{step.label}</span>
+                </div>
+              )
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {[
+              {
+                num: '01',
+                title: 'Abre el Menú Lateral',
+                desc: 'En la barra izquierda del ERP, desplázate hacia la sección de accesos directos (iconos al final del menú).',
+                icon: MousePointer2,
+                color: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
+              },
+              {
+                num: '02',
+                title: 'Clic en "CEO Móvil"',
+                desc: 'Localiza el ícono de celular con la etiqueta CEO Móvil. Aparece bajo los accesos directos junto a Reportes.',
+                icon: Smartphone,
+                color: 'text-mcvill-accent bg-mcvill-accent/10 border-mcvill-accent/20',
+              },
+              {
+                num: '03',
+                title: 'Permiso Requerido',
+                desc: 'Esta vista requiere rol Godmode o Admin Sistemas. Contacta al administrador si no ves el acceso.',
+                icon: Lock,
+                color: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
+              },
+            ].map((s) => (
+              <div key={s.num} className="flex gap-3 p-3 bg-slate-950/50 border border-white/5 rounded-xl">
+                <div className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center border ${s.color}`}>
+                  <s.icon size={14} />
+                </div>
+                <div>
+                  <div className="flex items-center gap-1.5 mb-0.5">
+                    <span className="text-[7px] font-black text-slate-600 font-mono">{s.num}</span>
+                    <span className="text-[9px] font-black text-white uppercase tracking-wider">{s.title}</span>
+                  </div>
+                  <p className="text-[8px] text-slate-500 font-mono leading-relaxed">{s.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Per-panel guide */}
+        <div className="bg-slate-900/40 border border-slate-800/40 rounded-2xl p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="p-2 rounded-lg bg-indigo-500/10 border border-indigo-500/20">
+              <Info size={14} className="text-indigo-400" />
+            </div>
+            <div>
+              <h4 className="text-[10px] font-black text-white uppercase tracking-widest">Guía de Cada Panel</h4>
+              <p className="text-[8px] text-slate-500 font-mono">Qué hace cada pestaña del simulador móvil</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {[
+              {
+                tab: 'ROI / Finanzas',
+                icon: CircleDollarSign,
+                color: 'text-mcvill-accent border-mcvill-accent/30 bg-mcvill-accent/10',
+                steps: [
+                  'Muestra el Margen Operativo Neto acumulado del día en USD.',
+                  'Detalla el Costo de Energía (KWh) y la Fuga Financiera por Scrap en tiempo real.',
+                  'El diagnóstico financiero al pie explica qué acción de nesting generó o perdió dinero.',
+                ],
+              },
+              {
+                tab: 'CCTV IA',
+                icon: Camera,
+                color: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10',
+                steps: [
+                  'Simula la cámara del inspector de calidad en piso vía IA neural.',
+                  'El láser verde barre la pieza en producción y detecta defectos automáticamente.',
+                  'Cada resultado queda registrado en el historial: APROBADO (verde) o SCRAP (rojo).',
+                  'Presiona LIVE FEED / PAUSED para pausar el escáner de piso.',
+                ],
+              },
+              {
+                tab: 'Semáforo de Producción',
+                icon: Factory,
+                color: 'text-amber-400 border-amber-500/30 bg-amber-500/10',
+                steps: [
+                  'Muestra el OEE (Eficiencia Global) de cada línea de producción: Corte Láser, Mecanizado, Forja.',
+                  'Verde = línea operando bien. Amarillo = alerta leve. Rojo = paro crítico.',
+                  'Alerta crítica en rojo muestra el costo de paro acumulado por minuto.',
+                ],
+              },
+              {
+                tab: 'IA Copilot',
+                icon: Sparkles,
+                color: 'text-purple-400 border-purple-500/30 bg-purple-500/10',
+                steps: [
+                  'Chat neural con Gemini 2.5 — pregunta en lenguaje natural sobre producción.',
+                  'Usa los botones de Preguntas Rápidas para consultar OEE, scrap o enviar directivas.',
+                  'El copilot responde con análisis de datos de piso y puede enviar alertas al supervisor.',
+                  'Diseñado para operar completamente desde el celular sin abrir pantallas complejas.',
+                ],
+              },
+            ].map((panel) => (
+              <div key={panel.tab} className="p-3.5 bg-slate-950/50 border border-white/5 rounded-xl space-y-2">
+                <div className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-lg border text-[8px] font-black uppercase tracking-wider ${panel.color}`}>
+                  <panel.icon size={10} />
+                  {panel.tab}
+                </div>
+                <ul className="space-y-1.5 mt-2">
+                  {panel.steps.map((step, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <span className="shrink-0 w-3.5 h-3.5 mt-0.5 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center text-[5px] font-black text-slate-500">{i + 1}</span>
+                      <span className="text-[8px] text-slate-400 font-mono leading-relaxed">{step}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
 
       </div>
