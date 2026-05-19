@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   Cog, Search, Plus, Rocket, FileCode, Layers, Cpu,
   Loader2, X, ArrowRight, FileText, Settings, CheckCircle2,
-  Clock, Archive, GitBranch, ShieldAlert, RefreshCw
+  Clock, Archive, GitBranch, ShieldAlert, RefreshCw, Trash2
 } from 'lucide-react';
 import { engineeringService } from '../services/engineeringService';
 import { EngineeringDetailView } from './EngineeringDetailView';
@@ -26,7 +26,7 @@ const STATUS: Record<string, { label: string; cls: string; icon: React.ElementTy
 
 export const EngineeringView: React.FC = () => {
   const { isDarkMode } = useConfig();
-  const [activeTab, setActiveTab] = useState<'proyectos' | 'factibilidad' | 'cotizacion' | 'nesting'>('factibilidad');
+  const [activeTab, setActiveTab] = useState<'proyectos' | 'factibilidad' | 'cotizacion' | 'nesting'>('proyectos');
   const [projects, setProjects]           = useState<any[]>([]);
   const [loading, setLoading]             = useState(true);
   const [search, setSearch]               = useState('');
@@ -239,7 +239,8 @@ export const EngineeringView: React.FC = () => {
                         {st.label}
                       </span>
                       <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={e => openEdit(p, e)} className="p-1 hover:text-blue-400"><Settings size={10} /></button>
+                        <button onClick={e => openEdit(p, e)} className="p-1 rounded hover:bg-blue-500/10 hover:text-blue-400 transition-colors"><Settings size={10} /></button>
+                        <button onClick={e => handleDelete(p.id, e)} className="p-1 rounded hover:bg-rose-500/10 hover:text-rose-400 transition-colors"><Trash2 size={10} /></button>
                       </div>
                     </div>
                     <h4 className="text-[10px] font-black text-white uppercase line-clamp-1 mb-1">{p.title}</h4>
