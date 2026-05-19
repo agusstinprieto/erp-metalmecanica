@@ -148,6 +148,13 @@ Responde ÚNICAMENTE con JSON válido:
   return prompts[type];
 };
 
+const DEMO_SAMPLES: { type: InspectionType; label: string; emoji: string; url: string }[] = [
+  { type: 'soldadura',   label: 'Soldadura MIG',  emoji: '🔥', url: 'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=600&q=80' },
+  { type: 'ensamble',   label: 'Ensamble Metal', emoji: '⚙️', url: 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=600&q=80' },
+  { type: 'material',   label: 'Materia Prima',  emoji: '🔩', url: 'https://images.unsplash.com/photo-1587293852726-70cdb56c2866?w=600&q=80' },
+  { type: 'pintura',    label: 'Pintura',         emoji: '🎨', url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80' },
+];
+
 export const VisualIAInspection: React.FC<{ onClose: () => void; onComplete: () => void }> = ({ onClose, onComplete }) => {
   const { config } = useConfig();
   const [images, setImages] = useState<{ dataUrl: string; file: File }[]>([]);
@@ -155,9 +162,31 @@ export const VisualIAInspection: React.FC<{ onClose: () => void; onComplete: () 
   const [inspectionType, setInspectionType] = useState<InspectionType>('soldadura');
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loadingDemo, setLoadingDemo] = useState<string | null>(null);
   const [result, setResult] = useState<IAInspectionResult | null>(null);
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const loadDemoSample = async (sample: typeof DEMO_SAMPLES[number]) => {
+    setLoadingDemo(sample.type);
+    setResult(null);
+    try {
+      const res = await fetch(sample.url);
+      const blob = await res.blob();
+      const file = new File([blob], `demo-${sample.type}.jpg`, { type: 'image/jpeg' });
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImages([{ dataUrl: reader.result as string, file }]);
+        setActiveImageIdx(0);
+        setInspectionType(sample.type);
+      };
+      reader.readAsDataURL(file);
+    } catch (e) {
+      console.error('Error loading demo image:', e);
+    } finally {
+      setLoadingDemo(null);
+    }
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -336,14 +365,38 @@ export const VisualIAInspection: React.FC<{ onClose: () => void; onComplete: () 
               </div>
 
               {images.length === 0 ? (
-                <div
-                  onClick={() => fileInputRef.current?.click()}
-                  className="h-48 rounded-2xl border-2 border-dashed border-white/10 flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-mcvill-accent/40 transition-all bg-white/[0.01]"
-                >
-                  <Camera size={36} className="text-slate-600" />
-                  <div className="text-center">
-                    <p className="text-[10px] font-black text-slate-500 uppercase">Subir foto</p>
-                    <p className="text-[9px] text-slate-700 uppercase font-bold mt-0.5">PNG · JPG · WEBP · Cámara</p>
+                <div className="space-y-2">
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    className="h-32 rounded-2xl border-2 border-dashed border-white/10 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-mcvill-accent/40 transition-all bg-white/[0.01]"
+                  >
+                    <Camera size={28} className="text-slate-600" />
+                    <div className="text-center">
+                      <p className="text-[10px] font-black text-slate-500 uppercase">Subir foto</p>
+                      <p className="text-[9px] text-slate-700 uppercase font-bold mt-0.5">PNG · JPG · WEBP · Cámara</p>
+                    </div>
+                  </div>
+                  {/* Demo samples */}
+                  <div className="pt-1">
+                    <p className="text-[8px] font-black text-slate-600 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+                      <Zap size={9} className="text-mcvill-accent" /> O cargar imagen de demo
+                    </p>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {DEMO_SAMPLES.map(s => (
+                        <button
+                          key={s.type}
+                          onClick={() => loadDemoSample(s)}
+                          disabled={loadingDemo !== null}
+                          className="flex items-center gap-2 px-2.5 py-2 bg-white/[0.03] border border-white/5 hover:border-mcvill-accent/30 hover:bg-mcvill-accent/5 rounded-xl transition-all text-left disabled:opacity-40"
+                        >
+                          {loadingDemo === s.type
+                            ? <Loader2 size={12} className="text-mcvill-accent animate-spin shrink-0" />
+                            : <span className="text-sm leading-none">{s.emoji}</span>
+                          }
+                          <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider">{s.label}</span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               ) : (
