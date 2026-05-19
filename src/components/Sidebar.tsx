@@ -416,11 +416,11 @@ export const Sidebar = (props: {
             </div>
             {isSidebarCollapsed && (
               <span className="absolute -top-1 -right-1 px-1 rounded bg-mcvill-accent text-[7px] font-black text-slate-950 uppercase tracking-tighter shadow-[0_0_8px_var(--theme-glow)] z-20">
-                V.15
+                V.16
               </span>
             )}
           </div>
-          
+
           {!isSidebarCollapsed && (
             <div className="flex flex-col min-w-0 flex-1">
               <div className="flex items-center gap-1.5">
@@ -428,7 +428,7 @@ export const Sidebar = (props: {
                   ERP IA
                 </h1>
                 <span className="px-1.5 py-0.5 rounded bg-mcvill-accent text-[7px] font-black text-slate-950 tracking-widest shrink-0 shadow-[0_0_10px_var(--theme-glow)]">
-                  V.15
+                  V.16
                 </span>
               </div>
               <p className="text-xs font-medium text-mcvill-accent tracking-widest uppercase mt-1 truncate">{config.companyName}</p>

@@ -781,6 +781,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
   const bancoConectado = !!localStorage.getItem(BANK_API_KEY);
 
   return (
+    <>
       {/* ── TOP CONTROL PANEL (FILTERBAR) ────────────────────────────────────── */}
       <div className="px-6 py-3.5 border-b border-white/5 bg-slate-950/80 backdrop-blur flex flex-col gap-3 z-20">
         
@@ -1448,6 +1449,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
           onNavigateToBanco={onNavigateToBanco ?? (() => setIsBancoModalOpen(false))}
         />
       )}
-    </div>
+    </>
   );
 };
