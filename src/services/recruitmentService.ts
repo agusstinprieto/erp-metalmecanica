@@ -45,6 +45,15 @@ export const recruitmentService = {
     return data as Vacancy;
   },
 
+  async deleteVacancy(id: string) {
+    const { error } = await supabase
+      .from('vacancies')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+  },
+
   // --- Candidates ---
   async getCandidates(vacancyId?: string) {
     const tenantId = await getTenantId();
@@ -76,21 +85,35 @@ export const recruitmentService = {
   },
 
   async uploadCV(candidateName: string, file: File) {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Date.now()}_${candidateName.replace(/\s+/g, '_').toLowerCase()}.${fileExt}`;
-    const filePath = `candidates/resumes/${fileName}`;
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}_${candidateName.replace(/\s+/g, '_').toLowerCase()}.${fileExt}`;
+      const filePath = `candidates/resumes/${fileName}`;
 
-    const { error: uploadError } = await supabase.storage
-      .from('erp-assets')
-      .upload(filePath, file);
+      // Set correct contentType for txt and other file types
+      const contentType = file.type || (file.name.toLowerCase().endsWith('.txt') ? 'text/plain; charset=utf-8' : 'application/octet-stream');
 
-    if (uploadError) throw uploadError;
+      const { error: uploadError } = await supabase.storage
+        .from('erp-assets')
+        .upload(filePath, file, {
+          contentType,
+          upsert: true
+        });
 
-    const { data: { publicUrl } } = supabase.storage
-      .from('erp-assets')
-      .getPublicUrl(filePath);
+      if (uploadError) {
+        console.warn('Supabase storage upload warning, using local fallback:', uploadError);
+        return URL.createObjectURL(file);
+      }
 
-    return publicUrl;
+      const { data: { publicUrl } } = supabase.storage
+        .from('erp-assets')
+        .getPublicUrl(filePath);
+
+      return publicUrl;
+    } catch (err) {
+      console.warn('Failed to upload CV to storage, falling back to local Object URL:', err);
+      return URL.createObjectURL(file);
+    }
   },
 
   async analyzeCandidate(candidate: Candidate, vacancy: Vacancy) {

@@ -185,16 +185,16 @@ export const Sidebar = (props: {
       supervisor:   ['portada', 'dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse', 'engineering', 'maintenance', 'logistica', 'lead_time_predictor', 'branding_studio'],
       ingenieria:   ['portada', 'dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse', 'engineering', 'maintenance', 'work_instructions', 'layout_design', 'process_simulator', 'nesting', 'energy_monitor', 'preventive_maintenance_ia', 'logistica', 'lead_time_predictor', 'branding_studio'],
       calidad:      ['portada', 'dashboard', 'inventory', 'production', 'viajeros', 'quality', 'hse', 'spc', 'visual_ia', 'trazabilidad', 'defect_library', 'ppap', 'voc', 'seguridad', 'preventive_maintenance_ia', 'logistica', 'lead_time_predictor', 'branding_studio'],
-      operaciones:  ['portada', 'dashboard', 'inventory', 'production', 'viajeros', 'shop_floor', 'compras', 'ventas', 'agente_cot', 'rfq_kanban', 'factibilidad', 'factibilidad_ia', 'metal_quoter', 'roi', 'maintenance', 'logistica', 'lead_time_predictor', 'branding_studio'],
-      ventas:       ['portada', 'dashboard', 'ventas', 'agente_cot', 'rfq_kanban', 'factibilidad', 'factibilidad_ia', 'metal_quoter', 'roi', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      operaciones:  ['portada', 'dashboard', 'inventory', 'production', 'viajeros', 'shop_floor', 'compras', 'ventas', 'agente_cot', 'rfq_kanban', 'factibilidad', 'factibilidad_ia', 'metal_quoter', 'roi', 'maintenance', 'logistica', 'lead_time_predictor', 'branding_studio', 'whatsapp_center'],
+      ventas:       ['portada', 'dashboard', 'ventas', 'agente_cot', 'rfq_kanban', 'factibilidad', 'factibilidad_ia', 'metal_quoter', 'roi', 'logistica', 'lead_time_predictor', 'branding_studio', 'whatsapp_center'],
       compras:      ['portada', 'dashboard', 'compras', 'inventory', 'logistica', 'lead_time_predictor', 'branding_studio'],
       almacen:      ['portada', 'dashboard', 'inventory', 'viajeros', 'hse', 'logistica', 'lead_time_predictor', 'branding_studio'],
-      rh:           ['portada', 'dashboard', 'rh', 'payroll', 'attendance', 'recruitment', 'desempeno', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      rh:           ['portada', 'dashboard', 'rh', 'payroll', 'attendance', 'recruitment', 'desempeno', 'logistica', 'lead_time_predictor', 'branding_studio', 'whatsapp_center'],
       finanzas:     ['portada', 'dashboard', 'finance', 'banco', 'costing', 'costeo', 'payroll', 'logistica', 'lead_time_predictor', 'branding_studio'],
       contabilidad: ['portada', 'dashboard', 'finance', 'banco', 'costing', 'payroll', 'logistica', 'lead_time_predictor', 'branding_studio'],
       auditoria:    ['portada', 'dashboard', 'reports', 'quality', 'spc', 'trazabilidad', 'logistica', 'lead_time_predictor', 'branding_studio'],
       soporte:      ['portada', 'dashboard', 'voc', 'quality', 'logistica', 'lead_time_predictor', 'branding_studio'],
-      marketing:    ['portada', 'dashboard', 'ventas', 'voc', 'logistica', 'lead_time_predictor', 'branding_studio'],
+      marketing:    ['portada', 'dashboard', 'ventas', 'voc', 'logistica', 'lead_time_predictor', 'branding_studio', 'whatsapp_center'],
       seguridad:    ['portada', 'dashboard', 'hse', 'seguridad', 'logistica', 'lead_time_predictor', 'branding_studio'],
     };
     return permissions[role]?.includes(module) ?? false;
@@ -240,6 +240,7 @@ export const Sidebar = (props: {
     { id: 'factibilidad_ia',   label: 'Factibilidad IA',  icon: BrainCircuit,    godmode: true },
     { id: 'metal_quoter',      label: 'Cotizador Metal',  icon: Calculator,      godmode: true },
     { id: 'roi',               label: 'Cotizador ROI',    icon: TrendingUp,      godmode: true },
+    { id: 'whatsapp_center',   label: 'Hub Mensajería',   icon: MessageCircle,   godmode: true },
     { id: 'engineering',       label: 'Ingeniería',       icon: Cpu,             godmode: true },
     { id: 'work_instructions', label: 'Inst. Trabajo',    icon: ClipboardList,   godmode: true },
     { id: 'layout_design',     label: 'Layout Planta',    icon: Layout,          godmode: true },
@@ -321,7 +322,7 @@ export const Sidebar = (props: {
             </div>
             {isSidebarCollapsed && (
               <span className="absolute -top-1 -right-1 px-1 rounded bg-mcvill-accent text-[7px] font-black text-slate-950 uppercase tracking-tighter shadow-[0_0_8px_var(--theme-glow)] z-20">
-                V.11
+                V.15
               </span>
             )}
           </div>
@@ -333,7 +334,7 @@ export const Sidebar = (props: {
                   ERP IA
                 </h1>
                 <span className="px-1.5 py-0.5 rounded bg-mcvill-accent text-[7px] font-black text-slate-950 tracking-widest shrink-0 shadow-[0_0_10px_var(--theme-glow)]">
-                  V.11
+                  V.15
                 </span>
               </div>
               <p className="text-xs font-medium text-mcvill-accent tracking-widest uppercase mt-1 truncate">{config.companyName}</p>
@@ -509,6 +510,7 @@ export const Sidebar = (props: {
                 {hasAccess('factibilidad_ia') && <SidebarItem icon={BrainCircuit} label={t('sidebar.factibilidad_ia', 'Fact. IA')} active={activeView === 'factibilidad_ia'} onClick={() => navigate('factibilidad_ia')} collapsed={isSidebarCollapsed} />}
                 {hasAccess('metal_quoter') && <SidebarItem icon={Calculator} label={t('sidebar.metal_quoter', 'Cotizador Metal')} active={activeView === 'metal_quoter'} onClick={() => navigate('metal_quoter')} collapsed={isSidebarCollapsed} />}
                 {hasAccess('roi') && <SidebarItem icon={TrendingUp} label={t('sidebar.roi', 'Cotizador ROI')} active={activeView === 'roi'} onClick={() => navigate('roi')} collapsed={isSidebarCollapsed} />}
+                {hasAccess('whatsapp_center') && <SidebarItem icon={MessageCircle} label="Hub Mensajería" active={activeView === 'whatsapp_center'} onClick={() => navigate('whatsapp_center')} collapsed={isSidebarCollapsed} />}
               </>
             )}
 
