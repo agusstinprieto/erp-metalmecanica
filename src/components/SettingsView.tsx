@@ -231,6 +231,16 @@ const PoliticasTab: React.FC = () => {
   const [margenUtilidad, setMargenUtilidad] = useState(config.margen_utilidad ?? 35.0);
   const [overheadOperativo, setOverheadOperativo] = useState(config.overhead_operativo ?? 15.0);
 
+  // Políticas de Tiempo Extra McVill
+  const [overtimeCutoffStartDay, setOvertimeCutoffStartDay] = useState(config.overtimeCutoffStartDay ?? 'martes');
+  const [overtimeCutoffEndDay, setOvertimeCutoffEndDay] = useState(config.overtimeCutoffEndDay ?? 'lunes');
+  const [overtimePaymentDay, setOvertimePaymentDay] = useState(config.overtimePaymentDay ?? 'viernes');
+  const [overtimeStrictAccess, setOvertimeStrictAccess] = useState(config.overtimeStrictAccess ?? true);
+  const [overtimeServicesLimitTime, setOvertimeServicesLimitTime] = useState(config.overtimeServicesLimitTime ?? '14:00');
+  const [overtimeRequiredAuthorizers, setOvertimeRequiredAuthorizers] = useState<string[]>(
+    config.overtimeRequiredAuthorizers ?? ['supervisor', 'gerencia', 'operaciones', 'rh', 'administracion']
+  );
+
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -251,6 +261,14 @@ const PoliticasTab: React.FC = () => {
     setScrapFactor(config.scrap_factor ?? 12.0);
     setMargenUtilidad(config.margen_utilidad ?? 35.0);
     setOverheadOperativo(config.overhead_operativo ?? 15.0);
+    
+    // Sincronizar tiempo extra
+    setOvertimeCutoffStartDay(config.overtimeCutoffStartDay ?? 'martes');
+    setOvertimeCutoffEndDay(config.overtimeCutoffEndDay ?? 'lunes');
+    setOvertimePaymentDay(config.overtimePaymentDay ?? 'viernes');
+    setOvertimeStrictAccess(config.overtimeStrictAccess ?? true);
+    setOvertimeServicesLimitTime(config.overtimeServicesLimitTime ?? '14:00');
+    setOvertimeRequiredAuthorizers(config.overtimeRequiredAuthorizers ?? ['supervisor', 'gerencia', 'operaciones', 'rh', 'administracion']);
   }, [config]);
 
   const handleSave = async () => {
@@ -272,6 +290,13 @@ const PoliticasTab: React.FC = () => {
       scrap_factor: Number(scrapFactor),
       margen_utilidad: Number(margenUtilidad),
       overhead_operativo: Number(overheadOperativo),
+      // Guardar tiempo extra
+      overtimeCutoffStartDay,
+      overtimeCutoffEndDay,
+      overtimePaymentDay,
+      overtimeStrictAccess,
+      overtimeServicesLimitTime,
+      overtimeRequiredAuthorizers,
     });
     setSaving(false);
     setSaved(true);
@@ -457,7 +482,7 @@ const PoliticasTab: React.FC = () => {
         </div>
 
         {/* Cotizaciones y Costos */}
-        <div className="col-span-full bg-slate-900/40 border border-white/5 rounded-xl p-5 space-y-4">
+        <div className="bg-slate-900/40 border border-white/5 rounded-xl p-5 space-y-4 md:col-span-2">
           <h4 className="text-[10px] font-black text-mcvill-accent uppercase tracking-widest border-b border-white/5 pb-2">Cotizaciones y Márgenes (Ingeniería)</h4>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-1.5">
@@ -471,6 +496,143 @@ const PoliticasTab: React.FC = () => {
             <div className="space-y-1.5">
               <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Margen de Utilidad Objetivo</label>
               <div className="relative"><input type="number" value={margenUtilidad} onChange={e => setMargenUtilidad(parseFloat(e.target.value) || 0)} className={inputCls} /><span className="absolute right-3 top-2.5 text-slate-500 font-mono text-[11px]">%</span></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Políticas de Tiempo Extra (McVill Standard) */}
+        <div className="bg-slate-900/40 border border-white/5 rounded-xl p-5 space-y-4 md:col-span-2">
+          <h4 className="text-[10px] font-black text-mcvill-accent uppercase tracking-widest border-b border-white/5 pb-2">Políticas de Control y Autorización de Tiempo Extra</h4>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="space-y-1.5">
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Inicio de Corte Semanal</label>
+              <select 
+                value={overtimeCutoffStartDay} 
+                onChange={(e) => setOvertimeCutoffStartDay(e.target.value)} 
+                className={inputCls}
+              >
+                <option value="lunes" className="bg-slate-950 text-white">Lunes</option>
+                <option value="martes" className="bg-slate-950 text-white">Martes</option>
+                <option value="miercoles" className="bg-slate-950 text-white">Miércoles</option>
+                <option value="jueves" className="bg-slate-950 text-white">Jueves</option>
+                <option value="viernes" className="bg-slate-950 text-white">Viernes</option>
+                <option value="sabado" className="bg-slate-950 text-white">Sábado</option>
+                <option value="domingo" className="bg-slate-950 text-white">Domingo</option>
+              </select>
+            </div>
+            
+            <div className="space-y-1.5">
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Fin de Corte Semanal</label>
+              <select 
+                value={overtimeCutoffEndDay} 
+                onChange={(e) => setOvertimeCutoffEndDay(e.target.value)} 
+                className={inputCls}
+              >
+                <option value="lunes" className="bg-slate-950 text-white">Lunes</option>
+                <option value="martes" className="bg-slate-950 text-white">Martes</option>
+                <option value="miercoles" className="bg-slate-950 text-white">Miércoles</option>
+                <option value="jueves" className="bg-slate-950 text-white">Jueves</option>
+                <option value="viernes" className="bg-slate-950 text-white">Viernes</option>
+                <option value="sabado" className="bg-slate-950 text-white">Sábado</option>
+                <option value="domingo" className="bg-slate-950 text-white">Domingo</option>
+              </select>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Día de Pago de Horas Extra</label>
+              <select 
+                value={overtimePaymentDay} 
+                onChange={(e) => setOvertimePaymentDay(e.target.value)} 
+                className={inputCls}
+              >
+                <option value="lunes" className="bg-slate-950 text-white">Lunes</option>
+                <option value="martes" className="bg-slate-950 text-white">Martes</option>
+                <option value="miercoles" className="bg-slate-950 text-white">Miércoles</option>
+                <option value="jueves" className="bg-slate-950 text-white">Jueves</option>
+                <option value="viernes" className="bg-slate-950 text-white">Viernes</option>
+                <option value="sabado" className="bg-slate-950 text-white">Sábado</option>
+                <option value="domingo" className="bg-slate-950 text-white">Domingo</option>
+              </select>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Límite Pedido Platillo/Transporte</label>
+              <input 
+                type="text" 
+                value={overtimeServicesLimitTime} 
+                onChange={(e) => setOvertimeServicesLimitTime(e.target.value)} 
+                placeholder="ej. 14:00"
+                className={inputCls}
+              />
+              <p className="text-[8px] text-slate-600 font-medium ml-1">Hora límite para solicitar servicios adicionales de personal (lunes a viernes).</p>
+            </div>
+
+            <div className="space-y-1.5 md:col-span-2">
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1 block">Acceso Físico Estricto</label>
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-black/40 border border-white/5 mt-1.5">
+                <button
+                  type="button"
+                  onClick={() => setOvertimeStrictAccess(!overtimeStrictAccess)}
+                  className={clsx(
+                    "relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-mcvill-accent",
+                    overtimeStrictAccess ? "bg-mcvill-accent" : "bg-slate-800"
+                  )}
+                >
+                  <span
+                    className={clsx(
+                      "pointer-events-none inline-block h-4 w-4 transform rounded-full bg-slate-950 shadow ring-0 transition duration-200 ease-in-out",
+                      overtimeStrictAccess ? "translate-x-4" : "translate-x-0"
+                    )}
+                  />
+                </button>
+                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">
+                  {overtimeStrictAccess ? "Bloqueo Activo: Prohibir acceso a planta sin listado de TE autorizado en ERP" : "Advertencia: Permitir checadas y reportar desviaciones posteriores"}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-3 pt-3 border-t border-white/5">
+            <div>
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1 block mb-1">Matriz de Firmas y Roles Autorizadores de Tiempo Extra</label>
+              <p className="text-[8px] text-slate-600 font-medium ml-1 mb-3">Selecciona los departamentos que deben firmar de forma mandatoria la solicitud de tiempo extra para habilitar su pago en el periodo de corte.</p>
+            </div>
+            
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 bg-black/30 p-4 rounded-xl border border-white/5">
+              {Object.entries(ROLES_CONFIG).map(([roleKey, roleVal]) => {
+                const isSelected = overtimeRequiredAuthorizers.includes(roleKey);
+                return (
+                  <button
+                    key={roleKey}
+                    type="button"
+                    onClick={() => {
+                      if (isSelected) {
+                        setOvertimeRequiredAuthorizers(prev => prev.filter(r => r !== roleKey));
+                      } else {
+                        setOvertimeRequiredAuthorizers(prev => [...prev, roleKey]);
+                      }
+                    }}
+                    className={clsx(
+                      "flex items-center gap-2 p-2 rounded-lg border text-left transition-all",
+                      isSelected 
+                        ? "bg-mcvill-accent/10 border-mcvill-accent/40 text-white shadow-[0_0_10px_rgba(var(--mcvill-accent-rgb),0.05)]" 
+                        : "bg-slate-950/40 border-white/5 text-slate-500 hover:border-white/10"
+                    )}
+                  >
+                    <div className={clsx(
+                      "w-3.5 h-3.5 rounded flex items-center justify-center border text-[9px] font-black transition-colors shrink-0",
+                      isSelected ? "border-mcvill-accent bg-mcvill-accent text-slate-950" : "border-slate-700 bg-transparent text-transparent"
+                    )}>
+                      ✓
+                    </div>
+                    <div className="truncate">
+                      <p className="text-[9px] font-black uppercase tracking-tight truncate">{roleVal.label}</p>
+                      <p className="text-[7px] font-mono text-slate-600 tracking-wider uppercase">{roleKey}</p>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>

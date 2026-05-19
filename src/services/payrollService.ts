@@ -198,8 +198,10 @@ export const payrollService = {
     // 1. Salario base
     const base_salary = (employee.daily_salary || DAILY_WAGE) * days;
     
-    // 2. Horas extras (2x hora normal)
-    const overtime_amount = overtime_hours * hourly_rate * HOURLY_RATE_MULTIPLIER;
+    // 2. Horas extras según LFT (primeras 9 horas al doble, excedente al triple)
+    const doubleHours = Math.min(9, overtime_hours);
+    const tripleHours = Math.max(0, overtime_hours - 9);
+    const overtime_amount = (doubleHours * hourly_rate * 2) + (tripleHours * hourly_rate * 3);
     
     // 3. Bono OEE (5% si OEE > 85%)
     const bonus_oee = (oee_percentage >= OEE_BONUS_THRESHOLD) 

@@ -39,6 +39,12 @@ interface BrandConfig {
   linkedinUrl?: string;
   tiktokUrl?: string;
   plantaPhotos?: string[];
+  overtimeCutoffStartDay?: string;
+  overtimeCutoffEndDay?: string;
+  overtimePaymentDay?: string;
+  overtimeStrictAccess?: boolean;
+  overtimeServicesLimitTime?: string;
+  overtimeRequiredAuthorizers?: string[];
 }
 
 interface ConfigContextType {
@@ -87,6 +93,12 @@ const defaultConfig: BrandConfig = {
   linkedinUrl: 'https://www.linkedin.com/company/mcvill',
   tiktokUrl: 'https://www.tiktok.com/@mcvil.trc',
   plantaPhotos: [],
+  overtimeCutoffStartDay: 'martes',
+  overtimeCutoffEndDay: 'lunes',
+  overtimePaymentDay: 'viernes',
+  overtimeStrictAccess: true,
+  overtimeServicesLimitTime: '14:00',
+  overtimeRequiredAuthorizers: ['supervisor', 'gerencia', 'operaciones', 'rh', 'administracion'],
 };
 
 const THEME_PALETTES: Record<ThemeName, {
@@ -265,6 +277,12 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               linkedinUrl: supabaseConfig.linkedinUrl || prev.linkedinUrl,
               tiktokUrl: supabaseConfig.tiktokUrl || prev.tiktokUrl,
               plantaPhotos: supabaseConfig.plantaPhotos !== undefined ? supabaseConfig.plantaPhotos : prev.plantaPhotos,
+              overtimeCutoffStartDay: supabaseConfig.overtimeCutoffStartDay !== undefined ? supabaseConfig.overtimeCutoffStartDay : prev.overtimeCutoffStartDay,
+              overtimeCutoffEndDay: supabaseConfig.overtimeCutoffEndDay !== undefined ? supabaseConfig.overtimeCutoffEndDay : prev.overtimeCutoffEndDay,
+              overtimePaymentDay: supabaseConfig.overtimePaymentDay !== undefined ? supabaseConfig.overtimePaymentDay : prev.overtimePaymentDay,
+              overtimeStrictAccess: supabaseConfig.overtimeStrictAccess !== undefined ? supabaseConfig.overtimeStrictAccess : prev.overtimeStrictAccess,
+              overtimeServicesLimitTime: supabaseConfig.overtimeServicesLimitTime !== undefined ? supabaseConfig.overtimeServicesLimitTime : prev.overtimeServicesLimitTime,
+              overtimeRequiredAuthorizers: supabaseConfig.overtimeRequiredAuthorizers !== undefined ? supabaseConfig.overtimeRequiredAuthorizers : prev.overtimeRequiredAuthorizers,
             };
             localStorage.setItem('mcvill-config', JSON.stringify(merged));
             return merged;
@@ -327,6 +345,12 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               linkedinUrl: updated.linkedinUrl,
               tiktokUrl: updated.tiktokUrl,
               plantaPhotos: updated.plantaPhotos,
+              overtimeCutoffStartDay: updated.overtimeCutoffStartDay,
+              overtimeCutoffEndDay: updated.overtimeCutoffEndDay,
+              overtimePaymentDay: updated.overtimePaymentDay,
+              overtimeStrictAccess: updated.overtimeStrictAccess,
+              overtimeServicesLimitTime: updated.overtimeServicesLimitTime,
+              overtimeRequiredAuthorizers: updated.overtimeRequiredAuthorizers,
             }
           })
           .eq('id', tenant.id);

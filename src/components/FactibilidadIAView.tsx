@@ -142,6 +142,7 @@ const AnalysisResult = ({
       { Sección: 'Tiempo entrega', Detalle: 'Días hábiles', Valor: `${analisis.tiempo_entrega_dias} días` },
       { Sección: 'Capacidad planta', Detalle: analisis.capacidad_planta, Valor: '' },
       { Sección: 'Resumen ejecutivo', Detalle: analisis.resumen_ejecutivo, Valor: '' },
+      ...(analisis.matriz_procesos || []).map(p => ({ Sección: `Proceso — ${p.proceso}`, Detalle: p.plan_mitigacion ? `Mitigación: ${p.plan_mitigacion}` : 'Listo', Valor: `Score: ${p.score}/6` })),
       ...analisis.riesgos.map(r => ({ Sección: `Riesgo — ${r.categoria}`, Detalle: r.descripcion, Valor: r.nivel })),
       ...analisis.cuellos_botella.map(c => ({ Sección: 'Cuello de botella', Detalle: c, Valor: '' })),
       ...analisis.procesos_criticos.map(p => ({ Sección: 'Proceso crítico', Detalle: p, Valor: '' })),
@@ -206,6 +207,70 @@ const AnalysisResult = ({
           <CapacidadBadge cap={analisis.capacidad_planta} />
         </div>
       </div>
+
+      {/* Matriz de Procesos (FT-IG-01) */}
+      {analisis.matriz_procesos && analisis.matriz_procesos.length > 0 && (
+        <div className="bg-white/3 border border-white/8 rounded-2xl overflow-hidden animate-fade-in">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-white/8 bg-white/2">
+            <div className="flex items-center gap-2">
+              <Factory size={14} className="text-mcvill-accent" />
+              <span className="text-xs font-black text-slate-200 uppercase tracking-wider">Matriz de Factibilidad por Proceso (FT-IG-01)</span>
+            </div>
+            <span className="text-[9px] text-slate-500 uppercase font-black tracking-widest">Criterio: 0 a 2</span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="border-b border-white/5 bg-white/1 text-[9px] uppercase tracking-widest text-slate-400 font-bold">
+                  <th className="px-4 py-2.5">Proceso</th>
+                  <th className="px-4 py-2.5 text-center">Disp. Máquina</th>
+                  <th className="px-4 py-2.5 text-center">Herramental</th>
+                  <th className="px-4 py-2.5 text-center">Cap. Humana</th>
+                  <th className="px-4 py-2.5 text-center">Score</th>
+                  <th className="px-4 py-2.5">Plan de Mitigación</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {analisis.matriz_procesos.map((p, idx) => {
+                  const scoreColor = p.score === 6 
+                    ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.05)]' 
+                    : p.score === 5 
+                    ? 'text-amber-400 bg-amber-500/10 border-amber-500/20' 
+                    : 'text-rose-400 bg-rose-500/10 border-rose-500/20';
+
+                  const renderVal = (v: number) => {
+                    const stars = '★'.repeat(v) + '☆'.repeat(2 - v);
+                    return <span className="font-mono tracking-widest text-mcvill-accent text-sm" title={`${v}/2`}>{stars}</span>;
+                  };
+
+                  return (
+                    <tr key={idx} className="hover:bg-white/2 transition-colors">
+                      <td className="px-4 py-2.5 font-bold text-slate-300">{p.proceso}</td>
+                      <td className="px-4 py-2.5 text-center">{renderVal(p.disponibilidad)}</td>
+                      <td className="px-4 py-2.5 text-center">{renderVal(p.herramental)}</td>
+                      <td className="px-4 py-2.5 text-center">{renderVal(p.capacidad)}</td>
+                      <td className="px-4 py-2.5 text-center">
+                        <span className={`px-2.5 py-0.5 rounded-lg border text-[10px] font-black font-mono ${scoreColor}`}>
+                          {p.score}/6
+                        </span>
+                      </td>
+                      <td className="px-4 py-2.5">
+                        {p.plan_mitigacion ? (
+                          <span className="text-amber-300 font-bold text-[10px] italic bg-amber-500/5 px-2.5 py-1 rounded border border-amber-500/15">
+                            ⚠ {p.plan_mitigacion}
+                          </span>
+                        ) : (
+                          <span className="text-slate-600 font-mono">—</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {/* Riesgos */}
       {analisis.riesgos.length > 0 && (

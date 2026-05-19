@@ -630,11 +630,18 @@ BOM — Subcomponents:
   <span class="comment">Example: $450 × 22 days = $9,900</span>
 </div>
 
-<h2>Step 3 — Overtime Payments</h2>
+<h2>Step 3 — Overtime Payments (LFT Art. 67-68)</h2>
+<p>According to Article 67 and 68 of the Mexican Federal Labor Law (LFT): the first 9 weekly overtime hours are paid at <strong>double rate</strong> (200% of standard hourly rate). Any overtime hours exceeding 9 hours in a single week must be paid at <strong>triple rate</strong> (300% of standard hourly rate).</p>
 <div class="formula">
   <span class="eq">hourly_rate</span> = daily_wage / 8<br>
-  <span class="eq">overtime_amount</span> = overtime_hours × hourly_rate × 2.0<br><br>
-  <span class="comment">Example: 10 hrs OT × ($450/8) × 2 = $1,125</span>
+  <span class="eq">double_hours</span> = min(9, overtime_hours)<br>
+  <span class="eq">triple_hours</span> = max(0, overtime_hours - 9)<br>
+  <span class="eq">overtime_amount</span> = (double_hours × hourly_rate × 2) + (triple_hours × hourly_rate × 3)<br><br>
+  <span class="comment">Example (10 hrs OT with a $450 base daily wage):</span><br>
+  hourly_rate = $450 / 8 = $56.25<br>
+  double_hours = 9 hrs × $56.25 × 2 = $1,012.50<br>
+  triple_hours = 1 hr × $56.25 × 3 = $168.75<br>
+  overtime_amount = $1,012.50 + $168.75 = <span class="eq">$1,181.25</span>
 </div>
 
 <h2>Step 4 — Productivity OEE Bonus</h2>
@@ -725,6 +732,9 @@ Gross Salary             $11,575.25   Total Deductions  $539.93
 <!-- ═══════════════════════════════════════════════════ -->
 <section id="desempeno">
 <h2>Performance &amp; Incentives</h2>
+<div class="tip">
+  <strong>💡 Engineering & Operational Gamification Proposal:</strong> This integrated schema (Performance + Incentives) and its real-time automated synchronization from the Human Resources ledger (eliminating double data entry) represents our own proposed value blueprint. It is specifically designed to motivate production-floor efficiency, improve plant throughput, foster teamwork, and maximize overall OEE in a measurable and auditable format.
+</div>
 <h3>Operator KPIs</h3>
 <div class="formula">
   <span class="eq">Efficiency</span> = (actual_parts / target_parts) × 100%<br>
@@ -1020,11 +1030,37 @@ Urgency level:
 <h2>Finance &amp; ROI</h2>
 <h3>Financial Dashboards</h3>
 <ul>
-  <li><strong>Cash Flow Forecasts:</strong> Projections of upcoming payments and collections over an 8-week horizon</li>
-  <li><strong>AR Ledger:</strong> Accounts receivable aging logs</li>
-  <li><strong>AP Ledger:</strong> Accounts payable calendar</li>
-  <li><strong>ERP ROI Tracker:</strong> Real-time financial analysis of returns on investment achieved via operational savings</li>
+  <li><strong>Cash Flow Forecasts:</strong> Projections of upcoming payments and collections over an 8-week horizon.</li>
+  <li><strong>AR Ledger:</strong> Accounts receivable aging logs.</li>
+  <li><strong>AP Ledger:</strong> Accounts payable calendar.</li>
+  <li><strong>ERP ROI Tracker:</strong> Real-time financial analysis of returns on investment achieved via operational savings.</li>
 </ul>
+
+<h3>Corporate Calendar &amp; Treasury Alerts</h3>
+<p>The ERP natively integrates milestone dates and key periods from the <strong>McVill Operational Calendar</strong> to ensure seamless working capital forecasts and prevent cash crunches:</p>
+<div class="tip">
+  <strong>⏰ Automated Alerts &amp; Financial Accruals:</strong>
+  <ul>
+    <li><strong>Real-Time Accruals:</strong> To protect end-of-year cash balances from sudden payroll drains, the system automatically calculates and records weekly and bi-weekly fractional provisions for employee Savings Funds (Caja de Ahorro) and Christmas Bonuses (Aguinaldos).</li>
+    <li><strong>Preventive Notifications (15-day lead time):</strong> The system issues direct dashboard alerts to the Finance and Treasury department to prepare funds ahead of key disbursement dates:
+      <ul>
+        <li><strong>January 30:</strong> Distribution of the remaining 25% savings fund from the prior fiscal year.</li>
+        <li><strong>December 10:</strong> Saving funds annual lock closure and full capital liquidation.</li>
+        <li><strong>December 16:</strong> Christmas Bonus (Aguinaldo) disbursement, completed well ahead of the legal December 20 Mexican LFT deadline.</li>
+        <li><strong>January 29 (Next year):</strong> Distribution of the remaining 25% savings fund.</li>
+      </ul>
+    </li>
+  </ul>
+</div>
+
+<div class="warn">
+  <strong>⚖️ Statutory Holidays &amp; Plant Inactivity Adjustments:</strong>
+  <ul>
+    <li><strong>Automatic Holiday Pay Rates:</strong> Shift hours logged on official Mexican statutory holidays (Jan 1, Feb 5, Mar 16, May 1, Sep 16, Nov 16, Dec 25) automatically calculate at <strong>triple (3.0)</strong> standard base rates, ensuring compliance with Mexican LFT regulations.</li>
+    <li><strong>OEE Availability Exclusions:</strong> Official statutory holidays and institutional plant-down holidays (Semana Santa, Christmas Party on Dec 12, Year-End Vacation from Dec 21 to Dec 31) are automatically excluded from workstation capacity calculations. This ensures that scheduled plant closures do not falsely penalize OEE plant availability metrics.</li>
+    <li><strong>Budget Cycle Timeline:</strong> Track budget cycle deadlines during October: Start (Oct 5), Pre-Revision (Oct 23), and Final Submission (Oct 30).</li>
+  </ul>
+</div>
 </section>
 
 <!-- ═══════════════════════════════════════════════════ -->

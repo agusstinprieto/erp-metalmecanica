@@ -25,6 +25,7 @@ import { useConfig } from '../contexts/ConfigContext';
 import { useSearch } from '../contexts/SearchContext';
 import { appConfirm } from '../lib/dialogs';
 import { PayrollCalculatorModal } from './PayrollCalculatorModal';
+import { PayrollPoliciesModal } from './PayrollPoliciesModal';
 import { FormulaPanel, FORMULAS } from './common/FormulaPanel';
 
 const StatusBadge = ({ status }: { status: string }) => {
@@ -55,6 +56,7 @@ export const PayrollView = () => {
   const [payrolls, setPayrolls] = useState<Payroll[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCalculatorModal, setShowCalculatorModal] = useState(false);
+  const [showPoliciesModal, setShowPoliciesModal] = useState(false);
   const [employees, setEmployees] = useState<any[]>([]);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -179,6 +181,12 @@ export const PayrollView = () => {
         </div>
         
         <div className="flex gap-2">
+          <button 
+            onClick={() => setShowPoliciesModal(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-white/5 text-slate-300 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all"
+          >
+            <ShieldCheck size={12} className="text-mcvill-accent" /> POLÍTICAS TE
+          </button>
           <button 
             onClick={handleDownloadReport}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-white/10 text-slate-400 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all"
@@ -341,6 +349,10 @@ export const PayrollView = () => {
         onClose={() => setShowCalculatorModal(false)}
         onSave={handleSavePayrollCalculations}
         employees={employees}
+      />
+      <PayrollPoliciesModal
+        isOpen={showPoliciesModal}
+        onClose={() => setShowPoliciesModal(false)}
       />
     </div>
   );

@@ -3,12 +3,6 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.7';
 
 const APP_ORIGIN = Deno.env.get('APP_ORIGIN') ?? 'https://mcvill.vercel.app';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': APP_ORIGIN,
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-};
-
 // ── Gemini embedding for RAG queries ─────────────────────────────────────────
 async function embedQuery(text: string, apiKey: string): Promise<number[]> {
   const res = await fetch(
@@ -30,6 +24,14 @@ async function embedQuery(text: string, apiKey: string): Promise<number[]> {
 const IS_DEV = Deno.env.get('ENV') === 'development';
 
 serve(async (req: Request) => {
+  const origin = req.headers.get('origin') || req.headers.get('Origin') || '*';
+  
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  };
+
   const debug: any = IS_DEV ? { timestamp: new Date().toISOString(), steps: [] } : null;
 
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });

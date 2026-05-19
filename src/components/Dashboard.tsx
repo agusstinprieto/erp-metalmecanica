@@ -9,6 +9,7 @@ import { useConfig } from '../contexts/ConfigContext';
 import { supabase, getActiveTenantId } from '../lib/supabase';
 import { productionService } from '../services/productionService';
 import { reportUtils } from '../utils/reportUtils';
+import { shiftService } from '../services/shiftService';
 
 const DAY_LABELS = ['DOM', 'LUN', 'MAR', 'MIE', 'JUE', 'VIE', 'SAB'];
 const BANK_API_KEY = 'mcvill_bank_api_key';
@@ -399,7 +400,7 @@ const EnlazarBancoModal: React.FC<EnlazarBancoModalProps> = ({ onClose, onNaviga
 interface DashboardProps { onNavigateToBanco?: () => void; }
 
 type PlantaKey = 'todas' | 'torreon_laser' | 'torreon_mecanizado' | 'torreon_forja';
-type TurnoKey = 'todos' | 'matutino' | 'vespertino' | 'nocturno';
+type TurnoKey = string;
 type CategoryKey = 'asistencia' | 'produccion' | 'calidad' | 'seguridad' | 'energia';
 type TimeRange = '1d' | '7d' | '30d' | '365d' | 'all';
 
@@ -415,6 +416,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
   const { config } = useConfig();
   const [selectedPlanta, setSelectedPlanta] = useState<PlantaKey>('todas');
   const [selectedTurno, setSelectedTurno] = useState<TurnoKey>('todos');
+  const [shifts, setShifts] = useState<any[]>([]);
   const [timeRange, setTimeRange] = useState<TimeRange>('7d');
 
 
@@ -443,11 +445,21 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
   useEffect(() => {
     loadDbStats();
     loadPrimaAntiguedad();
+    loadShifts();
   }, []);
+
+  const loadShifts = async () => {
+    try {
+      const data = await shiftService.listShifts();
+      setShifts(data || []);
+    } catch (e) {
+      console.error('Error loading shifts:', e);
+    }
+  };
 
   useEffect(() => {
     loadTelemetryData();
-  }, [selectedPlanta, selectedTurno, timeRange]);
+  }, [selectedPlanta, selectedTurno, timeRange, shifts]);
 
   const loadTelemetryData = async () => {
     try {
@@ -458,7 +470,17 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
       }
       
       if (selectedTurno !== 'todos') {
-        query = query.eq('turno', selectedTurno);
+        const activeShiftObj = shifts.find((s: any) => s.id === selectedTurno);
+        const shiftName = activeShiftObj ? activeShiftObj.name.toLowerCase() : '';
+        
+        let mappedTurno = 'matutino'; // default
+        if (shiftName.includes('vespertino') || shiftName.includes('t2')) {
+          mappedTurno = 'vespertino';
+        } else if (shiftName.includes('nocturno') || shiftName.includes('t3')) {
+          mappedTurno = 'nocturno';
+        }
+        
+        query = query.eq('turno', mappedTurno);
       }
       
       const now = new Date();
@@ -691,15 +713,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
       torreon_mecanizado: 'Planta Torreón (Mecanizado CNC)',
       torreon_forja: 'Planta Torreón (Forja Pesada)'
     };
-    const shiftNames: Record<TurnoKey, string> = {
-      todos: 'Todos los Turnos',
-      matutino: 'Turno Matutino',
-      vespertino: 'Turno Vespertino',
-      nocturno: 'Turno Nocturno'
-    };
+
+    const activeShiftObj = shifts.find((s: any) => s.id === selectedTurno);
+    const shift = activeShiftObj ? activeShiftObj.name : 'Todos los Turnos';
+    const shiftNameLower = activeShiftObj ? activeShiftObj.name.toLowerCase() : '';
+    const isNocturno = shiftNameLower.includes('nocturno') || shiftNameLower.includes('t3');
 
     const plant = plantNames[selectedPlanta];
-    const shift = shiftNames[selectedTurno];
 
     if (selectedPlanta === 'todas' && selectedTurno === 'todos') {
       return {
@@ -710,7 +730,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
       };
     }
 
-    if (selectedTurno === 'nocturno') {
+    if (isNocturno) {
       return {
         score: 'B-',
         summary: `Turno Nocturno en ${plant} presenta una caída del ${100 - metrics.oee}% en la disponibilidad de operadores, afectando la continuidad de OEE.`,
@@ -776,13 +796,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
           <div className="relative">
             <select
               value={selectedTurno}
-              onChange={e => setSelectedTurno(e.target.value as TurnoKey)}
+              onChange={e => setSelectedTurno(e.target.value)}
               className="w-full bg-slate-900 border border-slate-800 text-[10px] font-black uppercase text-white rounded-xl px-3 py-2 outline-none focus:border-mcvill-accent/50 cursor-pointer appearance-none pr-8 transition-all"
             >
               <option value="todos">⏰ Todos los Turnos</option>
-              <option value="matutino">☀️ Turno Matutino (06-14h)</option>
-              <option value="vespertino">⛅ Turno Vespertino (14-22h)</option>
-              <option value="nocturno">🌙 Turno Nocturno (22-06h)</option>
+              {shifts.map((s: any) => {
+                const isMat = s.name.toLowerCase().includes('matutino') || s.name.toLowerCase().includes('admin');
+                const isVesp = s.name.toLowerCase().includes('vespertino');
+                const emoji = isMat ? '☀️' : isVesp ? '⛅' : '🌙';
+                return (
+                  <option key={s.id} value={s.id}>
+                    {emoji} {s.name} ({s.start_time.substring(0, 5)}-{s.end_time.substring(0, 5)}h)
+                  </option>
+                );
+              })}
             </select>
             <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
           </div>
@@ -943,7 +970,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
           {/* 6 KPI Mini Charts (5 Line, 1 Bar) — 2 cols wide container */}
           <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {([
-              { key: 'oee',        label: 'OEE Producción', unit: '%',    color: 'var(--mcvill-accent)',  colorRgb: 'var(--mcvill-accent-rgb)', icon: '⚙️', good: (v: number) => v >= 85, type: 'line' },
+              { key: 'oee',        label: 'OEE Producción', unit: '%',    color: '#4fa5ff',              colorRgb: '79,165,255',              icon: '⚙️', good: (v: number) => v >= 85, type: 'line' },
               { key: 'asistencia', label: 'Asistencia',     unit: ' op',  color: '#60a5fa',              colorRgb: '96,165,250',              icon: '👥', good: (v: number) => v >= metrics.empleados * 0.9, type: 'line' },
               { key: 'scrap',      label: 'Scrap %',        unit: '%',    color: '#34d399',              colorRgb: '52,211,153',              icon: '✅', good: (v: number) => v <= 2, type: 'line' },
               { key: 'produccion', label: 'Producción',     unit: ' ton', color: '#f59e0b',              colorRgb: '245,158,11',              icon: '🏭', good: () => true, type: 'line' },
@@ -1076,7 +1103,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
               <Users className="text-blue-400" size={15} />
               <h3 className="text-[10px] font-black text-white uppercase tracking-widest">Escenario de Asistencia</h3>
               <span className="text-[8px] font-black text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-lg uppercase tracking-widest">
-                {selectedTurno === 'todos' ? 'Todos los Turnos' : selectedTurno === 'matutino' ? '☀️ Matutino' : selectedTurno === 'vespertino' ? '⛅ Vespertino' : '🌙 Nocturno'}
+                {selectedTurno === 'todos' ? 'Todos los Turnos' : shifts.find((s: any) => s.id === selectedTurno)?.name || 'Turno Activo'}
               </span>
             </div>
             <div className="flex items-center gap-3">
@@ -1102,7 +1129,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
                   { label: 'Nocturno 22-06h',    pct: 0.72, color: 'bg-purple-400' },
                 ].map(t => {
                   const n = Math.max(1, Math.round(metrics.empleados / 3));
-                  const present = Math.round(n * t.pct * (selectedTurno === 'todos' ? 1 : selectedTurno === 'matutino' && t.label.startsWith('Mat') ? 1 : selectedTurno === 'vespertino' && t.label.startsWith('Ves') ? 1 : selectedTurno === 'nocturno' && t.label.startsWith('Noc') ? 1 : 0.82));
+                  const activeShiftObj = shifts.find((s: any) => s.id === selectedTurno);
+                  const resolvedShiftKey = activeShiftObj
+                    ? (activeShiftObj.name.toLowerCase().includes('vespertino') || activeShiftObj.name.toLowerCase().includes('t2')
+                      ? 'vespertino'
+                      : activeShiftObj.name.toLowerCase().includes('nocturno') || activeShiftObj.name.toLowerCase().includes('t3')
+                        ? 'nocturno'
+                        : 'matutino')
+                    : 'todos';
+                  const present = Math.round(n * t.pct * (resolvedShiftKey === 'todos' ? 1 : resolvedShiftKey === 'matutino' && t.label.startsWith('Mat') ? 1 : resolvedShiftKey === 'vespertino' && t.label.startsWith('Ves') ? 1 : resolvedShiftKey === 'nocturno' && t.label.startsWith('Noc') ? 1 : 0.82));
                   return (
                     <div key={t.label}>
                       <div className="flex justify-between text-[8px] font-black mb-1">

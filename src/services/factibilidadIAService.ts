@@ -9,6 +9,15 @@ export interface FactibilidadRiesgo {
   mitigacion: string;
 }
 
+export interface ProcesoEvaluacion {
+  proceso: string;
+  disponibilidad: number; // 0, 1, 2
+  herramental: number;    // 0, 1, 2
+  capacidad: number;       // 0, 1, 2
+  score: number;          // Suma (0 a 6)
+  plan_mitigacion: string; // Requerido si score === 5, ej: "FABRICAR DADOS A DIMENSION"
+}
+
 export interface FactibilidadAnalisis {
   factibilidad: 'VIABLE' | 'CONDICIONADA' | 'NO_VIABLE';
   confianza: number;
@@ -26,6 +35,7 @@ export interface FactibilidadAnalisis {
   recomendaciones: string[];
   condiciones_especiales: string[];
   resumen_ejecutivo: string;
+  matriz_procesos: ProcesoEvaluacion[]; // Matriz real de procesos McVill FT-IG-01
 }
 
 export interface AnalisisRecord {
@@ -49,38 +59,35 @@ function getBrandConfig() {
   return { brandName: 'la empresa metal-mecánica', companyName: 'la empresa metal-mecánica' };
 }
 
-const SYSTEM_PROMPT = `Eres el analista de factibilidad de manufactura de una empresa metal-mecánica en Coahuila, México especializada en manufactura de precisión para clientes industriales.
+const SYSTEM_PROMPT = `Eres el analista senior de factibilidad de manufactura de una empresa metal-mecánica de precisión en Coahuila, México especializada en fabricación industrial pesada y maquinados CNC de alta tolerancia.
 
-CAPACIDADES DE PLANTA:
-- Corte: oxicorte, plasma CNC, láser Trumpf 3kW (hasta 12mm acero)
-- Maquinado CNC: tornos Mazak, fresadoras CNC, centros de maquinado
-- Soldadura: MIG/TIG certificada AWS, soldadura estructural, puntos resistencia
-- Ensamble industrial: sub-ensambles mecánicos y ensamble final
-- Pintura: líquida y en polvo, cabina industrial con horno
-- Materiales manejados: acero A36/A572, inoxidable 304/316, aluminio 6061, placas AR400/500
+CAPACIDADES DE PLANTA REALES (McVill):
+- Corte: láser Trumpf CNC de 3kW (acero hasta 12mm), oxicorte/plasma de alta definición
+- Transformación: prensas dobladoras CNC de 150 TON, roladoras de rodillos, sierra de cinta, biseladoras neumáticas
+- Maquinado: centros de maquinado vertical Haas/Mazak y tornos CNC Mazak
+- Ensamble/Soldadura: cabinas TIG/MIG certificadas bajo normas AWS D1.1 y AWS D1.3, soldadura por puntos
+- Acabado: cabina de pintura industrial electrostática en polvo y curado por horno
+- Materiales: acero al carbono (A36, A572), aceros aleados, inoxidables (304, 316), aluminio (6061-T6) y placas antidesgaste AR400/AR500
 
-CLIENTES ACTIVOS: CAT CMSA, CAT Acuña, WABTEC, KOMATSU, JOHN DEERE, KONE, BUHLER, ALFAGOMMA, New Standard
+CLIENTES OPERATIVOS: Caterpillar, John Deere, Kone, Buhler, Komatsu, Wabtec, Jabil
 
-REFERENCIA DE COSTOS (aproximados por proceso):
-- Corte oxicorte/plasma: $80–$200 MXN/kg procesado
-- Maquinado CNC: $400–$800 MXN/hr máquina
-- Soldadura estructural: $250–$500 MXN/hr
-- Ensamble industrial: $150–$300 MXN/hr
-- Pintura en polvo: $120–$250 MXN/m²
-- Materia prima acero: $22–$35 MXN/kg
+MATRIZ DE PROCESOS (FT-IG-01):
+Debes evaluar para cada RFQ los procesos necesarios de planta en escala 0 a 2 para:
+1. Disponibilidad de máquina (0: saturada, 1: limitada, 2: 100% libre)
+2. Herramental/Dados (0: no se tiene, 1: requiere fabricar/modificar dados o fixtures, 2: listo)
+3. Capacidad humana (0: sin personal, 1: requiere entrenamiento, 2: calificado)
 
-CRITERIOS DE FACTIBILIDAD (basados en Matriz F001):
-- Aceros únicos > 2: riesgo elevado de proveeduría
-- Procesos distintos ≥ 6: alta complejidad operativa
-- Sub-ensambles ≥ 4: integración compleja, cuellos potenciales
-- Hardwares/comprados ≥ 4: dependencia crítica de proveedores externos
+Si la suma de criterios (Score) es 5 (Poco Factible), debes asignar un plan de mitigación metalmecánico obligatorio en plan_mitigacion, por ejemplo:
+- Si requiere Doblez y el herramental es limitado (1) -> "FABRICAR DADOS A DIMENSION DE LAS PIEZAS"
+- Si requiere Ensamble/Soldadura y es complejo -> "FABRICAR PLANTILLAS (FIXTURES) PARA ARMADO"
+- Si la soldadura requiere normativas complejas -> "CALIFICAR SOLDADURA BAJO AWS D1.1/D1.3 CON PERSONAL CALIFICADO"
 
-REGLAS DE DECISIÓN:
-- VIABLE: planta puede ejecutar con recursos normales, riesgo F001 LOW o MEDIUM sin condicionantes críticos
-- CONDICIONADA: requiere acción previa (proveedor especial, capacidad extra, plazo extendido, inversión en herramental)
-- NO_VIABLE: excede capacidad técnica actual, materiales no disponibles en región, o riesgo F001 HIGH con múltiples condicionantes críticos sin mitigación clara
+Reglas de decisión:
+- VIABLE: Todos los procesos críticos score >= 5, con mitigaciones operativas estándar y riesgo F001 LOW/MED.
+- CONDICIONADA: Algún proceso crítico requiere inversión, dados especiales o el riesgo F001 es HIGH con mitigaciones complejas.
+- NO_VIABLE: Algún proceso tiene score <= 4 (sin máquina o sin capacidad).
 
-Responde ÚNICAMENTE con JSON válido. Sin markdown, sin texto fuera del JSON, sin comentarios.`;
+Responde únicamente con un JSON que cumpla exactamente la estructura solicitada. Sin markdown, sin comentarios.`;
 
 export async function analyzeRFQ(rfq: RFQCotizacion): Promise<FactibilidadAnalisis> {
   const brand = getBrandConfig();
@@ -129,7 +136,25 @@ Devuelve el análisis con esta estructura JSON exacta:
   "procesos_criticos": ["procesos que definen costo y tiempo"],
   "recomendaciones": ["acción recomendada para avanzar la cotización"],
   "condiciones_especiales": ["condición especial para hacer viable o mejorar la propuesta"],
-  "resumen_ejecutivo": "Párrafo de 2-3 oraciones con la conclusión ejecutiva del análisis."
+  "resumen_ejecutivo": "Párrafo de 2-3 oraciones con la conclusión ejecutiva del análisis.",
+  "matriz_procesos": [
+    {
+      "proceso": "Láser",
+      "disponibilidad": 2,
+      "herramental": 2,
+      "capacidad": 2,
+      "score": 6,
+      "plan_mitigacion": ""
+    },
+    {
+      "proceso": "Doblez",
+      "disponibilidad": 1,
+      "herramental": 2,
+      "capacidad": 2,
+      "score": 5,
+      "plan_mitigacion": "FABRICAR DADOS A DIMENSION DE LAS PIEZAS"
+    }
+  ]
 }`;
 
   const raw = await aiService.askGemini(prompt, undefined, [], SYSTEM_PROMPT);

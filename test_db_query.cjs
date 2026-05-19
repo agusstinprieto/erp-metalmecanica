@@ -1,30 +1,39 @@
 const { createClient } = require('@supabase/supabase-js');
-const url = 'https://kfdbgvyeomoewzmhkbsn.supabase.co';
-const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmZGJndnllb21vZXd6bWhrYnNuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Njc4MjIxOCwiZXhwIjoyMDkyMzU4MjE4fQ.Fiv_FSMBniNAeY26aJAPvxXYQCaNlHnPr88ZaqmJFv4';
+const url = 'https://rtfxxonlpzgtxkrirwrl.supabase.co';
+const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0Znh4b25scHpndHhrcmlyd3JsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTkwMzg1MDIsImV4cCI6MjA5NDYxNDUwMn0.HZiyyCfW-uWZhx6iioNHWOQD9bHaeP2713zQsehHPgo';
 
 const supabase = createClient(url, key);
 
 async function check() {
-  console.log('🔄 Querying tables...');
-  const { data: profiles, error: profErr } = await supabase.from('profiles').select('id, email, role, tenant_id');
-  if (profErr) {
-    console.error('❌ Error fetching profiles:', profErr);
-  } else {
-    console.log(`✅ Profiles in DB (${profiles ? profiles.length : 0}):`);
-    if (profiles) {
-      profiles.forEach(p => console.log(`  - ${p.email} | Role: ${p.role} | Tenant: ${p.tenant_id} | UUID: ${p.id}`));
-    }
+  console.log('🔄 Buscando Viajero 40124710.01 en erp-industrial-pro...');
+  const { data: traveler, error: travErr } = await supabase
+    .from('viajeros')
+    .select('*')
+    .eq('id', '40124710.01')
+    .single();
+
+  if (travErr) {
+    console.error('❌ Error buscando viajero:', travErr.message);
+    return;
   }
 
-  const { data: empleados, error: empErr } = await supabase.from('empleados').select('id, first_name, last_name, tenant_id');
-  if (empErr) {
-    console.error('❌ Error fetching empleados:', empErr);
-  } else {
-    console.log(`✅ Employees in DB (${empleados ? empleados.length : 0}):`);
-    if (empleados) {
-      empleados.forEach(e => console.log(`  - ${e.first_name} ${e.last_name} | Tenant: ${e.tenant_id} | UUID: ${e.id}`));
-    }
+  console.log('✅ Viajero encontrado:', traveler.id);
+
+  console.log('🔄 Buscando Materiales...');
+  const { data: materials, error: matErr } = await supabase
+    .from('viajero_materiales')
+    .select('*')
+    .eq('viajero_id', '40124710.01');
+
+  if (matErr) {
+    console.error('❌ Error buscando materiales:', matErr.message);
+    return;
   }
+
+  console.log(`✅ Materiales encontrados (${materials.length}):`);
+  materials.forEach((m, i) => {
+    console.log(`  [${i+1}] Desc: ${m.descripcion} | Clave: ${m.clave} | es_recogida: ${m.es_recogida} | Type: ${typeof m.es_recogida}`);
+  });
 }
 
 check();

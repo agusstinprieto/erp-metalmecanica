@@ -117,11 +117,15 @@ export const CotizadorExpress: React.FC = () => {
   const steelCostUsdKg = selectedMaterial ? Number(selectedMaterial.precio_total_usd_ton) / 1000 : 0;
 
   // Fórmulas Core (Calculadas primero en USD, luego convertidas a MXN)
-  const pesoBruto = pesoNeto * (1 + desperdicioPct / 100);
-  
+  const pesoBruto = desperdicioPct >= 100 ? pesoNeto : pesoNeto / (1 - desperdicioPct / 100);
+  const scrapWeight = Math.max(0, pesoBruto - pesoNeto);
+  const scrapRecoveryRateUSD = steelCostUsdKg * 0.15; // Acreditación del 15% del valor del acero base
+  const scrapRecoveryUSD = scrapWeight * scrapRecoveryRateUSD;
   const costoMaterialUSD = pesoBruto * steelCostUsdKg;
-  const costoIndirectosUSD = costoMaterialUSD * (indirectosPct / 100);
-  const costoTotalUSD = costoMaterialUSD + costoIndirectosUSD; // Subtotal
+  const costoAceroNetoUSD = Math.max(0, costoMaterialUSD - scrapRecoveryUSD);
+  
+  const costoIndirectosUSD = costoAceroNetoUSD * (indirectosPct / 100);
+  const costoTotalUSD = costoAceroNetoUSD + costoIndirectosUSD; // Subtotal
   
   const precioVentaUSD = costoTotalUSD / (1 - utilidadPct / 100);
   const utilidadUSD = precioVentaUSD - costoTotalUSD;
@@ -139,7 +143,7 @@ export const CotizadorExpress: React.FC = () => {
         peso_neto_fw: pesoNeto,
         desperdicio_aplicado: desperdicioPct / 100,
         precio_acero_aplicado: steelCostUsdKg,
-        costo_acero_usd: costoMaterialUSD,
+        costo_acero_usd: costoAceroNetoUSD, // Se guarda el costo de acero neto compensado por scrap
         subtotal_usd: costoTotalUSD,
         indirectos_usd: costoIndirectosUSD,
         utilidad_usd: utilidadUSD,
@@ -294,10 +298,26 @@ export const CotizadorExpress: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex justify-between items-center border-b border-slate-800/50 pb-2">
                 <div>
-                  <p className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Costo Acero (+Desp)</p>
-                  <p className="text-[10px] text-slate-400 font-mono">{pesoBruto.toFixed(1)} kgs @ ${steelCostUsdKg.toFixed(3)}</p>
+                  <p className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Masa Bruta (Nesting)</p>
+                  <p className="text-[10px] text-slate-400 font-mono">{pesoBruto.toFixed(2)} kgs @ ${steelCostUsdKg.toFixed(3)}/kg</p>
                 </div>
                 <span className="text-sm font-bold text-white font-mono">${costoMaterialUSD.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+              </div>
+              
+              <div className="flex justify-between items-center border-b border-slate-800/50 pb-2">
+                <div>
+                  <p className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Crédito Scrap Recuperado</p>
+                  <p className="text-[10px] text-emerald-400 font-mono">{scrapWeight.toFixed(2)} kgs @ ${(scrapRecoveryRateUSD).toFixed(3)}/kg</p>
+                </div>
+                <span className="text-sm font-bold text-emerald-400 font-mono">-${scrapRecoveryUSD.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+              </div>
+              
+              <div className="flex justify-between items-center border-b border-slate-800/50 pb-2">
+                <div>
+                  <p className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Costo Neto Acero</p>
+                  <p className="text-[10px] text-slate-400 font-mono">Material Compensado</p>
+                </div>
+                <span className="text-sm font-bold text-white font-mono">${costoAceroNetoUSD.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
               </div>
               
               <div className="flex justify-between items-center border-b border-slate-800/50 pb-2">

@@ -544,6 +544,18 @@ export const MODULE_GUIDES_EN: Record<string, ModuleGuide> = {
           '✅ Complete audit checks before processing final payments.',
         ],
       },
+      {
+        icon: 'ShieldAlert', color: 'text-yellow-400', bg: 'bg-yellow-400/10 border-yellow-400/30',
+        title: 'Overtime Policies & Signatures',
+        subtitle: 'Legal framework and operational controls',
+        tips: [
+          '⏰ Overtime Cycle: Tuesday to Monday weekly cutoff, with Friday as the official payment day.',
+          '⚖️ LFT Labor Framework (Mexico): Overtime is paid at DOUBLE rate (200% of standard hourly rate) for the first 9 weekly hours under Article 67 & 68.',
+          '✍️ 6-Signature Matrix: Every payroll report requires hierarchical sign-offs (Supervisor, Area Manager, Production, HR, Operations, and Administration).',
+          '🔒 Secure Access Control: Dynamic switch disables plant-floor clock-ins/gate access for operators lacking active ERP pre-authorization.',
+          '🥪 Complementary Logistics: Strict 14:00 PM cutoff to request food and transportation services for overtime shifts.',
+        ],
+      },
     ],
   },
 

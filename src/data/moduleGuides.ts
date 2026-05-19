@@ -562,6 +562,18 @@ export const MODULE_GUIDES: Record<string, ModuleGuide> = {
           '✅ Aprueba la nómina antes de procesar para validar que todo esté correcto.',
         ],
       },
+      {
+        icon: 'ShieldAlert', color: 'text-yellow-400', bg: 'bg-yellow-400/10 border-yellow-400/30',
+        title: 'Políticas de Tiempo Extra & Firmas',
+        subtitle: 'Matriz legal y restricciones operativas',
+        tips: [
+          '⏰ Corte de Tiempo Extra: De martes a lunes de forma semanal con día oficial de pago los viernes.',
+          '⚖️ Marco LFT (México): Las horas extra se pagan al DOBLE (primeras 9 horas semanales) según el Artículo 67 y 68 de la Ley Federal del Trabajo.',
+          '✍️ Matriz de 6 Firmas: Cada reporte requiere autorización jerárquica obligatoria (Supervisor, Gerente de Área, Producción, RH, Operaciones y Administración).',
+          '🔒 Control de Acceso: Interruptor dinámico que restringe e impide el ingreso a planta en reloj checador/portería a personal que no cuente con pre-autorización capturada en el ERP.',
+          '🥪 Logística Complementaria: Límite estricto de captura hasta las 14:00 horas para activar servicios de transporte y comida.',
+        ],
+      },
     ],
   },
 

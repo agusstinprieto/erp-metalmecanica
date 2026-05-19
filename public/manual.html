@@ -985,12 +985,18 @@ BOM — Componentes:
   <span class="comment">Ejemplo: $450 × 22 días = $9,900</span>
 </div>
 
-<h2>Paso 3 — Pago de Horas Extra</h2>
-<p>Según el Art. 67 de la LFT: las primeras 9 horas extra semanales se pagan al <strong>doble</strong>. Las que excedan ese límite se pagan al <strong>triple</strong>.</p>
+<h2>Paso 3 — Pago de Horas Extra (LFT Art. 67-68)</h2>
+<p>Según el Art. 67 y 68 de la Ley Federal del Trabajo (México): las primeras 9 horas extra semanales se pagan al <strong>doble</strong> (200% de la cuota por hora). Toda hora extra que exceda el límite de 9 horas semanales se pagará al <strong>triple</strong> (300% de la cuota por hora).</p>
 <div class="formula">
   <span class="eq">hourly_rate</span> = daily_salary / 8<br>
-  <span class="eq">overtime_amount</span> = overtime_hours × hourly_rate × 2<br><br>
-  <span class="comment">Ejemplo: 10h extra × ($450/8) × 2 = $1,125</span>
+  <span class="eq">horas_dobles</span> = min(9, overtime_hours)<br>
+  <span class="eq">horas_triples</span> = max(0, overtime_hours - 9)<br>
+  <span class="eq">overtime_amount</span> = (horas_dobles × hourly_rate × 2) + (horas_triples × hourly_rate × 3)<br><br>
+  <span class="comment">Ejemplo (10h extra con salario diario de $450):</span><br>
+  hourly_rate = $450 / 8 = $56.25<br>
+  horas_dobles = 9h × $56.25 × 2 = $1,012.50<br>
+  horas_triples = 1h × $56.25 × 3 = $168.75<br>
+  overtime_amount = $1,012.50 + $168.75 = <span class="eq">$1,181.25</span>
 </div>
 
 <h2>Paso 4 — Bono OEE (Productividad)</h2>
@@ -1203,6 +1209,9 @@ Bruto                    $11,575.25   Total deducciones $539.93
 <!-- ═══════════════════════════════════════════════════ -->
 <section id="desempeno">
 <h2>Desempeño e Incentivos</h2>
+<div class="tip">
+  <strong>💡 Propuesta de Gamificación Operativa e Ingeniería de Software:</strong> Este esquema integrado (Desempeño + Incentivos) y su vinculación automatizada en tiempo real desde el expediente de Recursos Humanos (para evitar la doble captura) representan una propuesta de valor de nuestra autoría. Está diseñado específicamente para motivar la eficiencia, elevar la productividad en planta, fomentar el trabajo en equipo y maximizar el OEE global de la empresa de manera medible y auditable.
+</div>
 <h3>KPIs por Operador</h3>
 <div class="formula">
   <span class="eq">Eficiencia</span> = (piezas_reales / piezas_meta) × 100%<br>
@@ -1812,11 +1821,37 @@ El agente calcula automáticamente:
 </svg></div>
 <h3>Módulos financieros</h3>
 <ul>
-  <li><strong>Flujo de Caja:</strong> Cobros esperados vs pagos, proyección 8 semanas</li>
-  <li><strong>CxC:</strong> Cuentas por cobrar con días vencidos</li>
-  <li><strong>CxP:</strong> Cuentas por pagar con fechas de vencimiento</li>
-  <li><strong>ROI del ERP:</strong> Calcula en tiempo real el retorno de inversión del sistema</li>
+  <li><strong>Flujo de Caja:</strong> Cobros esperados vs pagos, proyección 8 semanas.</li>
+  <li><strong>CxC:</strong> Cuentas por cobrar con días vencidos.</li>
+  <li><strong>CxP:</strong> Cuentas por pagar con fechas de vencimiento.</li>
+  <li><strong>ROI del ERP:</strong> Calcula en tiempo real el retorno de inversión del sistema.</li>
 </ul>
+
+<h3>Calendario Corporativo y Alertas de Tesorería</h3>
+<p>El ERP integra de manera nativa los hitos y fechas clave extraídos del <strong>Calendario de Operaciones McVill</strong>, asegurando una planeación eficiente y previniendo crisis de flujo de efectivo:</p>
+<div class="tip">
+  <strong>⏰ Automatización de Alertas y Provisiones:</strong>
+  <ul>
+    <li><strong>Provisiones en Tiempo Real:</strong> Para evitar descalces severos en el flujo al final de año, el ERP calcula y pre-provisiona de forma quincenal y semanal el impacto proporcional de la Caja de Ahorro y los Aguinaldos de los empleados.</li>
+    <li><strong>Alertas Preventivas (15 días de anticipación):</strong> El sistema notifica al departamento de Finanzas y Tesorería con antelación para preparar los fondos en las siguientes fechas críticas:
+      <ul>
+        <li><strong>30 de Enero:</strong> Entrega del 25% remanente de la caja de ahorro del año anterior.</li>
+        <li><strong>10 de Diciembre:</strong> Cierre de caja de ahorro y entrega total de los fondos acumulados.</li>
+        <li><strong>16 de Diciembre:</strong> Pago anual de Aguinaldos (liquidado con anterioridad al límite legal del 20 de diciembre).</li>
+        <li><strong>29 de Enero (Siguiente año):</strong> Entrega del 25% remanente del fondo de ahorro acumulado.</li>
+      </ul>
+    </li>
+  </ul>
+</div>
+
+<div class="warn">
+  <strong>⚖️ Impacto Operativo de Días Festivos y Descansos McVill:</strong>
+  <ul>
+    <li><strong>Cálculo Automático de Días Festivos:</strong> Las jornadas trabajadas durante los días marcados como <em>FESTIVO</em> oficial en el calendario (1 Ene, 5 Feb, 16 Mar, 1 May, 16 Sep, 16 Nov, 25 Dic) son remuneradas de forma automatizada con el multiplicador al <strong>triple (3.0)</strong> en concordancia con la Ley Federal del Trabajo.</li>
+    <li><strong>Exclusión de Inactividad Programada en OEE:</strong> Los días festivos oficiales y los descansos/vacaciones internas de McVill (Semana Santa, Posada Navideña el 12 de Dic y Vacaciones de fin de año del 21 al 31 de Dic) se excluyen automáticamente de las horas hábiles planeadas en el OEE. Esto previene distorsiones y caídas artificiales en el indicador de disponibilidad de planta de las células.</li>
+    <li><strong>Planeación de Presupuestos:</strong> El sistema calendariza alertas de flujo para el ciclo presupuestal anual durante octubre (Inicio el 5 Oct, Revisión previa el 23 Oct y Entrega final el 30 Oct).</li>
+  </ul>
+</div>
 </section>
 
 <!-- ═══════════════════════════════════════════════════ -->

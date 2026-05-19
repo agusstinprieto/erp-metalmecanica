@@ -22,13 +22,92 @@ export const MetalQuoterView: React.FC = () => {
     const handleFileSelect = async (file: File) => {
         setIsAnalyzing(true);
         try {
-            // ... existing code ...
+            const fileData = await fileToGenerativePart(file);
+            const prompt = `Analiza la imagen o plano técnico de esta pieza metalmecánica y realiza una auditoría completa de manufactura de alta precisión. Extrae la información geométrica y calcula los costos en base a los parámetros y tarifas reales de la planta de McVill:
+
+TARIFAS OPERATIVAS REALES DE PLANTA (USD):
+- Corte Láser: $125.00 USD/hr
+- Doblez (Bending): $45.00 USD/hr
+- Sierra-Cinta / Perfiles: $35.00 USD/hr
+- Rebabeo / Limpieza manual: $25.00 USD/hr
+- Ensamble y Soldadura (MIG/TIG): $35.00 USD/hr
+- Pintura Industrial: $40.00 USD/m² de superficie expuesta
+
+FÓRMULA DE COSTO DE ACERO COMPENSADO POR SCRAP (Nesting real):
+- Densidad del acero: 7.85 g/cm³
+- Peso Teórico (kg) = 7.85 * Espesor_mm * Ancho_m * Largo_m
+- Peso Real Cobrado (holgura 3%) = Peso Teórico / 0.97
+- Esqueleto de merma recuperada (scrap) = Peso Real - Peso Neto
+- Crédito por chatarra = Merma * ($1.80 USD/kg * 0.15)
+- Costo de acero neto final = (Peso Real * $1.80 USD/kg) - Crédito por chatarra
+
+VELOCIDADES DE CORTE LÁSER POR ESPESOR:
+- Espesor < 3.2mm (1/8"): 120 in/min
+- Espesor 3.2mm a 6.3mm (1/4"): 60 in/min
+- Espesor 6.3mm a 12.7mm (1/2"): 30 in/min
+
+Tareas de Visión IA:
+1. Extrae el nombre de la pieza/proyecto del dibujo o cuadro de datos.
+2. Identifica el material especificado (ej. Acero A36, Inoxidable 304, etc.)
+3. Extrae el espesor o calibre (gauge).
+4. Estima las dimensiones externas de la pieza (ancho y largo en mm, ej. 250 x 300 mm).
+5. Cuenta el número de barrenos/perforaciones (holes).
+6. Cuenta la cantidad de líneas de doblez (bends).
+7. Calcula el perímetro de corte total en milímetros (perimeterMm).
+
+Cálculos Financieros:
+- pesoKg: Calcula el peso neto final de la pieza en base a sus dimensiones y espesor.
+- costs.material: El costo neto final del acero aplicando descuento de scrap.
+- costs.machine: (Tiempo Láser (perímetro / velocidad in/min / 60) * $125/hr) + (Tiempo Doblez (dobleces * 1.5 min / 60) * $45/hr)
+- costs.labor: (Tiempo Ensamble/Soldadura + Rebabeo manual) * $35/hr
+- costs.total: (material + machine + labor) * 1.30 (markup estándar de Dirección del 30% para utilidad e indirectos)
+
+Devuelve ÚNICAMENTE un JSON válido que coincida exactamente con la siguiente estructura, sin markdown, sin texto fuera del JSON:
+{
+  "projectName": "Nombre del proyecto detectado",
+  "material": "Material detectado",
+  "gauge": "Calibre o Espesor mm",
+  "dimensions": "Dimensiones detectadas ej. 200 x 300 mm",
+  "weightKg": 3.8,
+  "geometryStats": {
+    "holes": 4,
+    "bends": 2,
+    "perimeterMm": 1250
+  },
+  "processes": [
+    {
+      "name": "Corte Láser Trumpf",
+      "description": "Corte láser de precisión CNC @ 120 in/min",
+      "estimatedTime": "1.5 min",
+      "confidence": 0.98
+    },
+    {
+      "name": "Doblez CNC",
+      "description": "2 golpes de doblez en prensa plegadora de 150 TON",
+      "estimatedTime": "3.0 min",
+      "confidence": 0.95
+    },
+    {
+      "name": "Rebabeo y Limpieza",
+      "description": "Eliminación de escoria y aristas vivas manualmente",
+      "estimatedTime": "5.0 min",
+      "confidence": 0.99
+    }
+  ],
+  "costs": {
+    "material": 12.50,
+    "machine": 5.40,
+    "labor": 4.25,
+    "total": 28.80
+  }
+}`;
+
             const responseText = await geminiService.generateText(prompt, {
                 contents: [
                     {
                         role: 'user',
                         parts: [
-                            { text: "Iniciando auditoría de ingeniería para pieza metalmecánica..." },
+                            { text: prompt },
                             { inlineData: fileData.inlineData }
                         ]
                     }
@@ -38,7 +117,7 @@ export const MetalQuoterView: React.FC = () => {
 
             const jsonMatch = responseText.match(/```json\n?([\s\S]*?)\n?```/) || responseText.match(/\{[\s\S]*\}/);
             const jsonText = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : responseText;
-            const parsed = JSON.parse(jsonText) as AnalysisData;
+            const parsed = JSON.parse(jsonText.trim()) as AnalysisData;
 
             setAnalysisResult(parsed);
         } catch (error) {

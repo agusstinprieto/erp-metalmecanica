@@ -51,14 +51,19 @@ const SBC_CALCULATION = {
   integration_factor: 1.0532
 };
 
-const calculateIMSS = (sbc: number, days: number, annualSalary: number) => {
-  const cuotafija = Math.min(annualSalary, 468 * 30 * 0.20) * 0.20;
-  const excedente = Math.max(0, annualSalary - (468 * 30)) * 0.01125;
-  const seguroEnfermedadMaternidad = Math.min(annualSalary, 468 * 30 * 3) * 0.007;
-  const seguroInvalidezVida = Math.min(annualSalary, 468 * 30 * 3) * 0.0175;
-  const guarderia = Math.min(annualSalary, 468 * 30 * 3) * 0.01;
+const calculateIMSS = (sbc: number, days: number, annualSalary: number, config?: any) => {
+  const uma = config?.uma_value ?? 108.57;
+  const iv_rate = (config?.imss_iv ?? 0.625) / 100;
+  const cv_rate = (config?.imss_cv ?? 1.125) / 100;
+  const em_rate = (config?.imss_em ?? 0.40) / 100;
+
+  const cuotafija = Math.min(annualSalary, uma * 30 * 0.20) * 0.20;
+  const excedente = Math.max(0, annualSalary - (uma * 30)) * 0.01125;
+  const seguroEnfermedadMaternidad = Math.min(annualSalary, uma * 30 * 3) * em_rate;
+  const seguroInvalidezVida = Math.min(annualSalary, uma * 30 * 3) * (iv_rate + cv_rate);
+  const guarderia = Math.min(annualSalary, uma * 30 * 3) * 0.01;
   
-  const employee = (cuotafija + excedente + seguroEnfermedadMaternidad + seguroInvalidezVida + guarderia) * (days / 365);
+  const employee = (excedente + seguroEnfermedadMaternidad + seguroInvalidezVida) * (days / 365);
   const employer = (cuotafija + excedente * 0.007 + seguroEnfermedadMaternidad * 0.007 + seguroInvalidezVida * 0.0125 + guarderia) * (days / 365);
   
   return { employee: Math.round(employee * 100) / 100, employer: Math.round(employer * 100) / 100 };
@@ -114,18 +119,59 @@ export const PayrollCalculatorModal: React.FC<PayrollCalculatorModalProps> = ({
     workedDays: 15
   });
 
+  useEffect(() => {
+    if (isOpen && config.overtimeCutoffStartDay) {
+      const today = new Date();
+      const startDayStr = config.overtimeCutoffStartDay.toLowerCase();
+      const dayMap: Record<string, number> = {
+        domingo: 0, lunes: 1, martes: 2, miercoles: 3, jueves: 4, viernes: 5, sabado: 6
+      };
+      
+      const startDayNum = dayMap[startDayStr] ?? 2; // Martes por defecto
+      const currentDayNum = today.getDay();
+      
+      const diffStart = (currentDayNum >= startDayNum) 
+        ? (currentDayNum - startDayNum) 
+        : (currentDayNum + 7 - startDayNum);
+        
+      const startDate = new Date();
+      startDate.setDate(today.getDate() - diffStart - 7); // Período semanal anterior completo
+      
+      const endDate = new Date(startDate);
+      endDate.setDate(startDate.getDate() + 6); // Lunes siguiente
+      
+      setPayrollPeriod({
+        start: format(startDate, 'yyyy-MM-dd'),
+        end: format(endDate, 'yyyy-MM-dd'),
+        workedDays: 7
+      });
+    }
+  }, [isOpen, config.overtimeCutoffStartDay, config.overtimeCutoffEndDay]);
+
   const performCalculation = (employee: any, daysOverride?: number) => {
     const dailySalary = employee.daily_salary || 350;
     const workedDays = daysOverride ?? payrollPeriod.workedDays;
+    const hourlyRate = dailySalary / 8;
     
     const grossSalary = dailySalary * workedDays;
-    const overtimeAmount = (employee.overtime_hours || 0) * (dailySalary * 2);
-    const bonusOEE = employee.bonus_oee || 0;
+    
+    // LFT Overtime calculation: First 9 hours double, exceeding hours triple
+    const otHours = employee.overtime_hours || 0;
+    const doubleHours = Math.min(9, otHours);
+    const tripleHours = Math.max(0, otHours - 9);
+    const overtimeAmount = (doubleHours * hourlyRate * 2) + (tripleHours * hourlyRate * 3);
+    
+    // OEE Bonus dynamically computed based on OEE threshold and OEE bonus amount in config
+    const oeeThreshold = config?.oee_bono_umbral ?? 85;
+    const oeeBonoMontoPct = (config?.oee_bono_monto ?? 5.0) / 100;
+    const empOee = employee.oee_percentage ?? 90; // Default fallback to 90% (triggers bonus if OEE is above threshold)
+    const bonusOEE = employee.bonus_oee || ((empOee >= oeeThreshold) ? grossSalary * oeeBonoMontoPct : 0);
+    
     const perceptionTotal = grossSalary + overtimeAmount + bonusOEE;
     
     const sbc = dailySalary * SBC_CALCULATION.integration_factor;
     const annualSalary = sbc * 365;
-    const imss = calculateIMSS(sbc, workedDays, annualSalary);
+    const imss = calculateIMSS(sbc, workedDays, annualSalary, config);
     
     const isr = calculateISR(annualSalary);
     const infonavit = employee.infonavit_credit ? Math.min(employee.infonavit_credit, perceptionTotal * 0.3) : 0;
