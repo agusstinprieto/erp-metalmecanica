@@ -42,6 +42,13 @@ interface QualityScan {
 export const CeoMobileSim: React.FC = () => {
   const { config } = useConfig();
   const [activeTab, setActiveTab] = useState<MobileTab>('finance');
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
   
   const brandPrefix = (config.brandName || 'MCV').substring(0, 3).toUpperCase();
 
@@ -134,6 +141,227 @@ export const CeoMobileSim: React.FC = () => {
       setIsTyping(false);
     }, 1500);
   };
+
+  const TAB_CONTENT = (
+    <>
+      {activeTab === 'finance' && (
+        <div className="space-y-3 animate-in fade-in duration-300">
+          <h5 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Margen & ROI en Piso</h5>
+          <div className="bg-gradient-to-br from-mcvill-accent/20 to-slate-900 border border-mcvill-accent/30 rounded-2xl p-4 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-mcvill-accent/10 rounded-full blur-2xl" />
+            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Margen Operativo Neto Hoy</p>
+            <h3 className="text-3xl font-black text-white leading-none mt-1">$4,820 <span className="text-sm text-slate-400 font-bold">USD</span></h3>
+            <span className="mt-2 inline-block text-[9px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded font-black">+14.2% VS META</span>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-slate-900/60 border border-slate-800/40 p-3 rounded-2xl">
+              <div className="flex justify-between items-start mb-1">
+                <Zap size={14} className="text-amber-400" />
+                <span className="text-[9px] font-mono text-emerald-400 font-bold">-12%</span>
+              </div>
+              <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Costo KWh Luz</p>
+              <span className="text-lg font-black text-white">$380 <span className="text-[9px] text-slate-500">USD</span></span>
+            </div>
+            <div className="bg-slate-900/60 border border-slate-800/40 p-3 rounded-2xl">
+              <div className="flex justify-between items-start mb-1">
+                <AlertTriangle size={14} className="text-red-400" />
+                <span className="text-[9px] font-mono text-red-400 font-bold">+$40</span>
+              </div>
+              <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Fuga por Scrap</p>
+              <span className="text-lg font-black text-red-400">-$180 <span className="text-[9px]">USD</span></span>
+            </div>
+          </div>
+          <div className="bg-slate-900/40 border border-slate-800/40 p-3 rounded-2xl">
+            <p className="text-[9px] font-black text-mcvill-accent uppercase tracking-wider mb-1">Diagnóstico Financiero:</p>
+            <p className="text-[11px] text-slate-400 leading-relaxed font-mono">
+              La optimización del anidamiento de placa de acero por nesting neural en el turno matutino evitó el desperdicio de 140kg de acero inoxidable, sumando +$240 USD al margen.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'cctv' && (
+        <div className="space-y-3 animate-in fade-in duration-300">
+          <div className="flex items-center justify-between">
+            <h5 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Inspección Visual IA</h5>
+            <button
+              onClick={() => setIsScanning(prev => !prev)}
+              className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase border tracking-wider transition-all ${
+                isScanning ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-red-500/10 border-red-500/30 text-red-400'
+              }`}
+            >
+              {isScanning ? '⬤ LIVE FEED' : '⏸ PAUSED'}
+            </button>
+          </div>
+          <div className="relative h-40 rounded-2xl bg-slate-900 overflow-hidden border border-white/5 flex flex-col items-center justify-center">
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(18,24,38,0.3)_1px,transparent_1px),linear-gradient(90deg,rgba(18,24,38,0.3)_1px,transparent_1px)] bg-[size:14px_14px]" />
+            {isScanning && (
+              <div className="relative w-24 h-12 bg-slate-800 rounded-lg border border-slate-700 flex flex-col items-center justify-center animate-pulse z-10">
+                <Cpu className="text-slate-600 mb-0.5" size={20} />
+                <span className="text-[7px] font-mono text-slate-500 font-bold">{activeScan.partCode}</span>
+                <div className="absolute left-0 right-0 h-[2px] bg-emerald-400 shadow-[0_0_8px_#34d399] transition-all duration-1000 ease-in-out" style={{ top: `${scanLaserPos}%` }} />
+              </div>
+            )}
+            <div className="absolute top-2 left-2 flex items-center gap-1 bg-slate-950/80 px-2 py-0.5 rounded border border-white/5 text-[8px] font-black text-slate-400">
+              <Camera size={9} /> CAM #04
+            </div>
+            <div className="absolute top-2 right-2 flex items-center gap-1 bg-red-500/15 px-2 py-0.5 rounded border border-red-500/20 text-[8px] font-black text-red-400 animate-pulse">
+              REC 1080P
+            </div>
+          </div>
+          <div className={`p-3 rounded-2xl border relative overflow-hidden ${activeScan.status === 'aprobado' ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-red-500/5 border-red-500/20'}`}>
+            <div className={`absolute left-0 top-0 bottom-0 w-1 ${activeScan.status === 'aprobado' ? 'bg-emerald-400' : 'bg-red-500 animate-pulse'}`} />
+            <div className="flex items-center justify-between mb-1 pl-2">
+              <span className="text-[11px] font-black text-white uppercase">{activeScan.partCode}</span>
+              <span className={`text-[9px] font-black px-2 py-0.5 rounded uppercase ${activeScan.status === 'aprobado' ? 'text-emerald-400 bg-emerald-500/10' : 'text-red-400 bg-red-500/10'}`}>
+                {activeScan.status === 'aprobado' ? '✓ PASÓ QA' : '✕ SCRAP'}
+              </span>
+            </div>
+            <p className="text-[10px] font-mono text-slate-400 pl-2 leading-relaxed">
+              {activeScan.status === 'aprobado'
+                ? `Red neuronal: 0 defectos. Certeza: ${activeScan.confidence}%`
+                : `Defecto: ${activeScan.defect}. Confianza: ${activeScan.confidence}%`}
+            </p>
+          </div>
+          <div className="space-y-1.5">
+            <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Historial Reciente</span>
+            {scans.map((s, idx) => (
+              <div key={idx} className="flex items-center justify-between p-2.5 bg-slate-900/40 rounded-xl border border-white/5">
+                <span className="text-[10px] font-mono font-bold text-slate-300">{s.partCode}</span>
+                <span className="text-[9px] font-mono text-slate-500">{s.timestamp}</span>
+                <span className={`text-[9px] font-black uppercase ${s.status === 'aprobado' ? 'text-emerald-400' : 'text-red-400'}`}>
+                  {s.status === 'aprobado' ? 'OK' : 'SCRAP'}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'status' && (
+        <div className="space-y-3 animate-in fade-in duration-300">
+          <h5 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Semáforo de Producción</h5>
+          {[
+            { name: 'Corte Láser Trumpf', sub: 'Línea #1 Torreón', oee: 88, color: 'emerald' },
+            { name: 'Mecanizado Mazak', sub: 'Línea #2 Torreón', oee: 82, color: 'emerald' },
+            { name: 'Forja Torreón', sub: 'Hornos de Inducción', oee: 71, color: 'amber' },
+          ].map((line) => (
+            <div key={line.name} className="p-3.5 bg-slate-900/50 rounded-2xl border border-white/5 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className={`w-3 h-3 rounded-full bg-${line.color}-400 shadow-[0_0_8px_theme(colors.${line.color}.400)] ${line.color === 'amber' ? 'animate-pulse' : ''}`} />
+                <div>
+                  <p className="text-[11px] font-black text-white uppercase">{line.name}</p>
+                  <span className="text-[9px] font-mono text-slate-500">{line.sub}</span>
+                </div>
+              </div>
+              <span className={`text-[10px] font-mono font-black px-2.5 py-1 rounded-lg text-${line.color}-400 bg-${line.color}-500/10`}>OEE {line.oee}%</span>
+            </div>
+          ))}
+          <div className="p-3.5 bg-red-950/20 border border-red-500/20 rounded-2xl">
+            <span className="text-[9px] font-black text-red-400 uppercase tracking-widest block mb-1">⚠ Alerta Crítica</span>
+            <p className="text-[11px] text-slate-400 font-mono leading-relaxed">
+              Forja Torreón reporta desvío térmico del 4% en Horno #2. OEE cayó a 71%. Mantenimiento preventivo en camino.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'copilot' && (
+        <div className="flex flex-col gap-3 animate-in fade-in duration-300">
+          <h5 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">IA Copilot</h5>
+          <div className="space-y-2 max-h-[50vh] overflow-y-auto pr-1">
+            {chatMessages.map((m, idx) => (
+              <div key={idx} className={`p-3 rounded-2xl text-[11px] leading-relaxed font-mono max-w-[85%] ${
+                m.sender === 'user'
+                  ? 'bg-mcvill-accent/20 border border-mcvill-accent/30 text-white ml-auto text-right'
+                  : 'bg-slate-900 border border-slate-800 text-slate-300'
+              }`}>
+                {m.text}
+              </div>
+            ))}
+            {isTyping && (
+              <div className="bg-slate-900 border border-slate-800 p-3 rounded-2xl text-[10px] text-slate-500 italic max-w-[40%] animate-pulse">
+                Analizando...
+              </div>
+            )}
+          </div>
+          <div className="space-y-2">
+            <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Preguntas Rápidas</span>
+            {[
+              { q: '📉 ¿A cuánto asciende la pérdida por Scrap hoy?', key: 'scrap' },
+              { q: '📊 ¿Cómo está el OEE acumulado en las plantas?', key: 'oee' },
+              { q: '⚠️ Enviar directiva de mantenimiento a Forja', key: 'alerta' },
+            ].map((item) => (
+              <button
+                key={item.key}
+                onClick={() => sendSuggestedQuery(item.q)}
+                className="w-full text-left p-3 bg-slate-900 hover:bg-slate-800 text-[11px] font-mono text-mcvill-accent rounded-xl border border-mcvill-accent/20 transition-all"
+              >
+                {item.q}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </>
+  );
+
+  const BOTTOM_NAV = (
+    <div className="flex items-center justify-around border-t border-white/5 pt-3 pb-1">
+      {[
+        { id: 'finance', label: 'ROI', icon: CircleDollarSign },
+        { id: 'cctv', label: 'CCTV IA', icon: Camera },
+        { id: 'status', label: 'Estatus', icon: Factory },
+        { id: 'copilot', label: 'Copilot', icon: Sparkles },
+      ].map(b => (
+        <button
+          key={b.id}
+          onClick={() => setActiveTab(b.id as MobileTab)}
+          className={`flex flex-col items-center gap-1 px-4 py-1.5 rounded-xl transition-all ${
+            activeTab === b.id ? 'text-mcvill-accent' : 'text-slate-600 hover:text-slate-400'
+          }`}
+        >
+          <b.icon size={18} />
+          <span className="text-[9px] font-black uppercase tracking-wide">{b.label}</span>
+        </button>
+      ))}
+    </div>
+  );
+
+  if (isMobile) {
+    return (
+      <div className="flex flex-col h-full bg-slate-950 animate-in fade-in duration-300">
+        {/* Mobile Header */}
+        <div className="px-4 pt-3 pb-2 border-b border-white/5 bg-slate-900/60 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-mcvill-accent animate-pulse" />
+            <div>
+              <h4 className="text-[11px] font-black text-white uppercase tracking-widest">{config.brandName || 'McVill'} Mobile</h4>
+              <p className="text-[8px] font-mono text-slate-500 uppercase tracking-widest">Director Hub v2.5</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setIsScanning(prev => !prev)}
+            className={`px-2 py-0.5 rounded text-[8px] font-black uppercase border tracking-wider transition-all ${
+              isScanning ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-red-500/10 border-red-500/30 text-red-400'
+            }`}
+          >
+            {isScanning ? 'LIVE' : 'PAUSED'}
+          </button>
+        </div>
+
+        {/* Mobile Content */}
+        <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+          {TAB_CONTENT}
+        </div>
+
+        {/* Mobile Bottom Nav */}
+        <div className="shrink-0 px-4 pb-4 bg-slate-900/60 border-t border-white/5">
+          {BOTTOM_NAV}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full min-h-[85vh] flex flex-col items-center justify-center p-4 lg:p-8 animate-in fade-in duration-500">
