@@ -46,3 +46,24 @@ env
 # Reportes PDF locales
 Reportes PDF/
 
+# Scripts de mantenimiento local (pueden contener credenciales)
+update_keys*.js
+update_keys*.mjs
+check-tables*.js
+check_tables*.cjs
+check_tables*.mjs
+delete-remote-migration*.js
+run-sql.js
+fix-sql.js
+get-project-details.js
+list_tables.js
+test_db_query.cjs
+test_update.cjs
+import_data.py
+generate_sql_seed.py
+qa_audit*.mjs
+
+# Test results (artefactos locales de Playwright)
+test-results/
+qa_screenshots/
+qa_screenshots_v2/
