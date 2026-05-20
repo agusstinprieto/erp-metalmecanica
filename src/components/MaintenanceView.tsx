@@ -23,6 +23,7 @@ import { MachineFormModal } from './MachineFormModal';
 import { MaintenanceAIModal } from './MaintenanceAIModal';
 import { useSearch } from '../contexts/SearchContext';
 import { appConfirm } from '../lib/dialogs';
+import { PrintButton } from './common/PrintButton';
 
 export const MaintenanceView = () => {
   const [machines, setMachines] = useState<Machine[]>([]);
@@ -136,12 +137,13 @@ export const MaintenanceView = () => {
           >
             <Zap size={12} className="animate-pulse" /> ANÁLISIS IA
           </button>
-          <button 
+          <button
             onClick={() => { setEditingMachine(null); setShowModal(true); }}
             className="flex items-center gap-1.5 px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all active:scale-95"
           >
             <Plus size={12} strokeWidth={3} /> VINCULAR ACTIVO
           </button>
+          <PrintButton />
         </div>
       </div>
 

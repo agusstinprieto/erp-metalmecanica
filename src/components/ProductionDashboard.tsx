@@ -23,6 +23,7 @@ import { eventBus } from '../utils/eventBus';
 import clsx from 'clsx';
 
 import { supabase } from '../lib/supabase';
+import { PrintButton } from './common/PrintButton';
 
 const bottleneckData = [
   { center: 'LASER', delay: 12, efficiency: 85, color: '#4FA5FF' },
@@ -138,12 +139,15 @@ export const ProductionDashboard: React.FC = () => {
             NÚCLEO DE <span className="text-mcvill-accent">PRODUCCIÓN</span>
           </h2>
         </div>
-        <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5">
-          <Activity className="text-mcvill-accent animate-pulse" size={20} />
-          <div className="text-right">
-            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Sincronización</p>
-            <p className="text-[10px] font-black text-white uppercase">Real-Time Cloud Active</p>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5">
+            <Activity className="text-mcvill-accent animate-pulse" size={20} />
+            <div className="text-right">
+              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Sincronización</p>
+              <p className="text-[10px] font-black text-white uppercase">Real-Time Cloud Active</p>
+            </div>
           </div>
+          <PrintButton />
         </div>
       </div>
 

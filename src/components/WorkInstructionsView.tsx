@@ -6,6 +6,7 @@ import {
   AlertCircle, CheckSquare, Square, RefreshCw
 } from 'lucide-react';
 import clsx from 'clsx';
+import { PrintButton } from './common/PrintButton';
 import {
   fetchWIs, fetchPasos, createWI, updateWI, deleteWI,
   createPaso, updatePaso, deletePaso,
@@ -338,10 +339,13 @@ export function WorkInstructionsView() {
               <ClipboardList size={16} className="text-mcvill-accent" />
               <span className="text-sm font-black text-mcvill-text uppercase tracking-wider">WI — Instrucciones</span>
             </div>
-            <button onClick={() => setShowForm(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-mcvill-accent/15 border border-mcvill-accent/30 text-mcvill-accent text-xs font-bold hover:bg-mcvill-accent/25 transition-all">
-              <Plus size={13} /> Nueva
-            </button>
+            <div className="flex items-center gap-1.5">
+              <button onClick={() => setShowForm(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-mcvill-accent/15 border border-mcvill-accent/30 text-mcvill-accent text-xs font-bold hover:bg-mcvill-accent/25 transition-all">
+                <Plus size={13} /> Nueva
+              </button>
+              <PrintButton />
+            </div>
           </div>
           {/* Search */}
           <div className="relative mb-2">

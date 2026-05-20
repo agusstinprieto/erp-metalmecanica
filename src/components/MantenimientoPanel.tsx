@@ -10,6 +10,7 @@ import { supabase } from '../lib/supabase';
 import { ImportDataModal, IMPORT_CONFIGS } from './ImportDataModal';
 import { useTenant } from '../hooks/useTenant';
 import { reportUtils } from '../utils/reportUtils';
+import { PrintButton } from './common/PrintButton';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -165,6 +166,7 @@ export const MantenimientoPanel: React.FC = () => {
             </p>
           </div>
         </div>
+        <PrintButton />
       </div>
 
       {/* Tab bar — Compact */}

@@ -21,6 +21,7 @@ import {
 } from '../services/desempenoService';
 
 import { useConfig } from '../contexts/ConfigContext';
+import { PrintButton } from './common/PrintButton';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function getThisWeek(): string {
@@ -507,6 +508,7 @@ export const DesempenoView: React.FC = () => {
             <p className="text-[10px] text-mcvill-text-muted font-black uppercase tracking-wider">Semana</p>
             <p className="text-sm font-black text-mcvill-text tabular-nums">{periodo}</p>
           </div>
+          <PrintButton />
         </div>
       </div>
 

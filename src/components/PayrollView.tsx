@@ -27,6 +27,7 @@ import { appConfirm } from '../lib/dialogs';
 import { PayrollCalculatorModal } from './PayrollCalculatorModal';
 import { PayrollPoliciesModal } from './PayrollPoliciesModal';
 import { FormulaPanel, FORMULAS } from './common/FormulaPanel';
+import { PrintButton } from './common/PrintButton';
 
 const StatusBadge = ({ status }: { status: string }) => {
   const configs: any = {
@@ -193,12 +194,13 @@ export const PayrollView = () => {
           >
             <Download size={12} /> REPORTE
           </button>
-          <button 
+          <button
             onClick={() => setShowCalculatorModal(true)}
             className="flex items-center gap-1.5 px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-600/20 active:scale-95"
           >
             <Calculator size={12} /> CALCULADORA
           </button>
+          <PrintButton />
         </div>
       </div>
 

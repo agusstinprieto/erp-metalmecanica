@@ -20,6 +20,7 @@ import { CatalogManagerModal } from './CatalogManagerModal';
 import { OCManagerModal } from './OCManagerModal';
 import { ViajeroQRModal } from './ViajeroQRModal';
 import { CyberModal } from './common/CyberModal';
+import { PrintButton } from './common/PrintButton';
 
 const BRIDGE_URL = (import.meta as any).env?.VITE_BRIDGE_URL || 'http://localhost:5005';
 
@@ -904,6 +905,7 @@ export const ViajeroAdminPanel: React.FC<{
             >
               <Plus size={13} /> Nuevo
             </button>
+            <PrintButton />
           </div>
         </div>
 

@@ -9,6 +9,7 @@ import { OCProveedorManagerModal } from './OCProveedorManagerModal';
 import { useTenant } from '../hooks/useTenant';
 import { reportUtils } from '../utils/reportUtils';
 import { PurchasingAgentTab } from './PurchasingAgentTab';
+import { PrintButton } from './common/PrintButton';
 
 type TabId = 'proveedores' | 'materiales' | 'operaciones' | 'ordenes_compra' | 'agente_ia';
 
@@ -679,6 +680,7 @@ export const ComprasPanel: React.FC = () => {
           <div className="text-[8px] font-mono text-slate-500 uppercase tracking-widest">
             CADENA DE SUMINISTRO: <span className="text-amber-400">ACTIVO</span>
           </div>
+          <PrintButton />
         </div>
       </div>
 

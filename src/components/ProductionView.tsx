@@ -15,6 +15,7 @@ import { useSearch } from '../contexts/SearchContext';
 import { useConfig } from '../contexts/ConfigContext';
 import { appConfirm } from '../lib/dialogs';
 import { ShopFloorTracking } from './ShopFloorTracking';
+import { PrintButton } from './common/PrintButton';
 import { ProductionDashboard } from './ProductionDashboard';
 
 export const ProductionView: React.FC = () => {
@@ -198,6 +199,7 @@ export const ProductionView: React.FC = () => {
           <button onClick={() => setShowModal(true)} className="mcvill-btn-create flex items-center gap-2 px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all shadow-lg shadow-emerald-600/20">
             <Plus size={13} /> Nueva Orden
           </button>
+          <PrintButton />
         </div>
       </div>
 

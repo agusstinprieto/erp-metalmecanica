@@ -11,6 +11,7 @@ import { aiService } from '../services/aiService';
 import { eventBus } from '../utils/eventBus';
 import { reportUtils } from '../utils/reportUtils';
 import { supabase } from '../lib/supabase';
+import { PrintButton } from './common/PrintButton';
 
 interface SecurityCamera {
   id: string;
@@ -896,6 +897,7 @@ export const SeguridadIndustrialView: React.FC = () => {
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-sky-600/20 border border-sky-500/30 text-sky-400 hover:bg-sky-600/30 text-[9px] font-black uppercase transition-all">
               <Plus size={12} /> <span className="hidden sm:inline">Cámara</span>
             </button>
+            <PrintButton />
           </div>
         </div>
 

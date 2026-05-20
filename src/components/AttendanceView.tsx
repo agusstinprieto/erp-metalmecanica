@@ -17,6 +17,7 @@ import type { AttendanceRecord as MyRecord } from '../services/attendanceService
 import { employeeService, type Employee } from '../services/employeeService';
 import { shiftService, type WorkShift } from '../services/shiftService';
 import { User } from 'lucide-react';
+import { PrintButton } from './common/PrintButton';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -324,6 +325,7 @@ export const AttendanceView: React.FC = () => {
           <button onClick={() => setShowScanner(true)} className="flex items-center gap-1.5 px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all shadow-lg shadow-emerald-600/20 active:scale-95">
             <Scan size={12} /> MODO ESCÁNER
           </button>
+          <PrintButton />
         </div>
       </div>
 

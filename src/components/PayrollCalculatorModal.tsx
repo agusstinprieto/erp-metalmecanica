@@ -250,107 +250,127 @@ export const PayrollCalculatorModal: React.FC<PayrollCalculatorModalProps> = ({
     onClose();
   };
 
+  const buildReceiptHTML = (calc: PayrollCalculation, isLast: boolean) => `
+    <div class="receipt${isLast ? '' : ' page-break'}">
+      <div class="header">
+        <div class="header-left">
+          <div class="company-name">${config.logoText || 'McVill Control ERP'}</div>
+          <div class="company-sub">RECIBO DE NÓMINA DIGITAL</div>
+        </div>
+        <div class="header-right">
+          <div class="period-label">PERIODO DE PAGO</div>
+          <div class="period-value">${format(new Date(payrollPeriod.start + 'T12:00:00'), 'dd/MM/yyyy')} – ${format(new Date(payrollPeriod.end + 'T12:00:00'), 'dd/MM/yyyy')}</div>
+        </div>
+      </div>
+
+      <div class="employee-box">
+        <div class="employee-title">DATOS DEL EMPLEADO</div>
+        <div class="employee-grid">
+          <div><span class="label">Nombre:</span> <strong>${calc.employee_name}</strong></div>
+          <div><span class="label">No. Empleado:</span> ${calc.employee_number}</div>
+          <div><span class="label">Puesto:</span> ${calc.job_title}</div>
+          <div><span class="label">Departamento:</span> ${calc.department}</div>
+          <div><span class="label">Días Trabajados:</span> ${calc.worked_days}</div>
+          <div><span class="label">Salario Diario:</span> $${calc.daily_salary.toLocaleString('es-MX')}</div>
+        </div>
+      </div>
+
+      <div class="concepts-title">DESGLOSE DE CONCEPTOS</div>
+      <div class="concepts-grid">
+        <div class="col">
+          <div class="col-header">PERCEPCIONES (+)</div>
+          <div class="row-item"><span>Sueldo Base</span><span>$${calc.gross_salary.toLocaleString('es-MX')}</span></div>
+          ${calc.overtime_hours > 0 ? `<div class="row-item"><span>Horas Extra (${calc.overtime_hours}h)</span><span>$${calc.overtime_amount.toLocaleString('es-MX')}</span></div>` : ''}
+          ${calc.bonus_oee > 0 ? `<div class="row-item"><span>Bono OEE</span><span>$${calc.bonus_oee.toLocaleString('es-MX')}</span></div>` : ''}
+          <div class="row-total"><span>Total Percepciones</span><span>$${calc.perception_total.toLocaleString('es-MX')}</span></div>
+        </div>
+        <div class="col">
+          <div class="col-header deduct">DEDUCCIONES (-)</div>
+          <div class="row-item"><span>IMSS Obrero</span><span class="red">-$${calc.imss_employee.toLocaleString('es-MX')}</span></div>
+          <div class="row-item"><span>ISR Retención</span><span class="red">-$${calc.isr.toLocaleString('es-MX')}</span></div>
+          ${calc.infonavit_discount > 0 ? `<div class="row-item"><span>INFONAVIT</span><span class="red">-$${calc.infonavit_discount.toLocaleString('es-MX')}</span></div>` : ''}
+          ${calc.absences_discount > 0 ? `<div class="row-item"><span>Ausencias</span><span class="red">-$${calc.absences_discount.toLocaleString('es-MX')}</span></div>` : ''}
+          ${calc.other_deductions > 0 ? `<div class="row-item"><span>Otras Deducciones</span><span class="red">-$${calc.other_deductions.toLocaleString('es-MX')}</span></div>` : ''}
+          <div class="row-total"><span>Total Deducciones</span><span class="red">-$${calc.deduction_total.toLocaleString('es-MX')}</span></div>
+        </div>
+      </div>
+
+      <div class="neto-box">
+        <span class="neto-label">NETO A RECIBIR:</span>
+        <span class="neto-value">$${calc.net_salary.toLocaleString('es-MX')} MXN</span>
+      </div>
+
+      <div class="signatures">
+        <div class="sig-block"><div class="sig-line"></div><div class="sig-name">FIRMA DEL EMPLEADO</div></div>
+        <div class="sig-block"><div class="sig-line"></div><div class="sig-name">REPRESENTANTE DE LA EMPRESA</div></div>
+      </div>
+
+      <div class="footer-legal">
+        Este recibo constituye una constancia de pago de conformidad con la Ley Federal del Trabajo mexicana. &nbsp;·&nbsp; ${config.logoText || 'McVill ERP'} &nbsp;·&nbsp; Generado: ${new Date().toLocaleDateString('es-MX')}
+      </div>
+    </div>`;
+
   const printReceipt = (calc: PayrollCalculation) => {
     const receiptWindow = window.open('', '_blank');
     if (!receiptWindow) return;
-    
-    receiptWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Recibo de Nomina - ${calc.employee_name}</title>
-        <style>
-          * { margin: 0; padding: 0; box-sizing: border-box; }
-          body { font-family: 'Courier New', monospace; padding: 20px; font-size: 12px; }
-          .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
-          .header h1 { font-size: 18px; margin-bottom: 5px; }
-          .header h2 { font-size: 14px; font-weight: normal; }
-          .period { text-align: center; background: #f0f0f0; padding: 8px; margin-bottom: 15px; }
-          .employee-info { display: flex; justify-content: space-between; border: 1px solid #000; padding: 10px; margin-bottom: 15px; }
-          .section { margin-bottom: 15px; }
-          .section-title { background: #333; color: #fff; padding: 5px 10px; font-weight: bold; margin-bottom: 5px; }
-          table { width: 100%; border-collapse: collapse; }
-          td { padding: 5px 10px; border: 1px solid #ddd; }
-          td:first-child { font-weight: bold; width: 60%; }
-          .text-right { text-align: right; }
-          .totals { font-weight: bold; background: #f9f9f9; }
-          .neto { font-size: 16px; background: #e0ffe0; }
-          .deductions { color: #c00; }
-          .footer { margin-top: 20px; border-top: 1px solid #000; padding-top: 10px; font-size: 10px; text-align: center; }
-          .break { page-break-after: always; }
-          @media print { .break { page-break-after: always; } }
-        </style>
-      </head>
-      <body>
-        <div class="header">
-          <h1>M CVILL Control ERP</h1>
-          <h2>RECIBO DE NOMINA</h2>
-        </div>
-        
-        <div class="period">
-          <strong>PERIODO:</strong> ${format(new Date(payrollPeriod.start), 'dd/MM/yyyy')} - ${format(new Date(payrollPeriod.end), 'dd/MM/yyyy')}
-          | DIAS TRABAJADOS: ${calc.worked_days}
-        </div>
-        
-        <div class="employee-info">
-          <div>
-            <strong>EMPLEADO:</strong> ${calc.employee_name}<br/>
-            <strong>NO. EMPLEADO:</strong> ${calc.employee_number}
-          </div>
-          <div>
-            <strong>DEPARTAMENTO:</strong> ${calc.department}<br/>
-            <strong>PUESTO:</strong> ${calc.job_title}
-          </div>
-        </div>
-        
-        <div class="section">
-          <div class="section-title">PERCEPCIONES</div>
-          <table>
-            <tr><td>Salario Diario</td><td class="text-right">$${calc.daily_salary.toLocaleString()}</td></tr>
-            <tr><td>Dias Trabajados</td><td class="text-right">${calc.worked_days}</td></tr>
-            <tr><td>SUELDO BRUTO</td><td class="text-right"><strong>$${calc.gross_salary.toLocaleString()}</strong></td></tr>
-            ${calc.overtime_hours > 0 ? `<tr><td>Horas Extra (${calc.overtime_hours}h)</td><td class="text-right">$${calc.overtime_amount.toLocaleString()}</td></tr>` : ''}
-            ${calc.bonus_oee > 0 ? `<tr><td>Bono OEE</td><td class="text-right">$${calc.bonus_oee.toLocaleString()}</td></tr>` : ''}
-            <tr class="totals"><td>TOTAL PERCEPCIONES</td><td class="text-right">$${calc.perception_total.toLocaleString()}</td></tr>
-          </table>
-        </div>
-        
-        <div class="section">
-          <div class="section-title">DEDUCCIONES</div>
-          <table>
-            <tr><td>IMSS (Cuota Obrera)</td><td class="text-right deductions">-$${calc.imss_employee.toLocaleString()}</td></tr>
-            <tr><td>ISR (Impuesto Sobre la Renta)</td><td class="text-right deductions">-$${calc.isr.toLocaleString()}</td></tr>
-            ${calc.infonavit_discount > 0 ? `<tr><td>INFONAVIT</td><td class="text-right deductions">-$${calc.infonavit_discount.toLocaleString()}</td></tr>` : ''}
-            ${calc.absences_discount > 0 ? `<tr><td>Descuento por Ausencias</td><td class="text-right deductions">-$${calc.absences_discount.toLocaleString()}</td></tr>` : ''}
-            ${calc.other_deductions > 0 ? `<tr><td>Otras Deducciones</td><td class="text-right deductions">-$${calc.other_deductions.toLocaleString()}</td></tr>` : ''}
-            <tr class="totals"><td>TOTAL DEDUCCIONES</td><td class="text-right deductions">-$${calc.deduction_total.toLocaleString()}</td></tr>
-          </table>
-        </div>
-        
-        <div class="section">
-          <table>
-            <tr class="neto"><td>NETO A PAGAR</td><td class="text-right"><strong>$${calc.net_salary.toLocaleString()}</strong></td></tr>
-          </table>
-        </div>
-        
-        <div class="section">
-          <div class="section-title">INFORMACION COMPLEMENTARIA</div>
-          <table>
-            <tr><td>IMSS Patron</td><td class="text-right">$${calc.imss_employer.toLocaleString()}</td></tr>
-            ${calc.infonavit_credit > 0 ? `<tr><td>Credito INFONAVIT (UMA)</td><td class="text-right">$${calc.infonavit_credit.toLocaleString()}</td></tr>` : ''}
-          </table>
-        </div>
-        
-        <div class="footer">
-          <p>Este recibo es un documento informativo. ${config.logoText} v6.2</p>
-          <p>Generado el ${new Date().toLocaleString()}</p>
-        </div>
-      </body>
-      </html>
-    `);
+    receiptWindow.document.write(buildPrintWindow([calc]));
     receiptWindow.document.close();
     receiptWindow.print();
   };
+
+  const printAllReceipts = () => {
+    if (calculations.length === 0) return;
+    const receiptWindow = window.open('', '_blank');
+    if (!receiptWindow) return;
+    receiptWindow.document.write(buildPrintWindow(calculations));
+    receiptWindow.document.close();
+    receiptWindow.print();
+  };
+
+  const buildPrintWindow = (calcs: PayrollCalculation[]) => `<!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Recibos de Nómina</title>
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #1e293b; background: #fff; }
+        .receipt { padding: 28px 32px; max-width: 800px; margin: 0 auto; }
+        .page-break { page-break-after: always; }
+        .header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 14px; border-bottom: 1.5px solid #e2e8f0; margin-bottom: 16px; }
+        .company-name { font-size: 17px; font-weight: 900; color: #1e3a8a; letter-spacing: 0.5px; }
+        .company-sub { font-size: 9px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+        .header-right { text-align: right; }
+        .period-label { font-size: 9px; font-weight: 700; color: #1e293b; text-transform: uppercase; letter-spacing: 0.8px; }
+        .period-value { font-size: 11px; color: #475569; margin-top: 2px; }
+        .employee-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px 16px; margin-bottom: 18px; }
+        .employee-title { font-size: 9px; font-weight: 800; color: #1e293b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .employee-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px 20px; }
+        .employee-grid div { font-size: 10px; color: #475569; }
+        .label { color: #94a3b8; }
+        .concepts-title { font-size: 10px; font-weight: 800; color: #1e3a8a; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; border-bottom: 2px solid #1e3a8a; padding-bottom: 3px; }
+        .concepts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; margin-bottom: 18px; }
+        .col { }
+        .col-header { font-size: 9px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 1px solid #cbd5e1; padding-bottom: 3px; margin-bottom: 5px; }
+        .col-header.deduct { color: #7f1d1d; }
+        .row-item { display: flex; justify-content: space-between; padding: 3px 0; font-size: 10px; color: #334155; border-bottom: 1px solid #f1f5f9; }
+        .row-total { display: flex; justify-content: space-between; padding: 5px 0; font-size: 10px; font-weight: 700; color: #0f172a; border-top: 1px solid #cbd5e1; margin-top: 3px; }
+        .red { color: #b91c1c; }
+        .neto-box { background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 6px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .neto-label { font-size: 11px; font-weight: 800; color: #1e3a8a; text-transform: uppercase; letter-spacing: 0.8px; }
+        .neto-value { font-size: 18px; font-weight: 900; color: #1e3a8a; }
+        .signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .sig-block { text-align: center; }
+        .sig-line { border-bottom: 1px solid #94a3b8; margin-bottom: 6px; height: 40px; }
+        .sig-name { font-size: 8px; color: #64748b; text-transform: uppercase; letter-spacing: 0.8px; }
+        .footer-legal { font-size: 7.5px; color: #94a3b8; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 8px; line-height: 1.5; }
+        @media print { .page-break { page-break-after: always; } body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+      </style>
+    </head>
+    <body>
+      ${calcs.map((c, i) => buildReceiptHTML(c, i === calcs.length - 1)).join('')}
+    </body>
+    </html>`;
 
   const toggleEmployee = (id: string) => {
     setSelectedEmployees(prev => 
@@ -635,11 +655,16 @@ export const PayrollCalculatorModal: React.FC<PayrollCalculatorModalProps> = ({
                         "p-3 text-[9px] font-black uppercase tracking-widest flex items-center justify-between",
                         isDarkMode ? "bg-slate-900 text-slate-500" : "bg-slate-100 text-slate-500"
                       )}>
-                        <span>Resumen de Calculos</span>
                         <span className="flex items-center gap-4">
                           <span className="text-emerald-400">Bruto Total: ${calculations.reduce((a, c) => a + c.gross_salary, 0).toLocaleString()}</span>
                           <span className="text-blue-400">Neto Total: ${calculations.reduce((a, c) => a + c.net_salary, 0).toLocaleString()}</span>
                         </span>
+                        <button
+                          onClick={printAllReceipts}
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-slate-900 font-black rounded-lg hover:bg-slate-100 transition-all text-[9px] uppercase tracking-wider shadow-sm"
+                        >
+                          <Printer size={11} /> Imprimir Todos ({calculations.length})
+                        </button>
                       </div>
                       
                       <div className="max-h-80 overflow-auto custom-scrollbar">

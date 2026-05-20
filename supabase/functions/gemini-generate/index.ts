@@ -76,7 +76,7 @@ serve(async (req: Request) => {
       qwen:      'qwen_api_key',
     };
 
-    if (!provider || provider === 'auto') { provider = 'deepseek'; model = model || 'deepseek-chat'; }
+    if (!provider || provider === 'auto') { provider = 'google'; model = model || 'gemini-2.5-flash-lite'; }
 
     const col = providerColumnMap[provider] || `${provider}_api_key`;
 

@@ -10,6 +10,7 @@ import { supabase, getActiveTenantId } from '../lib/supabase';
 import { productionService } from '../services/productionService';
 import { reportUtils } from '../utils/reportUtils';
 import { shiftService } from '../services/shiftService';
+import { PrintButton } from './common/PrintButton';
 
 const DAY_LABELS = ['DOM', 'LUN', 'MAR', 'MIE', 'JUE', 'VIE', 'SAB'];
 const BANK_API_KEY = 'mcvill_bank_api_key';
@@ -816,6 +817,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
             >
               <Plus size={12} /> ORDEN
             </button>
+            <PrintButton />
           </div>
         </div>
 

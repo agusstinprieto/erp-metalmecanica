@@ -12,6 +12,7 @@ import { reportUtils } from '../utils/reportUtils';
 import { appConfirm } from '../lib/dialogs';
 import { Toast } from './common/Toast';
 import { useConfig } from '../contexts/ConfigContext';
+import { PrintButton } from './common/PrintButton';
 
 type Tab = 'nueva' | 'historial';
 
@@ -613,6 +614,7 @@ PRÓXIMO SEGUIMIENTO: ${form.seguimiento || '(No especificado)'}`;
           <div className="text-[9px] font-black text-slate-600 uppercase tracking-widest">
             {historial.length} actas guardadas
           </div>
+          <PrintButton />
         </div>
       </div>
 

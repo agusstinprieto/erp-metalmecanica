@@ -708,3 +708,30 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
   filter: none;
   opacity: 0.6;
 }
+
+/* ============================================================
+   AGUS PRO - PRINT / PDF STYLES
+   ============================================================ */
+@media print {
+  .no-print,
+  nav, aside,
+  [class*="sidebar"], [class*="Sidebar"],
+  [class*="navbar"], [class*="Navbar"],
+  [class*="fixed bottom"], [class*="toast"], [class*="Toast"],
+  [class*="chat"], [class*="AIChatBubble"] {
+    display: none !important;
+  }
+  body { background: white !important; color: black !important; }
+  body::before { display: none !important; }
+  .print-area { width: 100% !important; margin: 0 !important; padding: 1rem !important;
+    background: white !important; color: black !important; box-shadow: none !important; }
+  [class*="bg-slate"], [class*="bg-gray"], [class*="glass"], [class*="backdrop"] {
+    background: white !important; border-color: #e5e7eb !important;
+    backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+  [class*="text-white"], [class*="text-slate"], [class*="text-gray"] { color: #111827 !important; }
+  table { width: 100% !important; border-collapse: collapse !important; }
+  th, td { border: 1px solid #d1d5db !important; padding: 6px 10px !important;
+    color: #111827 !important; background: white !important; }
+  th { background: #f3f4f6 !important; font-weight: 700 !important; }
+  @page { margin: 1.5cm; }
+}

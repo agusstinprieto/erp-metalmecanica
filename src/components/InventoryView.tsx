@@ -16,6 +16,7 @@ import { ScrapAnalyzerModal } from './ScrapAnalyzerModal';
 import { useSearch } from '../contexts/SearchContext';
 import { useConfig } from '../contexts/ConfigContext';
 import { appConfirm } from '../lib/dialogs';
+import { PrintButton } from './common/PrintButton';
 
 export const InventoryView: React.FC = () => {
   const { config } = useConfig();
@@ -204,6 +205,7 @@ Responde en español, formato conciso con bullets. Sé directo y específico.`;
           <button onClick={loadInventory} className="p-1.5 bg-white/5 border border-white/10 rounded-lg text-slate-400 hover:text-white transition-all">
             <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
           </button>
+          <PrintButton />
         </div>
       </div>
 

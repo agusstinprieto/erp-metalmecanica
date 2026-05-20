@@ -9,6 +9,7 @@ import {
   Hammer, Users, Calendar,
 } from 'lucide-react';
 import { useConfig } from '../contexts/ConfigContext';
+import { PrintButton } from './common/PrintButton';
 
 interface Props {
   viajeros: any[];
@@ -122,6 +123,7 @@ export const ViajeroKPIPanel: React.FC<Props> = ({ viajeros, onBack }) => {
               </div>
             </div>
           </div>
+          <PrintButton />
         </div>
 
         {/* ── 4 KPI Cards ── */}

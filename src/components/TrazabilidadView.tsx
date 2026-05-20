@@ -10,6 +10,7 @@ import { engineeringService } from '../services/engineeringService';
 import { useSearch } from '../contexts/SearchContext';
 import { appConfirm } from '../lib/dialogs';
 import { Toast } from './common/Toast';
+import { PrintButton } from './common/PrintButton';
 import { TraceTimeline } from './TraceTimeline';
 
 type Tab = 'lotes' | 'uso' | 'revisiones' | 'timeline';
@@ -273,6 +274,7 @@ export const TrazabilidadView: React.FC = () => {
               <Plus size={12} strokeWidth={3} /> NUEVA REVISIÓN
             </button>
           )}
+          <PrintButton />
         </div>
       </div>
 

@@ -63,6 +63,7 @@ const ReportsView            = lz(() => import('./components/ReportsView'),     
 const AttendanceView         = lz(() => import('./components/AttendanceView'),         'AttendanceView');
 const ViajeroProduccionView  = lz(() => import('./components/ViajeroProduccionView'),  'ViajeroProduccionView');
 const ViajeroAdminPanel      = lz(() => import('./components/ViajeroAdminPanel'),      'ViajeroAdminPanel');
+const IngenieriaFlowView     = lz(() => import('./components/IngenieriaFlowView'),     'IngenieriaFlowView');
 const ViajeroProduccionDetailView = lz(() => import('./components/ViajeroProduccionDetailView'), 'ViajeroProduccionDetailView');
 const CosteoDashboard        = lz(() => import('./components/CosteoDashboard'),        'CosteoDashboard');
 const TrazabilidadView       = lz(() => import('./components/TrazabilidadView'),       'TrazabilidadView');
@@ -95,6 +96,10 @@ const LeadTimePredictorView = lz(() => import('./components/LeadTimePredictorVie
 const BrandingStudioView = lz(() => import('./components/BrandingStudioView'), 'BrandingStudioView');
 const WhatsAppCenterView  = lz(() => import('./components/WhatsAppCenterView'),  'WhatsAppCenterView');
 const FlujoProcesosView   = lz(() => import('./components/FlujoProcesosView'),   'FlujoProcesosView');
+const ComprasFlowView     = lz(() => import('./components/ComprasFlowView'),     'ComprasFlowView');
+const RHFlowView          = lz(() => import('./components/RHFlowView'),          'RHFlowView');
+const VentasFlowView      = lz(() => import('./components/VentasFlowView'),      'VentasFlowView');
+const CotizacionFlowView  = lz(() => import('./components/CotizacionFlowView'),  'CotizacionFlowView');
 
 type UserRole = 'ceo' | 'gerencia' | 'sistemas' | 'empleado' | 'rh' | 'finanzas' | 'contabilidad' | 'supervisor' | 'ingenieria' | 'calidad' | 'operaciones' | 'ventas' | 'compras' | 'almacen' | 'auditoria' | 'soporte' | 'marketing' | 'seguridad';
 
@@ -577,22 +582,25 @@ function App() {
             )}
             
             {isTVMode && (
-              <button 
+              <button
                 onClick={() => setIsTVMode(false)}
                 className="fixed bottom-6 right-6 z-[200] p-4 bg-rose-600 text-white rounded-full shadow-2xl hover:bg-rose-500 transition-all border-4 border-slate-950 flex items-center gap-2 font-black text-xs uppercase tracking-widest"
               >
                 <X size={20} /> Salir Modo TV
               </button>
             )}
+            {activeView === 'ingenieria_flow' && <IngenieriaFlowView />}
             {activeView === 'quality' && <QualityView />}
             {activeView === 'finance' && <FinanceView />}
             {activeView === 'settings' && <SettingsView userRole={userRole} />}
             {activeView === 'hse' && <HSEView />}
             {activeView === 'maintenance' && <MantenimientoPanel />}
             {activeView === 'ventas' && <VentasPanel />}
+            {activeView === 'ventas_flow' && <VentasFlowView />}
             {activeView === 'factibilidad' && <VentasPanel initialTab="factibilidad" />}
             {activeView === 'roi' && <VentasPanel initialTab="cotizaciones" />}
             {activeView === 'compras' && <ComprasPanel />}
+            {activeView === 'compras_flow' && <ComprasFlowView />}
             {activeView === 'help' && <HelpView />}
             {activeView === 'reports' && <ReportsView />}
             {activeView === 'attendance' && <AttendanceView />}
@@ -600,6 +608,7 @@ function App() {
             {activeView === 'minutas' && <MinutasView />}
             {activeView === 'agente_cot' && <AgenteCotizacionesView />}
             {activeView === 'rfq_kanban' && <CotizacionesKanbanView onAnalyzeRFQ={handleAnalyzeRFQ} onNavigateToViajeros={() => setActiveView('viajeros')} />}
+            {activeView === 'cotizacion_flow' && <CotizacionFlowView />}
             {activeView === 'factibilidad_ia' && <FactibilidadIAView />}
             {activeView === 'work_instructions' && <WorkInstructionsView />}
             {activeView === 'spc' && <SPCView />}
@@ -625,6 +634,7 @@ function App() {
             {activeView === 'branding_studio' && <BrandingStudioView />}
             {activeView === 'whatsapp_center' && <WhatsAppCenterView />}
             {activeView === 'flujo_procesos' && <FlujoProcesosView />}
+            {activeView === 'rh_flow' && <RHFlowView />}
           </Suspense>
           </div>
         </div>

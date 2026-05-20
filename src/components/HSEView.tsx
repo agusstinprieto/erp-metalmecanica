@@ -25,6 +25,7 @@ import { IncidentModal } from './IncidentModal';
 import { HSEFormModal } from './HSEFormModal';
 import { useConfig } from '../contexts/ConfigContext';
 import { appConfirm } from '../lib/dialogs';
+import { PrintButton } from './common/PrintButton';
 
 export const HSEView = () => {
   const { isDarkMode } = useConfig();
@@ -158,13 +159,14 @@ export const HSEView = () => {
           >
             <Download size={12} /> AUDITORÍA CONTROL
           </button>
-          <button 
+          <button
             onClick={() => handleAction('Nuevo Registro HSE')}
             className="mcvill-btn-create flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all shadow-lg shadow-emerald-600/20 active:scale-95"
           >
             <Plus size={12} strokeWidth={3} />
             {activeTab === 'incidents' ? 'REPORTAR INCIDENTE' : 'NUEVO REGISTRO'}
           </button>
+          <PrintButton />
         </div>
       </div>
 

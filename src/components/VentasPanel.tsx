@@ -16,6 +16,7 @@ import { FileDown } from 'lucide-react';
 import { OCManagerModal } from './OCManagerModal';
 import { FactibilidadGatekeeper } from './FactibilidadGatekeeper';
 import { appConfirm } from '../lib/dialogs';
+import { PrintButton } from './common/PrintButton';
 
 type TabId = 'clientes' | 'ordenes_compra' | 'cotizaciones' | 'tarifas' | 'factibilidad';
 
@@ -1679,6 +1680,7 @@ export const VentasPanel: React.FC<{ initialTab?: TabId }> = ({ initialTab }) =>
             {isFactibilidad ? 'RISK_ANALYSIS: ' : 'CRM_ACTIVE_FLOW: '}
             <span className={isFactibilidad ? 'text-rose-400 font-black' : 'text-emerald-400 font-black'}>SYNCED</span>
           </div>
+          <PrintButton />
         </div>
       </div>
 

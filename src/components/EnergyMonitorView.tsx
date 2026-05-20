@@ -17,6 +17,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { toast } from '../lib/dialogs';
 import { supabase } from '../lib/supabase';
 import { aiService } from '../services/aiService';
+import { PrintButton } from './common/PrintButton';
 
 export const EnergyMonitorView: React.FC = () => {
   const { config, isDarkMode } = useConfig();
@@ -108,13 +109,13 @@ export const EnergyMonitorView: React.FC = () => {
             Gestión Inteligente de Carga Eléctrica y Eficiencia Eléctrica CFE
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap items-center">
           {(['realtime', 'analysis', 'savings'] as const).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider border transition-all ${
-                activeTab === tab 
+                activeTab === tab
                   ? 'bg-gradient-to-r from-mcvill-accent/20 to-mcvill-accent/5 border-mcvill-accent text-mcvill-text shadow-[0_0_15px_rgba(0,128,255,0.15)]'
                   : 'bg-transparent border-white/10 text-mcvill-text-muted hover:border-mcvill-accent/30 hover:text-mcvill-text'
               }`}
@@ -122,6 +123,7 @@ export const EnergyMonitorView: React.FC = () => {
               {tab === 'realtime' ? '📊 Carga en Vivo' : tab === 'analysis' ? '🤖 Optimización IA' : '💰 Ahorros CFE'}
             </button>
           ))}
+          <PrintButton />
         </div>
       </div>
 

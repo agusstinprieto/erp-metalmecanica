@@ -10,6 +10,7 @@ import { aiService } from '../services/aiService';
 import { supabase } from '../lib/supabase';
 import { Toast } from './common/Toast';
 import { useConfig } from '../contexts/ConfigContext';
+import { PrintButton } from './common/PrintButton';
 
 interface Partida {
   concepto: string;
@@ -515,6 +516,7 @@ Genera la cotización industrial completa.`;
               </button>
             </>
           )}
+          <PrintButton />
         </div>
       </div>
 

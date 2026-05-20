@@ -53,6 +53,7 @@ import { BulkBadgePrintModal } from './BulkBadgePrintModal';
 import { eventBus } from '../utils/eventBus';
 import { User } from 'lucide-react';
 import clsx from 'clsx';
+import { PrintButton } from './common/PrintButton';
 
 interface Employee {
   id: string;
@@ -385,6 +386,7 @@ export const RHView: React.FC = () => {
           <button onClick={() => setIsModalOpen(true)} className="mcvill-btn-create flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all shadow-lg shadow-emerald-600/20">
             <UserPlus size={12} /> {language === 'en' ? 'HIRE' : 'CONTRATAR'}
           </button>
+          <PrintButton />
         </div>
       </div>
 

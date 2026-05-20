@@ -17,6 +17,7 @@ import { reportUtils } from '../utils/reportUtils';
 import { Toast } from './common/Toast';
 import { FormulaPanel, FORMULAS } from './common/FormulaPanel';
 import { formatMoneyInput, parseFormattedNumber } from '../utils/inputFormatters';
+import { PrintButton } from './common/PrintButton';
 
 type Tab = 'dashboard' | 'cxc' | 'cxp' | 'flujo';
 
@@ -258,6 +259,7 @@ export const FinanceView: React.FC = () => {
               <FileBarChart size={12} /> EXPORTAR
             </button>
           )}
+          <PrintButton />
         </div>
       </div>
 

@@ -31,6 +31,7 @@ import { reportUtils } from '../utils/reportUtils';
 import clsx from 'clsx';
 import { useConfig } from '../contexts/ConfigContext';
 import { toast } from '../lib/dialogs';
+import { PrintButton } from './common/PrintButton';
 
 export const RecruitmentView: React.FC = () => {
   const showAlert = (title: string, message: string, type: 'success' | 'error' | 'info' | 'warning' = 'info') => {
@@ -435,7 +436,7 @@ export const RecruitmentView: React.FC = () => {
           >
             <UserPlus size={14} /> Capturar Candidato
           </button>
-          <button 
+          <button
             onClick={() => {
               setFormValues({ title: '', description: '', requirements: '' });
               setIsAddingVacancy(true);
@@ -444,6 +445,7 @@ export const RecruitmentView: React.FC = () => {
           >
             <Plus size={14} /> Nueva Vacante
           </button>
+          <PrintButton />
         </div>
       </div>
 

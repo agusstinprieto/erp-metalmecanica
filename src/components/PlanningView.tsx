@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { aiService } from '../services/aiService';
+import { PrintButton } from './common/PrintButton';
 
 // ── Planning Guide Modal ──────────────────────────────────────────────────────
 
@@ -331,6 +332,7 @@ export const PlanningView: React.FC = () => {
             <BrainCircuit size={12} className="text-mcvill-accent" />
             <span className="text-[10px] font-black text-mcvill-accent uppercase tracking-widest">IA Activa</span>
           </div>
+          <PrintButton />
         </div>
       </div>
 

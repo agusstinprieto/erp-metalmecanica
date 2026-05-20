@@ -17,6 +17,7 @@ import { whatsappService } from '../services/whatsappService';
 import { format } from 'date-fns';
 import { Toast } from './common/Toast';
 import { useConfig } from '../contexts/ConfigContext';
+import { PrintButton } from './common/PrintButton';
 
 type Tab = 'kpis' | 'production' | 'inventory' | 'payroll' | 'finance' | 'envio';
 type PeriodFilter = 'week' | 'month' | 'quarter' | 'year';
@@ -324,6 +325,7 @@ export const ReportsView = () => {
               <Download size={12} strokeWidth={3} /> EXPORTAR PDF
             </button>
           )}
+          <PrintButton />
         </div>
       </div>
 

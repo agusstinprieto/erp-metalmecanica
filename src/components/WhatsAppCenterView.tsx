@@ -31,6 +31,7 @@ import { useConfig } from '../contexts/ConfigContext';
 import { aiService } from '../services/aiService';
 import { toast, appConfirm } from '../lib/dialogs';
 import { supabase } from '../lib/supabase';
+import { PrintButton } from './common/PrintButton';
 
 interface Recipient {
   id: string;
@@ -502,37 +503,40 @@ export const WhatsAppCenterView: React.FC = () => {
         </div>
 
         {/* Channel Selection Buttons */}
-        <div className="flex bg-slate-950 p-1.5 rounded-2xl border border-white/10 shrink-0 self-start">
-          <button
-            onClick={() => { setActiveChannel('whatsapp'); handleSelectTemplate(selectedTemplate); }}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase transition-all ${
-              activeChannel === 'whatsapp'
-                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/30'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <Smartphone size={13} /> WhatsApp
-          </button>
-          <button
-            onClick={() => { setActiveChannel('email'); handleSelectTemplate(selectedTemplate); }}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase transition-all ${
-              activeChannel === 'email'
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/30'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <Mail size={13} /> Correo
-          </button>
-          <button
-            onClick={() => { setActiveChannel('teams'); handleSelectTemplate(selectedTemplate); }}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase transition-all ${
-              activeChannel === 'teams'
-                ? 'bg-violet-600 text-white shadow-lg shadow-violet-900/30'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <Laptop size={13} /> Teams
-          </button>
+        <div className="flex flex-col gap-2 items-end shrink-0 self-start">
+          <div className="flex bg-slate-950 p-1.5 rounded-2xl border border-white/10">
+            <button
+              onClick={() => { setActiveChannel('whatsapp'); handleSelectTemplate(selectedTemplate); }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase transition-all ${
+                activeChannel === 'whatsapp'
+                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/30'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Smartphone size={13} /> WhatsApp
+            </button>
+            <button
+              onClick={() => { setActiveChannel('email'); handleSelectTemplate(selectedTemplate); }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase transition-all ${
+                activeChannel === 'email'
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/30'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Mail size={13} /> Correo
+            </button>
+            <button
+              onClick={() => { setActiveChannel('teams'); handleSelectTemplate(selectedTemplate); }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase transition-all ${
+                activeChannel === 'teams'
+                  ? 'bg-violet-600 text-white shadow-lg shadow-violet-900/30'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Laptop size={13} /> Teams
+            </button>
+          </div>
+          <PrintButton />
         </div>
       </div>
 

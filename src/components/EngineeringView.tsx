@@ -15,6 +15,7 @@ import { MetalQuoterView } from './MetalQuoterView';
 import NestingView from './NestingView';
 import { Scissors, DollarSign, Zap } from 'lucide-react';
 import { TarifasTab } from './SettingsView';
+import { PrintButton } from './common/PrintButton';
 
 // ─── Status config ───────────────────────────────────────────────────────────
 
@@ -145,6 +146,7 @@ export const EngineeringView: React.FC = () => {
           <button onClick={loadProjects} className="p-1.5 bg-white/5 border border-white/10 rounded-lg text-slate-400 hover:text-white transition-all">
             <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
           </button>
+          <PrintButton />
         </div>
       </div>
 

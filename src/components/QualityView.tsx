@@ -13,6 +13,7 @@ import { useSearch } from '../contexts/SearchContext';
 import { appConfirm, appPrompt } from '../lib/dialogs';
 import { reportUtils } from '../utils/reportUtils';
 import { Toast } from './common/Toast';
+import { PrintButton } from './common/PrintButton';
 
 type Tab = 'inspections' | 'nc' | 'audits' | 'metrics' | 'cam_hub';
 
@@ -680,6 +681,7 @@ export const QualityView: React.FC = () => {
               <Download size={12} /> EXPORTAR
             </button>
           )}
+          <PrintButton />
         </div>
       </div>
 

@@ -19,6 +19,7 @@ import { useQuoteStatus } from '../hooks/useQuoteStatus';
 import { useTenant } from '../hooks/useTenant';
 import { useConfig } from '../contexts/ConfigContext';
 import { appConfirm, toast } from '../lib/dialogs';
+import { PrintButton } from './common/PrintButton';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -963,6 +964,7 @@ export const CotizacionesKanbanView: React.FC<{
             className="mcvill-btn-create flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-emerald-600/20">
             <Plus size={12} strokeWidth={3} />Nueva RFQ
           </button>
+          <PrintButton />
         </div>
       </div>
 

@@ -9,6 +9,7 @@ import { useConfig } from '../contexts/ConfigContext';
 import { ViajeroAdminPanel } from './ViajeroAdminPanel';
 import { ViajeroKPIPanel } from './ViajeroKPIPanel';
 import clsx from 'clsx';
+import { PrintButton } from './common/PrintButton';
 
 // ─── Tipos ───────────────────────────────────────────────────────────────────
 
@@ -192,6 +193,7 @@ export const ViajeroProduccionView: React.FC = () => {
           <button onClick={fetchData} className="p-1.5 bg-white/5 border border-white/10 rounded-lg text-slate-400 hover:text-white transition-all active:scale-95">
             <RefreshCw size={12} className={loading ? 'animate-spin text-blue-500' : ''} {...(loading ? { role: 'status', 'aria-label': 'Cargando' } : {})} />
           </button>
+          <PrintButton />
         </div>
       </div>
 

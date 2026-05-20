@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import { useConfig } from '../contexts/ConfigContext';
 import clsx from 'clsx';
 import { toast } from '../lib/dialogs';
+import { PrintButton } from './common/PrintButton';
 import { stripLeadingZeros, parseFormattedNumber } from '../utils/inputFormatters';
 
 export const CotizadorExpress: React.FC = () => {
@@ -175,6 +176,7 @@ export const CotizadorExpress: React.FC = () => {
             <p className="text-[9px] text-cyan-400 font-black uppercase tracking-widest">Cálculo paramétrico en tiempo real</p>
           </div>
         </div>
+        <PrintButton />
       </div>
 
       <div className="bg-cyan-500/5 border border-cyan-500/10 rounded-xl p-3 mb-4 flex items-start gap-3">

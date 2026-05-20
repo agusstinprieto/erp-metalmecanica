@@ -28,6 +28,7 @@ import {
 import { supabase } from '../lib/supabase';
 import { useConfig } from '../contexts/ConfigContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { PrintButton } from './common/PrintButton';
 
 interface Driver {
   id: string;
@@ -765,6 +766,7 @@ export function DeliveryTrackerView() {
               <span className="text-[7px] text-emerald-400 font-bold uppercase tracking-wider mt-0.5">12 Satélites Enlazados</span>
             </div>
           </div>
+          <PrintButton />
         </div>
       </div>
 
