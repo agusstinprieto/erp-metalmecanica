@@ -49,6 +49,7 @@ import { reportUtils } from '../utils/reportUtils';
 import { EmployeeFormModal } from './EmployeeFormModal';
 import { ImportEmployeesModal } from './ImportEmployeesModal';
 import { EmployeeBadgeModal } from './EmployeeBadgeModal';
+import { BulkBadgePrintModal } from './BulkBadgePrintModal';
 import { eventBus } from '../utils/eventBus';
 import { User } from 'lucide-react';
 import clsx from 'clsx';
@@ -227,6 +228,7 @@ export const RHView: React.FC = () => {
   const [isBadgeModalOpen, setIsBadgeModalOpen] = useState(false);
   const [badgeEmployee, setBadgeEmployee] = useState<Employee | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isBulkBadgeModalOpen, setIsBulkBadgeModalOpen] = useState(false);
   const [bajaModal, setBajaModal] = useState<{ employee: Employee; onConfirm: () => Promise<void> } | null>(null);
   const [employeeLayout, setEmployeeLayout] = useState<'list' | 'card'>('list');
 
@@ -422,12 +424,20 @@ export const RHView: React.FC = () => {
               </div>
               <div className="flex items-center gap-2 ml-auto">
                 {selectedIds.length > 0 && (
-                  <button 
-                    onClick={handleDeleteSelected}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-rose-600/20"
-                  >
-                    <Trash2 size={12} /> {language === 'en' ? 'DELETE SELECTED' : 'ELIMINAR SELECCIONADOS'} ({selectedIds.length})
-                  </button>
+                  <>
+                    <button
+                      onClick={() => setIsBulkBadgeModalOpen(true)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-indigo-600/20"
+                    >
+                      <Award size={12} /> {language === 'en' ? 'PRINT BADGES' : 'IMPRIMIR GAFETES'} ({selectedIds.length})
+                    </button>
+                    <button
+                      onClick={handleDeleteSelected}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-rose-600/20"
+                    >
+                      <Trash2 size={12} /> {language === 'en' ? 'DELETE SELECTED' : 'ELIMINAR SELECCIONADOS'} ({selectedIds.length})
+                    </button>
+                  </>
                 )}
                 <button onClick={handleDownloadReport} className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-white/10 text-slate-400 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all">
                   <Download size={12} /> {language === 'en' ? 'REPORT' : 'REPORTE'}
@@ -740,6 +750,12 @@ export const RHView: React.FC = () => {
         isOpen={isBadgeModalOpen}
         onClose={() => { setIsBadgeModalOpen(false); setBadgeEmployee(null); }}
         employee={badgeEmployee}
+      />
+
+      <BulkBadgePrintModal
+        isOpen={isBulkBadgeModalOpen}
+        onClose={() => setIsBulkBadgeModalOpen(false)}
+        employees={employees.filter(e => selectedIds.includes(e.id))}
       />
 
       {bajaModal && (

@@ -13,7 +13,8 @@ import { appConfirm, toast } from '../lib/dialogs';
 import { FactibilidadGatekeeper } from './FactibilidadGatekeeper';
 import { MetalQuoterView } from './MetalQuoterView';
 import NestingView from './NestingView';
-import { Scissors, DollarSign } from 'lucide-react';
+import { Scissors, DollarSign, Zap } from 'lucide-react';
+import { TarifasTab } from './SettingsView';
 
 // ─── Status config ───────────────────────────────────────────────────────────
 
@@ -26,7 +27,7 @@ const STATUS: Record<string, { label: string; cls: string; icon: React.ElementTy
 
 export const EngineeringView: React.FC = () => {
   const { isDarkMode } = useConfig();
-  const [activeTab, setActiveTab] = useState<'proyectos' | 'factibilidad' | 'cotizacion' | 'nesting'>('proyectos');
+  const [activeTab, setActiveTab] = useState<'proyectos' | 'factibilidad' | 'cotizacion' | 'nesting' | 'tarifas'>('proyectos');
   const [projects, setProjects]           = useState<any[]>([]);
   const [loading, setLoading]             = useState(true);
   const [search, setSearch]               = useState('');
@@ -204,9 +205,20 @@ export const EngineeringView: React.FC = () => {
           >
             <Scissors size={11} /> OPTIMIZADOR NESTING
           </button>
+          <button
+            onClick={() => setActiveTab('tarifas')}
+            className={clsx(
+              "px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2 border",
+              activeTab === 'tarifas' ? "bg-orange-600/20 border-orange-500 text-orange-400" : "bg-white/5 border-white/10 text-slate-500"
+            )}
+          >
+            <Zap size={11} /> TARIFARIO
+          </button>
         </div>
 
-        {activeTab === 'factibilidad' ? (
+        {activeTab === 'tarifas' ? (
+          <TarifasTab />
+        ) : activeTab === 'factibilidad' ? (
           <FactibilidadGatekeeper />
         ) : activeTab === 'cotizacion' ? (
           <MetalQuoterView />

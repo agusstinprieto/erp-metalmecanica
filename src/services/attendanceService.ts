@@ -34,7 +34,7 @@ export const attendanceService = {
   async getTodayRecord(employeeId: string): Promise<AttendanceRecord | null> {
     const today = new Date().toISOString().split('T')[0];
     const { data } = await supabase
-      .from('attendance_records')
+      .from('asistencia')
       .select('*')
       .eq('employee_id', employeeId)
       .eq('date', today)
@@ -69,7 +69,7 @@ export const attendanceService = {
     }
 
     const { data, error } = await supabase
-      .from('attendance_records')
+      .from('asistencia')
       .insert({
         employee_id: employeeId,
         employee_name: employeeName,
@@ -95,10 +95,10 @@ export const attendanceService = {
     
     // Obtener datos del empleado para ver su turno
     const { data: record } = await supabase
-      .from('attendance_records')
+      .from('asistencia')
       .select('employee_id')
       .eq('id', recordId)
-      .single();
+      .maybeSingle();
     
     const { data: emp } = await supabase
       .from('empleados')
@@ -153,7 +153,7 @@ export const attendanceService = {
     }
 
     const { data, error } = await supabase
-      .from('attendance_records')
+      .from('asistencia')
       .update({
         check_out: now.toISOString(),
         minutes_worked: minutesWorked,
@@ -174,7 +174,7 @@ export const attendanceService = {
     const since = new Date();
     since.setDate(since.getDate() - 6);
     const { data } = await supabase
-      .from('attendance_records')
+      .from('asistencia')
       .select('*')
       .eq('employee_id', employeeId)
       .gte('date', since.toISOString().split('T')[0])
@@ -202,7 +202,7 @@ export const attendanceService = {
 
     const today = new Date().toISOString().split('T')[0];
     const { data: existing } = await supabase
-      .from('attendance_records')
+      .from('asistencia')
       .select('*')
       .eq('employee_id', employee.id)
       .eq('date', today)

@@ -64,6 +64,52 @@ export const HelpView = () => {
         </div>
       </div>
 
+      {/* ERP Introduction */}
+      <div className={clsx('rounded-2xl border overflow-hidden', isDarkMode ? 'bg-slate-900/40 border-white/5' : 'bg-white border-slate-200')}>
+        <div className={clsx('px-6 py-3 border-b flex items-center gap-2', isDarkMode ? 'border-white/5 bg-slate-900/60' : 'border-slate-100 bg-slate-50')}>
+          <span className="text-base">🏭</span>
+          <h2 className={clsx('text-[10px] font-black uppercase tracking-widest', isDarkMode ? 'text-white' : 'text-slate-900')}>
+            {language === 'en' ? 'What is an ERP and how is it used in industry?' : '¿Qué es un ERP y cómo se usa en la industria?'}
+          </h2>
+        </div>
+        <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className={clsx('rounded-xl p-4 border', isDarkMode ? 'bg-slate-950/50 border-white/5' : 'bg-slate-50 border-slate-100')}>
+            <p className="text-[9px] font-black text-mcvill-accent uppercase tracking-widest mb-2">
+              {language === 'en' ? 'What it is' : 'Qué es'}
+            </p>
+            <p className={clsx('text-[10px] font-bold leading-relaxed', isDarkMode ? 'text-slate-300' : 'text-slate-700')}>
+              {language === 'en'
+                ? 'ERP (Enterprise Resource Planning) is a platform that integrates all business processes — HR, production, inventory, payroll, quality and finance — into a single real-time system.'
+                : 'ERP (Enterprise Resource Planning) es una plataforma que integra todos los procesos del negocio — RH, producción, inventario, nómina, calidad y finanzas — en un solo sistema en tiempo real.'}
+            </p>
+          </div>
+          <div className={clsx('rounded-xl p-4 border', isDarkMode ? 'bg-slate-950/50 border-white/5' : 'bg-slate-50 border-slate-100')}>
+            <p className="text-[9px] font-black text-blue-400 uppercase tracking-widest mb-2">
+              {language === 'en' ? 'How industry uses it' : 'Cómo lo usa la industria'}
+            </p>
+            <ul className={clsx('text-[10px] font-bold leading-relaxed space-y-1', isDarkMode ? 'text-slate-300' : 'text-slate-700')}>
+              <li>📦 {language === 'en' ? 'Control raw material stock in real time' : 'Control de stock de materia prima en tiempo real'}</li>
+              <li>🏭 {language === 'en' ? 'Track production orders and OEE per shift' : 'Seguimiento de órdenes de producción y OEE por turno'}</li>
+              <li>👷 {language === 'en' ? 'Manage payroll, attendance and HR from one place' : 'Gestión de nómina, asistencia y RH desde un solo lugar'}</li>
+              <li>📊 {language === 'en' ? 'Decision-making with real data, not gut feeling' : 'Toma de decisiones con datos reales, no suposiciones'}</li>
+            </ul>
+          </div>
+          <div className={clsx('rounded-xl p-4 border', isDarkMode ? 'bg-slate-950/50 border-white/5' : 'bg-slate-50 border-slate-100')}>
+            <p className="text-[9px] font-black text-emerald-400 uppercase tracking-widest mb-2">
+              {language === 'en' ? 'Key benefit' : 'Beneficio clave'}
+            </p>
+            <p className={clsx('text-[10px] font-bold leading-relaxed', isDarkMode ? 'text-slate-300' : 'text-slate-700')}>
+              {language === 'en'
+                ? 'Eliminates information silos. A production record automatically updates inventory, payroll and management reports — no manual re-entry, no errors.'
+                : 'Elimina los silos de información. Un registro en producción actualiza automáticamente inventario, nómina e informes de dirección — sin captura manual, sin errores.'}
+            </p>
+            <p className={clsx('text-[9px] mt-2 font-black', isDarkMode ? 'text-slate-500' : 'text-slate-400')}>
+              {language === 'en' ? '▸ Used by: Tier-1 automotive, aerospace, metalworking, food industry' : '▸ Usado por: Tier-1 automotriz, aeroespacial, metalmecánica, alimentos'}
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Search Bar */}
       <div className="relative group">
         <Search

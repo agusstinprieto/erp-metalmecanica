@@ -1,4 +1,6 @@
-import { Viajero, ViajeroRuta, ViajeroMaterial, ViajeroParametrosMaterial } from '../types/viajero';
+import { supabase } from '../lib/supabase';
+import { Viajero, ViajeroEstatus, ViajeroRuta, ViajeroMaterial, ViajeroParametrosMaterial } from '../types/viajero';
+import { qualityService } from './qualityService';
 
 /**
  * 🚀 IA.AGUS: Motor de Lógica Industrial para Viajeros
@@ -64,9 +66,108 @@ export const viajeroService = {
    * Lógica para procesar la jerarquía de sub-ensambles.
    */
   processEnsembleHierarchy: async (parentViajero: Viajero): Promise<Viajero[]> => {
-    console.log(`🔍 IA.AGUS: Procesando jerarquía para ${parentViajero.numero_parte}`);
-    // En una implementación real, esto consultaría recursivamente la tabla viajero_componentes
-    // y recuperaría los datos de los Viajeros hijos.
-    return [parentViajero]; // Retorna el array de viajeros a imprimir
-  }
+    console.log(`Procesando jerarquía para ${parentViajero.numero_parte}`);
+    return [parentViajero];
+  },
+
+  // ─── Multi-viajero: viajeros por orden de trabajo ────────────────────────────
+
+  getViajerosByOrden: async (ordenTrabajoId: string): Promise<Viajero[]> => {
+    const { data, error } = await supabase
+      .from('viajeros')
+      .select('*, componentes:viajero_componentes(*), rutas:viajero_rutas(*), materiales:viajero_materiales(*)')
+      .eq('orden_trabajo_id', ordenTrabajoId)
+      .order('created_at', { ascending: true });
+    if (error) throw error;
+    return data || [];
+  },
+
+  // ─── Ciclo de rechazo y retrabajo ────────────────────────────────────────────
+
+  rechazarViajero: async (params: {
+    viajeroId: string;
+    motivoRechazo: string;
+    rechazadoPor: string;
+  }): Promise<void> => {
+    const { error } = await supabase
+      .from('viajeros')
+      .update({
+        estatus: 'RECHAZADO' as ViajeroEstatus,
+        motivo_rechazo: params.motivoRechazo,
+        rechazado_por: params.rechazadoPor,
+        fecha_rechazo: new Date().toISOString(),
+      })
+      .eq('id', params.viajeroId);
+    if (error) throw error;
+  },
+
+  iniciarRetrabajo: async (params: {
+    viajeroId: string;
+    descripcionFalla: string;
+    operacionesRepetir?: string[];
+    responsable?: string;
+    costoEstimado?: number;
+    noConformidadId?: string;
+    notas?: string;
+  }): Promise<void> => {
+    // 1. Crear registro de retrabajo
+    await qualityService.createRetrabajo({
+      viajero_id: params.viajeroId,
+      descripcion_falla: params.descripcionFalla,
+      disposicion: 'reparar',
+      no_conformidad_id: params.noConformidadId,
+      operaciones_repetir: params.operacionesRepetir,
+      responsable: params.responsable,
+      costo_estimado: params.costoEstimado,
+      notas: params.notas,
+    });
+
+    // 2. Cambiar estatus del viajero a EN RETRABAJO
+    const { error } = await supabase
+      .from('viajeros')
+      .update({ estatus: 'EN RETRABAJO' as ViajeroEstatus })
+      .eq('id', params.viajeroId);
+    if (error) throw error;
+  },
+
+  completarRetrabajo: async (params: {
+    viajeroId: string;
+    retrabajoId: string;
+    costoReal: number;
+    aprobadoPor: string;
+    enviarAProduccion?: boolean; // true = regresa EN PROCESO, false = va directo a inspección
+  }): Promise<void> => {
+    // 1. Cerrar el retrabajo
+    await qualityService.cerrarRetrabajo(params.retrabajoId, params.costoReal, params.aprobadoPor);
+
+    // 2. Actualizar estatus del viajero
+    const nuevoEstatus: ViajeroEstatus = params.enviarAProduccion ? 'EN PROCESO' : 'PENDIENTE';
+    const { error } = await supabase
+      .from('viajeros')
+      .update({ estatus: nuevoEstatus })
+      .eq('id', params.viajeroId);
+    if (error) throw error;
+  },
+
+  enviarViajeroAScrap: async (params: {
+    viajeroId: string;
+    retrabajoId: string;
+    cantidadScrap: number;
+    motivoScrap: string;
+    aprobadoPor: string;
+  }): Promise<void> => {
+    // 1. Marcar retrabajo como scrap
+    await qualityService.enviarAScrap(params.retrabajoId, params.aprobadoPor);
+
+    // 2. Registrar scrap en el viajero y marcarlo como rechazado definitivamente
+    const { error } = await supabase
+      .from('viajeros')
+      .update({
+        estatus: 'RECHAZADO' as ViajeroEstatus,
+        cantidad_scrap: params.cantidadScrap,
+        motivo_scrap: params.motivoScrap,
+      })
+      .eq('id', params.viajeroId);
+    if (error) throw error;
+  },
 };

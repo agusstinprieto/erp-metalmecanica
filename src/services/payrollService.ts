@@ -285,7 +285,7 @@ export const payrollService = {
     if (employeeNumbers.length === 0) return {};
 
     const { data, error } = await supabase
-      .from('attendance_records')
+      .from('asistencia')
       .select('employee_id, status, minutes_worked, overtime_minutes')
       .in('employee_id', employeeNumbers)
       .gte('date', periodStart)

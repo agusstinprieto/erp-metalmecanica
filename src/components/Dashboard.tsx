@@ -512,11 +512,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToBanco }) => {
       const todayISO = new Date().toISOString().split('T')[0];
       const [empRes, presentRes, ordenRes, safetyRes, empDetailRes, attendDetailRes] = await Promise.all([
         supabase.from('empleados').select('id', { count: 'exact', head: true }).eq('status', 'active'),
-        supabase.from('attendance_records').select('id', { count: 'exact', head: true }).eq('date', todayISO),
+        supabase.from('asistencia').select('id', { count: 'exact', head: true }).eq('date', todayISO),
         supabase.from('ordenes_mantenimiento').select('id', { count: 'exact', head: true }).in('estado', ['pendiente', 'en_proceso']),
         supabase.from('seguridad_metricas').select('dias_sin_accidente').limit(1),
         supabase.from('empleados').select('id, shift_id, job_title').eq('status', 'active'),
-        supabase.from('attendance_records').select('employee_id').eq('date', todayISO),
+        supabase.from('asistencia').select('employee_id').eq('date', todayISO),
       ]);
 
       let stockCritico = 0;

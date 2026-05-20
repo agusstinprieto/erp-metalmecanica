@@ -93,6 +93,7 @@ const WORKFLOW_SECTIONS: WorkflowSection[] = [
   {
     id: 'produccion', label: 'Producción', icon: Factory,
     items: [
+      { id: 'flujo_procesos',       label: 'Flujo de Proceso',   icon: GitBranch },
       { id: 'ordenes_trabajo',      label: 'Órdenes de Trabajo', icon: ClipboardList },
       { id: 'viajeros',             label: 'Viajeros',           icon: Route },
       { id: 'planeacion',           label: 'Planeación',         icon: CalendarDays },

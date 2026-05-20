@@ -388,9 +388,9 @@ const GanttTab: React.FC = () => {
       // Separate queries to avoid Supabase 400 relationship errors
       const { data: wos } = await supabase
         .from('ordenes_trabajo')
-        .select('id, order_number, status, created_at, project_id')
+        .select('id, order_number, status, created_at:fecha_creacion, project_id')
         .in('status', ['pending', 'in_progress', 'completed'])
-        .order('created_at', { ascending: false })
+        .order('fecha_creacion', { ascending: false })
         .limit(12);
 
       const { data: projects } = await supabase
@@ -900,9 +900,9 @@ const ForecastTab: React.FC = () => {
       try {
         const { data: orders } = await supabase
           .from('ordenes_trabajo')
-          .select('created_at, status')
-          .gte('created_at', new Date(Date.now() - 90 * 86400000).toISOString())
-          .order('created_at');
+          .select('created_at:fecha_creacion, status')
+          .gte('fecha_creacion', new Date(Date.now() - 90 * 86400000).toISOString())
+          .order('fecha_creacion');
 
         const oList = orders ?? [];
         const weeks: Record<string, number> = {};

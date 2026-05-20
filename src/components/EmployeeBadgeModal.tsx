@@ -76,8 +76,8 @@ export const EmployeeBadgeModal: React.FC<EmployeeBadgeModalProps> = ({ isOpen, 
   const statusColor = employee.status === 'active' ? '#10b981' : '#f59e0b';
 
   return (
-    <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-300">
-      <div className="w-full max-w-md bg-slate-900 border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 pt-16 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-300">
+      <div className="w-full max-w-md max-h-[calc(100vh-5rem)] bg-slate-900 border border-white/10 rounded-3xl shadow-2xl overflow-y-auto flex flex-col">
 
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">

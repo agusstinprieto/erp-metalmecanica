@@ -159,6 +159,7 @@ function drawFooters(doc: jsPDFType) {
   const pageCount = (doc.internal as any).getNumberOfPages();
   const pageW     = doc.internal.pageSize.getWidth();
   const pageH     = doc.internal.pageSize.getHeight();
+  const { mid: BLUE_MID } = getThemeColors();
 
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
@@ -212,6 +213,7 @@ async function exportToPDF(
   try {
     const [logo, { jsPDF, autoTable }] = await Promise.all([loadLogo(), loadPDF()]);
     const doc  = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'letter' });
+    const { mid: BLUE_MID } = getThemeColors();
 
     const startY = await drawHeader(doc, title, area, logo);
 

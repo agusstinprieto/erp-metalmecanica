@@ -31,7 +31,7 @@ export const productionService = {
   async getWorkOrders() {
     // Separate queries to avoid missing relationship error (400)
     const [woRes, epRes] = await Promise.all([
-      supabase.from('ordenes_trabajo').select('*').order('created_at', { ascending: false }),
+      supabase.from('ordenes_trabajo').select('*').order('fecha_creacion', { ascending: false }),
       supabase.from('engineering_projects').select('id, title')
     ]);
 
@@ -41,6 +41,7 @@ export const productionService = {
 
     return (woRes.data || []).map(wo => ({
       ...wo,
+      created_at: wo.fecha_creacion,
       engineering_projects: projectsMap.get(wo.project_id) || null,
       project_title: projectsMap.get(wo.project_id)?.title
     }));

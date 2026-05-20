@@ -203,9 +203,9 @@ async function toolStatusViajero(args: Record<string, any>): Promise<ToolResult>
 async function toolCuellosBottleneck(): Promise<ToolResult> {
   const { data: orders } = await supabase
     .from('ordenes_trabajo')
-    .select('id, order_number, status, progress, created_at')
+    .select('id, order_number, status, progress, created_at:fecha_creacion')
     .in('status', ['in_progress', 'pending'])
-    .order('created_at');
+    .order('fecha_creacion');
 
   const now = Date.now();
   const bottlenecks = (orders ?? [])
@@ -240,7 +240,7 @@ async function toolAlertaParo(): Promise<ToolResult> {
     supabase.from('materiales').select('descripcion_mp, peso_mp, stock_minimo_mp').limit(50),
     supabase.from('maintenance_requests').select('id, title, priority, status')
       .in('status', ['pending', 'open']).eq('priority', 'critical').limit(5),
-    supabase.from('ordenes_trabajo').select('order_number, status, progress, created_at')
+    supabase.from('ordenes_trabajo').select('order_number, status, progress, created_at:fecha_creacion')
       .eq('status', 'in_progress').lt('progress', 30).limit(5),
   ]);
 
@@ -275,9 +275,9 @@ async function toolAlertaParo(): Promise<ToolResult> {
 async function toolListarOrdenes(): Promise<ToolResult> {
   const { data: orders } = await supabase
     .from('ordenes_trabajo')
-    .select('order_number, status, progress, created_at, project_id')
+    .select('order_number, status, progress, created_at:fecha_creacion, project_id')
     .in('status', ['in_progress', 'pending'])
-    .order('created_at', { ascending: false })
+    .order('fecha_creacion', { ascending: false })
     .limit(12);
 
   const { data: projects } = await supabase.from('engineering_projects').select('id, title');
@@ -306,7 +306,7 @@ async function toolEficienciaTurno(): Promise<ToolResult> {
   const today = new Date().toISOString().split('T')[0];
 
   const [attendanceRes, ordersRes] = await Promise.all([
-    supabase.from('attendance_records')
+    supabase.from('asistencia')
       .select('status, check_in, check_out')
       .gte('created_at', `${today}T00:00:00`)
       .lte('created_at', `${today}T23:59:59`),
@@ -357,7 +357,7 @@ async function toolProximasEntregas(): Promise<ToolResult> {
     .from('ordenes_trabajo')
     .select('order_number, status, progress, delivery_date, due_date, project_id')
     .in('status', ['in_progress', 'pending'])
-    .order('created_at')
+    .order('fecha_creacion')
     .limit(20);
 
   const { data: projects } = await supabase.from('engineering_projects').select('id, title');
@@ -408,7 +408,7 @@ async function toolReporteFaltasHoy(): Promise<ToolResult> {
   const today = new Date().toISOString().split('T')[0];
 
   const { data: records } = await supabase
-    .from('attendance_records')
+    .from('asistencia')
     .select('employee_id, status, check_in, check_out, employee_name')
     .gte('created_at', `${today}T00:00:00`)
     .lte('created_at', `${today}T23:59:59`);

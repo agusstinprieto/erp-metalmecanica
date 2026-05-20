@@ -26,21 +26,29 @@ async function run() {
     const tableNames = res.rows.map(r => r.table_name);
     console.log('Tables found:', tableNames.join(', '));
 
-    const checkTables = ['payrolls', 'nominas', 'work_orders', 'ordenes_trabajo', 'employees', 'empleados'];
+    const checkTables = ['payrolls', 'nominas', 'work_orders', 'ordenes_trabajo', 'employees', 'empleados', 'engineering_projects'];
     for (const t of checkTables) {
       const exists = tableNames.includes(t);
       console.log(`- ${t}: ${exists ? '✅ EXISTS' : '❌ NOT FOUND'}`);
       if (exists) {
         // Query some details
         const columnsRes = await client.query(`
-          SELECT column_name, data_type 
+          SELECT column_name, data_type, is_nullable 
           FROM information_schema.columns 
           WHERE table_schema = 'public' AND table_name = $1;
         `, [t]);
-        const cols = columnsRes.rows.map(c => `${c.column_name} (${c.data_type})`).join(', ');
+        const cols = columnsRes.rows.map(c => `${c.column_name} (${c.data_type}, nullable=${c.is_nullable})`).join(', ');
         console.log(`  Columns: ${cols}`);
       }
     }
+
+    console.log('\n--- SAMPLE ROWS ordenes_trabajo ---');
+    const otRes = await client.query('SELECT * FROM ordenes_trabajo LIMIT 5;');
+    console.log(otRes.rows);
+
+    console.log('\n--- SAMPLE ROWS engineering_projects ---');
+    const epRes = await client.query('SELECT * FROM engineering_projects LIMIT 5;');
+    console.log(epRes.rows);
 
     await client.end();
   } catch (err) {

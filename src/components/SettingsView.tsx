@@ -95,7 +95,7 @@ interface Tarifa {
   id: string; concepto_key: string; etiqueta: string; unidad: string; precio_unitario: number; updated_at?: string;
 }
 
-const TarifasTab: React.FC = () => {
+export const TarifasTab: React.FC = () => {
   const [tarifas, setTarifas]     = useState<Tarifa[]>([]);
   const [loading, setLoading]     = useState(true);
   const [saving, setSaving]       = useState<string | null>(null);
@@ -1311,7 +1311,7 @@ const AITokenUsageDashboard: React.FC<{ tenantId: string }> = ({ tenantId }) => 
 export const SettingsView: React.FC<SettingsViewProps> = ({ userRole }) => {
   const { language, t } = useLanguage();
   const isPrivileged = userRole === 'ceo' || userRole === 'sistemas';
-  const [activeTab, setActiveTab] = useState<'users' | 'audit' | 'api' | 'tarifas' | 'brand' | 'security' | 'knowledge' | 'shifts' | 'plantas' | 'politicas'>(isPrivileged ? 'users' : 'security');
+  const [activeTab, setActiveTab] = useState<'users' | 'audit' | 'api' | 'brand' | 'security' | 'knowledge' | 'shifts' | 'plantas' | 'politicas'>(isPrivileged ? 'users' : 'security');
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [users, setUsers] = useState<UserConfig[]>([]);
@@ -1603,7 +1603,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ userRole }) => {
             isPrivileged && { id: 'users', label: language === 'en' ? 'Users' : 'Usuarios', icon: Users },
             isPrivileged && { id: 'audit', label: language === 'en' ? 'Auditing' : 'Auditoría', icon: History },
             isPrivileged && { id: 'api', label: language === 'en' ? 'AI Engines' : 'Motores IA', icon: Cpu },
-            isPrivileged && { id: 'tarifas', label: language === 'en' ? 'Rates' : 'Tarifas', icon: Zap },
+
             isPrivileged && { id: 'plantas', label: language === 'en' ? 'Plants' : 'Plantas', icon: Factory },
             isPrivileged && { id: 'politicas', label: language === 'en' ? 'Policies' : 'Políticas', icon: FileText },
             isPrivileged && { id: 'shifts', label: language === 'en' ? 'Shifts' : 'Turnos', icon: Clock },
@@ -2181,8 +2181,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ userRole }) => {
             </div>
           </div>
         )}
-
-        {activeTab === 'tarifas' && <TarifasTab />}
 
         {activeTab === 'plantas' && <PlantasTab tenantId={tenantId || ''} />}
 

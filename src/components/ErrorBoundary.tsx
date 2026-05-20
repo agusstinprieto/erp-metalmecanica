@@ -4,6 +4,16 @@ import * as Sentry from '@sentry/react';
 
 interface State { hasError: boolean; error: Error | null; }
 
+function forceCacheBustReload() {
+  try {
+    const url = new URL(window.location.href);
+    url.searchParams.set('t', String(Date.now()));
+    window.location.replace(url.toString());
+  } catch (e) {
+    window.location.reload();
+  }
+}
+
 export class ErrorBoundary extends React.Component<{ children: React.ReactNode }, State> {
   constructor(props: any) {
     super(props);
@@ -28,7 +38,7 @@ export class ErrorBoundary extends React.Component<{ children: React.ReactNode }
       if (!sessionStorage.getItem('erp_chunk_reload')) {
         sessionStorage.setItem('erp_chunk_reload', '1');
         console.warn('[ErrorBoundary] Chunk load failed. Force reloading for new assets...');
-        window.location.reload();
+        forceCacheBustReload();
         return;
       }
       // Second consecutive chunk error — don't loop, fall through to error UI
@@ -49,7 +59,7 @@ export class ErrorBoundary extends React.Component<{ children: React.ReactNode }
             <p className="text-[9px] font-black uppercase tracking-[0.3em] text-red-400 mb-2">Error del Sistema</p>
             <h1 className="text-xl font-black text-white uppercase tracking-tight mb-3">Algo salió mal</h1>
             <p className="text-[11px] text-slate-500 mb-1 leading-relaxed">
-              {this.state.error?.message ?? 'Error inesperado en la aplicación.'}
+              {this.state.error?.message ?? 'Error inesperado en la application.'}
             </p>
             <p className="text-[10px] text-slate-700 mb-8">
               El error ha sido registrado. Contacta soporte si persiste.
@@ -64,7 +74,7 @@ export class ErrorBoundary extends React.Component<{ children: React.ReactNode }
                   if (isChunk) {
                     sessionStorage.removeItem('erp_chunk_reload');
                     sessionStorage.removeItem('__chunk_reload');
-                    window.location.reload();
+                    forceCacheBustReload();
                   } else {
                     this.setState({ hasError: false, error: null });
                   }

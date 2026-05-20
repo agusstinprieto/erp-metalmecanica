@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import { Retrabajo, RetrabajoDispo, RetrabajoStatus } from '../types/viajero';
 
 export interface QualityInspection {
   id: string;
@@ -183,5 +184,113 @@ export const qualityService = {
   async deleteAuditoria(id: string) {
     const { error } = await supabase.from('auditorias_internas').delete().eq('id', id);
     if (error) throw error;
+  },
+
+  // ─── Retrabajos ─────────────────────────────────────────────────────────────
+
+  async getRetrabajosByViajero(viajeroId: string): Promise<Retrabajo[]> {
+    const { data, error } = await supabase
+      .from('retrabajos')
+      .select('*')
+      .eq('viajero_id', viajeroId)
+      .order('numero_intento', { ascending: true });
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getRetrabajosPendientes(): Promise<Retrabajo[]> {
+    const { data, error } = await supabase
+      .from('retrabajos')
+      .select('*')
+      .in('status', ['pendiente', 'en_proceso'])
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  },
+
+  async createRetrabajo(params: {
+    viajero_id: string;
+    descripcion_falla: string;
+    disposicion: RetrabajoDispo;
+    no_conformidad_id?: string;
+    operaciones_repetir?: string[];
+    responsable?: string;
+    costo_estimado?: number;
+    notas?: string;
+  }): Promise<Retrabajo> {
+    // Calcular número de intento automáticamente
+    const { count } = await supabase
+      .from('retrabajos')
+      .select('id', { count: 'exact', head: true })
+      .eq('viajero_id', params.viajero_id);
+
+    const { data, error } = await supabase
+      .from('retrabajos')
+      .insert({
+        ...params,
+        numero_intento: (count ?? 0) + 1,
+        status: 'pendiente' as RetrabajoStatus,
+        costo_estimado: params.costo_estimado ?? 0,
+        tenant_id: 'mcvill',
+      })
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async updateRetrabajo(id: string, updates: Partial<Retrabajo>): Promise<Retrabajo> {
+    const { data, error } = await supabase
+      .from('retrabajos')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async cerrarRetrabajo(id: string, costoReal: number, aprobadoPor: string): Promise<Retrabajo> {
+    const { data, error } = await supabase
+      .from('retrabajos')
+      .update({
+        status: 'completado' as RetrabajoStatus,
+        costo_real: costoReal,
+        aprobado_por: aprobadoPor,
+        fecha_cierre: new Date().toISOString(),
+      })
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async enviarAScrap(id: string, aprobadoPor: string): Promise<Retrabajo> {
+    const { data, error } = await supabase
+      .from('retrabajos')
+      .update({
+        status: 'scrap' as RetrabajoStatus,
+        disposicion: 'scrap' as RetrabajoDispo,
+        aprobado_por: aprobadoPor,
+        fecha_cierre: new Date().toISOString(),
+      })
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  // ─── Vista consolidada de orden ──────────────────────────────────────────────
+
+  async getOrdenResumen(ordenTrabajoId: string) {
+    const { data, error } = await supabase
+      .from('v_orden_viajeros')
+      .select('*')
+      .eq('orden_id', ordenTrabajoId)
+      .single();
+    if (error) throw error;
+    return data;
   },
 };

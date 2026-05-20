@@ -29,7 +29,13 @@ const lz = <T extends object>(fn: () => Promise<{ [k: string]: T }>, key: string
           err?.name === 'ChunkLoadError';
         if (isChunkError && !sessionStorage.getItem('__chunk_reload')) {
           sessionStorage.setItem('__chunk_reload', '1');
-          window.location.reload();
+          try {
+            const url = new URL(window.location.href);
+            url.searchParams.set('t', String(Date.now()));
+            window.location.replace(url.toString());
+          } catch (e) {
+            window.location.reload();
+          }
         }
         throw err;
       })
@@ -87,7 +93,8 @@ const PortadaView = lz(() => import('./components/PortadaView'), 'PortadaView');
 const DeliveryTrackerView = lz(() => import('./components/DeliveryTrackerView'), 'DeliveryTrackerView');
 const LeadTimePredictorView = lz(() => import('./components/LeadTimePredictorView'), 'LeadTimePredictorView');
 const BrandingStudioView = lz(() => import('./components/BrandingStudioView'), 'BrandingStudioView');
-const WhatsAppCenterView = lz(() => import('./components/WhatsAppCenterView'), 'WhatsAppCenterView');
+const WhatsAppCenterView  = lz(() => import('./components/WhatsAppCenterView'),  'WhatsAppCenterView');
+const FlujoProcesosView   = lz(() => import('./components/FlujoProcesosView'),   'FlujoProcesosView');
 
 type UserRole = 'ceo' | 'gerencia' | 'sistemas' | 'empleado' | 'rh' | 'finanzas' | 'contabilidad' | 'supervisor' | 'ingenieria' | 'calidad' | 'operaciones' | 'ventas' | 'compras' | 'almacen' | 'auditoria' | 'soporte' | 'marketing' | 'seguridad';
 
@@ -617,6 +624,7 @@ function App() {
             {activeView === 'lead_time_predictor' && <LeadTimePredictorView />}
             {activeView === 'branding_studio' && <BrandingStudioView />}
             {activeView === 'whatsapp_center' && <WhatsAppCenterView />}
+            {activeView === 'flujo_procesos' && <FlujoProcesosView />}
           </Suspense>
           </div>
         </div>
