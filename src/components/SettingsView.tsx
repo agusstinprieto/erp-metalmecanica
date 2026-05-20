@@ -1529,7 +1529,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ userRole }) => {
   };
 
   const handleEditUser = (user: UserConfig) => {
-    setSelectedUser(user);
+    // UserConfig uses "name" but UserFormModal expects "full_name"
+    setSelectedUser({ ...user, full_name: user.name } as any);
     setIsModalOpen(true);
   };
 
