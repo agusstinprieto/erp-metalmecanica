@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://kfdbgvyeomoewzmhkbsn.supabase.co';
-const serviceRoleKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmZGJndnllb21vZXd6bWhrYnNuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Njc4MjIxOCwiZXhwIjoyMDkyMzU4MjE4fQ.Fiv_FSMBniNAeY26aJAPvxXYQCaNlHnPr88ZaqmJFv4';
-const WORKING_GEMINI_KEY = 'AIzaSyA6sUQG_NhVsNm90E4GPSug5JP2T5Whz9k';
+const supabaseUrl = process.env.SUPABASE_URL || '';
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const WORKING_GEMINI_KEY = process.env.GEMINI_API_KEY || '';
 
 const supabase = createClient(supabaseUrl, serviceRoleKey);
 
