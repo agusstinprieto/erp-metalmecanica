@@ -1845,6 +1845,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ userRole }) => {
               </div>
 
               <div className="space-y-1.5">
+                <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Nombre del Asistente de IA (Chat & Voz)</label>
+                <input type="text" value={config.aiAssistantName || 'Mac'} onChange={(e) => updateConfig({ aiAssistantName: e.target.value })} className="bg-black/40 border border-white/5 rounded-lg w-full px-3 h-9 text-[11px] text-white focus:border-mcvill-accent/50 transition-all" placeholder="Ej. Mac" />
+              </div>
+
+              <div className="space-y-1.5">
                 <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Tema de Color</label>
                 <div className="grid grid-cols-4 gap-3">
                   {([

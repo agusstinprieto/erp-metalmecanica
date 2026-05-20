@@ -348,7 +348,7 @@ export const McVillChat: React.FC<McVillChatProps> = ({
           </div>
           <div>
             <h3 className={`text-base font-black tracking-widest uppercase ${isDark ? 'text-white' : 'text-slate-900'}`}>
-              Control Core <span className="text-mcvill-accent text-xs">v2.5</span>
+              {config.aiAssistantName || 'Control Core'} <span className="text-mcvill-accent text-xs">v2.5</span>
             </h3>
             <div className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
@@ -459,7 +459,7 @@ export const McVillChat: React.FC<McVillChatProps> = ({
               <div className="flex items-center gap-2 mb-2 opacity-50">
                 {msg.role === 'user' ? <User size={10} /> : <Bot size={10} />}
                 <span className="text-[10px] font-black uppercase tracking-[0.2em]">
-                  {msg.role === 'user' ? 'AUTENTICADO' : 'Control CORE'} • {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  {msg.role === 'user' ? 'AUTENTICADO' : (config.aiAssistantName || 'Control CORE')} • {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </span>
               </div>
               <div className="text-sm leading-relaxed whitespace-pre-wrap">

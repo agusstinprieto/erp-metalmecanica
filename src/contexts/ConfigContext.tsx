@@ -45,6 +45,7 @@ interface BrandConfig {
   overtimeStrictAccess?: boolean;
   overtimeServicesLimitTime?: string;
   overtimeRequiredAuthorizers?: string[];
+  aiAssistantName?: string;
 }
 
 interface ConfigContextType {
@@ -99,6 +100,7 @@ const defaultConfig: BrandConfig = {
   overtimeStrictAccess: true,
   overtimeServicesLimitTime: '14:00',
   overtimeRequiredAuthorizers: ['supervisor', 'gerencia', 'operaciones', 'rh', 'administracion'],
+  aiAssistantName: 'Mac',
 };
 
 const THEME_PALETTES: Record<ThemeName, {
@@ -283,6 +285,7 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               overtimeStrictAccess: supabaseConfig.overtimeStrictAccess !== undefined ? supabaseConfig.overtimeStrictAccess : prev.overtimeStrictAccess,
               overtimeServicesLimitTime: supabaseConfig.overtimeServicesLimitTime !== undefined ? supabaseConfig.overtimeServicesLimitTime : prev.overtimeServicesLimitTime,
               overtimeRequiredAuthorizers: supabaseConfig.overtimeRequiredAuthorizers !== undefined ? supabaseConfig.overtimeRequiredAuthorizers : prev.overtimeRequiredAuthorizers,
+              aiAssistantName: supabaseConfig.ai_assistant_name || prev.aiAssistantName || 'Mac',
             };
             localStorage.setItem('mcvill-config', JSON.stringify(merged));
             return merged;
@@ -351,6 +354,7 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               overtimeStrictAccess: updated.overtimeStrictAccess,
               overtimeServicesLimitTime: updated.overtimeServicesLimitTime,
               overtimeRequiredAuthorizers: updated.overtimeRequiredAuthorizers,
+              ai_assistant_name: updated.aiAssistantName,
             }
           })
           .eq('id', tenant.id);

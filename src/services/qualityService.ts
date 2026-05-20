@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase';
-import { Retrabajo, RetrabajoDispo, RetrabajoStatus } from '../types/viajero';
+import type { Retrabajo, RetrabajoDispo, RetrabajoStatus } from '../types/viajero';
 
 export interface QualityInspection {
   id: string;
