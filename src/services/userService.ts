@@ -50,20 +50,33 @@ export const userService = {
   },
 
   async updateUser(userId: string, updates: Partial<CreateUserParams>) {
-    const { data, error } = await supabase
-      .from('profiles')
-      .update({
-        full_name: updates.full_name,
-        role: updates.role,
-      })
-      .eq('id', userId)
-      .select()
-      .maybeSingle();
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) throw new Error('Se requiere sesión activa.');
 
-    if (error) throw error;
+    // Usa el edge function admin-update-user para actualizar tanto profiles
+    // como auth.users.user_metadata (el update directo a profiles falla por RLS
+    // cuando el admin edita otro usuario, y maybeSingle() no lanza error → falso éxito)
+    const response = await fetch(
+      `${supabaseUrl}/functions/v1/admin-update-user`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          userId,
+          full_name: updates.full_name,
+          role: updates.role,
+        }),
+      },
+    );
+
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'Error al actualizar usuario');
 
     await auditService.log('UPDATE_USER', 'auth', userId, { role: updates.role });
-    return data;
+    return result;
   },
 
   async deleteUser(userId: string) {
